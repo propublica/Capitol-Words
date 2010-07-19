@@ -1,0 +1,13 @@
+The files in here are simple graphviz files. They are meant to (loosely) give a
+sense of the 'grammar' of the files to be parsed for each of the Senate, the
+House, and the Extensions of Remarks. Following these diagrams is unlikely to
+be a bulletproof guarantee but its a pretty good reference. 
+
+The graphviz (.gv) files should already be compiled into images, but if not you
+can generate the compiled output like so:
+
+dot -Tpng senate.gv -o senate.png
+
+where -T specifies the output format (here specified as png), senate.gv is the
+input file, and -o is the switch to specify the outpul file (here given as
+senate.png)
