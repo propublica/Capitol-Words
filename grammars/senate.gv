@@ -1,30 +1,41 @@
 digraph senate {
+
     size="50,40";
     node [style=filled fillcolor="lightpink" fontsize=12 fontname="Verdana"];
+   
+    "Title" [style=filled fillcolor=lightblue fontsize=24]; 
+    "APPOINTMENT OF ACTING PRESIDENT PRO TEMPORE" [style=filled fillcolor=bisque2];
+    "RECOGNITION OF THE MAJORITY LEADER" [style=filled fillcolor=bisque2];  
+    "SCHEDULE" [style=filled fillcolor=bisque2]; 
+    "RESERVATION OF LEADER TIME" [style=filled fillcolor=bisque2]; 
+    "MORNING BUSINESS" [style=filled fillcolor=bisque2];
+    "MORNING BUSINESS" [style=filled fillcolor=bisque2]; 
+    "content" [style=filled fillcolor=bisque2];
+
     "Senate Document" -> "preamble";
     "preamble" -> "volume";
     "volume" -> "number";
     "number" -> "date";
     "date" -> "chamber";
     "chamber" -> "pages";
-    "pages" -> "title";
+    "pages" -> "Title";
 
-    "title" [style=filled fillcolor=lightblue fontsize=24];
+    "Title" -> "opening business";
+    "Title" -> "closing business";
+    "Title" -> "content";
+    "Title" -> "other business";
 
-    "title" -> "REPORTS OF COMMITTEES"; 
-    "title" -> "INTRODUCTION OF BILLS AND JOINT RESOLUTIONS";
-    "title" -> "ADDITIONAL COSPONSORS"; 
-    "title" -> "STATEMENTS ON INTRODUCED BILLS AND JOINT RESOLUTIONS"; 
-    "title" -> "AUTHORITY FOR COMMITTEES TO MEET"; 
-    "title" -> "DISCHARGED NOMINATION"; 
-    "title" -> "CONFIRMATIONS"; 
-    "title" -> "prayer"; 
-    "title" -> "Senate"; 
-    "title" -> "PLEDGE OF ALLEGIANCE"; 
-    "title" -> "APPOINTMENT OF ACTING PRESIDENT PRO TEMPORE"; 
-    "title" -> "TOPIC";
+    "opening business" -> "Senate"; 
+    "opening business" -> "prayer"; 
+    "opening business" -> "PLEDGE OF ALLEGIANCE"; 
+    "opening business" -> "APPOINTMENT OF ACTING PRESIDENT PRO TEMPORE";
+    "opening business" -> "RECOGNITION OF THE MAJORITY LEADER";
+    "opening business" -> "SCHEDULE";
+    "opening business" -> "RESERVATION OF LEADER TIME" 
+    "opening business" -> "MORNING BUSINESS";
 
-    "TOPIC"  -> "newspeaker";
+
+    "content"  -> "newspeaker";
     
     "newspeaker" -> "speaking";
     "speaking" -> "speaking";
@@ -55,4 +66,16 @@ digraph senate {
     "pagebreak" -> "quote";
     "pagebreak" -> "speaking";
 
+    "other business" -> "MESSAGE FROM THE HOUSE";
+    "other business" -> "MEASURES REFERRED";
+    "other business" -> "EXECUTIVE AND OTHER COMMUNICATIONS";
+
+
+    "closing business" -> "REPORTS OF COMMITTEES"; 
+    "closing business" -> "INTRODUCTION OF BILLS AND JOINT RESOLUTIONS";
+    "closing business" -> "ADDITIONAL COSPONSORS"; 
+    "closing business" -> "STATEMENTS ON INTRODUCED BILLS AND JOINT RESOLUTIONS"; 
+    "closing business" -> "AUTHORITY FOR COMMITTEES TO MEET"; 
+    "closing business" -> "DISCHARGED NOMINATION"; 
+    "closing business" -> "CONFIRMATIONS"; 
 }
