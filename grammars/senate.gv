@@ -1,0 +1,58 @@
+digraph senate {
+    size="50,40";
+    node [style=filled fillcolor="lightpink" fontsize=12 fontname="Verdana"];
+    "Senate Document" -> "preamble";
+    "preamble" -> "volume";
+    "volume" -> "number";
+    "number" -> "date";
+    "date" -> "chamber";
+    "chamber" -> "pages";
+    "pages" -> "title";
+
+    "title" [style=filled fillcolor=lightblue fontsize=24];
+
+    "title" -> "REPORTS OF COMMITTEES"; 
+    "title" -> "INTRODUCTION OF BILLS AND JOINT RESOLUTIONS";
+    "title" -> "ADDITIONAL COSPONSORS"; 
+    "title" -> "STATEMENTS ON INTRODUCED BILLS AND JOINT RESOLUTIONS"; 
+    "title" -> "AUTHORITY FOR COMMITTEES TO MEET"; 
+    "title" -> "DISCHARGED NOMINATION"; 
+    "title" -> "CONFIRMATIONS"; 
+    "title" -> "prayer"; 
+    "title" -> "Senate"; 
+    "title" -> "PLEDGE OF ALLEGIANCE"; 
+    "title" -> "APPOINTMENT OF ACTING PRESIDENT PRO TEMPORE"; 
+    "title" -> "TOPIC";
+
+    "TOPIC"  -> "newspeaker";
+    
+    "newspeaker" -> "speaking";
+    "speaking" -> "speaking";
+    "speaking" -> "quote";
+    "speaking" -> "quotetitle";
+    "speaking" -> "pagebreak";
+    "speaking" -> "subheading" 
+    "speaking" -> "recorder comment";
+    "speaking" -> "shortquote";
+    "speaking" -> "footer";    
+    "speaking" -> "newspeaker";
+
+    "shortquote" -> "speaking";
+
+    "recorder comment" -> "speaking";
+    "recorder comment" -> "newspeaker";
+    "recorder comment" -> "pagebreak";
+    "recorder comment" -> "quote";
+    
+    "subheading" -> "speaking";
+    "subheading" -> "newspeaker";
+
+    "quote"   -> "pagebreak";
+    "quote" -> "quote";
+    
+    "quotetitle" -> "quote";
+
+    "pagebreak" -> "quote";
+    "pagebreak" -> "speaking";
+
+}
