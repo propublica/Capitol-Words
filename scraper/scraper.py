@@ -1,12 +1,12 @@
 #!/usr/bin/python
 
 import urllib, urllib2, os, datetime, re, sys, httplib, zipfile
+from settings import *
 try:
     import json
 except:
     import simplejson as json
 
-CWOD_DIR = '/tmp/cr'
     
 class CRScraper(object):
     def __init__(self):
@@ -37,15 +37,17 @@ class CRScraper(object):
             return True
 
     def retrieve(self):
-        # check to see if we have the zipfile already
+        tmpfile = os.path.join(TMP_DIR, "CREC-%s.zip" % self.datestring)
 
-        # save the zipfile
-#        zip = urllib.urlopen('http://' + self.domain + self.url)
-        tmpfile = "/tmp/CREC-%s.zip" % self.datestring
-#        tmp = open(tmpfile, 'w')
-#        print 'retrieving zip file %s. this could take a few mins...' % tmpfile
-#        tmp.write(zip.read())
-#        tmp.close()
+        # download the zipfile if we don't already have it. 
+        # XXX TODO should check the size of the zipfile to make sure it's correct. 
+        if not os.path.exists(tmpfile):
+            zip = urllib.urlopen('http://' + self.domain + self.url)
+            tmp = open(tmpfile, 'w')
+            print 'retrieving zip file %s. this could take a few mins...' % tmpfile
+            tmp.write(zip.read())
+            tmp.close()
+        else: print '%s exists. skipping download' % tmpfile
 
         # prepare the directory to copy the zipped files into
         save_path = os.path.join(CWOD_DIR, 'raw/%d/%d/%d/' % (self.date.year, self.date.month, self.date.day))
@@ -58,14 +60,21 @@ class CRScraper(object):
         html_files = [doc for doc in zip.namelist() if doc.endswith('.htm')]   
         for f in html_files:
             doc = zip.read(f)
-            # re.DOTALL is important - it tells 'dot' (.) to match newline character.
-            findraw = re.compile(r'<body><pre>(?P<raw>.*)</pre></body>', re.DOTALL)
-            raw = findraw.search(doc).group('raw')
             filename = os.path.basename(f).split('.')[0]+'.txt'
             saveas = os.path.join(save_path, filename)
-            out = open(saveas, 'w')
-            out.write(raw)
-            out.close()
+            if not os.path.exists(saveas):
+                # re.DOTALL is important - it tells 'dot' (.) to match newline character.
+                findraw = re.compile(r'<body><pre>(?P<raw>.*)</pre></body>', re.DOTALL)
+                try:
+                    raw = findraw.search(doc).group('raw')
+                    out = open(saveas, 'w')
+                    out.write(raw)
+                    out.close()
+                    print 'saving %s...' % saveas
+                except BaseException, e:
+                    print 'Problem downloading file %s. Error:' % saveas
+                    print e
+            else: print 'file %s already exists. skipping.' % saveas
 
         # delete tmfile
         os.remove(tmpfile)
