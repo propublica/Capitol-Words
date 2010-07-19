@@ -17,6 +17,7 @@ class CRScraper(object):
         self.date = None
         self.datestring = None
         self.url = None
+        self.zipsize = None
 
     def set_date(self, date):
         ''' given a date object, retrieve the documents for that given date and
@@ -32,16 +33,18 @@ class CRScraper(object):
         resp = conn.getresponse()
         content_type = resp.getheader('content-type')
         if content_type != 'application/zip':
+            print 'Congress was not in session on %s' % self.datestring
             return False
         else: 
+            self.zipsize = resp.getheader('content-length')
             return True
 
     def retrieve(self):
         tmpfile = os.path.join(TMP_DIR, "CREC-%s.zip" % self.datestring)
 
         # download the zipfile if we don't already have it. 
-        # XXX TODO should check the size of the zipfile to make sure it's correct. 
-        if not os.path.exists(tmpfile):
+        rightsize = lambda tmfile: os.path.getsize(tmpfile) == self.zipsize
+        if not os.path.exists(tmpfile) or not rightsize:
             zip = urllib.urlopen('http://' + self.domain + self.url)
             tmp = open(tmpfile, 'w')
             print 'retrieving zip file %s. this could take a few mins...' % tmpfile
