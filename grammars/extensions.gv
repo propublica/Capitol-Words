@@ -1,0 +1,25 @@
+digraph extensions {
+    
+    "title" -> "Topic";
+    "title" -> "Personal Explanation";    
+    "title" -> "SENATE COMMITTEE MEETINGS";
+
+    "Topic" -> "separator";
+    "separator" -> "speaker";
+    "separator" -> "extension type";
+    "extension type" -> "speaker";
+    "speaker" -> "fromwhere";
+    "fromwhere" -> "whichhouse";
+    "whichhouse" -> "remarkdate";
+    "remarkdate" -> "newspeaker";
+    "newspeaker" -> "speaking";
+
+    /* typical 'topic' parsing' ... */
+    /*
+        no recorder comments
+        no discussions/change of speaker
+    */
+
+    "speaking" -> "footer";
+
+}
