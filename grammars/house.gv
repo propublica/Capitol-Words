@@ -1,0 +1,115 @@
+digraph house {
+
+    size="50,50";
+    node [style=filled fillcolor="lightpink" fontsize=12 fontname="Verdana"];
+    
+    "House Document" -> "preamble";
+    "preamble" -> "volume";
+    "volume" -> "number";
+    "number" -> "date";
+    "date" -> "chamber";
+    "chamber" -> "pages";
+    "pages" -> "Title";
+    "pages" -> "time";
+    "pages" -> "no title";
+    "time" -> "Title";
+
+    "no title" -> "newspeaker";
+
+    "Title" -> "House of Representatives";
+    "Title" -> "DESIGNATION OF SPEAKER PRO TEMPORE";
+    "Title" -> "MORNING-HOUR DEBATE";
+    "Title" -> "RECESS";
+    "Title" -> "AFTER RECESS";
+    "Title" -> "PRAYER";
+    "Title" -> "THE JOURNAL";
+    "Title" -> "PLEDGE OF ALLEGIANCE";
+    "Title" -> "Topic";
+    "Title" -> "COMMUNICATION FROM THE CLERK OF THE HOUSE";
+    "Title" -> "ANNOUNCEMENT BY THE SPEAKER PRO TEMPORE";
+    "Title" -> "LEAVE OF ABSENCE";
+    "Title" -> "SPECIAL ORDERS GRANTED";
+    "Title" -> "BILLS PRESENTED TO THE PRESIDENT";
+    "Title" -> "EXECUTIVE COMMUNICATIONS, ETC.";
+    "Title" -> "REPORTS OF COMMITTEES ON PUBLIC BILLS AND RESOLUTIONS";
+    "Title" -> "PUBLIC BILLS AND RESOLUTIONS";
+    "Title" -> "MEMORIALS";
+    "Title" -> "ADDITIONAL SPONSORS";
+    "Title" -> "DISCHARGE PETITIONS";
+
+    "Topic" -> "newspeaker";
+    "Topic" -> "recorder comment";
+    "recorder comment" -> "newspeaker";
+    "newspeaker" -> "speaking";
+    "speaking" -> "speaking";
+    "speaking" -> "newspeaker";
+    "speaking" -> "pagebreak";
+    "speaking" -> "subheading" 
+    "speaking" -> "recorder comment";
+    "speaking" -> "quote";
+    "speaking" -> "shortquote";
+    "speaking" -> "quotetitle";
+    "speaking" -> "time";
+    "speaking" -> "footer";    
+    "speaking" -> "vote";
+    "vote" -> "yeas";
+    "vote" -> "nays";
+    "vote" -> "not voting";
+    "vote" -> "roll no.";
+    "vote" -> "yeaslist";
+    "yeaslist" -> "pagebreak";
+    "yeaslist" -> "novotelist";
+    "yeaslist" -> "nayslist";
+    "nayslist" -> "pagebreak";
+    "pagebreak" -> "nayslist";
+    "nayslist" -> "novotelist";
+    "nayslist" -> "time";
+    "nayslist" -> "subheading";
+    "pagebreak" -> "yeaslist";
+    "pagebreak" -> "novotelist";
+    "pagebreak" -> "yeaslist";
+    "novotelist" -> "time";
+    "novotelist" -> "subheading";
+    "time" -> "recorder comment";
+    "recorder comment" -> "recorder comment";
+    "quotetitle" -> "quote";
+    "quote" -> "speaking";
+    "quote" -> "pagebreak";
+    "quote" -> "quote";
+    "quote" -> "newspeaker";
+    "pagebreak" -> "speaking";
+    "pagebreak" -> "quote";
+    "pagebreak" -> "time";
+    "shortquote" -> "speaking";
+    "shortquote" -> "pagebreak";
+    "shortquote" -> "shortquote";
+    "shortquote" -> "newspeaker";
+    "pagebreak" -> "shortquote";
+    "subheading" -> "speaking";
+    "subheading" -> "newspeaker";
+    "recorder comment" -> "speaking";
+    "recorder comment" -> "newspeaker";
+    "recorder comment" -> "pagebreak";
+    "recorder comment" -> "quote";
+    "time" -> "speaking";
+    "time" -> "newspeaker";
+    "time" -> "recorder comment";
+    "time" -> "subheading";
+
+    "recorder comment" -> "The question was taken.";
+    "recorder comment" -> "The yeas and nays were ordered.";
+    "recorder comment" -> "The Clerk read the title of the resolution.";
+    "recorder comment" -> "The text of the resolution is as follows:";
+    "recorder comment" -> "There was no objection.";
+    "recorder comment" -> "...changed their vote from..."; //vote
+    "recorder comment" -> "^So... the rules were...and the resolution was..."; //vote
+    "recorder comment" -> "The result of the vote was announced as above recorded."
+    "recorder comment" -> "A motion to reconsider was laid on the table.";
+    "recorder comment" -> "(<name> addressed the House. <gender> remarks will appear hereafter in the Extensions of Remarks.)";
+    "recorder comment" -> "(<name> asked and was given permission to address the House for <time> ... )";
+    "recorder comment" -> "^The motion was agreed to; accordingly...";
+
+    "MORNING-HOUR DEBATE" -> "newspeaker";
+    "newspeaker" -> "speaking";
+
+}
