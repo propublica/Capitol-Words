@@ -2,13 +2,7 @@
 
 ''' Parse the plain text version of congressional record documents and mark them up with xml.'''
 
-# date
-# speaker
-# bill number
-# 
-
 import re, datetime, os
-
 
 class Regex(object):
 
@@ -18,36 +12,42 @@ class Regex(object):
         self.opentags = []
         self.closetags = []
 
-    def insert_before(self, re_string, tag):
-        # start tags are inserted at the start of a regex match
-        self.opentags.append((re_string, tag))
+    def insert_before(self, re_string, tag, group=None):
+        # start tags are inserted at the start of a regex match. if group is
+        # specified, matched at the beginning of the group instead. 
+        self.opentags.append((re_string, tag, group))
     
-    def insert_after(self, re_string, tag):
-        # start tags are inserted at the start of a regex match
-        self.closetags.append((re_string, tag))
+    def insert_after(self, re_string, tag, group=None):
+        # start tags are inserted at the start of a regex match. if group is
+        # specified, matched at the end of the group instead. 
+        self.closetags.append((re_string, tag, group))
 
 
     def apply(self):
         indexes = {}
         # identify where all the opening tags go (those that get inserted at
         # the start of the regex match)
-        for regex, tag in self.opentags:
+        for regex, tag, group in self.opentags:
             matchobj = re.search(regex, self.string)
-            if matchobj:
-                start = matchobj.start()
+            if matchobj: 
+                if group:
+                    start = matchobj.start(group)
+                else:
+                    start = matchobj.start()
                 indexes[start] = tag
         # identify where all the closing tags go (those that get inserted at
         # the end of the regex match)
-        for regex, tag in self.closetags:
+        for regex, tag, group in self.closetags:
             matchobj = re.search(regex, self.string)
             if matchobj:
-                end = matchobj.end()
+                if group:
+                    end = matchobj.end(group)
+                else:
+                    end = matchobj.end()
                 indexes[end] = tag
-        print indexes
-        print ''
 
         # we need to split the string into substrings between each pair of
-        # sorted indices, eg. at index_n and index_n+1. a substring is also needed
+        # (sorted) indices, eg. at index_n and index_n+1. a substring is also needed
         # from the beginning of the string to the first split index, and from
         # the last split index to the end of the string.  
         l = indexes.keys()
@@ -58,43 +58,42 @@ class Regex(object):
         print pairs
         print ''
         
-        # make sure we don't duplicate any xml insertions. 
+        output = []
+        # make sure we don't duplicate any insertions. 
         already_matched = []
-        
-        xml = []
         for start, stop in pairs:
-            print start, stop
             substr = self.string[start:stop]
             # is there a tag that goes here?
             if start in indexes.keys() and start not in already_matched:
-                print 'adding start'
-                xml.append(indexes[start])
-                xml.append(substr)
+                output.append(substr)
                 already_matched.append(start)
             elif stop in indexes.keys() and stop not in already_matched:
-                print 'adding stop'
-                print stop
-                print indexes[stop]
-                xml.append(substr)
-                xml.append(indexes[stop])
+                output.append(substr)
+                output.append(indexes[stop])
                 already_matched.append(stop)
             else:
-                xml.append(substr)
-                print 'nothing was added'
-            print 'xml is now:'
-            print xml
-        # now join the pieces of the xml string back together
-        xmlstring = ''.join(xml)
-        return xmlstring
+                output.append(substr)
+#           print 'output is now:'
+#           print output
+        # now join the pieces of the output string back together
+        outputstring = ''.join(output)
+        return outputstring
 
 class XMLAnnotator(object):
     def __init__(self, string):
         self.regx = Regex(string)
 
-    def register_tag(self, re_string, open_tag):
+    def register_tag(self, re_string, open_tag, group=None):
+        ''' Registers an XML tag to be inserted around a matching regular
+        expression. The closing tag is derived from the opening tag. This
+        function only registers the tags and their associated regex; apply()
+        must be run before the tags are inserted. If group is specified, then
+        the the tag is inserted around the matching group instead of the entire
+        regular expression. ''' 
+
         close_tag = self.derive_close_tag(open_tag)
-        self.regx.insert_before(re_string, open_tag)
-        self.regx.insert_after(re_string, close_tag)
+        self.regx.insert_before(re_string, open_tag, group)
+        self.regx.insert_after(re_string, close_tag, group)
 
     def derive_close_tag(self, open_tag):
         space = open_tag.find(' ')
@@ -109,6 +108,13 @@ class XMLAnnotator(object):
 
 
 class SenateParser(object):
+    re_volume =     r'(?<=Volume )\d+'
+    re_number =     r'(?<=Number )\d+'
+    re_weekday =    r'Number \d+ \((?P<weekday>[A-Za-z]+)'
+    re_month =      r'\([A-Za-z], (?P=<month>[a-zA-Z]+)'
+#    re_day =        r'(?<=\([A-Za-z], [a-zA-Z]+ )\d{1,2}'
+#    re_year =       r'(?<=\([A-Za-z], [a-zA-Z]+ \d{1,2}, )\d{4}'
+
     def __init__(self, fp):
         self.rawlines = fp.readlines()
         self.currentline = 0
@@ -116,34 +122,40 @@ class SenateParser(object):
         self.speaker = None
         self.inquote = False
         self.inpara = False
-        self.xml = ""
+        self.xml = []
 
     def parse(self):
         ''' parses a raw senate document and returns the same document marked up with XML '''
 
         # preable text is always in the same place and same format. 
-        self.markup_volume()
-        self.markup_number()
-        self.markup_date()
-        self.markup_chamber()
-        self.markup_pages()
+        self.markup_preamble()
         self.markup_title()
         
+    def markup_preamble(self):
+        theline = self.rawlines[1]
+        annotator = XMLAnnotator(theline)
+        annotator.register_tag(self.re_volume, '<volume>')
+        annotator.register_tag(self.re_number, '<number>')
+        annotator.register_tag(self.re_weekday, '<weekday>', group='weekday')
+
+        xml_line = annotator.apply()
+        print xml_line
+        self.xml.append(xml_line)
+        return
+
+    def markup_title(self):
+        pass
 
 if __name__ == '__main__':
-    line = '[Congressional Record Volume 156, Number 95 (Wednesday, June 23, 2010)]'
-    regx = Regex(line)
-    re_volume = r'(?<=Volume )\d+'
-    re_number = r'(?<=Number )\d+'
-    re_weekday = r'(?<=Number \d+ \()[A-Za-z]+'
-    re_month = ''
-    re_day = ''
-    re_year = ''
-    regx.insert_before(re_volume, '<volume>')
-    regx.insert_after(re_volume, '</volume>')
-    regx.insert_before(re_number, '<number>')
-    regx.insert_after(re_number, '</number>')
-    xml = regx.apply()
-    print 'result was:'
-    print xml
+
+    wd = '/tmp/cr/raw/2010/5/12/'
+    for file in os.listdir(wd):
+        resp = raw_input("process file %s? (y/n) " % file)
+        if resp == 'y':
+            fp = open(os.path.join(wd, file))
+            senate = SenateParser(fp)
+            senate.parse()
+        else: print 'skipping\n'
+
+
 
