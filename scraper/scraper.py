@@ -104,4 +104,8 @@ class ScraperManager(object):
         # update info about days (have, missing, DNE)
         pass
 
+if __name__ == '__main__':
+    datestring = raw_input("input date to retrieve dd/mm/yyyy: ")
+    dt = datetime.datetime.strptime(datestring, "%d/%m/%Y")
+    CRScraper().retrieve_by_date(dt)
 
