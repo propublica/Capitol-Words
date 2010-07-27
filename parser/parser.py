@@ -113,7 +113,10 @@ class XMLAnnotator(object):
         return self.regx.apply()
 
 
-class SenateParser(object):
+class CRParser(object):
+    ''' Parser functionality and regular expressions common to all
+    congressional record documents'''
+
     re_volume =             r'(?<=Volume )\d+'
     re_number =             r'(?<=Number )\d+'
     re_weekday =            r'Number \d+ \((?P<weekday>[A-Za-z]+)'
@@ -127,23 +130,69 @@ class SenateParser(object):
     re_newpage = r'\[\[Page \w+\]\]'
     re_underscore = r'\s+_+\s+'
 
+    def spaces_indented(self, theline):
+        ''' returns the number of spaces by which the line is indented. '''
+        re_textstart = r'\S'
+        return re.search(re_textstart, theline).start()
+        
+
+class SenateParser(CRParser):
+    ''' Parses Senate Documents '''
+
+    # documents with special titles need to be parsed differently than the
+    # topic documents, either because they follow a different format or because
+    # we derive special information from them. 
+    special_titles = {
+        "senate" : "" ,
+        "Senate" : "" ,
+        "prayer" : "",
+        "PLEDGE OF ALLEGIANCE" : "",
+        "APPOINTMENT OF ACTING PRESIDENT PRO TEMPORE" : "",
+        "RECOGNITION OF THE MAJORITY LEADER" : "",
+		"SCHEDULE" : "",
+        "RESERVATION OF LEADER TIME" : "",
+        "MORNING BUSINESS" : "",
+        "MESSAGE FROM THE HOUSE" : "",
+        "MESSAGES FROM THE HOUSE" : "",
+        "MEASURES REFERRED" : "",
+        "EXECUTIVE AND OTHER COMMUNICATIONS" : "",
+        "SUBMITTED RESOLUTIONS" : "",
+        "SENATE RESOLUTION" : "", # this is a special, special title, bc it is a prefix. 
+		"SUBMISSION OF CONCURRENT AND SENATE RESOLUTIONS" : "",
+		"ADDITIONAL COSPONSORS" : "",
+		"ADDITIONAL STATEMENTS" : "",
+		"REPORTS OF COMMITTEES" : "", 
+		"INTRODUCTION OF BILLS AND JOINT RESOLUTIONS" : "",
+		"ADDITIONAL COSPONSORS" : "", 
+		"STATEMENTS ON INTRODUCED BILLS AND JOINT RESOLUTIONS" : "", 
+		"AUTHORITY FOR COMMITTEES TO MEET" : "", 
+		"DISCHARGED NOMINATION" : "", 
+		"CONFIRMATIONS" : "", 
+		"AMENDMENTS SUBMITTED AND PROPOSED" : "",
+		"TEXT OF AMENDMENTS" : "",
+		"MEASURES PLACED ON THE CALENDAR" : "",
+		"EXECUTIVE CALENDAR" : "",
+        "NOTICES OF HEARINGS" : "",
+    }
+
     def __init__(self, fp):
         self.rawlines = fp.readlines()
         self.currentline = 0
         self.date = None
         self.speaker = None
-        self.inpreamble = True
-        self.title_begin = False
-        self.intitle = False
-        self.title_end = False
         self.inquote = False
         self.inpara = False
         self.xml = []
+        #self.inpreamble = True
+        #self.title_begin = False
+        #self.intitle = False
+        #self.title_end = False
 
     def parse(self):
         ''' parses a raw senate document and returns the same document marked
         up with XML '''
         print self.rawlines[:15]
+        print '\n\n'
         self.markup_preamble()
        
         
@@ -199,76 +248,132 @@ class SenateParser(object):
         self.markup_title()
 
     def clean_line(self, theline):
-        ''' strip unwanted parts of documents-- empty lines, page transitions and spacers.'''
+        ''' strip unwanted parts of documents-- page transitions and spacers.'''
         newpage = re.match(self.re_newpage, theline)
         if newpage:
             theline = theline[:newpage.start()]+theline[newpage.end():]
         underscore = re.match(self.re_underscore, theline)
         if underscore:
             theline = theline[:underscore.start()]+theline[underscore.end():]
-        # finally remove any remaining whitespace and return the cleaned line. 
-        theline = theline.strip()
+        # note: dont strip whitespace when cleaning the lines because
+        # whitespace is often the only indicator of the line's purpose or
+        # function. 
         return theline
 
-    def get_line(self):
-        return self.clean_line(self.rawlines[self.currentline])
+    def get_line(self, offset=0):
+        return self.clean_line(self.rawlines[self.currentline+offset])
+
+    def called_to_order(self):
+        print 'not yet implemented'
+        return
+
+    def no_title(self):
+        print 'not yet implemented'
+        return
+
+    def parse_special(self):
+        print 'not yet implemented'
+        return
+
+    def is_special_title(self, title):
+        title = title.strip()
+        if title in self.special_titles.keys():
+            print '{{ title is special }}'
+            return True
+        if re.match('SENATE RESOLUTION ', title):
+            print '{{ title is special }}'
+            return True
+        else: return False
 
     def markup_title(self):
         ''' identify and markup the document title. the title is some lines of
-        text, usually but not always capitalized, centered and followed by a
-        least one empty line. they sometimes have a line of dashes separating
-        them from the body of the document. and sometimes they don't exist at
-        all.'''
+        text, usually but not always capitalized, usually but not always
+        centered, and followed by a least one empty line. they sometimes have a
+        line of dashes separating them from the body of the document. and
+        sometimes they don't exist at all.'''
 
-        # XXX how to identify title-less documents?
-        # XXX make sure multi-line titles work
+        MIN_TITLE_INDENT = 5
 
         # skip line 4; it contains a static reference to the GPO website.  
         self.currentline = 5
-        theline = self.rawlines[self.currentline]
+        theline = self.get_line()
         while not theline.strip():
             self.currentline += 1
-            theline = self.rawlines[self.currentline]
+            theline = self.get_line()
         
-        annotator = XMLAnnotator(theline)
-        annotator.register_tag_start(self.re_title_start, '<title>')
-        self.currentline +=1
-        theline = self.rawlines[self.currentline]
+        # we're going to check what kind of title this is once we're done
+        # parsing it, so keep track of where it starts. since all the special
+        # titles are uniquely specified by their first line, we only need to
+        # track that. 
+        title_startline = theline
 
-        # check if the title finished on the sameline it started on:
-        if not theline.strip():
-            print 'the title is a single line'
-            annotator.register_tag_close(self.re_title_end, '</title>')
-            xml_line = annotator.apply()
-            print xml_line
-            self.xml.append(xml_line)
+        # if it's not a specially formatted title and it's not indented enough,
+        # then it's probably missing a title altogether
+        if self.spaces_indented(theline) < MIN_TITLE_INDENT and not self.is_special_title(theline):
+            self.no_title()
 
         else:
-            # either way we need to apply the tags to the title start. 
-            xml_line = annotator.apply()
-            print xml_line 
-            self.xml.append(xml_line)
-            # now find the title end
-            while theline.strip():
-                self.currentline +=1
-                theline = self.rawlines[self.currentline]
-            # once we hit an empty line, we know the end of the *previous* line
-            # is the end of the title. 
-            theline = self.rawlines[self.currentline-1]
-            annotator - XMLAnnotator()
-            annotator.register_tag_close(self.re_title_end, '</title>')
-            xml_line = annotator.apply()
-            print xml_line
-            self.xml.append(xml_line)
+            # whew, we made it to a regular old title to parse. 
+	        annotator = XMLAnnotator(theline)
+	        annotator.register_tag_start(self.re_title_start, '<title>')
+	        self.currentline +=1
+	        theline = self.get_line()
+	
+	        # check if the title finished on the sameline it started on:
+	        if not theline.strip():
+	            annotator.register_tag_close(self.re_title_end, '</title>')
+	            xml_line = annotator.apply()
+	            print xml_line
+	            self.xml.append(xml_line)
+	
+	        else:
+	            # either way we need to apply the tags to the title start. 
+	            xml_line = annotator.apply()
+	            print xml_line 
+	            self.xml.append(xml_line)
+	            # now find the title end
+	            while theline.strip():
+	                self.currentline +=1
+	                theline = self.get_line()
+	            # once we hit an empty line, we know the end of the *previous* line
+	            # is the end of the title. 
+	            theline = self.get_line(-1) 
+	            annotator = XMLAnnotator(theline)
+	            annotator.register_tag_close(self.re_title_end, '</title>')
+	            xml_line = annotator.apply()
+	            print xml_line
+	            self.xml.append(xml_line)
+	
+        # check for titles with special formatting
+        if self.is_special_title(title_startline):
+            self.parse_special()
 
         # the current line after the title should be empty
-        print self.rawlines[self.currentline]
-        print self.rawlines[self.currentline]
+        print ''
+        print self.rawlines[self.currentline:self.currentline+3]
+
+        # check if this is a special title or a regular topic
+
+        # call the appropriate next function
 
         #self.markup_paragraph()
 
     def markup_paragraph(self):
-        # it's the begining of the paragraph-- is there a new speaker?
+        # it's the begining of the paragraph
+        
+        MIN_LONGQUOTE_INDENT = 7 # ?
+        NEW_PARA_INDENT = 2
+        # new paragraph?
+        # if yes:
+        #       is there a new speaker?
+        #       is this a recorder comment?
+        #       is this the start of a long quote?
+        #       is there a shortquote?
+
+        # if shortquote...
+
+        # if longquote...
+        
         annotator = XMLAnnotator()
         annotator.register_tag(re_newspeaker)
         # multi-line tags keep track of whether or not the tag has been opened
@@ -282,12 +387,19 @@ if __name__ == '__main__':
 
     wd = '/tmp/cr/raw/2010/5/12/'
     for file in os.listdir(wd):
+        # nothing useful in the front matter. 
+        if file.find('FrontMatter') != -1:
+            continue
+        # skip if it's not a senate file, for now. 
+        if file.find('-PgS') == -1:
+            continue
         resp = raw_input("process file %s? (y/n/q) " % file)
         if resp == 'n': 
             print 'skipping\n'
         elif resp == 'q':
             sys.exit()
         else:
+            # senate documents
             fp = open(os.path.join(wd, file))
             senate = SenateParser(fp)
             senate.parse()
