@@ -119,7 +119,10 @@ digraph senate {
     "other business" -> "CONFIRMATIONS"; 
     "other business" -> "AMENDMENTS SUBMITTED AND PROPOSED";
     "other business" -> "TEXT OF AMENDMENTS";
-
+    "other business" -> "MEASURES PLACED ON THE CALENDAR";
+    "other business" -> "EXECUTIVE CALENDAR";
+    "other business" -> "NOTICES OF HEARINGS";
+    "other business" -> "MESSAGES FROM THE HOUSE";
    
     "TEXT OF AMENDMENTS" -> "senate ammendment";
     "senate ammendment" -> "proposer";
@@ -129,4 +132,7 @@ digraph senate {
     "description" -> "instruction";
     "instruction" -> "quoted ammendment";
     
+    "recorder comment" -> "The assistant legislative clerk read as follows:";
+    "recorder comment" -> "The nomination considered and confirmed is as follows:";
+
 }
