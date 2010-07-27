@@ -99,7 +99,7 @@ class XMLAnnotator(object):
         self.regx.insert_before(re_string, open_tag, group)
 
     def register_tag_close(self, re_string, close_tag, group=None):
-        self.regx.insert_before(re_string, close_tag, group)
+        self.regx.insert_after(re_string, close_tag, group)
 
     def derive_close_tag(self, open_tag):
         space = open_tag.find(' ')
@@ -123,7 +123,9 @@ class SenateParser(object):
     re_chamber =            r'(?<=\[)[A-Za-z]+'
     re_pages =              r'Pages? (?P<pages>[\w\-]+)'
     re_title_start =        r'\S+'
-    re_title_end =          r'[\S ]+'
+    re_title_end =          r'.+'
+    re_newpage = r'\[\[Page \w+\]\]'
+    re_underscore = r'\s+_+\s+'
 
     def __init__(self, fp):
         self.rawlines = fp.readlines()
@@ -141,7 +143,7 @@ class SenateParser(object):
     def parse(self):
         ''' parses a raw senate document and returns the same document marked
         up with XML '''
-        print self.rawlines[:10]
+        print self.rawlines[:15]
         self.markup_preamble()
        
         
@@ -164,8 +166,6 @@ class SenateParser(object):
     def markup_preamble(self):
         self.currentline = 1
         theline = self.rawlines[self.currentline]
-        print 'theline:'
-        print theline
         annotator = XMLAnnotator(theline)
         annotator.register_tag(self.re_volume, '<volume>')
         annotator.register_tag(self.re_number, '<number>')
@@ -198,10 +198,30 @@ class SenateParser(object):
         self.xml.append(xml_line)
         self.markup_title()
 
+    def clean_line(self, theline):
+        ''' strip unwanted parts of documents-- empty lines, page transitions and spacers.'''
+        newpage = re.match(self.re_newpage, theline)
+        if newpage:
+            theline = theline[:newpage.start()]+theline[newpage.end():]
+        underscore = re.match(self.re_underscore, theline)
+        if underscore:
+            theline = theline[:underscore.start()]+theline[underscore.end():]
+        # finally remove any remaining whitespace and return the cleaned line. 
+        theline = theline.strip()
+        return theline
+
+    def get_line(self):
+        return self.clean_line(self.rawlines[self.currentline])
+
     def markup_title(self):
         ''' identify and markup the document title. the title is some lines of
         text, usually but not always capitalized, centered and followed by a
-        least one empty line.'''
+        least one empty line. they sometimes have a line of dashes separating
+        them from the body of the document. and sometimes they don't exist at
+        all.'''
+
+        # XXX how to identify title-less documents?
+        # XXX make sure multi-line titles work
 
         # skip line 4; it contains a static reference to the GPO website.  
         self.currentline = 5
@@ -217,6 +237,7 @@ class SenateParser(object):
 
         # check if the title finished on the sameline it started on:
         if not theline.strip():
+            print 'the title is a single line'
             annotator.register_tag_close(self.re_title_end, '</title>')
             xml_line = annotator.apply()
             print xml_line
@@ -239,6 +260,10 @@ class SenateParser(object):
             xml_line = annotator.apply()
             print xml_line
             self.xml.append(xml_line)
+
+        # the current line after the title should be empty
+        print self.rawlines[self.currentline]
+        print self.rawlines[self.currentline]
 
         #self.markup_paragraph()
 
