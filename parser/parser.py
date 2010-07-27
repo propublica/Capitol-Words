@@ -2,7 +2,7 @@
 
 ''' Parse the plain text version of congressional record documents and mark them up with xml.'''
 
-import re, datetime, os
+import re, datetime, os, sys
 
 class Regex(object):
 
@@ -50,34 +50,34 @@ class Regex(object):
         # (sorted) indices, eg. at index_n and index_n+1. a substring is also needed
         # from the beginning of the string to the first split index, and from
         # the last split index to the end of the string.  
-        l = indexes.keys()
-        l.sort() 
-        first_substring = [(0,l[0])] 
-        last_substring = [(l[-1], len(self.string))]
-        pairs = first_substring + [(l[i], l[i+1]) for i in xrange(len(l)-1)] + last_substring
-        print pairs
-        print ''
-        
-        output = []
-        # make sure we don't duplicate any insertions. 
-        already_matched = []
-        for start, stop in pairs:
-            substr = self.string[start:stop]
-            # is there a tag that goes here?
-            if start in indexes.keys() and start not in already_matched:
-                output.append(substr)
-                already_matched.append(start)
-            elif stop in indexes.keys() and stop not in already_matched:
-                output.append(substr)
-                output.append(indexes[stop])
-                already_matched.append(stop)
-            else:
-                output.append(substr)
-#           print 'output is now:'
-#           print output
-        # now join the pieces of the output string back together
-        outputstring = ''.join(output)
-        return outputstring
+        if len(indexes):
+	        l = indexes.keys()
+	        l.sort() 
+	        first_substring = [(0,l[0])] 
+	        last_substring = [(l[-1], len(self.string))]
+	        pairs = first_substring + [(l[i], l[i+1]) for i in xrange(len(l)-1)] + last_substring
+	        
+	        output = []
+	        # make sure we don't duplicate any insertions. 
+	        already_matched = []
+	        for start, stop in pairs:
+	            substr = self.string[start:stop]
+	            # is there a tag that goes here?
+	            if start in indexes.keys() and start not in already_matched:
+	                output.append(substr)
+	                already_matched.append(start)
+	            elif stop in indexes.keys() and stop not in already_matched:
+	                output.append(substr)
+	                output.append(indexes[stop])
+	                already_matched.append(stop)
+	            else:
+	                output.append(substr)
+	        # now join the pieces of the output string back together
+	        outputstring = ''.join(output)
+	        return outputstring
+        else:
+            # if there were no matches, return the string unchanged.
+            return self.string
 
 class XMLAnnotator(object):
     def __init__(self, string):
@@ -95,6 +95,12 @@ class XMLAnnotator(object):
         self.regx.insert_before(re_string, open_tag, group)
         self.regx.insert_after(re_string, close_tag, group)
 
+    def register_tag_start(self, re_string, open_tag, group=None):
+        self.regx.insert_before(re_string, open_tag, group)
+
+    def register_tag_close(self, re_string, close_tag, group=None):
+        self.regx.insert_before(re_string, close_tag, group)
+
     def derive_close_tag(self, open_tag):
         space = open_tag.find(' ')
         if space != -1:
@@ -108,54 +114,157 @@ class XMLAnnotator(object):
 
 
 class SenateParser(object):
-    re_volume =     r'(?<=Volume )\d+'
-    re_number =     r'(?<=Number )\d+'
-    re_weekday =    r'Number \d+ \((?P<weekday>[A-Za-z]+)'
-    re_month =      r'\([A-Za-z], (?P=<month>[a-zA-Z]+)'
-#    re_day =        r'(?<=\([A-Za-z], [a-zA-Z]+ )\d{1,2}'
-#    re_year =       r'(?<=\([A-Za-z], [a-zA-Z]+ \d{1,2}, )\d{4}'
+    re_volume =             r'(?<=Volume )\d+'
+    re_number =             r'(?<=Number )\d+'
+    re_weekday =            r'Number \d+ \((?P<weekday>[A-Za-z]+)'
+    re_month =              r'\([A-Za-z]+, (?P<month>[a-zA-Z]+)'
+    re_day =                r'\([A-Za-z]+, [A-Za-z]+ (?P<day>\d{1,2})'
+    re_year =               r'\([A-Za-z]+, [A-Za-z]+ \d{1,2}, (?P<year>\d{4})'
+    re_chamber =            r'(?<=\[)[A-Za-z]+'
+    re_pages =              r'Pages? (?P<pages>[\w\-]+)'
+    re_title_start =        r'\S+'
+    re_title_end =          r'[\S ]+'
 
     def __init__(self, fp):
         self.rawlines = fp.readlines()
         self.currentline = 0
         self.date = None
         self.speaker = None
+        self.inpreamble = True
+        self.title_begin = False
+        self.intitle = False
+        self.title_end = False
         self.inquote = False
         self.inpara = False
         self.xml = []
 
     def parse(self):
-        ''' parses a raw senate document and returns the same document marked up with XML '''
-
-        # preable text is always in the same place and same format. 
+        ''' parses a raw senate document and returns the same document marked
+        up with XML '''
+        print self.rawlines[:10]
         self.markup_preamble()
-        self.markup_title()
+       
         
+    def nextstate(self, statename=None):
+        '''knows which state transitions are allowed, and which imply or
+        anti-imply which other ones. updates states or throws errors accordingly, and
+        generally ensures sanity reigns. if statename = None, then the next
+        state is implied. '''
+        
+        state_transitions = {
+            'inpreamble'        :       'intitle',
+            'intitle'           :       'topic',
+            'topic'             :       'newspeaker', 
+        }
+
+
+    def getstate(self):
+        pass
+
     def markup_preamble(self):
-        theline = self.rawlines[1]
+        self.currentline = 1
+        theline = self.rawlines[self.currentline]
+        print 'theline:'
+        print theline
         annotator = XMLAnnotator(theline)
         annotator.register_tag(self.re_volume, '<volume>')
         annotator.register_tag(self.re_number, '<number>')
         annotator.register_tag(self.re_weekday, '<weekday>', group='weekday')
-
+        annotator.register_tag(self.re_month, '<month>', group='month')
+        annotator.register_tag(self.re_day, '<day>', group='day')
+        annotator.register_tag(self.re_year, '<year>', group='year')
         xml_line = annotator.apply()
         print xml_line
         self.xml.append(xml_line)
-        return
+        self.markup_chamber()
+
+    def markup_chamber(self):
+        self.currentline = 2
+        theline = self.rawlines[self.currentline]
+        annotator = XMLAnnotator(theline)
+        annotator.register_tag(self.re_chamber, '<chamber>')
+        xml_line = annotator.apply()
+        print xml_line
+        self.xml.append(xml_line)
+        self.markup_pages()    
+        
+    def markup_pages(self):
+        self.currentline = 3
+        theline = self.rawlines[self.currentline]
+        annotator = XMLAnnotator(theline)
+        annotator.register_tag(self.re_pages, '<pages>', group='pages')
+        xml_line = annotator.apply()
+        print xml_line
+        self.xml.append(xml_line)
+        self.markup_title()
 
     def markup_title(self):
-        pass
+        ''' identify and markup the document title. the title is some lines of
+        text, usually but not always capitalized, centered and followed by a
+        least one empty line.'''
+
+        # skip line 4; it contains a static reference to the GPO website.  
+        self.currentline = 5
+        theline = self.rawlines[self.currentline]
+        while not theline.strip():
+            self.currentline += 1
+            theline = self.rawlines[self.currentline]
+        
+        annotator = XMLAnnotator(theline)
+        annotator.register_tag_start(self.re_title_start, '<title>')
+        self.currentline +=1
+        theline = self.rawlines[self.currentline]
+
+        # check if the title finished on the sameline it started on:
+        if not theline.strip():
+            annotator.register_tag_close(self.re_title_end, '</title>')
+            xml_line = annotator.apply()
+            print xml_line
+            self.xml.append(xml_line)
+
+        else:
+            # either way we need to apply the tags to the title start. 
+            xml_line = annotator.apply()
+            print xml_line 
+            self.xml.append(xml_line)
+            # now find the title end
+            while theline.strip():
+                self.currentline +=1
+                theline = self.rawlines[self.currentline]
+            # once we hit an empty line, we know the end of the *previous* line
+            # is the end of the title. 
+            theline = self.rawlines[self.currentline-1]
+            annotator - XMLAnnotator()
+            annotator.register_tag_close(self.re_title_end, '</title>')
+            xml_line = annotator.apply()
+            print xml_line
+            self.xml.append(xml_line)
+
+        #self.markup_paragraph()
+
+    def markup_paragraph(self):
+        # it's the begining of the paragraph-- is there a new speaker?
+        annotator = XMLAnnotator()
+        annotator.register_tag(re_newspeaker)
+        # multi-line tags keep track of whether or not the tag has been opened
+        # before looking for where it might close. 
+        annotator.register_multiline_tag(re_speaking)
+
+
+
 
 if __name__ == '__main__':
 
     wd = '/tmp/cr/raw/2010/5/12/'
     for file in os.listdir(wd):
-        resp = raw_input("process file %s? (y/n) " % file)
-        if resp == 'y':
+        resp = raw_input("process file %s? (y/n/q) " % file)
+        if resp == 'n': 
+            print 'skipping\n'
+        elif resp == 'q':
+            sys.exit()
+        else:
             fp = open(os.path.join(wd, file))
             senate = SenateParser(fp)
             senate.parse()
-        else: print 'skipping\n'
-
 
 
