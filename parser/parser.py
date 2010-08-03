@@ -4,6 +4,8 @@
 
 import re, datetime, os, sys
 
+DEBUG = False
+
 class Regex(object):
 
     def __init__(self, string):
@@ -35,6 +37,7 @@ class Regex(object):
                 else:
                     start = matchobj.start()
                 indexes[start] = tag
+
         # identify where all the closing tags go (those that get inserted at
         # the end of the regex match)
         for regex, tag, group in self.closetags:
@@ -51,30 +54,30 @@ class Regex(object):
         # from the beginning of the string to the first split index, and from
         # the last split index to the end of the string.  
         if len(indexes):
-	        l = indexes.keys()
-	        l.sort() 
-	        first_substring = [(0,l[0])] 
-	        last_substring = [(l[-1], len(self.string))]
-	        pairs = first_substring + [(l[i], l[i+1]) for i in xrange(len(l)-1)] + last_substring
+            l = indexes.keys()
+            l.sort() 
+            first_substring = [(0,l[0])] 
+            last_substring = [(l[-1], len(self.string))]
+            pairs = first_substring + [(l[i], l[i+1]) for i in xrange(len(l)-1)] + last_substring
 	        
-	        output = []
+            output = []
 	        # make sure we don't duplicate any insertions. 
-	        already_matched = []
-	        for start, stop in pairs:
-	            substr = self.string[start:stop]
-	            # is there a tag that goes here?
-	            if start in indexes.keys() and start not in already_matched:
-	                output.append(substr)
-	                already_matched.append(start)
-	            elif stop in indexes.keys() and stop not in already_matched:
-	                output.append(substr)
-	                output.append(indexes[stop])
-	                already_matched.append(stop)
-	            else:
+            already_matched = []
+            for start, stop in pairs:
+                substr = self.string[start:stop]
+                # is there a tag that goes here?
+                if start in indexes.keys() and start not in already_matched:
+                    output.append(substr)
+                    already_matched.append(start)
+                elif stop in indexes.keys() and stop not in already_matched:
+                    output.append(substr)
+                    output.append(indexes[stop])
+                    already_matched.append(stop)
+                else:
 	                output.append(substr)
 	        # now join the pieces of the output string back together
 	        outputstring = ''.join(output)
-	        return outputstring
+            return outputstring
         else:
             # if there were no matches, return the string unchanged.
             return self.string
@@ -95,7 +98,7 @@ class XMLAnnotator(object):
         self.regx.insert_before(re_string, open_tag, group)
         self.regx.insert_after(re_string, close_tag, group)
 
-    def register_tag_start(self, re_string, open_tag, group=None):
+    def register_tag_open(self, re_string, open_tag, group=None):
         self.regx.insert_before(re_string, open_tag, group)
 
     def register_tag_close(self, re_string, close_tag, group=None):
@@ -104,7 +107,7 @@ class XMLAnnotator(object):
     def derive_close_tag(self, open_tag):
         space = open_tag.find(' ')
         if space != -1:
-            close_tag = open_tag[1:space]
+            close_tag = '</' + open_tag[1:space] + '>'
         else:
             close_tag = '</' + open_tag[1:]
         return close_tag
@@ -127,8 +130,24 @@ class CRParser(object):
     re_pages =              r'Pages? (?P<pages>[\w\-]+)'
     re_title_start =        r'\S+'
     re_title_end =          r'.+'
-    re_newpage = r'\[\[Page \w+\]\]'
-    re_underscore = r'\s+_+\s+'
+    re_newpage =            r'\[\[Page \w+\]\]'
+    re_underscore =         r'\s+_+\s+'
+    # a new speaker might either be a legislator's name, or a reference to the role of president of presiding officer. 
+    re_newspeaker =         r'^  (?P<name>(((Mr)|(Ms)|(Mrs))\. [A-Z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER))\.'
+
+    # whatever follows the statement of a new speaker marks someone starting to
+    # speak. if it's a new paragraph and there's already a current_speaker,
+    # then this re is also used to insert the <speaking> tag. 
+    re_speaking =           r'^  (((((Mr)|(Ms)|(Mrs))\. [A-Z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER))\. )?(?P<start>.)'
+    re_startshortquote =    r'``'
+    re_endshortquote =      r"''"
+    re_longquotestart =    r' {7,}\w'
+    re_endofline =          r'$'
+    re_recorderstart =      (r'(The assistant legislative clerk read as follows)'
+                             + '|(The nomination considered and confirmed is as follows)'
+                             + ''
+                            )
+    re_recorderend =        re_recorderstart # for now
 
     def spaces_indented(self, theline):
         ''' returns the number of spaces by which the line is indented. '''
@@ -179,14 +198,12 @@ class SenateParser(CRParser):
         self.rawlines = fp.readlines()
         self.currentline = 0
         self.date = None
-        self.speaker = None
+        self.current_speaker = None
         self.inquote = False
-        self.inpara = False
+        self.new_paragraph = False
+        self.recorder = False
+        self.inlongquote = False
         self.xml = []
-        #self.inpreamble = True
-        #self.title_begin = False
-        #self.intitle = False
-        #self.title_end = False
 
     def parse(self):
         ''' parses a raw senate document and returns the same document marked
@@ -261,6 +278,8 @@ class SenateParser(CRParser):
         return theline
 
     def get_line(self, offset=0):
+        if self.currentline+offset > len(self.rawlines)-1:
+            return None
         return self.clean_line(self.rawlines[self.currentline+offset])
 
     def called_to_order(self):
@@ -269,6 +288,9 @@ class SenateParser(CRParser):
 
     def no_title(self):
         print 'not yet implemented'
+        # one of the things to do here is when the acting president is assigned
+        # for the day, make note of who they are so we can assign words spoken
+        # by that role to the correct legislator 
         return
 
     def parse_special(self):
@@ -314,73 +336,201 @@ class SenateParser(CRParser):
 
         else:
             # whew, we made it to a regular old title to parse. 
-	        annotator = XMLAnnotator(theline)
-	        annotator.register_tag_start(self.re_title_start, '<title>')
-	        self.currentline +=1
-	        theline = self.get_line()
+            annotator = XMLAnnotator(theline)
+            annotator.register_tag_open(self.re_title_start, '<title>')
+            self.currentline +=1
+            theline = self.get_line()
+            
+            # check if the title finished on the sameline it started on:
+            if not theline.strip():
+                annotator.register_tag_close(self.re_title_end, '</title>')
+                xml_line = annotator.apply()
+                print xml_line
+                self.xml.append(xml_line)
+
+            else:
+                # either way we need to apply the tags to the title start. 
+                xml_line = annotator.apply()
+                print xml_line 
+                self.xml.append(xml_line)
+                # now find the title end
+                while theline.strip():
+                    self.currentline +=1
+                    theline = self.get_line()
+                # once we hit an empty line, we know the end of the *previous* line
+                # is the end of the title. 
+                theline = self.get_line(-1) 
+                annotator = XMLAnnotator(theline)
+                annotator.register_tag_close(self.re_title_end, '</title>')
+                xml_line = annotator.apply()
+                print xml_line
+                self.xml.append(xml_line)
+
+	        # check for titles with special formatting
+            if self.is_special_title(title_startline):
+                self.parse_special()
+            else:
+                self.markup_paragraph()
 	
-	        # check if the title finished on the sameline it started on:
-	        if not theline.strip():
-	            annotator.register_tag_close(self.re_title_end, '</title>')
-	            xml_line = annotator.apply()
-	            print xml_line
-	            self.xml.append(xml_line)
-	
-	        else:
-	            # either way we need to apply the tags to the title start. 
-	            xml_line = annotator.apply()
-	            print xml_line 
-	            self.xml.append(xml_line)
-	            # now find the title end
-	            while theline.strip():
-	                self.currentline +=1
-	                theline = self.get_line()
-	            # once we hit an empty line, we know the end of the *previous* line
-	            # is the end of the title. 
-	            theline = self.get_line(-1) 
-	            annotator = XMLAnnotator(theline)
-	            annotator.register_tag_close(self.re_title_end, '</title>')
-	            xml_line = annotator.apply()
-	            print xml_line
-	            self.xml.append(xml_line)
-	
-        # check for titles with special formatting
-        if self.is_special_title(title_startline):
-            self.parse_special()
+            # note that as we exit this function, the current line is one PAST
+            # the end of the title, which should be a blank line. 
 
-        # the current line after the title should be empty
-        print ''
-        print self.rawlines[self.currentline:self.currentline+3]
-
-        # check if this is a special title or a regular topic
-
-        # call the appropriate next function
-
-        #self.markup_paragraph()
+    def set_speaker(self, theline):
+        # checks if there is a new speaker, and if so, set the current_speaker
+        # attribute, and returns the name of the new (and now current) speaker.
+        # else leaves the current speaker.  
+        new_speaker = re.search(self.re_newspeaker, theline)
+        if new_speaker:
+            name = new_speaker.group('name')
+            self.current_speaker = name # XXX TODO this should be a unique ID
+        return self.current_speaker
 
     def markup_paragraph(self):
-        # it's the begining of the paragraph
+        ''' this is the standard paragraph parser. handles new speakers,
+        standard recorder comments, long and short quotes, etc. '''
         
         MIN_LONGQUOTE_INDENT = 7 # ?
-        NEW_PARA_INDENT = 2
-        # new paragraph?
-        # if yes:
-        #       is there a new speaker?
-        #       is this a recorder comment?
-        #       is this the start of a long quote?
-        #       is there a shortquote?
 
-        # if shortquote...
+        # get to the first line 
+        theline = self.get_line()
+        while not theline.strip():
+            self.currentline += 1
+            theline = self.get_line()
 
-        # if longquote...
+        #self.currentline +=1
+        #theline = self.get_line()
+        while theline:
+            self.preprocess_state(theline)
+            annotator = XMLAnnotator(theline)
+            # some things only appear on the first line of a paragraph
+            if self.new_paragraph:
+                annotator.register_tag_open(self.re_recorderstart, '<recorder>')
+                annotator.register_tag(self.re_newspeaker, '<speaker name="%s">' % self.current_speaker, group='name')
+                if not self.recorder:
+                    annotator.register_tag_open(self.re_speaking, '<speaking name="%s">' % self.current_speaker, group='start')
+            # some things can appear on any line of a paragraph:
+            annotator.register_tag_open(self.re_startshortquote, '<quote speaker="%s">' % self.current_speaker)
+            # XXX TODO--> insert long quote start and end detection here. 
+            
+            if self.inquote:
+                annotator.register_tag_close(self.re_endshortquote, '</quote>')
+
+            if self.paragraph_ends():
+                if self.recorder:
+                    annotator.register_tag_close(self.re_endofline, '</recorder>')
+                elif self.inlongquote:
+                    annotator.register_tag_close(self.re_endofline, '</quote>')
+                else:
+                    annotator.register_tag_close(self.re_endofline, '</speaking>')
+
+            xml_line = annotator.apply()
+            print xml_line
+            self.xml.append(xml_line)
+
+            # do some post processing
+            self.postprocess_state(theline)
+
+            # get the next line and do it all again
+            self.currentline +=1
+            theline = self.get_line()
+            while theline and not theline.strip():
+                self.currentline += 1
+                theline = self.get_line()
+            if not theline:
+                # end of file
+                print ''.join(self.xml)
+                return
+
+            
+
+    def preprocess_state(self, theline):
+        ''' does some analysis to determine which tags to register, since in
+        certain cases we need to match a state AND a regular expression.'''
+
+        print 'preprocessing...'
+
+        if self.is_new_paragraph(theline):
+            self.new_paragraph = True
+
+            # check if this is a subheading...
+            # if re.search(self.re_subheading, theline):
+            # set speaker to None
+            #   pass
+            
+            # in the case of a long quote, we don't change the current speaker. 
+            if re.search(self.re_longquotestart, theline):
+                self.inlongquote = True
+            else: 
+                # if it's a recorder reading, then make a note that they are
+                # the speaker 
+                if re.search(self.re_recorderstart, theline):
+                    self.recorder = True
+                    self.currentspeaker = None #'Recorder'
+                else:
+                    self.set_speaker(theline)
+
+        else:
+            self.new_paragraph = False
+
+        # if a quote starts we are "in a quote" but we stay in that quote until
+        # we detect it ends. 
+        if re.search(self.re_startshortquote, theline):
+            self.inquote = True
+
+        # debugging..
+        print 'new paragraph? %s' % self.new_paragraph
+        if self.current_speaker:
+            print 'current speaker: ' + self.current_speaker 
+        else:
+            print 'no current speaker'
+        print 'in long quote? %s' % self.recorder
+        print 'in recorder? %s' % self.recorder
+        print 'in quote? %s' % self.inquote
+
+    def postprocess_state(self, theline):
+        ''' in certain cases where a state ends on a line, we only want to note
+        that after the proper tags have been registered and inserted. ''' 
         
-        annotator = XMLAnnotator()
-        annotator.register_tag(re_newspeaker)
-        # multi-line tags keep track of whether or not the tag has been opened
-        # before looking for where it might close. 
-        annotator.register_multiline_tag(re_speaking)
+        if self.inquote and re.search(self.re_endshortquote, theline):
+            self.inquote = False
 
+        if self.recorder and re.search(self.re_recorderend, theline):
+            self.recorder = False
 
+        if self.inlongquote and self.paragraph_ends():
+            self.inlongquote = False
+
+    def paragraph_ends(self):
+        ''' check if the current paragraph ends by looking ahead to what the
+        next non-empty line is. idempotent. '''
+
+        # a paragraph ending is really only indicated by the formatting which
+        # follows it. if a line is followed by a new paragraph, a long section
+        # of quoted text, or a subheading, then we know this must be the end of
+        # athe current paragraph. all of those possibilities are indicated by
+        # the indentation level.  
+
+        offset = 1
+        theline = self.get_line(offset)
+        while theline and not theline.strip():
+            offset += 1
+            theline = self.get_line(offset)
+    
+        # if the document ends here, then it's certainly also the end of the
+        # paragraph
+        if not theline:
+            return True
+        # new para or new long quote?
+        if self.is_new_paragraph(theline):
+            return True
+        return False
+
+    def is_new_paragraph(self, theline):
+        NEW_PARA_INDENT = 2
+        if self.spaces_indented(theline) >= NEW_PARA_INDENT:
+            return True
+        else:
+            return False
 
 
 if __name__ == '__main__':
