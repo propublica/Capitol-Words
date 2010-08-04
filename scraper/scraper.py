@@ -43,7 +43,7 @@ class CRScraper(object):
         tmpfile = os.path.join(TMP_DIR, "CREC-%s.zip" % self.datestring)
 
         # download the zipfile if we don't already have it. 
-        rightsize = lambda tmfile: os.path.getsize(tmpfile) == self.zipsize
+        rightsize = lambda tmpfile: os.path.getsize(tmpfile) == self.zipsize
         if not os.path.exists(tmpfile) or not rightsize:
             zip = urllib.urlopen('http://' + self.domain + self.url)
             tmp = open(tmpfile, 'w')
@@ -52,8 +52,10 @@ class CRScraper(object):
             tmp.close()
         else: print '%s exists. skipping download' % tmpfile
 
-        # prepare the directory to copy the zipped files into
-        save_path = os.path.join(CWOD_DIR, 'raw/%d/%d/%d/' % (self.date.year, self.date.month, self.date.day))
+        # prepare the directory to copy the zipped files into. use strftime
+        # here to ensure day and month directories are always 2 digits. 
+        save_path = os.path.join(CWOD_DIR, 'raw/%d/%s/%s/' % (self.date.year,
+        self.date.strftime("%m"), self.date.strftime("%d")))
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
