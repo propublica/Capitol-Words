@@ -154,6 +154,11 @@ class CRParser(object):
         re_textstart = r'\S'
         return re.search(re_textstart, theline).start()
         
+class HouseParser(CRParser):
+    pass
+
+class ExtensionsParser(CRParser):
+    pass
 
 class SenateParser(CRParser):
     ''' Parses Senate Documents '''
@@ -213,22 +218,6 @@ class SenateParser(CRParser):
         self.markup_preamble()
        
         
-    def nextstate(self, statename=None):
-        '''knows which state transitions are allowed, and which imply or
-        anti-imply which other ones. updates states or throws errors accordingly, and
-        generally ensures sanity reigns. if statename = None, then the next
-        state is implied. '''
-        
-        state_transitions = {
-            'inpreamble'        :       'intitle',
-            'intitle'           :       'topic',
-            'topic'             :       'newspeaker', 
-        }
-
-
-    def getstate(self):
-        pass
-
     def markup_preamble(self):
         self.currentline = 1
         theline = self.rawlines[self.currentline]
@@ -373,7 +362,7 @@ class SenateParser(CRParser):
                 self.markup_paragraph()
 	
             # note that as we exit this function, the current line is one PAST
-            # the end of the title, which should be a blank line. 
+            # the end of the title, which should generally be a blank line. 
 
     def set_speaker(self, theline):
         # checks if there is a new speaker, and if so, set the current_speaker
@@ -441,13 +430,9 @@ class SenateParser(CRParser):
                 print ''.join(self.xml)
                 return
 
-            
-
     def preprocess_state(self, theline):
-        ''' does some analysis to determine which tags to register, since in
-        certain cases we need to match a state AND a regular expression.'''
-
-        print 'preprocessing...'
+        ''' in certain cases we need to match a regular expression AND a state,
+        so do some analysis to determine which tags to register. '''
 
         if self.is_new_paragraph(theline):
             self.new_paragraph = True
@@ -532,26 +517,83 @@ class SenateParser(CRParser):
         else:
             return False
 
+def usage():
+    print 'Usage:'
+    print 'You must pass in a congressional record filename, or specify yyyy/mm/dd [chamber],'
+    print 'where chamber is one of [senate|house|extensions]. eg:'
+    print './parser.py CREC-2010-07-12-pt1-PgS5744-2.txt'
+    print './parser.py 2010/07/02 senate'
+    print ''
+    sys.exit()
 
 if __name__ == '__main__':
 
-    wd = '/tmp/cr/raw/2010/5/12/'
-    for file in os.listdir(wd):
-        # nothing useful in the front matter. 
-        if file.find('FrontMatter') != -1:
-            continue
-        # skip if it's not a senate file, for now. 
-        if file.find('-PgS') == -1:
-            continue
-        resp = raw_input("process file %s? (y/n/q) " % file)
-        if resp == 'n': 
-            print 'skipping\n'
-        elif resp == 'q':
-            sys.exit()
+    # processes a file or entire directory
+    
+    wd = '/tmp/cr/raw'
+    parsers = {
+        'senate':       SenateParser,
+        'house' :       HouseParser,
+        'extensions' :  ExtensionsParser,
+        'S':            SenateParser,
+        'H' :           HouseParser,
+        'E' :           ExtensionsParser,
+     }
+
+    chambers = {
+        'senate':       '-PgS',
+        'house' :       '-PgH',
+        'extensions' :  '-PgE',
+        'S':            '-PgS',
+        'H' :           '-PgH',
+        'E' :           '-PgE',
+    }
+
+    if len(sys.argv) < 2:
+        usage()
+
+    if sys.argv[1].endswith('.txt'):
+        file = sys.argv[1]
+        if file.startswith('/'):
+            print 'opening file %s' % file
+            fp = open(file)
         else:
-            # senate documents
-            fp = open(os.path.join(wd, file))
-            senate = SenateParser(fp)
-            senate.parse()
+            # get date from filename
+            parts = file.split('-')
+            year = parts[1]
+            month = parts[2]
+            day = parts[3]
+            path = os.path.join(wd, '%s/%s/%s/%s' % (year, month, day, file))
+            print 'processing file %s' % path
+            fp = open(path)
+        chamber = re.search(r'-Pg(?P<chamber>E|S|H)', file).group('chamber')
+        chamber_doc = parsers[chamber](fp)
+        chamber_doc.parse()
+
+
+    else:
+        directory = sys.argv[1]
+        path = os.path.join(wd, directory)
+        print path
+        chamber = sys.argv[2].lower()
+        correct_chamber = chambers[chamber]
+
+        if not os.path.exists(path):
+            print 'no records exist for that date. try a different date.'
+            usage()
+
+        for file in os.listdir(path):
+            # nothing useful in the front matter. 
+            if file.find('FrontMatter') != -1 or file.find(correct_chamber) == -1:
+                continue
+            resp = raw_input("process file %s? (y/n/q) " % file)
+            if resp == 'n': 
+                print 'skipping\n'
+            elif resp == 'q':
+                sys.exit()
+            else:
+                fp = open(os.path.join(path, file))
+                chamber_doc = parsers[chamber](fp)
+                chamber_doc.parse()
 
 
