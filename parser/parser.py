@@ -197,9 +197,12 @@ class SenateParser(CRParser):
 		"MEASURES PLACED ON THE CALENDAR" : "",
 		"EXECUTIVE CALENDAR" : "",
         "NOTICES OF HEARINGS" : "",
+        "REPORTS OF COMMITTEES DURING ADJOURNMENT" : "",
     }
 
-    def __init__(self, fp):
+    def __init__(self, abspath):
+        self.filename = abspath
+        fp = open(document)
         self.rawlines = fp.readlines()
         self.currentline = 0
         self.date = None
@@ -386,8 +389,6 @@ class SenateParser(CRParser):
             self.currentline += 1
             theline = self.get_line()
 
-        #self.currentline +=1
-        #theline = self.get_line()
         while theline:
             self.preprocess_state(theline)
             annotator = XMLAnnotator(theline)
@@ -476,6 +477,13 @@ class SenateParser(CRParser):
         ''' in certain cases where a state ends on a line, we only want to note
         that after the proper tags have been registered and inserted. ''' 
         
+        if not self.recorder and not self.current_speaker:
+            # this is a wierd state we shouldn't be in
+            print '!! unrecognized state. exiting.'
+            print self.rawlines
+            sys.exit()
+            #show_errors_and_exit()
+
         if self.inquote and re.search(self.re_endshortquote, theline):
             self.inquote = False
 
@@ -556,18 +564,17 @@ if __name__ == '__main__':
         file = sys.argv[1]
         if file.startswith('/'):
             print 'opening file %s' % file
-            fp = open(file)
+            abspath = file
         else:
             # get date from filename
             parts = file.split('-')
             year = parts[1]
             month = parts[2]
             day = parts[3]
-            path = os.path.join(wd, '%s/%s/%s/%s' % (year, month, day, file))
+            abspath = os.path.join(wd, '%s/%s/%s/%s' % (year, month, day, file))
             print 'processing file %s' % path
-            fp = open(path)
-        chamber = re.search(r'-Pg(?P<chamber>E|S|H)', file).group('chamber')
-        chamber_doc = parsers[chamber](fp)
+        chamber = re.search(r'-Pg(?P<chamber>E|S|H)', abspath).group('chamber')
+        chamber_doc = parsers[chamber](abspath)
         chamber_doc.parse()
 
 
@@ -592,8 +599,8 @@ if __name__ == '__main__':
             elif resp == 'q':
                 sys.exit()
             else:
-                fp = open(os.path.join(path, file))
-                chamber_doc = parsers[chamber](fp)
+                abspath = os.path.join(path, file)
+                chamber_doc = parsers[chamber](abspath)
                 chamber_doc.parse()
 
 
