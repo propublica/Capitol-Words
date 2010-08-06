@@ -6,6 +6,12 @@ import re, datetime, os, sys
 
 DEBUG = False
 
+class UnrecognizedCRDoc(Exception):
+    pass
+
+class AlignmentError(Exception):
+    pass
+
 class Regex(object):
 
     def __init__(self, string):
@@ -54,6 +60,7 @@ class Regex(object):
         # from the beginning of the string to the first split index, and from
         # the last split index to the end of the string.  
         if len(indexes):
+            print indexes
             l = indexes.keys()
             l.sort() 
             first_substring = [(0,l[0])] 
@@ -129,11 +136,12 @@ class CRParser(object):
     re_chamber =            r'(?<=\[)[A-Za-z]+'
     re_pages =              r'Pages? (?P<pages>[\w\-]+)'
     re_title_start =        r'\S+'
+    re_title =              r'\s+(?P<title>(\S ?)+)'
     re_title_end =          r'.+'
     re_newpage =            r'\[\[Page \w+\]\]'
     re_underscore =         r'\s+_+\s+'
     # a new speaker might either be a legislator's name, or a reference to the role of president of presiding officer. 
-    re_newspeaker =         r'^  (?P<name>(((Mr)|(Ms)|(Mrs))\. [A-Z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER))\.'
+    re_newspeaker =         r'^(<bullet> |  )(?P<name>(((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER))\.'
 
     # whatever follows the statement of a new speaker marks someone starting to
     # speak. if it's a new paragraph and there's already a current_speaker,
@@ -141,12 +149,21 @@ class CRParser(object):
     re_speaking =           r'^  (((((Mr)|(Ms)|(Mrs))\. [A-Z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER))\. )?(?P<start>.)'
     re_startshortquote =    r'``'
     re_endshortquote =      r"''"
-    re_longquotestart =    r' {7,}\w'
+    re_longquotestart =    r' {7}(?P<start>.)'
     re_endofline =          r'$'
-    re_recorderstart =      (r'(The assistant legislative clerk read as follows)'
-                             + '|(The nomination considered and confirmed is as follows)'
-                             + ''
-                            )
+
+    # need to fix this - need tomatch on the whole statement including what's after the prefix. 
+    re_recorderstart =      (r'^\s+(?P<start>'
+                             + r'(The assistant legislative clerk read as follows)'
+                             + r'|(The nomination considered and confirmed is as follows)'
+                             + r'|(The (assistant )?legislative clerk)'
+                             + r'|(The nomination was confirmed)'
+                             + r'|(There being no objection, )'
+                             + r'|(The resolution .*?was agreed to.)'
+                             + r'|(The preamble was agreed to.)'
+                             + r'|(The resolution .*?reads as follows)'
+                             #+ r'|()'
+                            + r').*')
     re_recorderend =        re_recorderstart # for now
 
     def spaces_indented(self, theline):
@@ -165,7 +182,8 @@ class SenateParser(CRParser):
 
     # documents with special titles need to be parsed differently than the
     # topic documents, either because they follow a different format or because
-    # we derive special information from them. 
+    # we derive special information from them. in many cases these special
+    # titles are matched as prefixes, not just full text match. 
     special_titles = {
         "senate" : "" ,
         "Senate" : "" ,
@@ -181,13 +199,14 @@ class SenateParser(CRParser):
         "MEASURES REFERRED" : "",
         "EXECUTIVE AND OTHER COMMUNICATIONS" : "",
         "SUBMITTED RESOLUTIONS" : "",
-        "SENATE RESOLUTION" : "", # this is a special, special title, bc it is a prefix. 
+        "SENATE RESOLUTION" : "", 
 		"SUBMISSION OF CONCURRENT AND SENATE RESOLUTIONS" : "",
 		"ADDITIONAL COSPONSORS" : "",
 		"ADDITIONAL STATEMENTS" : "",
 		"REPORTS OF COMMITTEES" : "", 
 		"INTRODUCTION OF BILLS AND JOINT RESOLUTIONS" : "",
 		"ADDITIONAL COSPONSORS" : "", 
+        "INTRODUCTION OF BILLS AND JOINT RESOLUTIONS" : "",
 		"STATEMENTS ON INTRODUCED BILLS AND JOINT RESOLUTIONS" : "", 
 		"AUTHORITY FOR COMMITTEES TO MEET" : "", 
 		"DISCHARGED NOMINATION" : "", 
@@ -198,16 +217,18 @@ class SenateParser(CRParser):
 		"EXECUTIVE CALENDAR" : "",
         "NOTICES OF HEARINGS" : "",
         "REPORTS OF COMMITTEES DURING ADJOURNMENT" : "",
+        "MEASURES DISCHARGED" : "",
     }
 
     def __init__(self, abspath):
         self.filename = abspath
-        fp = open(document)
+        fp = open(abspath)
         self.rawlines = fp.readlines()
         self.currentline = 0
         self.date = None
         self.current_speaker = None
         self.inquote = False
+        self.intitle = False
         self.new_paragraph = False
         self.recorder = False
         self.inlongquote = False
@@ -291,13 +312,12 @@ class SenateParser(CRParser):
 
     def is_special_title(self, title):
         title = title.strip()
-        if title in self.special_titles.keys():
-            print '{{ title is special }}'
-            return True
-        if re.match('SENATE RESOLUTION ', title):
-            print '{{ title is special }}'
-            return True
-        else: return False
+        special_title_prefixes = self.special_titles.keys()
+        for prefix in special_title_prefixes:
+            if re.search(prefix, title):
+                print '{{ title is special }}'
+                return True
+        return False
 
     def markup_title(self):
         ''' identify and markup the document title. the title is some lines of
@@ -392,24 +412,31 @@ class SenateParser(CRParser):
         while theline:
             self.preprocess_state(theline)
             annotator = XMLAnnotator(theline)
+            if self.intitle:
+                annotator.register_tag(self.re_title, '<title>', group='title')
             # some things only appear on the first line of a paragraph
-            if self.new_paragraph:
-                annotator.register_tag_open(self.re_recorderstart, '<recorder>')
+            elif self.new_paragraph:
+                annotator.register_tag_open(self.re_longquotestart, '<quote speaker="%s">' % self.current_speaker, group='start')
+                annotator.register_tag_open(self.re_recorderstart, '<recorder>', 'start')
                 annotator.register_tag(self.re_newspeaker, '<speaker name="%s">' % self.current_speaker, group='name')
-                if not self.recorder:
+                if not self.recorder and not self.inlongquote:
                     annotator.register_tag_open(self.re_speaking, '<speaking name="%s">' % self.current_speaker, group='start')
-            # some things can appear on any line of a paragraph:
-            annotator.register_tag_open(self.re_startshortquote, '<quote speaker="%s">' % self.current_speaker)
-            # XXX TODO--> insert long quote start and end detection here. 
-            
-            if self.inquote:
-                annotator.register_tag_close(self.re_endshortquote, '</quote>')
+
+            if not self.intitle and not self.inlongquote:
+                annotator.register_tag_open(self.re_startshortquote, '<quote speaker="%s">' % self.current_speaker)
+
+            if not self.inlongquote and not self.intitle:
+                if self.inquote:
+                    annotator.register_tag_close(self.re_endshortquote, '</quote>')
 
             if self.paragraph_ends():
                 if self.recorder:
                     annotator.register_tag_close(self.re_endofline, '</recorder>')
                 elif self.inlongquote:
-                    annotator.register_tag_close(self.re_endofline, '</quote>')
+                    if self.longquote_ends():
+                        annotator.register_tag_close(self.re_endofline, '</quote>')
+                elif self.intitle:
+                    pass
                 else:
                     annotator.register_tag_close(self.re_endofline, '</speaking>')
 
@@ -429,7 +456,27 @@ class SenateParser(CRParser):
             if not theline:
                 # end of file
                 print ''.join(self.xml)
+                print self.filename
+                print '\n\n'
                 return
+
+    def longquote_ends(self):
+        # XXX this function is totally repeating patterns used in many other
+        # places... 
+        NEW_PARA_INDENT = 2
+        LONGQUOTE_NEW_PARA_INDENT = 7
+
+        offset = 1
+        theline = self.get_line(offset)
+        while theline and not theline.strip():
+            offset += 1
+            theline = self.get_line(offset)
+    
+        # longquote ends when the new paragraph is NOT another longquote
+        # paragraph (be it a new title, vote, or just regular paragraph). 
+        if self.spaces_indented(theline) != LONGQUOTE_NEW_PARA_INDENT:
+            return True
+        return False
 
     def preprocess_state(self, theline):
         ''' in certain cases we need to match a regular expression AND a state,
@@ -437,6 +484,7 @@ class SenateParser(CRParser):
 
         if self.is_new_paragraph(theline):
             self.new_paragraph = True
+            self.intitle = False
 
             # check if this is a subheading...
             # if re.search(self.re_subheading, theline):
@@ -445,31 +493,43 @@ class SenateParser(CRParser):
             
             # in the case of a long quote, we don't change the current speaker. 
             if re.search(self.re_longquotestart, theline):
+                # if it's a long quote but we're already IN a long quote, then
+                # we don't want to mark the beginning again, so suppress the
+                # new paragraph state. 
+                if self.inlongquote == True:
+                    self.new_paragraph = False
                 self.inlongquote = True
             else: 
+                self.inlongquote = False
                 # if it's a recorder reading, then make a note that they are
                 # the speaker 
                 if re.search(self.re_recorderstart, theline):
                     self.recorder = True
-                    self.currentspeaker = None #'Recorder'
+                    self.current_speaker = None #'Recorder'
                 else:
                     self.set_speaker(theline)
 
+        elif not self.inlongquote and self.is_title(theline):
+            self.intitle = True
+            self.new_paragraph = False
+
         else:
             self.new_paragraph = False
+            self.intitle = False
 
         # if a quote starts we are "in a quote" but we stay in that quote until
         # we detect it ends. 
-        if re.search(self.re_startshortquote, theline):
+        if not self.inlongquote and re.search(self.re_startshortquote, theline):
             self.inquote = True
 
         # debugging..
+        print 'in title? %s' % self.intitle
         print 'new paragraph? %s' % self.new_paragraph
         if self.current_speaker:
             print 'current speaker: ' + self.current_speaker 
         else:
             print 'no current speaker'
-        print 'in long quote? %s' % self.recorder
+        print 'in long quote? %s' % self.inlongquote
         print 'in recorder? %s' % self.recorder
         print 'in quote? %s' % self.inquote
 
@@ -477,12 +537,17 @@ class SenateParser(CRParser):
         ''' in certain cases where a state ends on a line, we only want to note
         that after the proper tags have been registered and inserted. ''' 
         
+        # if we're in a long quote, the only way that we know the long quote is
+        # over is when a new paragraph starts and is NOT a long quote. else,
+        # just move along... nothing to see here. 
+        if self.inlongquote:
+            return
+
         if not self.recorder and not self.current_speaker:
             # this is a wierd state we shouldn't be in
-            print '!! unrecognized state. exiting.'
-            print self.rawlines
-            sys.exit()
-            #show_errors_and_exit()
+            print ''.join(self.rawlines)
+            message = '!! unrecognized state while parsing %s.' % self.filename
+            raise UnrecognizedCRDoc(message)
 
         if self.inquote and re.search(self.re_endshortquote, theline):
             self.inquote = False
@@ -490,8 +555,10 @@ class SenateParser(CRParser):
         if self.recorder and re.search(self.re_recorderend, theline):
             self.recorder = False
 
-        if self.inlongquote and self.paragraph_ends():
-            self.inlongquote = False
+        if self.intitle:
+            self.intitle = False
+        #if self.inlongquote and self.paragraph_ends():
+        #    self.inlongquote = False
 
     def paragraph_ends(self):
         ''' check if the current paragraph ends by looking ahead to what the
@@ -518,12 +585,48 @@ class SenateParser(CRParser):
             return True
         return False
 
-    def is_new_paragraph(self, theline):
-        NEW_PARA_INDENT = 2
-        if self.spaces_indented(theline) >= NEW_PARA_INDENT:
+    def is_centered(self, theline):
+        # titles seem to always* be centered (* famous last words). 
+        LINE_MAX_LENGTH = 71
+        left_align = re.search('\S', theline).start()
+        right_align = (LINE_MAX_LENGTH - len(theline.strip()))/2
+        # if the left and right align are the same (modulo off-by-one for
+        # even-length titles) then we consider it centered, and therefore a
+        # title. 
+        if left_align in [right_align-1, right_align, right_align+1]:
             return True
         else:
             return False
+
+    def is_title(self, theline):
+        # assumes that self.current_line is the index for theline
+        if not self.rawlines[self.currentline] == theline:
+            message = 'current line and index are not aligned'
+            raise AlignmentError(message)
+
+        # the first line on a page can look like a title because there's an
+        # empty line separating new page designators from page content. but, we
+        # know exactly what those look like so eliminate that possibility here. 
+        first_line_on_page = re.search(self.re_newpage, self.rawlines[self.currentline -2])
+        line_above = self.rawlines[self.currentline - 1].strip() 
+        line_below = self.rawlines[self.currentline + 1].strip() 
+        empty = ''
+        if (line_above == empty and line_below == empty and 
+            not first_line_on_page and self.is_centered(theline)):
+                return True
+        return False
+
+
+    def is_new_paragraph(self, theline):
+        NEW_PARA_INDENT = 2
+        LONGQUOTE_NEW_PARA_INDENT = 7
+        if theline.startswith('<bullet>'):
+            return True 
+        if self.spaces_indented(theline) == LONGQUOTE_NEW_PARA_INDENT:
+            return True
+        if self.spaces_indented(theline) == NEW_PARA_INDENT:
+            return True
+        return False
 
 def usage():
     print 'Usage:'
@@ -572,7 +675,7 @@ if __name__ == '__main__':
             month = parts[2]
             day = parts[3]
             abspath = os.path.join(wd, '%s/%s/%s/%s' % (year, month, day, file))
-            print 'processing file %s' % path
+            print 'processing file %s' % abspath
         chamber = re.search(r'-Pg(?P<chamber>E|S|H)', abspath).group('chamber')
         chamber_doc = parsers[chamber](abspath)
         chamber_doc.parse()
@@ -601,6 +704,9 @@ if __name__ == '__main__':
             else:
                 abspath = os.path.join(path, file)
                 chamber_doc = parsers[chamber](abspath)
-                chamber_doc.parse()
-
+                try:
+                    chamber_doc.parse()
+                except UnrecognizedCRDoc, e:
+                    print e
+                    print '\n\n'
 
