@@ -141,7 +141,7 @@ class CRParser(object):
     re_newpage =            r'\[\[Page \w+\]\]'
     re_underscore =         r'\s+_+\s+'
     # a new speaker might either be a legislator's name, or a reference to the role of president of presiding officer. 
-    re_newspeaker =         r'^(<bullet> |  )(?P<name>(((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER))\.'
+    re_newspeaker =         r'^(<bullet> |  )(?P<name>(((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER( \([A-Za-z.\- ]+\))?))\.'
 
     # whatever follows the statement of a new speaker marks someone starting to
     # speak. if it's a new paragraph and there's already a current_speaker,
