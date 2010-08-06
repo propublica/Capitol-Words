@@ -149,7 +149,8 @@ class CRParser(object):
     re_speaking =           r'^  (((((Mr)|(Ms)|(Mrs))\. [A-Z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER))\. )?(?P<start>.)'
     re_startshortquote =    r'``'
     re_endshortquote =      r"''"
-    re_longquotestart =    r' {7}(?P<start>.)'
+    re_longquotestart =     r' {7}(?P<start>.)'
+    re_longquotebody =      r' {5}(?P<start>.)' 
     re_endofline =          r'$'
 
     # need to fix this - need tomatch on the whole statement including what's after the prefix. 
@@ -165,6 +166,12 @@ class CRParser(object):
                              #+ r'|()'
                             + r').*')
     re_recorderend =        re_recorderstart # for now
+
+    LINE_MAX_LENGTH =           71
+    LONGQUOTE_INDENT =          5
+    NEW_PARA_INDENT =           2
+    LONGQUOTE_NEW_PARA_INDENT = 7
+
 
     def spaces_indented(self, theline):
         ''' returns the number of spaces by which the line is indented. '''
@@ -401,7 +408,6 @@ class SenateParser(CRParser):
         ''' this is the standard paragraph parser. handles new speakers,
         standard recorder comments, long and short quotes, etc. '''
         
-        MIN_LONGQUOTE_INDENT = 7 # ?
 
         # get to the first line 
         theline = self.get_line()
@@ -419,6 +425,8 @@ class SenateParser(CRParser):
                 annotator.register_tag_open(self.re_longquotestart, '<quote speaker="%s">' % self.current_speaker, group='start')
                 annotator.register_tag_open(self.re_recorderstart, '<recorder>', 'start')
                 annotator.register_tag(self.re_newspeaker, '<speaker name="%s">' % self.current_speaker, group='name')
+                if self.return_from_quote_interjection(theline):
+                    annotator.register_tag(self.re_longquotebody, '<quote speaker="%s">' % self.current_speaker, group='start')
                 if not self.recorder and not self.inlongquote:
                     annotator.register_tag_open(self.re_speaking, '<speaking name="%s">' % self.current_speaker, group='start')
 
@@ -463,8 +471,6 @@ class SenateParser(CRParser):
     def longquote_ends(self):
         # XXX this function is totally repeating patterns used in many other
         # places... 
-        NEW_PARA_INDENT = 2
-        LONGQUOTE_NEW_PARA_INDENT = 7
 
         offset = 1
         theline = self.get_line(offset)
@@ -474,7 +480,7 @@ class SenateParser(CRParser):
     
         # longquote ends when the new paragraph is NOT another longquote
         # paragraph (be it a new title, vote, or just regular paragraph). 
-        if self.spaces_indented(theline) != LONGQUOTE_NEW_PARA_INDENT:
+        if self.spaces_indented(theline) != self.LONGQUOTE_NEW_PARA_INDENT:
             return True
         return False
 
@@ -482,7 +488,8 @@ class SenateParser(CRParser):
         ''' in certain cases we need to match a regular expression AND a state,
         so do some analysis to determine which tags to register. '''
 
-        if self.is_new_paragraph(theline):
+        return_from_interjection = self.return_from_quote_interjection(theline)
+        if self.is_new_paragraph(theline) or return_from_interjection:
             self.new_paragraph = True
             self.intitle = False
 
@@ -492,7 +499,7 @@ class SenateParser(CRParser):
             #   pass
             
             # in the case of a long quote, we don't change the current speaker. 
-            if re.search(self.re_longquotestart, theline):
+            if re.search(self.re_longquotestart, theline) or return_from_interjection:
                 # if it's a long quote but we're already IN a long quote, then
                 # we don't want to mark the beginning again, so suppress the
                 # new paragraph state. 
@@ -560,6 +567,25 @@ class SenateParser(CRParser):
         #if self.inlongquote and self.paragraph_ends():
         #    self.inlongquote = False
 
+    def return_from_quote_interjection(self, theline):
+        ''' sometimes a paragraph in a long quote is not indented because it
+        was only briefly interrupted for the reader to make a comment. but we
+        still need to treat it like a new paragraph. '''
+
+        if not self.rawlines[self.currentline] == theline:
+            message = 'current line and index are not aligned'
+            raise AlignmentError(message)
+
+        line_above = self.rawlines[self.currentline -1].strip()
+        two_lines_above = self.rawlines[self.currentline -2].strip()
+        empty = ""
+
+        if (self.spaces_indented(theline) == self.LONGQUOTE_INDENT and 
+            line_above == empty and two_lines_above.endswith('--')):
+            return True
+        else:
+            return False
+
     def paragraph_ends(self):
         ''' check if the current paragraph ends by looking ahead to what the
         next non-empty line is. idempotent. '''
@@ -567,9 +593,8 @@ class SenateParser(CRParser):
         # a paragraph ending is really only indicated by the formatting which
         # follows it. if a line is followed by a new paragraph, a long section
         # of quoted text, or a subheading, then we know this must be the end of
-        # athe current paragraph. all of those possibilities are indicated by
-        # the indentation level.  
-
+        # athe current paragraph. almost all of those possibilities are
+        # indicated by the indentation level.  
         offset = 1
         theline = self.get_line(offset)
         while theline and not theline.strip():
@@ -583,13 +608,19 @@ class SenateParser(CRParser):
         # new para or new long quote?
         if self.is_new_paragraph(theline):
             return True
+        # this strange case arises sometimes when legislators interject a
+        # comment into the middle of something they are quoting/reading. 
+        line_above = self.rawlines[self.currentline+offset-1].strip()
+        empty = ""
+        if self.spaces_indented(theline) == self.LONGQUOTE_INDENT and line_above == empty:
+            return True
+        # finally, if none of these cases are true, return false. 
         return False
 
     def is_centered(self, theline):
         # titles seem to always* be centered (* famous last words). 
-        LINE_MAX_LENGTH = 71
         left_align = re.search('\S', theline).start()
-        right_align = (LINE_MAX_LENGTH - len(theline.strip()))/2
+        right_align = (self.LINE_MAX_LENGTH - len(theline.strip()))/2
         # if the left and right align are the same (modulo off-by-one for
         # even-length titles) then we consider it centered, and therefore a
         # title. 
@@ -618,13 +649,11 @@ class SenateParser(CRParser):
 
 
     def is_new_paragraph(self, theline):
-        NEW_PARA_INDENT = 2
-        LONGQUOTE_NEW_PARA_INDENT = 7
         if theline.startswith('<bullet>'):
             return True 
-        if self.spaces_indented(theline) == LONGQUOTE_NEW_PARA_INDENT:
+        if self.spaces_indented(theline) == self.LONGQUOTE_NEW_PARA_INDENT:
             return True
-        if self.spaces_indented(theline) == NEW_PARA_INDENT:
+        if self.spaces_indented(theline) == self.NEW_PARA_INDENT:
             return True
         return False
 
