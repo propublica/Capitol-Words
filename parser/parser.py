@@ -671,6 +671,17 @@ class SenateParser(CRParser):
             return True
         return False
 
+    def save(self):
+        ''' save the xml file to disk.'''
+        saveas = self.filename.replace('raw', 'xml').replace('.txt', '.xml')
+        savedir = os.path.dirname(saveas)
+        if not os.path.exists(savedir):
+            os.makedirs(savedir)
+        fp = open(saveas, 'w')
+        fp.write(''.join(self.xml))
+        fp.close()
+        print "saved file %s to disk" % saveas    
+
 def usage():
     print 'Usage:'
     print 'You must pass in a congressional record filename, or specify yyyy/mm/dd [chamber],'
@@ -722,7 +733,7 @@ if __name__ == '__main__':
         chamber = re.search(r'-Pg(?P<chamber>E|S|H)', abspath).group('chamber')
         chamber_doc = parsers[chamber](abspath)
         chamber_doc.parse()
-
+        chamber_doc.save()
 
     else:
         directory = sys.argv[1]
@@ -749,7 +760,7 @@ if __name__ == '__main__':
                 chamber_doc = parsers[chamber](abspath)
                 try:
                     chamber_doc.parse()
-                except UnrecognizedCRDoc, e:
-                    print e
+                except:# UnrecognizedCRDoc, e:
+                    #print e
                     print '\n\n'
-
+                chamber_doc.save()
