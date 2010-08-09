@@ -75,6 +75,7 @@ class Regex(object):
                 # is there a tag that goes here?
                 if start in indexes.keys() and start not in already_matched:
                     output.append(substr)
+                    output.append(indexes[start])# hmm, keep an eye on this line...
                     already_matched.append(start)
                 elif stop in indexes.keys() and stop not in already_matched:
                     output.append(substr)
@@ -163,6 +164,7 @@ class CRParser(object):
                              + r'|(The resolution .*?was agreed to.)'
                              + r'|(The preamble was agreed to.)'
                              + r'|(The resolution .*?reads as follows)'
+                             + r'|(The assistant editor .*?proceeded to call the roll)'
                              #+ r'|()'
                             + r').*')
     re_recorderend =        re_recorderstart # for now
@@ -489,6 +491,7 @@ class SenateParser(CRParser):
         so do some analysis to determine which tags to register. '''
 
         return_from_interjection = self.return_from_quote_interjection(theline)
+
         if self.is_new_paragraph(theline) or return_from_interjection:
             self.new_paragraph = True
             self.intitle = False
@@ -550,22 +553,28 @@ class SenateParser(CRParser):
         if self.inlongquote:
             return
 
-        if not self.recorder and not self.current_speaker:
+        if (not self.recorder and not self.inlongquote 
+            and not self.intitle and not self.current_speaker):
             # this is a wierd state we shouldn't be in
             print ''.join(self.rawlines)
+            objdata = self.__dict__
+            print objdata['xml']
+            del objdata['xml']
+            del objdata['rawlines']
+            print ''
+            print objdata
+            print ''
             message = '!! unrecognized state while parsing %s.' % self.filename
             raise UnrecognizedCRDoc(message)
 
         if self.inquote and re.search(self.re_endshortquote, theline):
             self.inquote = False
 
-        if self.recorder and re.search(self.re_recorderend, theline):
+        if self.recorder and self.paragraph_ends():
             self.recorder = False
 
         if self.intitle:
             self.intitle = False
-        #if self.inlongquote and self.paragraph_ends():
-        #    self.inlongquote = False
 
     def return_from_quote_interjection(self, theline):
         ''' sometimes a paragraph in a long quote is not indented because it
@@ -608,6 +617,10 @@ class SenateParser(CRParser):
         # new para or new long quote?
         if self.is_new_paragraph(theline):
             return True
+        # if the next line is a title then this paragraph is also over.
+        # finished. caput. 
+        if self.is_title(theline, offset=offset):
+            return True
         # this strange case arises sometimes when legislators interject a
         # comment into the middle of something they are quoting/reading. 
         line_above = self.rawlines[self.currentline+offset-1].strip()
@@ -629,18 +642,19 @@ class SenateParser(CRParser):
         else:
             return False
 
-    def is_title(self, theline):
-        # assumes that self.current_line is the index for theline
-        if not self.rawlines[self.currentline] == theline:
+    def is_title(self, theline, offset=0):
+        #self.current_line +offset must be the index for theline
+        local_offset = self.currentline + offset
+        if not self.rawlines[local_offset] == theline:
             message = 'current line and index are not aligned'
             raise AlignmentError(message)
 
         # the first line on a page can look like a title because there's an
         # empty line separating new page designators from page content. but, we
         # know exactly what those look like so eliminate that possibility here. 
-        first_line_on_page = re.search(self.re_newpage, self.rawlines[self.currentline -2])
-        line_above = self.rawlines[self.currentline - 1].strip() 
-        line_below = self.rawlines[self.currentline + 1].strip() 
+        first_line_on_page = re.search(self.re_newpage, self.rawlines[local_offset - 2])
+        line_above = self.rawlines[local_offset - 1].strip() 
+        line_below = self.rawlines[local_offset + 1].strip() 
         empty = ''
         if (line_above == empty and line_below == empty and 
             not first_line_on_page and self.is_centered(theline)):
