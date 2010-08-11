@@ -42,7 +42,12 @@ class Regex(object):
                     start = matchobj.start(group)
                 else:
                     start = matchobj.start()
-                indexes[start] = tag
+                # the tag for a given position is stored as a list, because
+                # there may be more than one tag that goes here. (eg a quote
+                # that end at the end of a paragraph).
+                if start not in indexes:
+                    indexes[start] = []
+                indexes[start].append(tag)
 
         # identify where all the closing tags go (those that get inserted at
         # the end of the regex match)
@@ -53,14 +58,20 @@ class Regex(object):
                     end = matchobj.end(group)
                 else:
                     end = matchobj.end()
-                indexes[end] = tag
+                # the tag for a given position is stored as a list, because
+                # there may be more than one tag that goes here. (eg a quote
+                # that end at the end of a paragraph).
+                if end not in indexes:
+                    indexes[end] = []
+                indexes[end].append(tag)
 
-        # we need to split the string into substrings between each pair of
-        # (sorted) indices, eg. at index_n and index_n+1. a substring is also needed
-        # from the beginning of the string to the first split index, and from
-        # the last split index to the end of the string.  
         if len(indexes):
             print indexes
+
+            # we need to split the string into substrings between each pair of
+            # (sorted) indices, eg. at index_n and index_n+1. a substring is
+            # also needed from the beginning of the string to the first split
+            # index, and from the last split index to the end of the string.  
             l = indexes.keys()
             l.sort() 
             first_substring = [(0,l[0])] 
@@ -75,11 +86,13 @@ class Regex(object):
                 # is there a tag that goes here?
                 if start in indexes.keys() and start not in already_matched:
                     output.append(substr)
-                    output.append(indexes[start])# hmm, keep an eye on this line...
+                    for tag in indexes[start]:
+                        output.append(tag)
                     already_matched.append(start)
                 elif stop in indexes.keys() and stop not in already_matched:
                     output.append(substr)
-                    output.append(indexes[stop])
+                    for tag in indexes[stop]:
+                        output.append(tag)
                     already_matched.append(stop)
                 else:
 	                output.append(substr)
@@ -147,14 +160,13 @@ class CRParser(object):
     # whatever follows the statement of a new speaker marks someone starting to
     # speak. if it's a new paragraph and there's already a current_speaker,
     # then this re is also used to insert the <speaking> tag. 
-    re_speaking =           r'^  (((((Mr)|(Ms)|(Mrs))\. [A-Z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER))\. )?(?P<start>.)'
+    re_speaking =           r'^(<bullet> |  )(((((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER))\. )?(?P<start>.)'
     re_startshortquote =    r'``'
     re_endshortquote =      r"''"
     re_longquotestart =     r' {7}(?P<start>.)'
     re_longquotebody =      r' {5}(?P<start>.)' 
     re_endofline =          r'$'
 
-    # need to fix this - need tomatch on the whole statement including what's after the prefix. 
     re_recorderstart =      (r'^\s+(?P<start>'
                              + r'(The assistant legislative clerk read as follows)'
                              + r'|(The nomination considered and confirmed is as follows)'
@@ -241,7 +253,8 @@ class SenateParser(CRParser):
         self.new_paragraph = False
         self.recorder = False
         self.inlongquote = False
-        self.xml = []
+        self.newspeaker = False
+        self.xml = ['<CRDoc>', ]
 
     def parse(self):
         ''' parses a raw senate document and returns the same document marked
@@ -435,6 +448,11 @@ class SenateParser(CRParser):
             if not self.intitle and not self.inlongquote:
                 annotator.register_tag_open(self.re_startshortquote, '<quote speaker="%s">' % self.current_speaker)
 
+            # note: the endquote tag needs to be registered BEFORE the end
+            # speaking tag, because the quote tag should appear before (be
+            # nested within) the speaking tag. a nesting functionality should
+            # really be implemented within the XMLAnnotator class, but this
+            # will do for now. 
             if not self.inlongquote and not self.intitle:
                 if self.inquote:
                     annotator.register_tag_close(self.re_endshortquote, '</quote>')
@@ -465,6 +483,7 @@ class SenateParser(CRParser):
                 theline = self.get_line()
             if not theline:
                 # end of file
+                self.xml.append('</CRDoc>')
                 print ''.join(self.xml)
                 print self.filename
                 print '\n\n'
@@ -500,7 +519,11 @@ class SenateParser(CRParser):
             # if re.search(self.re_subheading, theline):
             # set speaker to None
             #   pass
-            
+        
+            # if there's a new speaker, we don't want to 
+            #if re.search(self.re_newspeaker, theline):
+            #    self.newspeaker = True
+        
             # in the case of a long quote, we don't change the current speaker. 
             if re.search(self.re_longquotestart, theline) or return_from_interjection:
                 # if it's a long quote but we're already IN a long quote, then
@@ -567,8 +590,15 @@ class SenateParser(CRParser):
             message = '!! unrecognized state while parsing %s.' % self.filename
             raise UnrecognizedCRDoc(message)
 
+        # if there's one or more complete quotes (start and end) on a line, or
+        # if a single quote ends that started on a previous line,  then we're
+        # good to go and close the state. but if there's a quote that opens,
+        # that doesn't close, we need to stay in this state.
         if self.inquote and re.search(self.re_endshortquote, theline):
-            self.inquote = False
+            last_open_quote = theline.rfind("``")
+            last_close_quote = theline.rfind("''")
+            if last_open_quote != -1 and last_close_quote > last_open_quote:
+                self.inquote = False
 
         if self.recorder and self.paragraph_ends():
             self.recorder = False
@@ -623,9 +653,11 @@ class SenateParser(CRParser):
             return True
         # this strange case arises sometimes when legislators interject a
         # comment into the middle of something they are quoting/reading. 
-        line_above = self.rawlines[self.currentline+offset-1].strip()
+        local_offset = self.currentline+offset
+        line_above = self.rawlines[local_offset - 1].strip()
+        first_line_on_page = re.search(self.re_newpage, self.rawlines[local_offset - 2])
         empty = ""
-        if self.spaces_indented(theline) == self.LONGQUOTE_INDENT and line_above == empty:
+        if self.spaces_indented(theline) == self.LONGQUOTE_INDENT and line_above == empty and not first_line_on_page:
             return True
         # finally, if none of these cases are true, return false. 
         return False
