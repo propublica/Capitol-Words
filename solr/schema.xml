@@ -297,11 +297,11 @@
    -->
 
    <field name="id" type="string" indexed="true" stored="true" required="true" /> 
-   <field name="volume" type="" indexed="true" stored="true" required="true" /> 
-   <field name="number" type="" indexed="true" stored="true" required="true" /> 
-   <field name="date" type="" indexed="true" stored="true" required="true" /> 
-   <field name="chamber" type="" indexed="true" stored="true" required="true" /> 
-   <field name="pages" type="" indexed="true" stored="true" required="true" /> 
+   <field name="volume" type="int" indexed="true" stored="true" required="true" /> 
+   <field name="number" type="int" indexed="true" stored="true" required="true" /> 
+   <field name="date" type="date" indexed="true" stored="true" required="true" /> 
+   <field name="chamber" type="string" indexed="true" stored="false" required="true" /> 
+   <field name="pages" type="??? range" indexed="true" stored="true" required="true" /> 
    <field name="document_title" type="" indexed="true" stored="true" required="false" /> 
    <field name="title" type="" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="newspeaker" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
@@ -309,10 +309,12 @@
    <field name="speaking" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
    <field name="quote" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
    <field name="time" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
-   <field name="vote" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
    <field name="recorder" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
     
-
+    <!--
+    to be implemented...
+   <field name="vote" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
+    -->
 
     <!-- below here are default fields -->
 
@@ -356,57 +358,12 @@
         leading wildcard queries. -->
    <field name="text_rev" type="text_rev" indexed="true" stored="false" multiValued="true"/>
 
-   <!-- non-tokenized version of manufacturer to make it easier to sort or group
-        results by manufacturer.  copied from "manu" via copyField -->
-   <field name="manu_exact" type="string" indexed="true" stored="false"/>
-
-   <field name="payloads" type="payloads" indexed="true" stored="true"/>
-
    <!-- Uncommenting the following will create a "timestamp" field using
         a default value of "NOW" to indicate when each document was indexed.
      -->
-   <!--
    <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
-     -->
    
-
-   <!-- Dynamic field definitions.  If a field name is not found, dynamicFields
-        will be used if the name matches any of the patterns.
-        RESTRICTION: the glob-like pattern in the name attribute must have
-        a "*" only at the start or the end.
-        EXAMPLE:  name="*_i" will match any field ending in _i (like myid_i, z_i)
-        Longer patterns will be matched first.  if equal size patterns
-        both match, the first appearing in the schema will be used.  -->
-   <dynamicField name="*_i"  type="int"    indexed="true"  stored="true"/>
-   <dynamicField name="*_s"  type="string"  indexed="true"  stored="true"/>
-   <dynamicField name="*_l"  type="long"   indexed="true"  stored="true"/>
-   <dynamicField name="*_t"  type="text"    indexed="true"  stored="true"/>
-   <dynamicField name="*_b"  type="boolean" indexed="true"  stored="true"/>
-   <dynamicField name="*_f"  type="float"  indexed="true"  stored="true"/>
-   <dynamicField name="*_d"  type="double" indexed="true"  stored="true"/>
-   <dynamicField name="*_dt" type="date"    indexed="true"  stored="true"/>
-
-   <!-- some trie-coded dynamic fields for faster range queries -->
-   <dynamicField name="*_ti" type="tint"    indexed="true"  stored="true"/>
-   <dynamicField name="*_tl" type="tlong"   indexed="true"  stored="true"/>
-   <dynamicField name="*_tf" type="tfloat"  indexed="true"  stored="true"/>
-   <dynamicField name="*_td" type="tdouble" indexed="true"  stored="true"/>
-   <dynamicField name="*_tdt" type="tdate"  indexed="true"  stored="true"/>
-
-   <dynamicField name="*_pi"  type="pint"    indexed="true"  stored="true"/>
-
-   <dynamicField name="ignored_*" type="ignored" multiValued="true"/>
-   <dynamicField name="attr_*" type="textgen" indexed="true" stored="true" multiValued="true"/>
-
-   <dynamicField name="random_*" type="random" />
-
-   <!-- uncomment the following to ignore any fields that don't already match an existing 
-        field name or dynamic field, rather than reporting them as an error. 
-        alternately, change the type="ignored" to some other type e.g. "text" if you want 
-        unknown fields indexed and/or stored by default --> 
-   <!--dynamicField name="*" type="ignored" multiValued="true" /-->
-   
- </fields>
+</fields>
 
  <!-- Field to use to determine and enforce document uniqueness. 
       Unless this field is marked with required="false", it will be a required field
