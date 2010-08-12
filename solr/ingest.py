@@ -7,27 +7,51 @@ if you want to limit a search result to a specific speaker, then you may only
 have one speaker per solr document.'''
 
 from httplib import HTTPConnection
+import xml.dom.minidom as xml
+import sys, os, re
 
 class SolrDoc(object):
     def __init__(self, file):
         self.filename = file
-        self.lines = open(filename).readlines()
-        self.metadata = {
-            'speaker' : None,
-            'document_title' : None,
-            'volume' : None,
-        }
-        self.documents = []
+        self.dom = xml.parse(filename)
+        self.metadata_xml = None
+        self.document_bodies = []
+
+    def get_text(self, uniquetag):
+        ''' only use this for unique tags that appear once in the document'''
+        re_tag_content = r'<.*?>(?P<content>.*?)</.*?>'
+        nodexml = self.dom.getElementsByTagName(uniquetag)[0].toxml()
+        text = re.search(re_tag_content, nodexml).group('content')
+        return text
+
+    def make_solr_id(self, num):
+        uid = os.path.basename(self.filename).strip('xml')+'chunk%d' % num
+        id_xml = '''<field name="id">%s</field>\n''' % uid
+        return id_xml
 
     def set_metadata(self):
         ''' each solr document generated from this CR document will share the
         same metadata. assemble a string containing that metadata.''' 
-        pass
+        
+        # date format: 1995-12-31T23:59:59Z
+        day = self.get_text('day')
+        month = self.get_text('month')
+        year = self.get_text('year')
+        date = "%s-%s-%sT00:00:00Z" % (year, month, day)
+        self.metadata_xml = '''<field name="date">%s</field>\n''' % date
 
+        if self.dom.getElementsByTagName('document_title'):
+            doc_title = self.get_text('document_title')
+            self.metadata_xml += '''<field name="document_title">%s</field>\n''' % doc_title
+
+        for tag in ['volume', 'number', 'chamber', 'pages']:
+            tag_content = self.get_text(tag)
+            self.metadata_xml += '''<field name="%s">%s</field>\n''' % (tag, tag_content)
+    
     def get_metadata(self):
-        return self.metadata_string
+        return self.metadata_xml
 
-    def speaker_split(self):
+    def speaker_split_old(self):
         ''' iterate over the document, and split it up anytime there is a
         change in speaker.'''
         self.current_speaker = 'empty'
@@ -38,58 +62,87 @@ class SolrDoc(object):
                 self.documents.append([])
             self.documents[-1].append(line)
 
-    def speaker_change(self, line):
-        ''' update the current speaker and return True if there is a speaker
-        change, else return False.'''
+    def build_document_bodies(self):
+        # get the top level xml nodes
+        tln = self.dom.documentElement.childNodes
 
-        new_speaker = re.match(r'<speaker name="(Mr|Mrs|Ms)\. (?P<name>.*?)">'
-        recorder = line.stip().startswith('<recorder>')
-        if new_speaker or recorder:
-            # XXX This should be expanded to include bioguide id, full name etc.
-            if new_speaker:
-                speaker_name = matchob.group('name')
-            else:
-                speaker_name = 'recorder'
-            if speaker_name == self.current_speaker:
-                return False
-            else: 
-                self.current_speaker = speaker_name
-                return True  
-        else:
-            return False
+        # break the CR document into sections. a new section starts when the
+        # speaker changes. 
+        sectionstarts = []
+        for node in tln:
+            if node.nodeName == 'speaker' or node.nodeName == 'recorder':
+                sectionstarts.append(node)
+        # add a control item onto the end of this list so we don't go off the
+        # end when iterating over it below. 
+        sectionstarts.append(None)
+
+        sections = []
+        for node_i in xrange(len(sectionstarts)):
+            sections.append([])
+            node = sectionstarts[node_i]
+            while node is not None and node is not sectionstarts[node_i+1]:
+                sections[-1].append(node.toxml())
+                node = node.nextSibling
+        sections.remove([])
+
+        # now that we have our sections, replace the <speaker>, <speaking> and
+        # <quote> tags with their solr equivalents
+        self.document_bodies = []
+        for section in sections:
+            body = ''.join(section)
+
+            # identify the current speaker
+            # remove the speaker/recorder tags
+            # replace <speaking> tags by <field name=speaking"> 
+            # replace <quote> tags by <field name="quote">
+            re_speaker = r'<speaker name="(?P<current_speaker>.*?)">.*?</speaker>'
+            re_recorder = r'<recorder>'
+            re_quote = r'<quote speaker=.*?>'
+            re_speaking = r'<speaking name=.*?>'
+            re_title = r'<title>'
+            re_endtag = r'</.*?>'
             
+            someone_speaking = re.search(re_speaker, body)
+            if someone_speaking:
+                current_speaker = someone_speaking.group('current_speaker')
+            else:
+                current_speaker = 'recorder'
+            # XXX add in more info about the speaker
+            #speaker_fields = self.get_speakerinfo(current_speaker)) 
 
-    def doc_gen(self):
+            body = re.sub(re_speaker, '', body)
+            body = re.sub(re_recorder, '<field name="recorder">', body)
+            body = re.sub(re_quote, '<field name="quote">', body)
+            body = re.sub(re_speaking, '<field name="speaking">', body)
+            body = re.sub(re_title, '<field name="title">', body) 
+            body = re.sub(re_endtag, '</field>', body)
+
+            speaker_line = '''<field name="speaker">%s</field>\n''' % current_speaker
+            self.document_bodies.append(speaker_line + body)
+
+    def assemble_and_submit(self):
         ''' generate a proper solr document '''
         # add metadata
         # replace xml with proper solr fields
-        for xmldoc in self.documents:
+        for idx, body in enumerate(self.document_bodies):
+            document_id_field = self.make_solr_id(idx)
             metadata_fields = self.get_metadata()
-            speaker_name = self.extract_speakername(xmldoc[1])
-            speaker_fields = self.get_speakerinfo(speaker_name)) 
-            body_fields = self.solrize_fields(xmldoc)
-            solrdoc = metadata_fields + speaker_fields + body_fields
-            self.add(solrdoc)
-            self.commit()
+            solrdoc = document_id_field + metadata_fields + body
+            print solrdoc
+            raw_input("enter to continue...")
+            #self.post(solrdoc)
+            #self.commit()
         
-        
-
-   def add(self, item_id, title, description, text):
+    def post(self, payload):
         """
         Add a document to index
         """
-        DATA = '''<add><doc>
-    <field name="id">%d</field>
-    <field name="title">%s</field>
-    <field name="description">%s</field>
-    <field name="text">%s</field>
-    </doc></add>''' % (item_id, title, description, text)
-        con = HTTPConnection('0.0.0.0:8983')
+        con = HTTPConnection('localhost:8983')
         con.putrequest('POST', '/solr/update/')
-        con.putheader('content-length', str(len(DATA)))
+        con.putheader('content-length', str(len(payload)))
         con.putheader('content-type', 'text/xml; charset=UTF-8')
         con.endheaders()
-        con.send(DATA)
+        con.send(payload)
         r = con.getresponse()
         if str(r.status) == '200':
             print r.read()
@@ -102,7 +155,7 @@ class SolrDoc(object):
         commit changes
         """
         DATA = '<commit/>'
-        con = HTTPConnection('0.0.0.0:8983')
+        con = HTTPConnection('localhost:8983')
         con.putrequest('POST', '/solr/update/')
         con.putheader('content-length', str(len(DATA)))
         con.putheader('content-type', 'text/xml; charset=UTF-8')
@@ -115,10 +168,16 @@ class SolrDoc(object):
             print r.status
             print r.read()
 
-    def parse(self):
+  
+    def process(self):
         self.set_metadata()
-        self.speaker_split()
-        self.doc_gen()
+        self.build_document_bodies()
+        self.assemble_and_submit()
+        
 
+if __name__ == '__main__' :
 
- 
+    filename = sys.argv[1]
+    s = SolrDoc(filename)
+    s.process()
+
