@@ -304,12 +304,11 @@
    <field name="pages" type="??? range" indexed="true" stored="true" required="true" /> 
    <field name="document_title" type="" indexed="true" stored="true" required="false" /> 
    <field name="title" type="" indexed="true" stored="true" required="false" multiValued="true" /> 
-   <field name="newspeaker" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
    <field name="speaker" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
    <field name="speaking" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
+   <field name="title" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
    <field name="quote" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
    <field name="time" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
-   <field name="recorder" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
     
     <!--
     to be implemented...
