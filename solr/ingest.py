@@ -33,11 +33,26 @@ class SolrDoc(object):
         ''' each solr document generated from this CR document will share the
         same metadata. assemble a string containing that metadata.''' 
         
+        numeric_months = {
+            'january' : '01',
+            'february' : '02',
+            'march': '03',
+            'april': '04',
+            'may': '05',
+            'june': '06',
+            'july': '07',
+            'august': '08',
+            'september': '09',
+            'october': '10',
+            'november': '11',
+            'december': '12',
+        }
+
         # date format: 1995-12-31T23:59:59Z
         day = self.get_text('day')
         month = self.get_text('month')
         year = self.get_text('year')
-        date = "%s-%s-%sT00:00:00Z" % (year, month, day)
+        date = "%s-%s-%sT00:00:00Z" % (year, numeric_months[month.lower()], day)
         self.metadata_xml = '''<field name="date">%s</field>\n''' % date
 
         if self.dom.getElementsByTagName('document_title'):
@@ -127,11 +142,12 @@ class SolrDoc(object):
         for idx, body in enumerate(self.document_bodies):
             document_id_field = self.make_solr_id(idx)
             metadata_fields = self.get_metadata()
-            solrdoc = document_id_field + metadata_fields + body
+            solrdoc = '''<add><doc>\n''' + document_id_field + metadata_fields + body + '''\n</doc></add>'''
             print solrdoc
+            raw_input("enter to post...")
+            self.post(solrdoc)
+            self.commit()
             raw_input("enter to continue...")
-            #self.post(solrdoc)
-            #self.commit()
         
     def post(self, payload):
         """
