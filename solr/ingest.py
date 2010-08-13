@@ -53,6 +53,8 @@ class SolrDoc(object):
         month = self.get_text('month')
         year = self.get_text('year')
         date = "%s-%s-%sT00:00:00Z" % (year, numeric_months[month.lower()], day)
+        # store the original file this came from so we can go back to it
+        self.metadata_xml = '''<field name="crdoc">%s</field>''' % self.filename
         self.metadata_xml = '''<field name="date">%s</field>\n''' % date
 
         if self.dom.getElementsByTagName('document_title'):
@@ -76,6 +78,9 @@ class SolrDoc(object):
             if speaker_change(line):
                 self.documents.append([])
             self.documents[-1].append(line)
+
+    def get_speaker_metadata(self, speaker):
+       return ''
 
     def build_document_bodies(self):
         # get the top level xml nodes
@@ -133,7 +138,8 @@ class SolrDoc(object):
             body = re.sub(re_endtag, '</field>', body)
 
             speaker_line = '''<field name="speaker">%s</field>\n''' % current_speaker
-            self.document_bodies.append(speaker_line + body)
+            speaker_metadata = self.get_speaker_metadata(current_speaker)
+            self.document_bodies.append(speaker_line + speaker_metadata + body)
 
     def assemble_and_submit(self):
         ''' generate a proper solr document '''
