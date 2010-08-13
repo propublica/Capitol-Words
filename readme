@@ -1,1 +1,8 @@
 useful info goes here
+
+Requirements
+* json or simplejson
+* pysolr 
+* solr
+* sunlightlabs API key
+
