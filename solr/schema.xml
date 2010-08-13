@@ -73,17 +73,25 @@
    -->
 
    <field name="id" type="string" indexed="true" stored="true" required="true" /> 
+   <field name="crdoc" type="string" indexed="true" stored="true" required="true" /> 
    <field name="volume" type="int" indexed="true" stored="true" required="true" /> 
    <field name="number" type="int" indexed="true" stored="true" required="true" /> 
    <field name="date" type="date" indexed="true" stored="true" required="true" /> 
    <field name="chamber" type="string" indexed="true" stored="false" required="true" /> 
    <field name="pages" type="string" indexed="true" stored="true" required="true" /> 
    <field name="document_title" type="CRtext" indexed="true" stored="true" required="false" /> 
+    <!-- speaker info that we want ability to search on-->
    <field name="speaker" type="string" indexed="true" stored="true" required="true" /> 
+   <field name="speaker_state" type="string" indexed="true" stored="true" required="false" /> 
+   <field name="speaker_party" type="string" indexed="true" stored="true" required="false" /> 
+   <field name="speaker_bioguide" type="string" indexed="true" stored="true" required="false" /> 
+   <field name="speaker_firstname" type="string" indexed="true" stored="true" required="false" /> 
+   <field name="speaker_lastname" type="string" indexed="true" stored="true" required="false" /> 
     <!-- multivalued fields -->
    <field name="title" type="CRtext" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="speaking" type="CRtext" indexed="true" stored="true" required="false" multiValued="true"/> 
    <field name="quote" type="CRtext" indexed="true" stored="true" required="false" multiValued="true"/> 
+   <field name="longquote" type="CRtext" indexed="true" stored="true" required="false" multiValued="true"/> 
     
     <!--
     to be implemented...
@@ -93,7 +101,7 @@
    
      <!--   Create a "timestamp" field with a default value of "NOW" to indicate
             when each document was indexed.  -->
-    <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
+    <field name="ingestdate" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
    
 </fields>
 
