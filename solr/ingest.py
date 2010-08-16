@@ -9,6 +9,7 @@ have one speaker per solr document.'''
 from httplib import HTTPConnection
 import xml.dom.minidom as xml
 import sys, os, re
+from lib import bioguide_lookup
 
 class SolrDoc(object):
     def __init__(self, file):
@@ -52,6 +53,8 @@ class SolrDoc(object):
         day = self.get_text('day')
         month = self.get_text('month')
         year = self.get_text('year')
+        # keep the year around; we use it later to retrieve speaker metadata
+        self.year = year
         date = "%s-%s-%sT00:00:00Z" % (year, numeric_months[month.lower()], day)
         # store the original file this came from so we can go back to it
         self.metadata_xml = '''<field name="crdoc">%s</field>''' % self.filename
@@ -68,19 +71,24 @@ class SolrDoc(object):
     def get_metadata(self):
         return self.metadata_xml
 
-    def speaker_split_old(self):
-        ''' iterate over the document, and split it up anytime there is a
-        change in speaker.'''
-        self.current_speaker = 'empty'
-        for line in self.lines:
-            # figure out the first speaker or if there is none:
-            speaker = self.check_speaker(line)
-            if speaker_change(line):
-                self.documents.append([])
-            self.documents[-1].append(line)
-
     def get_speaker_metadata(self, speaker):
-       return ''
+        pieces = speaker.split(' of ')
+        name = pieces[0]
+        lastname = name.lower().strip('msr.').strip()
+        if len(pieces) > 1:
+            state = pieces[1]
+        else:
+            state = None
+        data = bioguide_lookup(lastname, self.year, state)
+        if not data or len(data) > 1:
+            return None
+        xml = ''
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_bioguide', data['bioguide'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_party', data['party'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_state', data['state'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_firstname', data['firstname'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_lastname', data['lastname'])
+        return xml
 
     def build_document_bodies(self):
         # get the top level xml nodes
