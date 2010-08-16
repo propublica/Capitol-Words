@@ -3,6 +3,7 @@
 ''' Parse the plain text version of congressional record documents and mark them up with xml.'''
 
 import re, datetime, os, sys
+from settings import CWOD_HOME, LOG_DIR
 
 DEBUG = False
 
@@ -727,7 +728,9 @@ if __name__ == '__main__':
 
     # processes a file or entire directory
     
-    wd = '/tmp/cr/raw'
+    if not os.path.exists(os.path.join(CWOD_HOME, LOG_DIR)):
+        os.mkdir(os.path.join(CWOD_HOME, LOG_DIR))
+    logfile = open(os.path.join(CWOD_HOME, LOG_DIR, 'cwod.log'), 'a')
     parsers = {
         'senate':       SenateParser,
         'house' :       HouseParser,
@@ -760,7 +763,7 @@ if __name__ == '__main__':
             year = parts[1]
             month = parts[2]
             day = parts[3]
-            abspath = os.path.join(wd, '%s/%s/%s/%s' % (year, month, day, file))
+            abspath = os.path.join(CWOD_HOME, 'raw', '%s/%s/%s/%s' % (year, month, day, file))
             print 'processing file %s' % abspath
         chamber = re.search(r'-Pg(?P<chamber>E|S|H)', abspath).group('chamber')
         chamber_doc = parsers[chamber](abspath)
@@ -768,8 +771,8 @@ if __name__ == '__main__':
         chamber_doc.save()
 
     else:
-        directory = sys.argv[1]
-        path = os.path.join(wd, directory)
+        date_path = sys.argv[1]
+        path = os.path.join(CWOD_HOME, 'raw', date_path)
         print path
         chamber = sys.argv[2].lower()
         correct_chamber = chambers[chamber]
@@ -792,7 +795,9 @@ if __name__ == '__main__':
                 chamber_doc = parsers[chamber](abspath)
                 try:
                     chamber_doc.parse()
-                except:# UnrecognizedCRDoc, e:
-                    #print e
-                    print '\n\n'
-                chamber_doc.save()
+                    chamber_doc.save()
+                except Exception, e:
+                    logfile.write('Error processing file %s')
+                    logfile.write('\t%s' % e)
+                    logfile.flush()
+                    
