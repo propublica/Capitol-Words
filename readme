@@ -6,3 +6,9 @@ Requirements
 * solr
 * sunlightlabs API key
 
+Setup:
+* cp settings.example.py settings.py
+* create symlinks to settings.py from each of solr/, scraper/ and parser/
+
+
+
