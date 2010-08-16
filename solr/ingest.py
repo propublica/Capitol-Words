@@ -58,7 +58,7 @@ class SolrDoc(object):
         date = "%s-%s-%sT00:00:00Z" % (year, numeric_months[month.lower()], day)
         # store the original file this came from so we can go back to it
         self.metadata_xml = '''<field name="crdoc">%s</field>''' % self.filename
-        self.metadata_xml = '''<field name="date">%s</field>\n''' % date
+        self.metadata_xml += '''<field name="date">%s</field>\n''' % date
 
         if self.dom.getElementsByTagName('document_title'):
             doc_title = self.get_text('document_title')
@@ -80,14 +80,17 @@ class SolrDoc(object):
         else:
             state = None
         data = bioguide_lookup(lastname, self.year, state)
+        print data
+        print lastname, self.year, state
+        print len(data)
         if not data or len(data) > 1:
             return None
         xml = ''
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_bioguide', data['bioguide'])
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_party', data['party'])
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_state', data['state'])
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_firstname', data['firstname'])
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_lastname', data['lastname'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_bioguide', data[0]['bioguide'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_party', data[0]['party'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_state', data[0]['state'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_firstname', data[0]['firstname'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_lastname', data[0]['lastname'])
         return xml
 
     def build_document_bodies(self):
@@ -139,14 +142,17 @@ class SolrDoc(object):
             #speaker_fields = self.get_speakerinfo(current_speaker)) 
 
             body = re.sub(re_speaker, '', body)
-            body = re.sub(re_recorder, '<field name="recorder">', body)
+            body = re.sub(re_recorder, '<field name="speaking">', body)
             body = re.sub(re_quote, '<field name="quote">', body)
             body = re.sub(re_speaking, '<field name="speaking">', body)
             body = re.sub(re_title, '<field name="title">', body) 
             body = re.sub(re_endtag, '</field>', body)
 
             speaker_line = '''<field name="speaker">%s</field>\n''' % current_speaker
-            speaker_metadata = self.get_speaker_metadata(current_speaker)
+            if (current_speaker != 'recorder' and not re.search('pro tempore', current_speaker) 
+                and not re.search('president', current_speaker)):
+                speaker_metadata = self.get_speaker_metadata(current_speaker)
+            else: speaker_metadata = ''
             self.document_bodies.append(speaker_line + speaker_metadata + body)
 
     def assemble_and_submit(self):
