@@ -85,7 +85,10 @@
    <field name="speaker_state" type="string" indexed="true" stored="true" required="false" /> 
    <field name="speaker_party" type="string" indexed="true" stored="true" required="false" /> 
    <field name="speaker_bioguide" type="string" indexed="true" stored="true" required="false" /> 
-   <field name="speaker_firstname" type="string" indexed="true" stored="true" required="false" /> 
+    <!-- the firstname field contains middle names and/or initials, so use the
+    CRtext field to tokenize and enable searching by any of the individual's names
+    -->
+   <field name="speaker_firstname" type="CRtext" indexed="true" stored="true" required="false" /> 
    <field name="speaker_lastname" type="string" indexed="true" stored="true" required="false" /> 
     <!-- multivalued fields -->
    <field name="title" type="CRtext" indexed="true" stored="true" required="false" multiValued="true" /> 
