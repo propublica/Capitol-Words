@@ -44,7 +44,7 @@ class CRScraper(object):
 
         # download the zipfile if we don't already have it. 
         rightsize = lambda tmpfile: os.path.getsize(tmpfile) == self.zipsize
-        if not os.path.exists(tmpfile) or not rightsize:
+        if not os.path.exists(tmpfile) or not rightsize(tmpfile):
             zip = urllib.urlopen('http://' + self.domain + self.url)
             tmp = open(tmpfile, 'w')
             print 'retrieving zip file %s. this could take a few mins...' % tmpfile
@@ -54,7 +54,7 @@ class CRScraper(object):
 
         # prepare the directory to copy the zipped files into. use strftime
         # here to ensure day and month directories are always 2 digits. 
-        save_path = os.path.join(CWOD_DIR, 'raw/%d/%s/%s/' % (self.date.year,
+        save_path = os.path.join(CWOD_HOME, 'raw/%d/%s/%s/' % (self.date.year,
         self.date.strftime("%m"), self.date.strftime("%d")))
         if not os.path.exists(save_path):
             os.makedirs(save_path)
@@ -92,22 +92,28 @@ class CRScraper(object):
             path = self.retrieve()
 
 
-class ScraperManager(object):
-    ''' manage scraping process '''
-    
-    def __init__(self, scraper_type):
-        self.scraper = scraper_type
-    
-    def catchup(self):
-        ''' checks for new or missing files and retreives them'''
-        # retrieve info about state of downloaded files
-        # determine which files need to be retrieved
-        # retrieve them
-        # update info about days (have, missing, DNE)
-        pass
+def date_from_string(datestring):
+    return datetime.datetime.strptime(datestring, "%d/%m/%Y")
 
 if __name__ == '__main__':
-    datestring = raw_input("input date to retrieve dd/mm/yyyy: ")
-    dt = datetime.datetime.strptime(datestring, "%d/%m/%Y")
-    CRScraper().retrieve_by_date(dt)
 
+    if len(sys.argv) == 1:
+        datestring = raw_input("input date to retrieve dd/mm/yyyy: ")
+        dates = [date_from_string(datestring)]
+
+    elif len(sys.argv) == 2:
+        dates = [date_from_string(sys.argv[1])]
+
+    elif len(sys.argv) == 4: 
+        start = date_from_string(sys.argv[1])
+        end = date_from_string(sys.argv[3])
+        daterange = (end - start).days
+        dates = [start + datetime.timedelta(n) for n in xrange(daterange)]
+
+    else:
+        print '\ninvalid date range. date range must look like dd/mm/yyyy - dd/mm/yyyy\n'
+        sys.exit()
+
+    for date in dates:
+        print "Checking Congressional Record for %s" % date
+        CRScraper().retrieve_by_date(date)
