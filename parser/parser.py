@@ -154,6 +154,7 @@ class CRParser(object):
     re_title =              r'\s+(?P<title>(\S ?)+)'
     re_title_end =          r'.+'
     re_newpage =            r'\[\[Page \w+\]\]'
+    re_timestamp =          r'{time}\s\d{4}'
     re_underscore =         r'\s+_+\s+'
     # a new speaker might either be a legislator's name, or a reference to the role of president of presiding officer. 
     re_newspeaker =         r'^(<bullet> |  )(?P<name>(((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER( \([A-Za-z.\- ]+\))?))\.'
@@ -169,6 +170,8 @@ class CRParser(object):
     re_longquotebody =      r' {5}(?P<start>.)' 
     re_endofline =          r'$'
     re_alltext =            r"^\s+(?P<text>\S([\S ])+)"
+    re_rollcall =           r'\[Roll(call)?( Vote)? No. \d+.*\]'
+    re_allcaps =            r'^[^a-z]+$'
 
     re_recorderstart =      (r'^\s+(?P<start>'
                              + r'(The (assistant )?legislative clerk read as follows)'
@@ -195,6 +198,9 @@ class CRParser(object):
                              + r'|(The text of the.*?is as follows)'
                              + r'|(amended( to read)? as follows:)'
                              + r'|(The material (previously )?referred to (by.*?)?is as follows:)'
+                             + r'|(There was no objection)'
+                             + r'|(The amendment.*?was agreed to)'
+                             + r'|(The motion to table was .*)'
                              #+ r'|()'
                             + r').*')
 
@@ -288,6 +294,7 @@ class SenateParser(CRParser):
         self.recorder = False
         self.inlongquote = False
         self.newspeaker = False
+        self.inrollcall = False
         self.xml = ['<CRDoc>', ]
 
     def parse(self):
@@ -470,6 +477,9 @@ class SenateParser(CRParser):
             if self.intitle:
                 annotator.register_tag(self.re_title, '<title>', group='title')
             # some things only appear on the first line of a paragraph
+            elif self.inrollcall:
+                # will only match on first line of the roll call
+                annotator.register_tag_open(self.re_rollcall, '<rollcall>')
             elif self.new_paragraph:
                 annotator.register_tag_open(self.re_longquotestart, '<quote speaker="%s">' % self.current_speaker, group='start')
                 if self.recorder:
@@ -477,11 +487,19 @@ class SenateParser(CRParser):
                     annotator.register_tag_open(self.re_recorder_fuzzy, '<recorder>', 'start')
                 annotator.register_tag(self.re_newspeaker, '<speaker name="%s">' % self.current_speaker, group='name')
                 if self.return_from_quote_interjection(theline):
-                    annotator.register_tag(self.re_longquotebody, '<quote speaker="%s">' % self.current_speaker, group='start')
+                    annotator.register_tag_open(self.re_longquotebody, '<quote speaker="%s">' % self.current_speaker, group='start')
                 if not self.recorder and not self.inlongquote:
-                    annotator.register_tag_open(self.re_speaking, '<speaking name="%s">' % self.current_speaker, group='start')
+                    # check the current speaker-- if it's the recorder, then
+                    # even though this isn't a "known" recorder sentence,
+                    # there's no other speaker so we treat it like a recorder
+                    # comment.
+                    if self.current_speaker == 'recorder':
+                        annotator.register_tag_open(self.re_speaking, '<recorder>', group='start')
+                        self.recorder=True
+                    else: 
+                        annotator.register_tag_open(self.re_speaking, '<speaking name="%s">' % self.current_speaker, group='start')
 
-            if not self.intitle and not self.inlongquote:
+            if not self.intitle and not self.inlongquote and not self.inrollcall:
                 annotator.register_tag_open(self.re_startshortquote, '<quote speaker="%s">' % self.current_speaker)
 
             # note: the endquote tag needs to be registered BEFORE the end
@@ -489,33 +507,35 @@ class SenateParser(CRParser):
             # nested within) the speaking tag. a nesting functionality should
             # really be implemented within the XMLAnnotator class, but this
             # will do for now. 
-            if not self.inlongquote and not self.intitle:
+            if not self.inlongquote and not self.intitle and not self.inrollcall:
                 if self.inquote:
                     annotator.register_tag_close(self.re_endshortquote, '</quote>')
 
             if self.paragraph_ends():
-                if self.recorder:
+                if self.inrollcall: 
+                    annotator.register_tag_close(self.re_endofline, '</rollcall>')
+                    self.inrollcall = False
+                elif self.recorder:
                     annotator.register_tag_close(self.re_endofline, '</recorder>')
                 elif self.inlongquote:
                     if self.longquote_ends():
+                        print 'i think the longquote ends'
                         annotator.register_tag_close(self.re_endofline, '</quote>')
                 elif self.intitle:
                     pass
                 #  this specific set of states usually means we're somewhere
                 #  unrecognized, and can without these caveats can end up with
                 #  stray </speaking> tags. 
-                elif (self.current_speaker == 'recorder' and self.inlongquote == False 
+                elif (self.current_speaker == 'recorder' and self.inlongquote == False and self.inrollcall == False
                     and self.recorder == False and self.inquote == False and self.intitle == False):
-                    #print "UNRECOGNIZED STATE (but that's ok): %s" % theline
-                    pass
-                    #annotator.register_tag(self.re_alltext, '<unknown>', group='text')
+                    print "UNRECOGNIZED STATE (but that's ok): %s" % theline
                 else:
                     annotator.register_tag_close(self.re_endofline, '</speaking>')
 
-            if (self.current_speaker == 'recorder' and self.inlongquote == False 
-                and self.recorder == False and self.inquote == False and self.intitle == False):
-                print "UNRECOGNIZED STATE (but that's ok): %s" % theline
-                annotator.register_tag(self.re_alltext, '<unknown>', group='text')
+            #if (self.current_speaker == 'recorder' and self.inlongquote == False and self.inrollcall == False
+            #    and self.recorder == False and self.inquote == False and self.intitle == False):
+            #    print "UNRECOGNIZED STATE (but that's ok): %s" % theline
+            #    annotator.register_tag(self.re_alltext, '<unknown>', group='text')
  
             xml_line = annotator.apply()
             print xml_line
@@ -533,13 +553,71 @@ class SenateParser(CRParser):
             if not theline:
                 # end of file
                 self.xml.append('</CRDoc>')
-                print ''.join(self.xml)
-                print self.filename
-                print '\n\n'
-                return
+                self.validate()
+
+    def matching_tags(self, open, close):
+        ''' determine if the close tag matches the open tag '''
+        space = open.find(' ')
+        if space != -1:
+            derived_close = '</' + open[1:space] + '>'
+        else:
+            derived_close = '</' + open[1:]
+        if derived_close == close:
+            return True
+        else:
+            return False
+
+
+    def validate(self):
+        ''' validate the xml in the file, checking for mismatched tags and
+        removing any tags if necessary. basically, it's more important for the
+        document to validate than to get everything perfect.'''
+        
+        re_opentag = r'<[A-Za-z_]+( [a-z]+=".*?")?>'
+        re_closetag = r'</[A-Za-z_]+>'
+        re_tag = '</?.+?>'
+
+        active = []
+        orphans = []
+        for linenum, line in enumerate(self.xml):
+            tagiter = re.finditer(re_tag, line)
+            tags = [(match.group(), match.start(), match.end(), linenum) for match in tagiter]
+            for taginfo in tags:
+                tagname = taginfo[0]
+                if re.search(re_opentag, tagname):
+                    active.append(taginfo)
+                    print active
+                elif re.search(re_closetag, tagname):
+                    print 'line: %s' % self.xml[taginfo[3]]
+                    print 'comparing %s and %s' % (active[-1][0], tagname)
+                    if len(active) and self.matching_tags(active[-1][0], tagname):
+                        del active[-1]
+                    else:
+                        print 'no match-- orphaned'
+                        orphans.append(taginfo)
+        # append any remaining, unclosed open tags to the orphan list
+        orphans.extend(active)
+
+        print 'Orphaned Tags:\n'
+        for orphan in orphans:
+            print orphan
+        
+        for orphan in orphans:
+            linenum = orphan[3]
+            theline = self.xml[linenum]
+            # we have to use start and end indices instead of replace, since
+            # replace will replace *all* occurences
+            start = orphan[1]
+            end = orphan[2]
+            self.xml[linenum] = theline[:start]+theline[end:]
+
+        print ''.join(self.xml)
+        print self.filename
+        print '\n\n'
+        return
 
     def longquote_ends(self):
-        # XXX this function is totally repeating patterns used in many other
+        # XXX this function is totally repeating patterns used in other
         # places... 
 
         offset = 1
@@ -557,6 +635,7 @@ class SenateParser(CRParser):
     def preprocess_state(self, theline):
         ''' in certain cases we need to match a regular expression AND a state,
         so do some analysis to determine which tags to register. '''
+
 
         return_from_interjection = self.return_from_quote_interjection(theline)
 
@@ -589,12 +668,18 @@ class SenateParser(CRParser):
                 else:
                     self.set_speaker(theline)
 
-        elif not self.inlongquote and self.is_title(theline):
+        elif re.search(self.re_rollcall, theline):
+            self.inrollcall=True
+            self.intitle = False
+            self.new_paragraph = False
+
+        elif not self.inlongquote and not self.inrollcall and self.is_title(theline):
             self.intitle = True
             self.new_paragraph = False
 
         elif re.search(self.re_billheading, theline):
             self.intitle = True
+            self.inlongquote = False
             self.new_paragraph = False
 
         else:
@@ -616,6 +701,7 @@ class SenateParser(CRParser):
         print 'in long quote? %s' % self.inlongquote
         print 'in recorder? %s' % self.recorder
         print 'in quote? %s' % self.inquote
+        print 'in roll call? %s' % self.inrollcall
 
     def postprocess_state(self, theline):
         ''' in certain cases where a state ends on a line, we only want to note
@@ -700,6 +786,11 @@ class SenateParser(CRParser):
         # paragraph
         if not theline:
             return True
+        if self.inrollcall:
+            if self.spaces_indented(theline) == self.NEW_PARA_INDENT:
+                return True
+            else:
+                return False
         # new para or new long quote?
         if self.is_new_paragraph(theline):
             return True
@@ -742,13 +833,18 @@ class SenateParser(CRParser):
         line_above = self.rawlines[local_offset - 1].strip('\n')
         line_below = self.rawlines[local_offset + 1].strip('\n')
         empty = lambda line: len(line.strip()) == 0
+
+        if re.search(self.re_allcaps, theline):
+            return True
         if self.is_centered(theline) and self.spaces_indented(theline) > 0:
             if (empty(line_above) and self.is_centered(line_below)):
+                print 'line above empty'
                 return True
             if (empty(line_below) and self.is_centered(line_above)):
+                print 'line below empty'
                 return True
             if (self.is_centered(line_above) and self.is_centered(line_below)):
-                if (self.spaces_indented(theline) == 5 and self.spaces_indented(line_below) == 5):
+                if self.inlongquote:
                     return False
                 else:
                     return True
