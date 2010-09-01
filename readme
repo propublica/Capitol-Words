@@ -10,5 +10,9 @@ Setup:
 * cp settings.example.py settings.py
 * create symlinks to settings.py from each of solr/, scraper/ and parser/
 
+Startup
+* start up solr. in a dev environment this looks like:
+  cd $SOLR_DIR/example
+  java -jar start.jar (uses jetty)
 
 
