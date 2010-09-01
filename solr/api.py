@@ -23,42 +23,15 @@ def occurences_of_phrase(phrase, daterange, entity=None, granularity='day'):
     
 
 
-
-def most_vocal_by_person(date, n):
-    ''' get the n most vocal lawmakers.''' 
-    pass
-
-def least_vocal_by_person(date, n):
-    ''' get the n least vocal lawmakers.''' 
-    pass
-
-
-def phrase_by_person(phrase, name):
-    pass
-
-def phrase_by_state(phrase, state):
-    pass
-
-def phrase_by_party(phrase, party):
-    pass
-
-def phrase_by_date(phrase, date):
-    pass
-
-def most_frequent(numwords=1, daterange ):
-    ''' most popular (frequent) phrases over a given daterange'''
-    pass
-
-def most_frequent_over_daterange(start, end):
-    pass
-
-
 '''
 most_frequent_phrases(daterange, numwords, n, entity_type, entity, granularity='day')
 ==> most frequent phrases for a specific entity over a given date range
+
 occurences_of_phrase(phrase, daterange, entity_type, entity, granularity='day')
 ==> occurences of a specific phrase over time
+
 words_by_category(entity_type, phrase=None, order)
+==> eg. most vocal, least vocal... 
 
 entity=None will search across all documents for all entities
 special values of daterange =-1 will check for all time
