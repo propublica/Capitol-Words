@@ -14,7 +14,9 @@ from lib import bioguide_lookup
 class SolrDoc(object):
     def __init__(self, file):
         self.filename = file
-        self.dom = xml.parse(filename)
+        raw = open(filename).read()
+        # minidom doesn't properly escape ampersands!
+        self.dom = xml.parseString(raw.replace("&", "&amp;"))
         self.metadata_xml = None
         self.document_bodies = []
 
@@ -80,9 +82,9 @@ class SolrDoc(object):
         else:
             state = None
         data = bioguide_lookup(lastname, self.year, state)
+        print 'getting metadata for %s:' % speaker
         print data
         print lastname, self.year, state
-        print len(data)
         if not data or len(data) > 1:
             return None
         xml = ''
@@ -135,7 +137,7 @@ class SolrDoc(object):
             
             someone_speaking = re.search(re_speaker, body)
             if someone_speaking:
-                current_speaker = someone_speaking.group('current_speaker')
+                current_speaker = someone_speaking.group('current_speaker').lower()
             else:
                 current_speaker = 'recorder'
             # XXX add in more info about the speaker
@@ -150,8 +152,10 @@ class SolrDoc(object):
 
             speaker_line = '''<field name="speaker">%s</field>\n''' % current_speaker
             if (current_speaker != 'recorder' and not re.search('pro tempore', current_speaker) 
-                and not re.search('president', current_speaker)):
+                and not re.search('president', current_speaker) and not re.search('presiding', current_speaker)):
                 speaker_metadata = self.get_speaker_metadata(current_speaker)
+                if speaker_metadata == None:
+                    speaker_metadata = ''
             else: speaker_metadata = ''
             self.document_bodies.append(speaker_line + speaker_metadata + body)
 
