@@ -162,7 +162,7 @@ class CRParser(object):
     # whatever follows the statement of a new speaker marks someone starting to
     # speak. if it's a new paragraph and there's already a current_speaker,
     # then this re is also used to insert the <speaking> tag. 
-    re_speaking =           r'^(<bullet> |  )(((((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER))\. )?(?P<start>.)'
+    re_speaking =           r'^(<bullet> |  )(((((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER( \([A-Za-z.\- ]+\))?))\. )?(?P<start>.)'
     re_startshortquote =    r'``'
     re_endshortquote =      r"''"
     re_billheading =        r'\s+SEC.[A-Z_0-9. \-()\[\]]+'
@@ -588,19 +588,24 @@ class SenateParser(CRParser):
                     active.append(taginfo)
                     print active
                 elif re.search(re_closetag, tagname):
-                    print 'line: %s' % self.xml[taginfo[3]]
+                    print 'line: %s' % self.xml[taginfo[3]].strip('\n')
                     print 'comparing %s and %s' % (active[-1][0], tagname)
                     if len(active) and self.matching_tags(active[-1][0], tagname):
                         del active[-1]
                     else:
-                        print 'no match-- orphaned'
+                        print 'no match-- orphaned\n'
                         orphans.append(taginfo)
         # append any remaining, unclosed open tags to the orphan list
         orphans.extend(active)
 
+        print 'Before Validation:\n'
+        print ''.join(self.xml)
+        print self.filename
+        print '\n\n'
+
         print 'Orphaned Tags:\n'
         for orphan in orphans:
-            print orphan
+            print orphan, self.xml[orphan[3]]
         
         for orphan in orphans:
             linenum = orphan[3]
@@ -611,6 +616,7 @@ class SenateParser(CRParser):
             end = orphan[2]
             self.xml[linenum] = theline[:start]+theline[end:]
 
+        print '\nAfter Validation:\n'
         print ''.join(self.xml)
         print self.filename
         print '\n\n'
