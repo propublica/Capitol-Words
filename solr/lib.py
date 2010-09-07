@@ -109,7 +109,7 @@ def sunlight_lookup(lastname, state=None):
                 legislator = result['result']['legislator'] 
                 return legislator
 
-def bioguide_lookup(lastname, year, state=None):
+def bioguide_lookup(lastname, year, position=None, state=None):
     ''' looks up full name, bioguide id, state, and party based on last name, year
     and optionally, state. returns one or more results. lastname and year are
     usually all that's required to return a unique result, but with common names if
@@ -120,6 +120,8 @@ def bioguide_lookup(lastname, year, state=None):
     arguments = {'lastname': lastname, 'congress': year}
     if state and abbr(state):
         arguments['state'] = abbr(state).upper()
+    if position:
+        arguments['position'] = position.title()
     url = "http://bioguide.congress.gov/biosearch/biosearch1.asp"
     html_lines = urllib2.urlopen(url, urllib.urlencode(arguments)).readlines()
     re_result_firstline = r'<tr><td><a href="http://bioguide\.congress\.gov/scripts/biodisplay\.pl\?index=(?P<bioguide>.*?)">(?P<lastname>.*?), (?P<firstname>.*?)</a></td><td>.*?</td>'

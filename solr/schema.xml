@@ -34,7 +34,21 @@
                 />
         </analyzer>
     </fieldType>
-    <!-- other options we may consider: indexing in reverse as well to support more
+
+   <!-- the ShingleFilterFactory produces n-grams. Note that stopwords are not
+        removed. Ideally, we would have a stop list for n-grams. -->
+    <fieldType name="ngrams" class="solr.TextField" positionIncrementGap="100" >
+        <analyzer>
+            <tokenizer class="solr.StandardTokenizerFactory"/>    
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.ShingleFilterFactory" 
+                maxShingleSize="5" 
+                outputUnigrams="true" 
+            />
+       </analyzer>
+    </fieldType>
+
+     <!-- other options we may consider: indexing in reverse as well to support more
         efficient wildcard queries, adding more flexible matching for search including
         synonyms, word delimiters, and stemming-->
 
@@ -44,33 +58,7 @@
 
  </types>
 
-
  <fields>
-   <!-- Valid attributes for fields:
-     name: mandatory - the name for the field
-     type: mandatory - the name of a previously defined type from the 
-       <types> section
-     indexed: true if this field should be indexed (searchable or sortable)
-     stored: true if this field should be retrievable
-     compressed: [false] if this field should be stored using gzip compression
-       (this will only apply if the field type is compressable; among
-       the standard field types, only TextField and StrField are)
-     multiValued: true if this field may contain multiple values per document
-     omitNorms: (expert) set to true to omit the norms associated with
-       this field (this disables length normalization and index-time
-       boosting for the field, and saves some memory).  Only full-text
-       fields or fields that need an index-time boost need norms.
-     termVectors: [false] set to true to store the term vector for a
-       given field.
-       When using MoreLikeThis, fields used for similarity should be
-       stored for best performance.
-     termPositions: Store position information with the term vector.  
-       This will increase storage costs.
-     termOffsets: Store offset information with the term vector. This 
-       will increase storage costs.
-     default: a value that should be used if no value is specified
-       when adding a document.
-   -->
 
    <field name="id" type="string" indexed="true" stored="true" required="true" /> 
    <field name="crdoc" type="string" indexed="true" stored="true" required="true" /> 
@@ -80,30 +68,37 @@
    <field name="chamber" type="string" indexed="true" stored="false" required="true" /> 
    <field name="pages" type="string" indexed="true" stored="true" required="true" /> 
    <field name="document_title" type="CRtext" indexed="true" stored="true" required="false" /> 
-    <!-- speaker info that we want ability to search on-->
-   <field name="speaker" type="string" indexed="true" stored="true" required="true" /> 
+    <!-- speaker info -->
+   <field name="speaker_raw" type="string" indexed="false" stored="true" required="true" /> 
    <field name="speaker_state" type="string" indexed="true" stored="true" required="false" /> 
    <field name="speaker_party" type="string" indexed="true" stored="true" required="false" /> 
-   <field name="speaker_bioguide" type="string" indexed="true" stored="true" required="false" /> 
-    <!-- the firstname field contains middle names and/or initials, so use the
-    CRtext field to tokenize and enable searching by any of the individual's names
-    -->
-   <field name="speaker_firstname" type="CRtext" indexed="true" stored="true" required="false" /> 
-   <field name="speaker_lastname" type="string" indexed="true" stored="true" required="false" /> 
+   <field name="speaker_bioguide" type="string" indexed="false" stored="true" required="false" /> 
+   <field name="speaker_firstname" type="string" indexed="false" stored="true" required="false" /> 
+   <field name="speaker_lastname" type="string" indexed="false" stored="true" required="false" /> 
+     <!-- the dummy field has the same value in every document, and is used
+        to anchor searches when we want to facet on "all" since wildcard
+        searches for * are not allowed in solr -->
+   <field name="dummy" type="CRtext" indexed="true" stored="false" required="false" multiValued="true"/> 
     <!-- multivalued fields -->
    <field name="title" type="CRtext" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="speaking" type="CRtext" indexed="true" stored="true" required="false" multiValued="true"/> 
    <field name="quote" type="CRtext" indexed="true" stored="true" required="false" multiValued="true"/> 
    <field name="longquote" type="CRtext" indexed="true" stored="true" required="false" multiValued="true"/> 
-    
-    <!--
+    <!-- speaker field has to be multi valued even though there is only one
+        speaker per document because it is a copy field for multiple fields in the
+        document -->
+   <field name="speaker" type="CRtext" indexed="true" stored="false" required="false" multiValued="true"/> 
+    <!-- this is a destination for the copy field which stores the speaker
+        first name, last name and bioguide ID to enable simpler searching -->
+   <field name="text" type="ngrams" indexed="true" stored="false" required="false" multiValued="true"/> 
+   <!--
     to be implemented...
    <field name="vote" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
    <field name="time" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
     -->
    
-     <!--   Create a "timestamp" field with a default value of "NOW" to indicate
-            when each document was indexed.  -->
+     <!--   A timestamp field with a default value of "NOW" to indicate when
+        each document was indexed.  -->
     <field name="ingestdate" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
    
 </fields>
@@ -122,8 +117,13 @@
   <!-- copyField commands copy one field to another at the time a document
         is added to the index.  It's used either to index the same field differently,
         or to add multiple fields to the same field for easier/faster searching.  -->
+<copyField source="speaker_firstname" dest="speaker"/>
+<copyField source="speaker_lastname" dest="speaker"/>
+<copyField source="speaker_bioguide" dest="speaker"/>
+<copyField source="speaking" dest="text"/>
+<copyField source="quote" dest="text"/>
+
   <!--
-   <copyField source="cat" dest="text"/>
    <copyField source="name" dest="text"/>
    <copyField source="manu" dest="text"/>
    <copyField source="features" dest="text"/>

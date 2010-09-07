@@ -8,15 +8,20 @@ have one speaker per solr document.'''
 
 from httplib import HTTPConnection
 import xml.dom.minidom as xml
+from xml.parsers.expat import ExpatError
 import sys, os, re
 from lib import bioguide_lookup
 
 class SolrDoc(object):
     def __init__(self, file):
+        self.status = None
+        self.error = None
+        self.warning = None
         self.filename = file
         raw = open(filename).read()
         # minidom doesn't properly escape ampersands!
-        self.dom = xml.parseString(raw.replace("&", "&amp;"))
+        raw_replaced = raw.replace("&", "&amp;")
+        self.dom = xml.parseString(raw_replaced)
         self.metadata_xml = None
         self.document_bodies = []
 
@@ -59,7 +64,7 @@ class SolrDoc(object):
         self.year = year
         date = "%s-%s-%sT00:00:00Z" % (year, numeric_months[month.lower()], day)
         # store the original file this came from so we can go back to it
-        self.metadata_xml = '''<field name="crdoc">%s</field>''' % self.filename
+        self.metadata_xml = '''<field name="crdoc">%s</field>\n''' % self.filename
         self.metadata_xml += '''<field name="date">%s</field>\n''' % date
 
         if self.dom.getElementsByTagName('document_title'):
@@ -69,23 +74,36 @@ class SolrDoc(object):
         for tag in ['volume', 'number', 'chamber', 'pages']:
             tag_content = self.get_text(tag)
             self.metadata_xml += '''<field name="%s">%s</field>\n''' % (tag, tag_content)
+   
+        # the dummy field has the same value for all documents, and provides an
+        # anchor when we want to do a wildcard search on all terms in a
+        # specific field. 
+        self.metadata_xml += '''<field name="dummy">dummyvalue</field>\n''' 
+        
     
     def get_metadata(self):
         return self.metadata_xml
 
     def get_speaker_metadata(self, speaker):
         pieces = speaker.split(' of ')
-        name = pieces[0]
-        lastname = name.lower().strip('msr.').strip()
+        lastname = pieces[0].lower()
+        if lastname.startswith('mr.') or lastname.startswith('ms.') or lastname.startswith('mrs.'):
+            i = lastname.find('.')
+            lastname = lastname[i+1:].strip()
         if len(pieces) > 1:
             state = pieces[1]
         else:
             state = None
-        data = bioguide_lookup(lastname, self.year, state)
-        print 'getting metadata for %s:' % speaker
-        print data
-        print lastname, self.year, state
+        # get the chamber info
+        chamber = self.get_text('chamber').lower()
+        if chamber == 'senate':
+            position = 'senator'
+        else:
+            position = 'representative'
+        data = bioguide_lookup(lastname, self.year, position, state)
         if not data or len(data) > 1:
+            print data
+            print 'No data or too many responses for %s, %s, %s, %s' % (lastname, self.year, position, state)
             return None
         xml = ''
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_bioguide', data[0]['bioguide'])
@@ -150,7 +168,7 @@ class SolrDoc(object):
             body = re.sub(re_title, '<field name="title">', body) 
             body = re.sub(re_endtag, '</field>', body)
 
-            speaker_line = '''<field name="speaker">%s</field>\n''' % current_speaker
+            speaker_line = '''<field name="speaker_raw">%s</field>\n''' % current_speaker
             if (current_speaker != 'recorder' and not re.search('pro tempore', current_speaker) 
                 and not re.search('president', current_speaker) and not re.search('presiding', current_speaker)):
                 speaker_metadata = self.get_speaker_metadata(current_speaker)
@@ -167,12 +185,12 @@ class SolrDoc(object):
             document_id_field = self.make_solr_id(idx)
             metadata_fields = self.get_metadata()
             solrdoc = '''<add><doc>\n''' + document_id_field + metadata_fields + body + '''\n</doc></add>'''
-            print solrdoc
-            raw_input("enter to post...")
             self.post(solrdoc)
             self.commit()
-            raw_input("enter to continue...")
-        
+        if not len(self.document_bodies):
+            self.status = 'OK'
+            self.warning  = 'No document body. Skipping.'
+                
     def post(self, payload):
         """
         Add a document to index
@@ -185,10 +203,13 @@ class SolrDoc(object):
         con.send(payload)
         r = con.getresponse()
         if str(r.status) == '200':
-            print r.read()
+            self.status = 'OK'
+            #print r.read()
         else:
-            print r.status
-            print r.read()
+            self.status = 'error'
+            self.error = '%d: %s' % (r.status, r.read())
+            #print r.status
+            #print r.read()
 
     def commit(self):
         """
@@ -202,14 +223,38 @@ class SolrDoc(object):
         con.endheaders()
         con.send(DATA)
         r = con.getresponse()
-        if str(r.status) == '200':
+        if not str(r.status) == '200':
+            print ' ==> There was an error committing to solr'
             print r.read()
-        else:
             print r.status
-            print r.read()
 
-  
+    def validate(self):
+        ''' checks for extraneous tags and other things which would cause solr
+        to choke. needs to be run before the document is processed.'''
+
+        def check_kids(node):
+            kids = node.childNodes
+            for kid in kids:
+                if kid.nodeName not in valid_tags:
+                    print 'replacing invalid tag %s' % kid.nodeName
+                    # get it's inner contents and replace the invalid tag with
+                    # what's inside it. 
+                    parent = kid.parentNode
+                    grandkids = kid.childNodes
+                    parent.removeChild(kid)
+                    for node in grandkids:
+                        parent.appendChild(node)
+                check_kids(kid)
+
+        valid_tags = [
+            u'doc', u'add', u'#text', u'volume', u'number', u'weekday', u'month', u'day', 
+            u'year', u'chamber', u'pages', u'document_title', u'speaker', u'speaking', 
+            u'quote', u'recorder', 'title']
+        root = self.dom.firstChild
+        check_kids(root)
+    
     def process(self):
+        self.validate()
         self.set_metadata()
         self.build_document_bodies()
         self.assemble_and_submit()
@@ -218,6 +263,16 @@ class SolrDoc(object):
 if __name__ == '__main__' :
 
     filename = sys.argv[1]
+    print '***   ' + filename + '   ***'
+    #try:
     s = SolrDoc(filename)
     s.process()
+    print 'STATUS: ', s.status
+    if s.error:
+        print 'Solr Ingest error: ', s.error
+    if s.warning:
+        print 'Solr Ingest warning: ', s.warning
+    #except ExpatError, e:
+    #    print 'XML Error: %s' % e
+    print '\n'
 

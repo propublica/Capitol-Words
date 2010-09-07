@@ -282,11 +282,18 @@ class SenateParser(CRParser):
     }
 
     def __init__(self, abspath):
+        # track error conditions
+        self.error_flag = False
+        self.not_implemented_flag = False
+
+        # file data
         self.filename = abspath
         fp = open(abspath)
         self.rawlines = fp.readlines()
-        self.currentline = 0
         self.date = None
+
+        # state information
+        self.currentline = 0
         self.current_speaker = None
         self.inquote = False
         self.intitle = False
@@ -295,6 +302,8 @@ class SenateParser(CRParser):
         self.inlongquote = False
         self.newspeaker = False
         self.inrollcall = False
+
+        # output
         self.xml = ['<CRDoc>', ]
 
     def parse(self):
@@ -303,7 +312,6 @@ class SenateParser(CRParser):
         print self.rawlines[:15]
         print '\n\n'
         self.markup_preamble()
-       
         
     def markup_preamble(self):
         self.currentline = 1
@@ -360,9 +368,11 @@ class SenateParser(CRParser):
 
     def called_to_order(self):
         print 'not yet implemented'
+        self.not_implemented_flag = True
         return
 
     def no_title(self):
+        self.not_implemented_flag = True
         print 'not yet implemented'
         # one of the things to do here is when the acting president is assigned
         # for the day, make note of who they are so we can assign words spoken
@@ -370,6 +380,7 @@ class SenateParser(CRParser):
         return
 
     def parse_special(self):
+        self.not_implemented_flag = True
         print 'not yet implemented'
         return
 
@@ -460,17 +471,32 @@ class SenateParser(CRParser):
             self.current_speaker = name # XXX TODO this should be a unique ID
         return self.current_speaker
 
+    def check_bullet(self, theline):
+        if theline.find('<bullet>') >= 0:
+            self.rawlines[self.currentline] = self.rawlines[self.currentline].replace('<bullet>', ' ')
+            # now start at the end of the document and walk up the doc, to find
+            # the closing bullet tag. 
+            ix = len(self.rawlines)-1
+            while True:
+                if self.rawlines[ix].find('<bullet>') >= 0:
+                    self.rawlines[ix] = self.rawlines[ix].replace('<bullet>', '')
+                    return self.rawlines[self.currentline]
+                ix -= 1
+        else:
+            return theline
+
     def markup_paragraph(self):
         ''' this is the standard paragraph parser. handles new speakers,
         standard recorder comments, long and short quotes, etc. '''
         
-
         # get to the first line 
         theline = self.get_line()
         while not theline.strip():
             self.currentline += 1
             theline = self.get_line()
 
+        # remove <bullet> tags if they exist
+        theline = self.check_bullet(theline)
         while theline:
             self.preprocess_state(theline)
             annotator = XMLAnnotator(theline)
@@ -553,7 +579,6 @@ class SenateParser(CRParser):
             if not theline:
                 # end of file
                 self.xml.append('</CRDoc>')
-                self.validate()
 
     def matching_tags(self, open, close):
         ''' determine if the close tag matches the open tag '''
@@ -597,6 +622,14 @@ class SenateParser(CRParser):
                         orphans.append(taginfo)
         # append any remaining, unclosed open tags to the orphan list
         orphans.extend(active)
+        # BUT, we don't want to remove the CRDoc tags
+        save = []
+        for orphan in orphans:
+            if orphan[0] == '<CRDoc>' or orphan[0] == '</CRDoc>':
+                print 'saving crdoc tag', orphan[0]
+                save.append(orphan)
+        for s in save:
+            orphans.remove(s)
 
         print 'Before Validation:\n'
         print ''.join(self.xml)
@@ -620,6 +653,7 @@ class SenateParser(CRParser):
         print ''.join(self.xml)
         print self.filename
         print '\n\n'
+        print orphans
         return
 
     def longquote_ends(self):
@@ -632,6 +666,9 @@ class SenateParser(CRParser):
             offset += 1
             theline = self.get_line(offset)
     
+        # there should only be NO line if it's the end of the document
+        if not theline:
+            return True
         # longquote ends when the new paragraph is NOT another longquote
         # paragraph (be it a new title, vote, or just regular paragraph). 
         if self.spaces_indented(theline) not in self.LONGQUOTE_NEW_PARA_INDENT:
@@ -731,6 +768,7 @@ class SenateParser(CRParser):
             print objdata
             print ''
             message = '!! Unrecognized state while parsing %s.\n' % self.filename
+            self.error_flag = True
             raise UnrecognizedCRDoc(message)
 
         # if there's one or more complete quotes (start and end) on a line, or
@@ -761,6 +799,7 @@ class SenateParser(CRParser):
 
         if not self.rawlines[self.currentline] == theline:
             message = 'current line and index are not aligned'
+            self.error_flag = True
             raise AlignmentError(message)
 
         line_above = self.rawlines[self.currentline -1].strip()
@@ -833,6 +872,7 @@ class SenateParser(CRParser):
         local_offset = self.currentline + offset
         if not self.rawlines[local_offset] == theline:
             message = 'current line and index are not aligned'
+            self.error_flag = True
             raise AlignmentError(message)
 
         first_line_on_page = re.search(self.re_newpage, self.rawlines[local_offset - 2])
@@ -950,7 +990,9 @@ if __name__ == '__main__':
         chamber = re.search(r'-Pg(?P<chamber>E|S|H)', abspath).group('chamber')
         chamber_doc = parsers[chamber](abspath)
         chamber_doc.parse()
-        chamber_doc.save()
+        if not chamber_doc.error_flag and not chamber_doc.not_implemented_flag:
+            chamber_doc.validate()
+            chamber_doc.save()
 
     else:
         date_path = sys.argv[1]
@@ -958,6 +1000,9 @@ if __name__ == '__main__':
         print path
         chamber = sys.argv[2].lower()
         correct_chamber = chambers[chamber]
+        if len(sys.argv) > 3 and sys.argv[3] == 'interactive':
+            interactive = True
+        else: interactive = False
 
         if not os.path.exists(path):
             print 'no records exist for that date. try a different date.'
@@ -967,19 +1012,24 @@ if __name__ == '__main__':
             # nothing useful in the front matter. 
             if file.find('FrontMatter') != -1 or file.find(correct_chamber) == -1:
                 continue
-            resp = raw_input("process file %s? (y/n/q) " % file)
-            if resp == 'n': 
-                print 'skipping\n'
-            elif resp == 'q':
-                sys.exit()
-            else:
-                abspath = os.path.join(path, file)
-                chamber_doc = parsers[chamber](abspath)
-                try:
-                    chamber_doc.parse()
+            if interactive:
+                resp = raw_input("process file %s? (y/n/q) " % file)
+                if resp == 'n': 
+                    print 'skipping\n'
+                    continue
+                elif resp == 'q':
+                    sys.exit()
+            
+            abspath = os.path.join(path, file)
+            chamber_doc = parsers[chamber](abspath)
+            try:
+                chamber_doc.parse()
+                print 'flag status:', chamber_doc.error_flag, chamber_doc.not_implemented_flag
+                if not chamber_doc.error_flag and not chamber_doc.not_implemented_flag:
+                    chamber_doc.validate()
                     chamber_doc.save()
-                except Exception, e:
-                    logfile.write('Error processing file %s' % abspath)
-                    logfile.write('\t%s' % e)
-                    logfile.flush()
-                    
+            except Exception, e:
+                logfile.write('Error processing file %s' % abspath)
+                logfile.write('\t%s' % e)
+                logfile.flush()
+                
