@@ -100,7 +100,16 @@ class SolrDoc(object):
             position = 'senator'
         else:
             position = 'representative'
-        data = bioguide_lookup(lastname, self.year, position, state)
+
+        # add some redundancy into the bioguide lookup (servers can be sketchy)
+        tries = 1
+        data = False # use False because bioguide_lookup returns None if no data found.
+        while data == False and tries < 3:
+            try:
+                data = bioguide_lookup(lastname, self.year, position, state)
+            except:
+                tries += 1
+
         if not data or len(data) > 1:
             print data
             print 'No data or too many responses for %s, %s, %s, %s' % (lastname, self.year, position, state)
