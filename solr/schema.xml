@@ -35,18 +35,75 @@
         </analyzer>
     </fieldType>
 
-   <!-- the ShingleFilterFactory produces n-grams. Note that stopwords are not
+   <!-- the ShingleFilterFactory produces n-grams. Note that stopwords are 
         removed. Ideally, we would have a stop list for n-grams. -->
-    <fieldType name="ngrams" class="solr.TextField" positionIncrementGap="100" >
+    <fieldType name="bigrams" class="solr.TextField" positionIncrementGap="100" >
         <analyzer>
-            <tokenizer class="solr.StandardTokenizerFactory"/>    
+            <tokenizer class="solr.WhitespaceTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
-            <filter class="solr.ShingleFilterFactory" 
-                maxShingleSize="5" 
-                outputUnigrams="true" 
+            <filter class="solr.StopFilterFactory"
+                ignoreCase="true"
+                words="stopwords.txt"
+                enablePositionIncrements="true"
+                />
+             <filter class="solr.ShingleFilterFactory" 
+                maxShingleSize="2" 
+                minShingleSize="2"
+                outputUnigrams="false" 
             />
        </analyzer>
     </fieldType>
+    <fieldType name="trigrams" class="solr.TextField" positionIncrementGap="100" >
+        <analyzer>
+            <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.StopFilterFactory"
+                ignoreCase="true"
+                words="stopwords.txt"
+                enablePositionIncrements="true"
+                />
+             <filter class="solr.ShingleFilterFactory" 
+                maxShingleSize="3" 
+                minShingleSize="3" 
+                outputUnigrams="false" 
+            />
+       </analyzer>
+    </fieldType>
+
+    <fieldType name="quadgrams" class="solr.TextField" positionIncrementGap="100" >
+        <analyzer>
+            <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.StopFilterFactory"
+                ignoreCase="true"
+                words="stopwords.txt"
+                enablePositionIncrements="true"
+                />
+             <filter class="solr.ShingleFilterFactory" 
+                maxShingleSize="4" 
+                minShingleSize="4" 
+                outputUnigrams="false" 
+            />
+       </analyzer>
+    </fieldType>
+
+    <fieldType name="pentagrams" class="solr.TextField" positionIncrementGap="100" >
+        <analyzer>
+            <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.StopFilterFactory"
+                ignoreCase="true"
+                words="stopwords.txt"
+                enablePositionIncrements="true"
+                />
+             <filter class="solr.ShingleFilterFactory" 
+                maxShingleSize="5" 
+                minShingleSize="5" 
+                outputUnigrams="false" 
+            />
+       </analyzer>
+    </fieldType>
+
 
      <!-- other options we may consider: indexing in reverse as well to support more
         efficient wildcard queries, adding more flexible matching for search including
@@ -84,13 +141,21 @@
    <field name="speaking" type="CRtext" indexed="true" stored="true" required="false" multiValued="true"/> 
    <field name="quote" type="CRtext" indexed="true" stored="true" required="false" multiValued="true"/> 
    <field name="longquote" type="CRtext" indexed="true" stored="true" required="false" multiValued="true"/> 
-    <!-- speaker field has to be multi valued even though there is only one
-        speaker per document because it is a copy field for multiple fields in the
+    <!-- this is a destination for the copy field which stores the speaker
+        first name, last name and bioguide ID to enable simpler searching
+        speaker field has to be multi valued even though there is only one speaker per
+        document because it is a copy field for multiple fields in the
         document -->
    <field name="speaker" type="CRtext" indexed="true" stored="false" required="false" multiValued="true"/> 
-    <!-- this is a destination for the copy field which stores the speaker
-        first name, last name and bioguide ID to enable simpler searching -->
-   <field name="text" type="ngrams" indexed="true" stored="false" required="false" multiValued="true"/> 
+    <!-- text is a copy field for both the speaking and quote fields. it is
+        indexed as normal with stop words removed and case normalized-->
+   <field name="text" type="CRtext" indexed="true" stored="false" required="false" multiValued="true"/> 
+    <!-- ngrams is a field for ngrams to be indexed. ngrams is configurable but
+        the field is defined to index up to n=5. -->
+   <field name="bigrams" type="bigrams" indexed="true" stored="false" required="false" multiValued="true"/> 
+   <field name="trigrams" type="trigrams" indexed="true" stored="false" required="false" multiValued="true"/> 
+   <field name="quadgrams" type="quadgrams" indexed="true" stored="false" required="false" multiValued="true"/> 
+   <field name="pentagrams" type="pentagrams" indexed="true" stored="false" required="false" multiValued="true"/> 
    <!--
     to be implemented...
    <field name="vote" type="" indexed="true" stored="true" required="false" multiValued="true"/> 
@@ -109,7 +174,7 @@
  <uniqueKey>id</uniqueKey>
 
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
- <defaultSearchField>speaking</defaultSearchField>
+ <defaultSearchField>text</defaultSearchField>
 
  <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
  <solrQueryParser defaultOperator="OR"/>
@@ -122,13 +187,13 @@
 <copyField source="speaker_bioguide" dest="speaker"/>
 <copyField source="speaking" dest="text"/>
 <copyField source="quote" dest="text"/>
-
-  <!--
-   <copyField source="name" dest="text"/>
-   <copyField source="manu" dest="text"/>
-   <copyField source="features" dest="text"/>
-   <copyField source="includes" dest="text"/>
-   <copyField source="manu" dest="manu_exact"/>
-  -->
+<copyField source="speaking" dest="bigrams"/>
+<copyField source="quote" dest="bigrams"/>
+<copyField source="speaking" dest="trigrams"/>
+<copyField source="quote" dest="trigrams"/>
+<copyField source="speaking" dest="quadgrams"/>
+<copyField source="quote" dest="quadgrams"/>
+<copyField source="speaking" dest="pentagrams"/>
+<copyField source="quote" dest="pentagrams"/>
 
 </schema>
