@@ -191,7 +191,6 @@ mr
 president
 senator
 representative
-president
 senate
 congress
 congressional
