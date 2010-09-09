@@ -23,7 +23,7 @@
 
    <!-- Strict text field that splits only on whitespace for exact matching of
         words, but has a custom stopword list and normalizes case -->
-    <fieldType name="CRtext" class="solr.TextField" positionIncrementGap="100" >
+    <fieldType name="CRtext" class="solr.TextField" positionIncrementGap="1" >
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
@@ -35,9 +35,26 @@
         </analyzer>
     </fieldType>
 
+    <!-- same as the above field except with a positionIncrementGap of 100 for
+        multi-valued fields where we don't want distinct input fields to be
+        concatenated together and inadvertently match a search query -->
+
+    <fieldType name="CRtext_multivalued" class="solr.TextField" positionIncrementGap="100" >
+        <analyzer>
+            <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.StopFilterFactory"
+                ignoreCase="true"
+                words="stopwords.txt"
+                enablePositionIncrements="true"
+                />
+        </analyzer>
+    </fieldType>
+
+
    <!-- the ShingleFilterFactory produces n-grams. Note that stopwords are 
         removed. Ideally, we would have a stop list for n-grams. -->
-    <fieldType name="bigrams" class="solr.TextField" positionIncrementGap="100" >
+    <fieldType name="bigrams" class="solr.TextField" positionIncrementGap="1" >
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
@@ -47,13 +64,13 @@
                 enablePositionIncrements="true"
                 />
              <filter class="solr.ShingleFilterFactory" 
-                maxShingleSize="2" 
                 minShingleSize="2"
+                maxShingleSize="2" 
                 outputUnigrams="false" 
             />
        </analyzer>
     </fieldType>
-    <fieldType name="trigrams" class="solr.TextField" positionIncrementGap="100" >
+    <fieldType name="trigrams" class="solr.TextField" positionIncrementGap="1" >
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
@@ -63,14 +80,14 @@
                 enablePositionIncrements="true"
                 />
              <filter class="solr.ShingleFilterFactory" 
-                maxShingleSize="3" 
                 minShingleSize="3" 
+                maxShingleSize="3" 
                 outputUnigrams="false" 
             />
        </analyzer>
     </fieldType>
 
-    <fieldType name="quadgrams" class="solr.TextField" positionIncrementGap="100" >
+    <fieldType name="quadgrams" class="solr.TextField" positionIncrementGap="1" >
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
@@ -80,14 +97,14 @@
                 enablePositionIncrements="true"
                 />
              <filter class="solr.ShingleFilterFactory" 
-                maxShingleSize="4" 
                 minShingleSize="4" 
+                maxShingleSize="4" 
                 outputUnigrams="false" 
             />
        </analyzer>
     </fieldType>
 
-    <fieldType name="pentagrams" class="solr.TextField" positionIncrementGap="100" >
+    <fieldType name="pentagrams" class="solr.TextField" positionIncrementGap="1" >
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
@@ -97,8 +114,8 @@
                 enablePositionIncrements="true"
                 />
              <filter class="solr.ShingleFilterFactory" 
-                maxShingleSize="5" 
                 minShingleSize="5" 
+                maxShingleSize="5" 
                 outputUnigrams="false" 
             />
        </analyzer>
@@ -146,7 +163,7 @@
         speaker field has to be multi valued even though there is only one speaker per
         document because it is a copy field for multiple fields in the
         document -->
-   <field name="speaker" type="CRtext" indexed="true" stored="false" required="false" multiValued="true"/> 
+   <field name="speaker" type="CRtext_multivalued" indexed="true" stored="false" required="false" multiValued="true"/> 
     <!-- text is a copy field for both the speaking and quote fields. it is
         indexed as normal with stop words removed and case normalized-->
    <field name="text" type="CRtext" indexed="true" stored="false" required="false" multiValued="true"/> 
