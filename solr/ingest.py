@@ -62,7 +62,11 @@ class SolrDoc(object):
         year = self.get_text('year')
         # keep the year around; we use it later to retrieve speaker metadata
         self.year = year
-        date = "%s-%s-%sT00:00:00Z" % (year, numeric_months[month.lower()], day)
+        # set the date. note the time is set to noon. this is to avoid setting
+        # the time near the boundary of the day, since solr requires more
+        # subtle handling of such date queries.
+        date = "%s-%s-%sT12:00:00Z" % (year, numeric_months[month.lower()],
+        day)
         # store the original file this came from so we can go back to it
         self.metadata_xml = '''<field name="crdoc">%s</field>\n''' % self.filename
         self.metadata_xml += '''<field name="date">%s</field>\n''' % date
