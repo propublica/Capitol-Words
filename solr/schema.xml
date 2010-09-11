@@ -146,9 +146,9 @@
    <field name="speaker_raw" type="string" indexed="false" stored="true" required="true" /> 
    <field name="speaker_state" type="string" indexed="true" stored="true" required="false" /> 
    <field name="speaker_party" type="string" indexed="true" stored="true" required="false" /> 
-   <field name="speaker_bioguide" type="string" indexed="false" stored="true" required="false" /> 
-   <field name="speaker_firstname" type="string" indexed="false" stored="true" required="false" /> 
-   <field name="speaker_lastname" type="string" indexed="false" stored="true" required="false" /> 
+   <field name="speaker_bioguide" type="string" indexed="true" stored="true" required="false" /> 
+   <field name="speaker_firstname" type="string" indexed="true" stored="true" required="false" /> 
+   <field name="speaker_lastname" type="string" indexed="true" stored="true" required="false" /> 
      <!-- the dummy field has the same value in every document, and is used
         to anchor searches when we want to facet on "all" since wildcard
         searches for * are not allowed in solr -->
