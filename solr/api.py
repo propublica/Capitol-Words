@@ -3,7 +3,7 @@
 ''' A set of functions that give specific views into the solr documents,
 returning nicely formatted statistics.  '''
 
-import urllib, urllib2
+import urllib, urllib2, sys, os
 import settings
 try:
     import json
@@ -18,14 +18,16 @@ def as_solr_date(datestring):
     ''' converts a string in the form dd/mm/yyyy to a solr date of
     2010-01-01T00:00:00Z'''
     day, month, year = datestring.strip().split('/')
-    solr_date = "%s-%s-%sT00:00:00Z" % (day, month, year)
+    solr_date = "%s-%s-%sT00:00:00Z" % (year, month, day)
     return solr_date
 
 def encode_and_retrieve(args):
     ''' encode the args and retrieve the solr response.'''
-    base_url = settings.SOLR_DOMAIN + 'solr/select?'
+    base_url = os.path.join(settings.SOLR_DOMAIN, 'solr/select?')
     data = urllib.urlencode(args)
-    fp = urllib2.urlopen(base+url+data)
+    full_url = base_url+data
+    print full_url
+    fp = urllib2.urlopen(full_url)
     return json.loads(fp.read())
 
 def solr_api_call(args):
@@ -33,11 +35,13 @@ def solr_api_call(args):
     pagination if necessary.'''
 
     # pagination settings
-    start = 0
-    if not 'rows' in args or args['rows'] == 0:
+    if not 'rows' in args:
         rows = 50
-    args['start'] = start
-    args['rows'] = rows
+        args['rows'] = rows
+    else: rows = args['rows']
+    if args['rows'] != 0:
+        start = 0
+        args['start'] = start
 
     # return results in json format
     args['wt'] = 'json'
@@ -56,69 +60,65 @@ def solr_api_call(args):
 
     return responses
 
-def occurences_of_phrase(phrase, start_date=None, end_date=None, entity_type, entity_name, 
-    granularity='day'):
+def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=None, 
+    end_date=None, granularity='day', mincount=0):
     ''' find occurences of a specific phrase over time. returns counts. expects
-    date in dd/mm/yyyy format. if start and end date or none, uses a default
-    date range of all dates for which there are records. entity information
-    (type and name) limits results to the entity specified (eg. occurences of
-    phrase by a single person or party). if entity information is empty, then
-    returns results across all entities. '''
+    date in dd/mm/yyyy format. if 'start' and 'end' date are none, defaults
+    to all time. entity information (type and name) limits results to the entity
+    specified (eg. occurences of phrase by a single person or party). if entity
+    information is empty, then returns results across all entities.  granularity allows an
+    interval to be specified over which data will be aggregated and normalized,
+    such as by day or by year. default granularity is daily. '''
 
     args = {}
     
-    # set up the faceting. many of these query args need to be set using a
-    # string variable for the key since they contain periods. 
+    # set up the faceting. 
 
-    facet = "true"
-    # set this for completeness, but it's not actually respected in solr 1.4.
-    # see https://issues.apache.org/jira/browse/SOLR-343. 
-    facet_mincount = 'facet.mincount'
-    args[facet_mincount] = 1
-    facet_date = 'facet.date'
-    args[facet_date] = 'date'
+    args['facet'] = "true"
+    args['facet.date'] = 'date'
     # default limit for # faceted fields returned is 100; we want to return for
     # all dates, and this could be a large number. 
-    facet_limit = 'facet.limit'
-    args[facet_limit] = -1
-    # specify facet start and end dates
-    facet_date_start = 'facet.date.start'
-    facet_date_end = 'facet.date.end'
+    args['facet.limit'] = -1
     if start_date and end_date:
         date_start_value = as_solr_date(start_date)
         date_end_value = as_solr_date(end_date) 
     else:
-        # default date range is between oldest date we have and today
+        # default date range is all time
         date_start_value = as_solr_date(settings.OLDEST_DATE)
-        date_end_value = '+NOW/DAY'
-    args[facet_date_start] = date_start_value
-    args[facet_date_end] =   date_end_value
+        date_end_value = 'NOW/DAY+1DAY'
+    args['facet.date.start'] = date_start_value
+    args['facet.date.end'] =   date_end_value
     
     # specify facet granularity
-    facet_date_gap = 'facet.date.gap'
     if granularity == 'year':
-        date_gap_value = '+1YEAR'
+        date_gap_value = '+1YEARS'
     elif granularity == 'month':
-        date_gap_value = '+1MONTH'
-    elif granularity = 'congress'
+        date_gap_value = '+1MONTHS'
+    elif granularity == 'week':
+        date_gap_value = '+7DAYS'
+    elif granularity == 'congress':
         # XXX get start and end dates of current and past congresses to fill these in
+        pass
     else:
         date_gap_value = '+1DAY'
-    args[facet_date_gap] = date_gap_value
+    args['facet.date.gap'] = date_gap_value
 
-    # specify actual search parameters, including limiting by entity if specified:
-    if entity_type and entity_name:
+    # specify actual search parameters, including limiting by entity if
+    # specified. if entity_type and entity_value are specified, then the search
+    # is limited to that specific entity.  
+    if entity_type and entity_value:
         if entity_type == 'state':
-            pass 
+            field_name = 'speaker_state'
         if entity_type == 'party':
-            pass
+            field_name = 'speaker_party'
         if entity_type == 'legislator':
-            pass
+            field_name = 'speaker'
         if entity_type == 'bioguide':
-            pass
-        q = "%s:%s AND (speaker:%s OR quote:%s)" % (field_name, entity_name, phrase, phrase)
+            field_name = 'speaker_bioguide'
+        field_value = entity_value
+        q = '''%s:"%s" AND text:"%s"''' % (field_name, field_value, phrase)
     else:
-        q = "speaker:%s+quote:%s" % (phrase, phrase)
+        q = '''text:"%s"''' % (phrase)
     args['q'] = q 
 
     # return counts only, not the documents themselves
@@ -127,32 +127,117 @@ def occurences_of_phrase(phrase, start_date=None, end_date=None, entity_type, en
     # do the api call
     json_resp = solr_api_call(args)
 
-    # remove all the cruft and format nicely 
+    # remove any cruft and format nicely. 
+    print json_resp
+    return json_resp
+
+def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, mincount=0):
+    '''finds occurences of a specific phrase by category. expects
+    dates in dd/mm/yyyy format. if 'start' and 'end' date are none, defaults
+    to all time. the mincount argument controls whether counts are returned for all
+    entities in the category, or only those with non-zero results.''' 
+    args = {}
+    
+    # set up the faceting. many of these query args need to be set using a
+    # string variable for the key since they contain periods. 
+
+    args['facet'] = "true"
+    if entity_type == 'legislator':
+        field = 'speaker_bioguide'
+    elif entity_type == 'state':
+        field = 'speaker_state'
+    elif entity_type == 'party':
+        field = 'speaker_party'
+    elif entity_type == 'bioguide':
+        field = 'speaker_bioguide'
+    args['facet.field'] = field
+
+    if mincount:
+        args['facet.mincount'] = 1
+
+    # default limit for # faceted fields returned is 100; we want to return for
+    # all fields. 
+    facet_limit = 'facet.limit'
+    args[facet_limit] = -1
+
+    q = '''text:"%s"''' % phrase
+    if start_date and end_date:
+        start = as_solr_date(start_date)
+        end = as_solr_date(end_date)
+        daterange = '''date:[%s TO %s]''' % (start, end)
+        q = '''(%s AND %s)''' % (q, daterange)
+    args['q'] = q 
+
+    # return counts only, not the documents themselves
+    args['rows'] = 0
+
+    # do the api call
+    json_resp = solr_api_call(args)
+
+    # remove any cruft and format nicely. 
+    print json_resp
+    return json_resp
 
 
-def most_frequent_phrases(start_date, end_date, num_words, n, entity_type, entity_name, granularity='day'):
-    # eg. view-source:http://localhost:8983/solr/select/?q=*:*&rows=0&indent=on&wt=json&facet=true&facet.field=speaking&facet.mincount=1&facet.query=a&facet.limit=-1&facet.sort=count
-    # but the above should use the dummy field. 
-    pass
+def most_frequent_phrases(top, n, start_date=None, end_date=None, entity_type=None, 
+    entity_name=None):
 
-'''
-most_frequent_phrases(start_date, end_date, numwords, n, entity_type, entity, granularity='day')
-==> most frequent phrases for a specific entity over a given date range. return phrases.(and counts?) 
+    args = {}
+    
+    args['facet'] = 'true'
+    args['facet.mincount'] = 1
+    # return counts only, not the documents themselves
+    args['rows'] = 0
+    if n == 1:
+        args['facet.field'] = 'text'
+    elif n == 2:
+        args['facet.field'] = 'bigrams'
+    elif n == 3:
+        args['facet.field'] = 'trigrams'
+    elif n == 4:
+        args['facet.field'] = 'quadgrams'
+    elif n == 5:
+        args['facet.field'] = 'pentagrams'
 
-occurences_of_phrase(phrase, start_date, end_date, entity_type, entity, granularity='day')
-==> occurences of a specific phrase over time. returns counts. 
+    # XXX do we want to put a max limit in here?
+    args['facet.limit'] = top
+    args['facet.sort'] = 'count'
+ 
+    if start_date and end_date:
+        start = as_solr_date(start_date)
+        end = as_solr_date(end_date)
+        q = '''date:[%s TO %s]''' % (start, end)
+        args['q'] = q
+     
+    if entity_type and entity_name:
+        if entity_type == 'state':
+            field_name = 'speaker_state'
+        if entity_type == 'party':
+            field_name = 'speaker_party'
+        if entity_type == 'legislator':
+            field_name = 'speaker'
+        if entity_type == 'bioguide':
+            field_name = 'speaker_bioguide'
+        entity_constraint = '''%s:%s''' % (field_name, field_value)
+        if 'q' in args:
+            # then we've already set the date above, so combine it with the
+            # entity constraint. 
+            args['q'] = '''(%s AND %s)''' % (entity_constraint, args['q'])
+        else:
+            args['q'] = entity_constraint  
+    if 'q' not in args:
+        # at this point if neither of the above constraints have been set, then
+        # use a wildcard search
+        args['q'] = "*:*"     
 
-words_by_category(entity_type, phrase=None, order)
-==> (eg. most vocal, least vocal... ) (category = person, state...
+    # do the api call
+    json_resp = solr_api_call(args)
 
-entity=None will search across all documents for all entities
-special values of daterange =-1 will check for all time
+    # remove any cruft and format nicely. 
+    print json_resp
+    return json_resp
 
-granularity allows an interval to be specified over whcih data will be
-aggregated and normaized, such as monthly or weekly. without this argument,
-data is given over the daterange specified at a daily granularity, since that
-is what we have. 
 
-'''
-
+   
+    
 
