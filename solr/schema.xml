@@ -21,11 +21,16 @@
     -->
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
 
-   <!-- Strict text field that splits only on whitespace for exact matching of
-        words, but has a custom stopword list and normalizes case -->
+   <!-- General text field that splits on whitespace with some special
+    delimiter handling for punctuation. has a custom stopword list and normalizes
+    case -->
+
     <fieldType name="CRtext" class="solr.TextField" positionIncrementGap="1" >
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" 
+                    generateNumberParts="1" catenateWords="0" catenateNumbers="0" 
+                    catenateAll="0" splitOnCaseChange="0"/>
             <filter class="solr.LowerCaseFilterFactory"/>
             <filter class="solr.StopFilterFactory"
                 ignoreCase="true"
@@ -42,6 +47,9 @@
     <fieldType name="CRtext_multivalued" class="solr.TextField" positionIncrementGap="100" >
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" 
+                    generateNumberParts="1" catenateWords="0" catenateNumbers="0" 
+                    catenateAll="0" splitOnCaseChange="0"/>
             <filter class="solr.LowerCaseFilterFactory"/>
             <filter class="solr.StopFilterFactory"
                 ignoreCase="true"
@@ -57,6 +65,9 @@
     <fieldType name="bigrams" class="solr.TextField" positionIncrementGap="1" >
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" 
+                    generateNumberParts="1" catenateWords="0" catenateNumbers="0" 
+                    catenateAll="0" splitOnCaseChange="0"/>
             <filter class="solr.LowerCaseFilterFactory"/>
             <filter class="solr.StopFilterFactory"
                 ignoreCase="true"
@@ -73,6 +84,9 @@
     <fieldType name="trigrams" class="solr.TextField" positionIncrementGap="1" >
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" 
+                    generateNumberParts="1" catenateWords="0" catenateNumbers="0" 
+                    catenateAll="0" splitOnCaseChange="0"/>
             <filter class="solr.LowerCaseFilterFactory"/>
             <filter class="solr.StopFilterFactory"
                 ignoreCase="true"
@@ -90,6 +104,9 @@
     <fieldType name="quadgrams" class="solr.TextField" positionIncrementGap="1" >
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" 
+                    generateNumberParts="1" catenateWords="0" catenateNumbers="0" 
+                    catenateAll="0" splitOnCaseChange="0"/>
             <filter class="solr.LowerCaseFilterFactory"/>
             <filter class="solr.StopFilterFactory"
                 ignoreCase="true"
@@ -107,6 +124,9 @@
     <fieldType name="pentagrams" class="solr.TextField" positionIncrementGap="1" >
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" 
+                    generateNumberParts="1" catenateWords="0" catenateNumbers="0" 
+                    catenateAll="0" splitOnCaseChange="0"/>
             <filter class="solr.LowerCaseFilterFactory"/>
             <filter class="solr.StopFilterFactory"
                 ignoreCase="true"
