@@ -29,16 +29,27 @@ class CRScraper(object):
 
     def was_in_session(self):
         # check the response header to make sure the Record exists for this date. 
-        conn = httplib.HTTPConnection(self.domain, timeout=15)
+        conn = httplib.HTTPConnection(self.domain, timeout=25)
         conn.request("HEAD", self.url)
-        resp = conn.getresponse()
+        # the connection can be a little dodgy, let it try connecting a few
+        # times if needed. 
+        could_not_connect = 0
+        while could_not_connect < 3:
+            try:
+                resp = conn.getresponse()
+                could_not_connect = False
+                break
+            except:
+                could_not_connect += 1
+        if could_not_connect:
+            return None
+
         content_type = resp.getheader('content-type')
         if content_type != 'application/zip':
             print 'Congress was not in session on %s' % self.datestring
             return False
-        else: 
-            self.zipsize = resp.getheader('content-length')
-            return True
+        self.zipsize = resp.getheader('content-length')
+        return True
 
     def retrieve(self):
         tmpfile = os.path.join(TMP_DIR, "CREC-%s.zip" % self.datestring)
@@ -115,11 +126,9 @@ class CRScraper(object):
                 # update the status of that line 
                 update_line = linenum
         if update_line:
-            print 'updating line'
             scraper_lines[update_line] = '%s, %s\n' % (datestring, status)
         # if the date was not already in the log file, append it at the end
         else:
-            print 'appending line'
             scraper_lines.append('%s, %s\n' % (datestring, status))
         scraper_log = open(SCRAPER_LOG, 'w')
         scraper_log.writelines(scraper_lines)
@@ -142,12 +151,15 @@ class CRScraper(object):
     def retrieve_by_date(self, date):
         self.set_date(date)
         if not self.previously_retrieved():
-            if self.was_in_session():
+            in_session = self.was_in_session()
+            if in_session:
                 path = self.retrieve()
                 return path
-            else:
+            elif in_session == False:
                 datestring = self.date.strftime("%d/%m/%Y")
                 self.log_download_status(datestring, 'nosession')
+            elif in_session == None:
+                self.log_download_status(self.date.strftime("%d/%m/%Y"), 'GPO connection error')
 
 def date_from_string(datestring):
     return datetime.datetime.strptime(datestring, "%d/%m/%Y")
