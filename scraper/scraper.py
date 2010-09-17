@@ -89,7 +89,6 @@ class CRScraper(object):
                     out = open(saveas, 'w')
                     out.write(raw)
                     out.close()
-                    print 'saving %s...' % saveas
                 except BaseException, e:
                     errors += 1
                     print 'Problem downloading file %s. Error:' % saveas
