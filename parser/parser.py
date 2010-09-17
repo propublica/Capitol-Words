@@ -309,8 +309,6 @@ class SenateParser(CRParser):
     def parse(self):
         ''' parses a raw senate document and returns the same document marked
         up with XML '''
-        print self.rawlines[:15]
-        print '\n\n'
         self.markup_preamble()
         
     def markup_preamble(self):
