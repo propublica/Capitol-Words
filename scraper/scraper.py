@@ -105,9 +105,11 @@ class CRScraper(object):
             scraper_log.write('Date, Status\n')
             scraper_log.close()
 
-        scraper_log = open(SCRAPER_LOG, 'r+')
+        scraper_log = open(SCRAPER_LOG, 'r')
         scraper_lines = scraper_log.readlines()
+        scraper_log.close()
         update_line = None
+        # if this date is already in the log file, update it. 
         for linenum, logline in enumerate(scraper_lines):
             if datestring in logline:
                 # update the status of that line 
@@ -115,25 +117,31 @@ class CRScraper(object):
         if update_line:
             print 'updating line'
             scraper_lines[update_line] = '%s, %s\n' % (datestring, status)
+        # if the date was not already in the log file, append it at the end
         else:
             print 'appending line'
             scraper_lines.append('%s, %s\n' % (datestring, status))
+        scraper_log = open(SCRAPER_LOG, 'w')
         scraper_log.writelines(scraper_lines)
         scraper_log.close()
 
-    def record_retrieved(self):
+    def previously_retrieved(self):
         datestring = self.date.strftime("%d/%m/%Y")
         if not os.path.exists(SCRAPER_LOG):
              return False
         scraper_lines = open(SCRAPER_LOG).readlines()
         for line in scraper_lines:
             if datestring in line and 'success' in line:
+                print 'This date was previously retrieved: Record already exists\n'
+                return True
+            if datestring in line and 'nosession' in line:
+                print 'This date was previously retrieved: Congress was not in session.\n'
                 return True
         return False
 
     def retrieve_by_date(self, date):
         self.set_date(date)
-        if not self.record_retrieved():
+        if not self.previously_retrieved():
             if self.was_in_session():
                 path = self.retrieve()
                 return path
@@ -155,14 +163,15 @@ def usage():
     return ''' 
 Several ways to invoke the scraper:
 
-1. "./scraper.py" will ask you to interactively enter an input date dd/mm/yyyy
+0. "./scraper.py" will display this message (and do nothing)
 
-2. "./scraper.py all" will go back in time retrieving all daily congressional records until the date specified as OLDEST_DATE in settings.py. 
+1. "./scraper.py all" will go back in time retrieving all daily congressional records until the date specified as OLDEST_DATE in settings.py. You probably want to use this with caution, but it can be useful during initial setup. 
 
-3. "./scraper.py backto dd/mm/yyyy" will retrieve congressional records back to the date given. 
+2. "./scraper.py backto dd/mm/yyyy" will retrieve congressional records back to the date given. 
 
-4. "./scraper.py dd/mm/yyyy - dd/mm/yyyy" will retreive congressional records for all days within the range given. the first date should occur before the second date in time. 
+3. "./scraper.py dd/mm/yyyy - dd/mm/yyyy" will retreive congressional records for all days within the range given. the first date should occur before the second date in time. 
 
+4. "./scraper.py dd/mm/yyyy" will retreive the congressional record for the day given.
     '''
 
 if __name__ == '__main__':
@@ -200,8 +209,11 @@ if __name__ == '__main__':
     for date in dates:
         print "Checking Congressional Record for %s" % date
         if CRScraper().retrieve_by_date(date):
-            print 'Will now sleep for 5 minutes before retrieving next record...zzz...'
-            time.sleep(300) 
+            print 'Will now sleep for one minute before retrieving next record...zzz...'
+            time.sleep(60) 
         else:
-            print 'sleeping for 5 seconds...zzz...' 
-
+            if len(dates) == 1:
+                sys.exit()
+            else:
+                print 'sleeping for 5 seconds...zzz...' 
+                time.sleep(5)
