@@ -157,18 +157,20 @@ class CRParser(object):
     re_timestamp =          r'{time}\s\d{4}'
     re_underscore =         r'\s+_+\s+'
     # a new speaker might either be a legislator's name, or a reference to the role of president of presiding officer. 
-    re_newspeaker =         r'^(<bullet> |  )(?P<name>(((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER( \([A-Za-z.\- ]+\))?))\.'
+    re_newspeaker =         r'^(<bullet> |  )(?P<name>(((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|((The (ACTING )?(PRESIDENT|SPEAKER)( pro tempore)?)|(The PRESIDING OFFICER))( \([A-Za-z.\- ]+\))?)\.'
 
     # whatever follows the statement of a new speaker marks someone starting to
     # speak. if it's a new paragraph and there's already a current_speaker,
     # then this re is also used to insert the <speaking> tag. 
-    re_speaking =           r'^(<bullet> |  )(((((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|(The (ACTING )?PRESIDENT pro tempore)|(The PRESIDING OFFICER( \([A-Za-z.\- ]+\))?))\. )?(?P<start>.)'
+#    re_speaking =           r'^(<bullet> |  )((((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|((The (ACTING )?(PRESIDENT|SPEAKER)( pro tempore)?)|(The PRESIDING OFFICER))( \([A-Za-z.\- ]+\))?)\.'
+    re_speaking =           r'^(<bullet> |  )((((((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|((The (ACTING )?(PRESIDENT|SPEAKER)( pro tempore)?)|(The PRESIDING OFFICER))( \([A-Za-z.\- ]+\))?))\. )?(?P<start>.)'
     re_startshortquote =    r'``'
     re_endshortquote =      r"''"
     re_billheading =        r'\s+SEC.[A-Z_0-9. \-()\[\]]+'
     re_longquotestart =     r' {7}(?P<start>.)'
     re_longquotebody =      r' {5}(?P<start>.)' 
     re_endofline =          r'$'
+    re_startofline =        r'^'
     re_alltext =            r"^\s+(?P<text>\S([\S ])+)"
     re_rollcall =           r'\[Roll(call)?( Vote)? No. \d+.*\]'
     re_allcaps =            r'^[^a-z]+$'
@@ -201,6 +203,7 @@ class CRParser(object):
                              + r'|(There was no objection)'
                              + r'|(The amendment.*?was agreed to)'
                              + r'|(The motion to table was .*)'
+                             + r'|(The question was taken(;|.))'
                              #+ r'|()'
                             + r').*')
 
@@ -225,21 +228,6 @@ class CRParser(object):
     LONGQUOTE_INDENT =          5
     NEW_PARA_INDENT =           2
     LONGQUOTE_NEW_PARA_INDENT = [6,7]
-
-
-    def spaces_indented(self, theline):
-        ''' returns the number of spaces by which the line is indented. '''
-        re_textstart = r'\S'
-        return re.search(re_textstart, theline).start()
-        
-class HouseParser(CRParser):
-    pass
-
-class ExtensionsParser(CRParser):
-    pass
-
-class SenateParser(CRParser):
-    ''' Parses Senate Documents '''
 
     # documents with special titles need to be parsed differently than the
     # topic documents, either because they follow a different format or because
@@ -306,6 +294,12 @@ class SenateParser(CRParser):
         # output
         self.xml = ['<CRDoc>', ]
 
+
+    def spaces_indented(self, theline):
+        ''' returns the number of spaces by which the line is indented. '''
+        re_textstart = r'\S'
+        return re.search(re_textstart, theline).start()
+        
     def parse(self):
         ''' parses a raw senate document and returns the same document marked
         up with XML '''
@@ -495,6 +489,7 @@ class SenateParser(CRParser):
 
         # remove <bullet> tags if they exist
         theline = self.check_bullet(theline)
+        self.document_first_line = True
         while theline:
             self.preprocess_state(theline)
             annotator = XMLAnnotator(theline)
@@ -507,8 +502,9 @@ class SenateParser(CRParser):
             elif self.new_paragraph:
                 annotator.register_tag_open(self.re_longquotestart, '<quote speaker="%s">' % self.current_speaker, group='start')
                 if self.recorder:
-                    annotator.register_tag_open(self.re_recorderstart, '<recorder>', 'start')
-                    annotator.register_tag_open(self.re_recorder_fuzzy, '<recorder>', 'start')
+                    annotator.register_tag_open(self.re_startofline, '<recorder>')
+                    #annotator.register_tag_open(self.re_recorderstart, '<recorder>', 'start')
+                    #annotator.register_tag_open(self.re_recorder_fuzzy, '<recorder>', 'start')
                 annotator.register_tag(self.re_newspeaker, '<speaker name="%s">' % self.current_speaker, group='name')
                 if self.return_from_quote_interjection(theline):
                     annotator.register_tag_open(self.re_longquotebody, '<quote speaker="%s">' % self.current_speaker, group='start')
@@ -677,7 +673,6 @@ class SenateParser(CRParser):
         ''' in certain cases we need to match a regular expression AND a state,
         so do some analysis to determine which tags to register. '''
 
-
         return_from_interjection = self.return_from_quote_interjection(theline)
 
         if self.is_new_paragraph(theline) or return_from_interjection:
@@ -698,8 +693,8 @@ class SenateParser(CRParser):
                 self.inlongquote = True
             else: 
                 self.inlongquote = False
-                # if it's a recorder reading, then make a note that there is no
-                # speaker. re_recroder_fuzzy looks for terms that indicate a
+                # if it's a recorder reading, then make a note.  
+                # re_recroder_fuzzy looks for terms that indicate a
                 # continuation of a recorder comment only if the recorder was
                 # already speaking, but not otherwise. 
                 if re.search(self.re_recorderstart, theline) or (self.current_speaker == 'recorder'
@@ -708,6 +703,10 @@ class SenateParser(CRParser):
                     self.current_speaker = 'recorder' 
                 else:
                     self.set_speaker(theline)
+                    if self.current_speaker == None and self.document_first_line:
+                        self.document_first_line = False
+                        self.recorder = True
+                        self.current_speaker = 'recorder' 
 
         elif re.search(self.re_rollcall, theline):
             self.inrollcall=True
@@ -765,7 +764,7 @@ class SenateParser(CRParser):
             print ''
             print objdata
             print ''
-            message = '!! Unrecognized state while parsing %s.\n' % self.filename
+            message = 'Unrecognized state while parsing %s.\n' % self.filename
             self.error_flag = True
             raise UnrecognizedCRDoc(message)
 
@@ -936,11 +935,15 @@ class SenateParser(CRParser):
         print "saved file %s to disk" % saveas    
 
 def usage():
+    print ''
     print 'Usage:'
-    print 'You must pass in a congressional record filename, or specify yyyy/mm/dd [chamber],'
-    print 'where chamber is one of [senate|house|extensions]. eg:'
+    print 'You must pass in a congressional record filename, or specify yyyy/mm/dd. eg:'
+    print ''
     print './parser.py CREC-2010-07-12-pt1-PgS5744-2.txt'
-    print './parser.py 2010/07/02 senate'
+    print './parser.py 2010/07/02 [interactive]'
+    print ''
+    print "The optional 'interactive' mode is for debugging and will prompt" 
+    print "the user if they want to continue after each file."
     print ''
     sys.exit()
 
@@ -951,27 +954,11 @@ if __name__ == '__main__':
     if not os.path.exists(os.path.join(CWOD_HOME, LOG_DIR)):
         os.mkdir(os.path.join(CWOD_HOME, LOG_DIR))
     logfile = open(os.path.join(CWOD_HOME, LOG_DIR, 'cwod.log'), 'a')
-    parsers = {
-        'senate':       SenateParser,
-        'house' :       HouseParser,
-        'extensions' :  ExtensionsParser,
-        'S':            SenateParser,
-        'H' :           HouseParser,
-        'E' :           ExtensionsParser,
-     }
-
-    chambers = {
-        'senate':       '-PgS',
-        'house' :       '-PgH',
-        'extensions' :  '-PgE',
-        'S':            '-PgS',
-        'H' :           '-PgH',
-        'E' :           '-PgE',
-    }
 
     if len(sys.argv) < 2:
         usage()
 
+    # if a file is passed in, then determine the path
     if sys.argv[1].endswith('.txt'):
         file = sys.argv[1]
         if file.startswith('/'):
@@ -985,20 +972,18 @@ if __name__ == '__main__':
             day = parts[3]
             abspath = os.path.join(CWOD_HOME, 'raw', '%s/%s/%s/%s' % (year, month, day, file))
             print 'processing file %s' % abspath
-        chamber = re.search(r'-Pg(?P<chamber>E|S|H)', abspath).group('chamber')
-        chamber_doc = parsers[chamber](abspath)
-        chamber_doc.parse()
-        if not chamber_doc.error_flag and not chamber_doc.not_implemented_flag:
-            chamber_doc.validate()
-            chamber_doc.save()
+        parser = CRParser(abspath)
+        parser.parse()
+        if not parser.error_flag and not parser.not_implemented_flag:
+            parser.validate()
+            parser.save()
 
+    # if a date is passed in, process all files from that date
     else:
         date_path = sys.argv[1]
         path = os.path.join(CWOD_HOME, 'raw', date_path)
         print path
-        chamber = sys.argv[2].lower()
-        correct_chamber = chambers[chamber]
-        if len(sys.argv) > 3 and sys.argv[3] == 'interactive':
+        if len(sys.argv) == 3 and sys.argv[2] == 'interactive':
             interactive = True
         else: interactive = False
 
@@ -1007,8 +992,8 @@ if __name__ == '__main__':
             usage()
 
         for file in os.listdir(path):
-            # nothing useful in the front matter. 
-            if file.find('FrontMatter') != -1 or file.find(correct_chamber) == -1:
+            # we don't process the daily digest or front matter. 
+            if file.find('FrontMatter') != -1 or file.find('PgD') != -1:
                 continue
             if interactive:
                 resp = raw_input("process file %s? (y/n/q) " % file)
@@ -1019,15 +1004,16 @@ if __name__ == '__main__':
                     sys.exit()
             
             abspath = os.path.join(path, file)
-            chamber_doc = parsers[chamber](abspath)
+            parser = CRParser(abspath)
             try:
-                chamber_doc.parse()
-                print 'flag status:', chamber_doc.error_flag, chamber_doc.not_implemented_flag
-                if not chamber_doc.error_flag and not chamber_doc.not_implemented_flag:
-                    chamber_doc.validate()
-                    chamber_doc.save()
+                parser.parse()
+                print 'flag status:', parser.error_flag, parser.not_implemented_flag
+                if not parser.error_flag and not parser.not_implemented_flag:
+                    parser.validate()
+                    parser.save()
             except Exception, e:
-                logfile.write('Error processing file %s' % abspath)
+                today = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                logfile.write('%s: Error processing file %s\n' % (today, abspath))
                 logfile.write('\t%s' % e)
                 logfile.flush()
                 
