@@ -101,6 +101,7 @@ class CRScraper(object):
         else:
             status = "success"
         self.log_download_status(self.date.strftime("%d/%m/%Y"), status)
+        print 'Files for %s were retrieved with: %s' % (self.date.strftime("%d/%m/%Y"), status)
 
         # delete tmfile
         os.remove(tmpfile)
