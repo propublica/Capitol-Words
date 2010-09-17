@@ -29,7 +29,7 @@ class SolrDoc(object):
         ''' only use this for unique tags that appear once in the document'''
         re_tag_content = r'<.*?>(?P<content>.*?)</.*?>'
         nodexml = self.dom.getElementsByTagName(uniquetag)[0].toxml()
-        text = re.search(re_tag_content, nodexml).group('content')
+        text = re.search(re_tag_content, nodexml, re.DOTALL).group('content')
         return text
 
     def make_solr_id(self, num):
