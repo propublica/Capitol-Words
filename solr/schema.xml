@@ -162,6 +162,7 @@
    <field name="chamber" type="string" indexed="true" stored="false" required="true" /> 
    <field name="pages" type="string" indexed="true" stored="true" required="true" /> 
    <field name="document_title" type="CRtext" indexed="true" stored="true" required="false" /> 
+   <field name="rollcall" type="CRtext" indexed="true" stored="true" required="false" /> 
     <!-- speaker info -->
    <field name="speaker_raw" type="string" indexed="false" stored="true" required="true" /> 
    <field name="speaker_state" type="string" indexed="true" stored="true" required="false" /> 

@@ -165,6 +165,7 @@ class SolrDoc(object):
             # replace <quote> tags by <field name="quote">
             re_speaker = r'<speaker name="(?P<current_speaker>.*?)">.*?</speaker>'
             re_recorder = r'<recorder>'
+            re_rollcall = r'<rollcall>'
             re_quote = r'<quote speaker=.*?>'
             re_speaking = r'<speaking name=.*?>'
             re_title = r'<title>'
@@ -180,6 +181,7 @@ class SolrDoc(object):
 
             body = re.sub(re_speaker, '', body)
             body = re.sub(re_recorder, '<field name="speaking">', body)
+            body = re.sub(re_rollcall, '<field name="rollcall">', body)
             body = re.sub(re_quote, '<field name="quote">', body)
             body = re.sub(re_speaking, '<field name="speaking">', body)
             body = re.sub(re_title, '<field name="title">', body) 
@@ -187,7 +189,8 @@ class SolrDoc(object):
 
             speaker_line = '''<field name="speaker_raw">%s</field>\n''' % current_speaker
             if (current_speaker != 'recorder' and not re.search('pro tempore', current_speaker) 
-                and not re.search('president', current_speaker) and not re.search('presiding', current_speaker)):
+                and not re.search('president', current_speaker) 
+                and not re.search('presiding', current_speaker)):
                 speaker_metadata = self.get_speaker_metadata(current_speaker)
                 if speaker_metadata == None:
                     speaker_metadata = ''
@@ -209,9 +212,7 @@ class SolrDoc(object):
             self.warning  = 'No document body. Skipping.'
                 
     def post(self, payload):
-        """
-        Add a document to index
-        """
+        """ Add a document to index """
         con = HTTPConnection('localhost:8983')
         con.putrequest('POST', '/solr/update/')
         con.putheader('content-length', str(len(payload)))
@@ -229,9 +230,7 @@ class SolrDoc(object):
             #print r.read()
 
     def commit(self):
-        """
-        commit changes
-        """
+        """ commit changes """
         DATA = '<commit/>'
         con = HTTPConnection('localhost:8983')
         con.putrequest('POST', '/solr/update/')
@@ -266,7 +265,7 @@ class SolrDoc(object):
         valid_tags = [
             u'doc', u'add', u'#text', u'volume', u'number', u'weekday', u'month', u'day', 
             u'year', u'chamber', u'pages', u'document_title', u'speaker', u'speaking', 
-            u'quote', u'recorder', 'title']
+            u'quote', u'recorder', 'title', 'rollcall']
         root = self.dom.firstChild
         check_kids(root)
     
