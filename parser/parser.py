@@ -444,15 +444,10 @@ class CRParser(object):
                 print xml_line
                 self.xml.append(xml_line)
 
-	        # check for titles with special formatting
-            if self.is_special_title(title_startline):
-                self.parse_special()
-            else:
-                self.markup_paragraph()
-	
             # note that as we exit this function, the current line is one PAST
             # the end of the title, which should generally be a blank line. 
-
+            self.markup_paragraph()
+	
     def set_speaker(self, theline):
         # checks if there is a new speaker, and if so, set the current_speaker
         # attribute, and returns the name of the new (and now current) speaker.
