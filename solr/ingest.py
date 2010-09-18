@@ -11,6 +11,8 @@ import xml.dom.minidom as xml
 from xml.parsers.expat import ExpatError
 import sys, os, re
 from lib import bioguide_lookup
+from settings import *
+import datetime
 
 class SolrDoc(object):
     def __init__(self, file):
@@ -18,7 +20,7 @@ class SolrDoc(object):
         self.error = None
         self.warning = None
         self.filename = file
-        raw = open(filename).read()
+        raw = open(self.filename).read()
         # minidom doesn't properly escape ampersands!
         raw_replaced = raw.replace("&", "&amp;")
         self.dom = xml.parseString(raw_replaced)
@@ -294,8 +296,16 @@ def solr_ingest_file(filename):
     print '\n'
 
 def solr_ingest_dir(path):
+    logfile = initialize_logfile()
     for filename in os.listdir(path):
-        solr_ingest_file(filename) 
+        full_path = os.path.join(path, filename)
+        try:
+            solr_ingest_file(full_path) 
+        except Exception, e:
+            today = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            logfile.write('%s: Error processing file %s\n' % (today, full_path))
+            logfile.write('\t%s' % e)
+            logfile.flush()
 
 if __name__ == '__main__' :
 

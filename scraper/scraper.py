@@ -189,7 +189,6 @@ Several ways to invoke the scraper:
 def run_scraper(date):
     ''' Returns True if there were records to retrieve, and False is congress
     was not in session '''
-
     return CRScraper().retrieve_by_date(date)
 
 
