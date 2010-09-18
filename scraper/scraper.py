@@ -186,6 +186,14 @@ Several ways to invoke the scraper:
 4. "./scraper.py dd/mm/yyyy" will retreive the congressional record for the day given.
     '''
 
+def run_scraper(date):
+    ''' Returns True if there were records to retrieve, and False is congress
+    was not in session '''
+
+    return CRScraper().retrieve_by_date(date)
+
+
+
 if __name__ == '__main__':
 
     if len(sys.argv) == 1:

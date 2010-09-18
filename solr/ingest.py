@@ -274,13 +274,16 @@ class SolrDoc(object):
         self.set_metadata()
         self.build_document_bodies()
         self.assemble_and_submit()
-        
+       
+def initialize_logfile():
+    ''' returns a filelike object'''
+    if not os.path.exists(os.path.join(CWOD_HOME, LOG_DIR)):
+        os.mkdir(os.path.join(CWOD_HOME, LOG_DIR))
+    logfile = open(os.path.join(CWOD_HOME, LOG_DIR, 'ingest.log'), 'a')
+    return logfile 
 
-if __name__ == '__main__' :
-
-    filename = sys.argv[1]
+def solr_ingest_file(filename):
     print '***   ' + filename + '   ***'
-    #try:
     s = SolrDoc(filename)
     s.process()
     print 'STATUS: ', s.status
@@ -288,7 +291,15 @@ if __name__ == '__main__' :
         print 'Solr Ingest error: ', s.error
     if s.warning:
         print 'Solr Ingest warning: ', s.warning
-    #except ExpatError, e:
-    #    print 'XML Error: %s' % e
     print '\n'
+
+def solr_ingest_dir(path):
+    for filename in os.listdir(path):
+        solr_ingest_file(filename) 
+
+if __name__ == '__main__' :
+
+    filename = sys.argv[1]
+    solr_ingest_file(filename)
+
 

@@ -272,7 +272,6 @@ class CRParser(object):
     def __init__(self, abspath):
         # track error conditions
         self.error_flag = False
-        self.not_implemented_flag = False
 
         # file data
         self.filename = abspath
@@ -358,30 +357,11 @@ class CRParser(object):
             return None
         return self.clean_line(self.rawlines[self.currentline+offset])
 
-    def called_to_order(self):
-        print 'not yet implemented'
-        self.not_implemented_flag = True
-        return
-
-    def no_title(self):
-        self.not_implemented_flag = True
-        print 'not yet implemented'
-        # one of the things to do here is when the acting president is assigned
-        # for the day, make note of who they are so we can assign words spoken
-        # by that role to the correct legislator 
-        return
-
-    def parse_special(self):
-        self.not_implemented_flag = True
-        print 'not yet implemented'
-        return
-
     def is_special_title(self, title):
         title = title.strip()
         special_title_prefixes = self.special_titles.keys()
         for prefix in special_title_prefixes:
             if re.search(prefix, title):
-                print '{{ title is special }}'
                 return True
         return False
 
@@ -410,7 +390,7 @@ class CRParser(object):
         # if it's not a specially formatted title and it's not indented enough,
         # then it's probably missing a title altogether
         if self.spaces_indented(theline) < MIN_TITLE_INDENT and not self.is_special_title(theline):
-            self.no_title()
+            self.markup_paragraph()
 
         else:
             # whew, we made it to a regular old title to parse. 
@@ -942,18 +922,53 @@ def usage():
     print ''
     sys.exit()
 
+def initialize_logfile():
+    ''' returns a filelike object'''
+    if not os.path.exists(os.path.join(CWOD_HOME, LOG_DIR)):
+        os.mkdir(os.path.join(CWOD_HOME, LOG_DIR))
+    logfile = open(os.path.join(CWOD_HOME, LOG_DIR, 'parser.log'), 'a')
+    return logfile
+
+def parse_directory(path, interactive=False):
+    logfile = initialize_logfile()
+    for file in os.listdir(path):
+        # we don't process the daily digest or front matter. 
+        if file.find('FrontMatter') != -1 or file.find('PgD') != -1:
+            continue
+        if interactive:
+            resp = raw_input("process file %s? (y/n/q) " % file)
+            if resp == 'n': 
+                print 'skipping\n'
+                continue
+            elif resp == 'q':
+                sys.exit()
+        
+        abspath = os.path.join(path, file)
+        parser = CRParser(abspath)
+        try:
+            parser.parse()
+            print 'flag status:', parser.error_flag
+            if not parser.error_flag:
+                parser.validate()
+                parser.save()
+        except Exception, e:
+            today = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            logfile.write('%s: Error processing file %s\n' % (today, abspath))
+            logfile.write('\t%s' % e)
+            logfile.flush()
+
+    output_dir = path.replace('raw', 'xml')
+    return output_dir
+
 if __name__ == '__main__':
 
     # processes a file or entire directory
     
-    if not os.path.exists(os.path.join(CWOD_HOME, LOG_DIR)):
-        os.mkdir(os.path.join(CWOD_HOME, LOG_DIR))
-    logfile = open(os.path.join(CWOD_HOME, LOG_DIR, 'cwod.log'), 'a')
-
     if len(sys.argv) < 2:
         usage()
 
-    # if a file is passed in, then determine the path
+    # if a single file is passed in, then determine the path (does NOT log,
+    # just for debugging)
     if sys.argv[1].endswith('.txt'):
         file = sys.argv[1]
         if file.startswith('/'):
@@ -969,7 +984,7 @@ if __name__ == '__main__':
             print 'processing file %s' % abspath
         parser = CRParser(abspath)
         parser.parse()
-        if not parser.error_flag and not parser.not_implemented_flag:
+        if not parser.error_flag:
             parser.validate()
             parser.save()
 
@@ -986,29 +1001,5 @@ if __name__ == '__main__':
             print 'no records exist for that date. try a different date.'
             usage()
 
-        for file in os.listdir(path):
-            # we don't process the daily digest or front matter. 
-            if file.find('FrontMatter') != -1 or file.find('PgD') != -1:
-                continue
-            if interactive:
-                resp = raw_input("process file %s? (y/n/q) " % file)
-                if resp == 'n': 
-                    print 'skipping\n'
-                    continue
-                elif resp == 'q':
-                    sys.exit()
-            
-            abspath = os.path.join(path, file)
-            parser = CRParser(abspath)
-            try:
-                parser.parse()
-                print 'flag status:', parser.error_flag, parser.not_implemented_flag
-                if not parser.error_flag and not parser.not_implemented_flag:
-                    parser.validate()
-                    parser.save()
-            except Exception, e:
-                today = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-                logfile.write('%s: Error processing file %s\n' % (today, abspath))
-                logfile.write('\t%s' % e)
-                logfile.flush()
-                
+        parse_directory(path, interactive)
+           
