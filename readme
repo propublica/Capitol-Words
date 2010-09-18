@@ -2,6 +2,8 @@ useful info goes here
 
 Requirements
 * json or simplejson
+* beautifulsoup verion 3.0 series (it MUST be 3.0 series, not 3.1)
+  http://www.crummy.com/software/BeautifulSoup/download/3.x/BeautifulSoup-3.0.8.1.tar.gz
 * solr
 * sunlightlabs API key
 
@@ -9,15 +11,17 @@ Setup:
 * cp settings.example.py settings.py
 * create symlinks to settings.py from each of solr/, scraper/ and parser/
 
-* tell solr where to find the schema file. eg, if using running the dev environment in apache-solr-1.4.1/example/, it will uses schema.xml in the directory /apache-solr-1.4.1/example/solr/conf. same is true for the stopwords file.so set up symlinks to he real things, optionally backing up the originals as .example. 
+* tell solr where to find the schema file. eg, if using running the dev
+* environment in apache-solr-1.4.1/example/, it will uses schema.xml in the
+* directory /apache-solr-1.4.1/example/solr/conf. same is true for the
+* stopwords file. so set up symlinks to he real things, optionally backing up
+* the originals as .example. 
 
 cd apache-solr-1.4.1/example/solr/conf
 mv schema.{,example.}xml
 mv stopwords.{,example.}txt
 ln -s /home/cwod/capitolwords/src/solr/schema.xml schema.xml
 ln -s /home/cwod/capitolwords/src/solr/stopwords.txt stopwords.txt
-
-
 
 Startup
 * start up solr. in a dev environment this looks like:
