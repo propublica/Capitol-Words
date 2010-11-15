@@ -10,6 +10,8 @@ try:
 except:
     import simplejson as json
 
+from dateutil.parser import parse as dateparse
+
 
 # return dicts of dates and frequency counts, plus links back to the raw ascii
 # documents
@@ -26,7 +28,7 @@ def encode_and_retrieve(args):
     base_url = os.path.join(settings.SOLR_DOMAIN, 'solr/select?')
     data = urllib.urlencode(args)
     full_url = base_url+data
-    print full_url
+    #print full_url
     fp = urllib2.urlopen(full_url)
     return json.loads(fp.read())
 
@@ -71,6 +73,11 @@ def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=Non
     such as by day or by year. default granularity is daily. '''
 
     args = {}
+
+    if isinstance(start_date, basestring):
+        start_date = dateparse(start_date).strftime('%d/%m/%Y')
+    if isinstance(end_date, basestring):
+        end_date = dateparse(end_date).strftime('%d/%m/%Y')
     
     # set up the faceting. 
 
@@ -128,7 +135,6 @@ def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=Non
     json_resp = solr_api_call(args)
 
     # remove any cruft and format nicely. 
-    print json_resp
     return json_resp
 
 def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, mincount=0):
@@ -137,6 +143,11 @@ def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, minc
     to all time. the mincount argument controls whether counts are returned for all
     entities in the category, or only those with non-zero results.''' 
     args = {}
+
+    if isinstance(start_date, basestring):
+        start_date = dateparse(start_date).strftime('%d/%m/%Y')
+    if isinstance(end_date, basestring):
+        end_date = dateparse(end_date).strftime('%d/%m/%Y')
     
     # set up the faceting. many of these query args need to be set using a
     # string variable for the key since they contain periods. 
@@ -150,6 +161,8 @@ def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, minc
         field = 'speaker_party'
     elif entity_type == 'bioguide':
         field = 'speaker_bioguide'
+    else:
+        raise NotImplementedError(entity_type)
     args['facet.field'] = field
 
     if mincount:
@@ -175,17 +188,24 @@ def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, minc
     json_resp = solr_api_call(args)
 
     # remove any cruft and format nicely. 
-    print json_resp
     return json_resp
 
 
-def most_frequent_phrases(top=10, n, start_date=None, end_date=None, entity_type=None, 
+def most_frequent_phrases(top=10, n=1, start_date=None, end_date=None, entity_type=None, 
     entity_name=None):
+
+    if isinstance(start_date, basestring):
+        start_date = dateparse(start_date).strftime('%d/%m/%Y')
+    if isinstance(end_date, basestring):
+        end_date = dateparse(end_date).strftime('%d/%m/%Y')
+    if isinstance(n, basestring):
+        n = int(n)
 
     args = {}
     
     args['facet'] = 'true'
     args['facet.mincount'] = 1
+    args['facet.method'] = 'enum'
     # return counts only, not the documents themselves
     args['rows'] = 0
     if n == 1:
@@ -218,7 +238,7 @@ def most_frequent_phrases(top=10, n, start_date=None, end_date=None, entity_type
             field_name = 'speaker'
         if entity_type == 'bioguide':
             field_name = 'speaker_bioguide'
-        entity_constraint = '''%s:%s''' % (field_name, field_value)
+        entity_constraint = '''%s:%s''' % (field_name, entity_name)
         if 'q' in args:
             # then we've already set the date above, so combine it with the
             # entity constraint. 
@@ -234,10 +254,5 @@ def most_frequent_phrases(top=10, n, start_date=None, end_date=None, entity_type
     json_resp = solr_api_call(args)
 
     # remove any cruft and format nicely. 
-    print json_resp
     return json_resp
-
-
-   
-    
 
