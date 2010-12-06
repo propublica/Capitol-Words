@@ -148,7 +148,7 @@ def bioguide_lookup(lastname, year, position=None, state=None):
     else: return None
 
 
-def db_bioguide_lookup(lastname, year, position, state):
+def db_bioguide_lookup(lastname, year, position, state=None):
     import sqlite3
     conn = sqlite3.connection('../api/capitolwords')
     cursor = conn.cursor()
@@ -166,7 +166,9 @@ def db_bioguide_lookup(lastname, year, position, state):
                   '2000': '106',
                   '1999': '106', }
 
-    cursor.execute("""SELECT bioguide_id AS bioguide,
+
+
+    query = """SELECT bioguide_id AS bioguide,
                              party AS party,
                              state AS state,
                              first AS firstname,
@@ -174,9 +176,14 @@ def db_bioguide_lookup(lastname, year, position, state):
                         FROM bioguide_legislator 
                                             WHERE last = ?
                                             AND   year = ?
-                                            AND   position = ?
-                                            AND   state = ?""", [lastname.upper(),
-                                                                 congresses[year],
-                                                                 position.title(),
-                                                                 state, ])
+                                            AND   position = ?"""
+
+    args = [lastname.upper(),
+            congresses[year],
+            position.title(),]
+    if state:
+        query += " AND state = ?"
+        args.append(state)
+
+    cursor.execute(query, args)
     return list(cursor.fetchall())
