@@ -10,7 +10,7 @@ from httplib import HTTPConnection
 import xml.dom.minidom as xml
 from xml.parsers.expat import ExpatError
 import sys, os, re
-from lib import bioguide_lookup
+from lib import bioguide_lookup, db_bioguide_lookup
 from settings import *
 import datetime
 
@@ -116,7 +116,7 @@ class SolrDoc(object):
         data = False # use False because bioguide_lookup returns None if no data found.
         while data == False and tries < 3:
             try:
-                data = bioguide_lookup(lastname, self.year, position, state)
+                data = db_bioguide_lookup(lastname, self.year, position, state)
             except:
                 tries += 1
 
