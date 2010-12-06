@@ -3,11 +3,12 @@ import sys
 import urllib2
 
 from django.core.management.base import BaseCommand, CommandError
+from django.db.utils import IntegrityError
 
 from bioguide.models import Legislator
 
 import name_tools
-from lxml.html import document_fromstring
+from BeautifulSoup import BeautifulSoup
 
 
 class Command(BaseCommand):
@@ -19,25 +20,20 @@ class Command(BaseCommand):
             url = 'http://bioguide.congress.gov/biosearch/biosearch1.asp'
             req = urllib2.Request(url, data)
             response = urllib2.urlopen(req).read()
-            doc = document_fromstring(response)
 
-            for row in doc.cssselect('tr'):
+            soup = BeautifulSoup(response)
+
+            for row in soup.findAll('tr')[2:]:
+                cells = row.findAll('td')
+                if len(cells) != 6:
+                    continue
+
                 try:
-                    cells = row.cssselect('td')
-                    if len(cells) != 6:
-                        continue
+                    name = cells[0].find('a').renderContents()
+                    bioguide_id = cells[0].find('a')['href'].split('=')[-1]
 
-                    namecell = cells[0]
-                    birth_death, position, party, state, congress = [x.text.encode('utf-8') if x.text else '' for x in cells[1:]]
-                    a = namecell.cssselect('a')
-                    name = None
-
-                    if a:
-                        a = a[0]
-                        name = a.text
-                        bioguide_id = a.values()[0].split('=')[-1]
-                    else:
-                        continue
+                    birth_death, position, party, state, congress = [x.renderContents() for x in cells[1:]]
+                    congress = congress.split('<br />')[0]
 
                     data = {'bioguide_id': bioguide_id,
                             'birth_death': birth_death,
@@ -47,8 +43,11 @@ class Command(BaseCommand):
                             'congress': congress, }
 
                     data['prefix'], data['first'], data['last'], data['suffix'] = name_tools.split(name)
-                    legislator = Legislator.objects.create(**data)
                     print data
-
                 except Exception, e:
                     print Exception, e
+
+                try:
+                    legislator = Legislator.objects.create(**data)
+                except IntegrityError:
+                    continue
