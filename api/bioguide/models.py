@@ -15,7 +15,7 @@ class Legislator(models.Model):
     congress = models.CharField(max_length=3)
 
     class Meta:
-        unique_together = (('bioguide_id', 'congress', ))
+        unique_together = (('bioguide_id', 'congress', 'position', ))
 
     def __unicode__(self):
         return ' '.join([self.prefix, self.first, self.last, self.suffix, ])
