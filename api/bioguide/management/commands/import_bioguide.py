@@ -15,39 +15,43 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         fields = ['bioguide_id', 'name', 'birth_death', 'position', 'party', 'state', 'congress', ]
 
-        for congress in range(1, 112):
-            data = 'lastname=&firstname=&position=&state=&party=&congress=%s' % str(congress)
-            url = 'http://bioguide.congress.gov/biosearch/biosearch1.asp'
-            req = urllib2.Request(url, data)
-            response = urllib2.urlopen(req).read()
+        if args:
+            congress = args[0]
+        else:
+            congress = 111
 
-            soup = BeautifulSoup(response)
+        data = 'lastname=&firstname=&position=&state=&party=&congress=%s' % str(congress)
+        url = 'http://bioguide.congress.gov/biosearch/biosearch1.asp'
+        req = urllib2.Request(url, data)
+        response = urllib2.urlopen(req).read()
 
-            for row in soup.findAll('tr')[2:]:
-                cells = row.findAll('td')
-                if len(cells) != 6:
-                    continue
+        soup = BeautifulSoup(response)
 
-                try:
-                    name = cells[0].find('a').renderContents()
-                    bioguide_id = cells[0].find('a')['href'].split('=')[-1]
+        for row in soup.findAll('tr')[2:]:
+            cells = row.findAll('td')
+            if len(cells) != 6:
+                continue
 
-                    birth_death, position, party, state, congress = [x.renderContents() for x in cells[1:]]
-                    congress = congress.split('<br />')[0]
+            try:
+                name = cells[0].find('a').renderContents()
+                bioguide_id = cells[0].find('a')['href'].split('=')[-1]
 
-                    data = {'bioguide_id': bioguide_id,
-                            'birth_death': birth_death,
-                            'position': position,
-                            'party': party,
-                            'state': state,
-                            'congress': congress, }
+                birth_death, position, party, state, congress = [x.renderContents() for x in cells[1:]]
+                congress = congress.split('<br />')[0]
 
-                    data['prefix'], data['first'], data['last'], data['suffix'] = name_tools.split(name)
-                    print data
-                except Exception, e:
-                    print Exception, e
+                data = {'bioguide_id': bioguide_id,
+                        'birth_death': birth_death,
+                        'position': position,
+                        'party': party,
+                        'state': state,
+                        'congress': congress, }
 
-                try:
-                    legislator = Legislator.objects.create(**data)
-                except IntegrityError:
-                    continue
+                data['prefix'], data['first'], data['last'], data['suffix'] = name_tools.split(name)
+                print data
+            except Exception, e:
+                print Exception, e
+
+            try:
+                legislator = Legislator.objects.create(**data)
+            except IntegrityError:
+                continue
