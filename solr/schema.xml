@@ -69,12 +69,7 @@
                     generateNumberParts="1" catenateWords="0" catenateNumbers="0" 
                     catenateAll="0" splitOnCaseChange="0"/>
             <filter class="solr.LowerCaseFilterFactory"/>
-            <filter class="solr.StopFilterFactory"
-                ignoreCase="true"
-                words="stopwords.txt"
-                enablePositionIncrements="true"
-                />
-             <filter class="solr.ShingleFilterFactory" 
+            <filter class="solr.ShingleFilterFactory" 
                 minShingleSize="2"
                 maxShingleSize="2" 
                 outputUnigrams="false" 
@@ -88,12 +83,7 @@
                     generateNumberParts="1" catenateWords="0" catenateNumbers="0" 
                     catenateAll="0" splitOnCaseChange="0"/>
             <filter class="solr.LowerCaseFilterFactory"/>
-            <filter class="solr.StopFilterFactory"
-                ignoreCase="true"
-                words="stopwords.txt"
-                enablePositionIncrements="true"
-                />
-             <filter class="solr.ShingleFilterFactory" 
+            <filter class="solr.ShingleFilterFactory" 
                 minShingleSize="3" 
                 maxShingleSize="3" 
                 outputUnigrams="false" 
@@ -108,12 +98,7 @@
                     generateNumberParts="1" catenateWords="0" catenateNumbers="0" 
                     catenateAll="0" splitOnCaseChange="0"/>
             <filter class="solr.LowerCaseFilterFactory"/>
-            <filter class="solr.StopFilterFactory"
-                ignoreCase="true"
-                words="stopwords.txt"
-                enablePositionIncrements="true"
-                />
-             <filter class="solr.ShingleFilterFactory" 
+            <filter class="solr.ShingleFilterFactory" 
                 minShingleSize="4" 
                 maxShingleSize="4" 
                 outputUnigrams="false" 
@@ -128,12 +113,7 @@
                     generateNumberParts="1" catenateWords="0" catenateNumbers="0" 
                     catenateAll="0" splitOnCaseChange="0"/>
             <filter class="solr.LowerCaseFilterFactory"/>
-            <filter class="solr.StopFilterFactory"
-                ignoreCase="true"
-                words="stopwords.txt"
-                enablePositionIncrements="true"
-                />
-             <filter class="solr.ShingleFilterFactory" 
+            <filter class="solr.ShingleFilterFactory" 
                 minShingleSize="5" 
                 maxShingleSize="5" 
                 outputUnigrams="false" 
