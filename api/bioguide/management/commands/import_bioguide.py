@@ -13,7 +13,6 @@ from BeautifulSoup import BeautifulSoup
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        fields = ['bioguide_id', 'name', 'birth_death', 'position', 'party', 'state', 'congress', ]
 
         if args:
             congress = args[0]
@@ -33,8 +32,11 @@ class Command(BaseCommand):
                 continue
 
             try:
-                name = cells[0].find('a').renderContents()
-                bioguide_id = cells[0].find('a')['href'].split('=')[-1]
+                try:
+                    name = cells[0].find('a').renderContents()
+                    bioguide_id = cells[0].find('a')['href'].split('=')[-1]
+                except AttributeError:
+                    pass
 
                 birth_death, position, party, state, congress = [x.renderContents() for x in cells[1:]]
                 congress = congress.split('<br />')[0]
