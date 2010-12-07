@@ -28,6 +28,7 @@ def encode_and_retrieve(args):
     base_url = os.path.join(settings.SOLR_DOMAIN, 'solr/select?')
     data = urllib.urlencode(args)
     full_url = base_url+data
+    print full_url
     fp = urllib2.urlopen(full_url)
     return json.loads(fp.read())
 
