@@ -137,7 +137,7 @@ def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=Non
     # remove any cruft and format nicely. 
     return json_resp
 
-def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, mincount=0):
+def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, mincount=0, sort='false'):
     '''finds occurences of a specific phrase by entity_type. expects
     dates in dd/mm/yyyy format. if 'start' and 'end' date are none, defaults
     to all time. the mincount argument controls whether counts are returned for all
@@ -167,6 +167,8 @@ def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, minc
 
     if mincount:
         args['facet.mincount'] = 1
+
+    args['facet.sort'] = sort
 
     # default limit for # faceted fields returned is 100; we want to return for
     # all fields. 
