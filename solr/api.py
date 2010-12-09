@@ -63,7 +63,7 @@ def solr_api_call(args):
     return responses
 
 def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=None, 
-    end_date=None, granularity='day', mincount=0):
+    end_date=None, granularity='day', mincount=0, page=1):
     ''' find occurences of a specific phrase over time. returns counts. expects
     date in dd/mm/yyyy format. if 'start' and 'end' date are none, defaults
     to all time. entity information (type and name) limits results to the entity
@@ -83,9 +83,11 @@ def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=Non
 
     args['facet'] = "true"
     args['facet.date'] = 'date'
-    # default limit for # faceted fields returned is 100; we want to return for
-    # all dates, and this could be a large number. 
-    args['facet.limit'] = -1
+
+    # Limit number of results to 100 at a time.
+    args['facet.limit'] = 100
+    args['facet.offset'] = int(page) * 100
+
     if start_date and end_date:
         date_start_value = as_solr_date(start_date)
         date_end_value = as_solr_date(end_date) 
@@ -193,8 +195,8 @@ def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, minc
     return json_resp
 
 
-def most_frequent_phrases(top=10, n=1, start_date=None, end_date=None, entity_type=None, 
-    entity_name=None):
+def most_frequent_phrases(n=1, start_date=None, end_date=None, entity_type=None, 
+    entity_name=None, page=1):
 
     if isinstance(start_date, basestring):
         start_date = dateparse(start_date).strftime('%d/%m/%Y')
@@ -221,8 +223,8 @@ def most_frequent_phrases(top=10, n=1, start_date=None, end_date=None, entity_ty
     elif n == 5:
         args['facet.field'] = 'pentagrams'
 
-    # XXX do we want to put a max limit in here?
-    args['facet.limit'] = top
+    args['facet.limit'] = 100
+    args['facet.offset'] = int(page) * 100
     args['facet.sort'] = 'count'
  
     if start_date and end_date:
