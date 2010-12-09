@@ -88,6 +88,7 @@ def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=Non
     # Limit number of results to 100 at a time.
     args['facet.limit'] = 100
     args['facet.offset'] = int(page) * 100
+    args['facet.sort'] = 'false'
 
     if start_date and end_date:
         date_start_value = as_solr_date(start_date)
@@ -140,7 +141,7 @@ def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=Non
     # remove any cruft and format nicely. 
     return json_resp
 
-def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, mincount=0, sort='false'):
+def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, mincount=1, sort='false'):
     '''finds occurences of a specific phrase by entity_type. expects
     dates in dd/mm/yyyy format. if 'start' and 'end' date are none, defaults
     to all time. the mincount argument controls whether counts are returned for all
