@@ -63,7 +63,7 @@ def solr_api_call(args):
     return responses
 
 def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=None, 
-    end_date=None, granularity='day', mincount=0, page=1):
+    end_date=None, granularity='day', mincount=0, page=0):
     ''' find occurences of a specific phrase over time. returns counts. expects
     date in dd/mm/yyyy format. if 'start' and 'end' date are none, defaults
     to all time. entity information (type and name) limits results to the entity
@@ -198,7 +198,7 @@ def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, minc
 
 
 def most_frequent_phrases(n=1, start_date=None, end_date=None, entity_type=None, 
-    entity_name=None, page=1):
+    entity_name=None, page=0):
 
     if isinstance(start_date, basestring):
         start_date = dateparse(start_date).strftime('%d/%m/%Y')

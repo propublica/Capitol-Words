@@ -1,14 +1,34 @@
 from django.conf.urls.defaults import *
+from django.conf import settings
 from django.http import HttpResponse
 
 from views import *
 
-from piston.resource import Resource
+import piston.resource
 
-popular_phrase_handler = Resource(PopularPhraseHandler)
-phrase_by_category_handler = Resource(PhraseByCategoryHandler)
-phrase_over_time_handler = Resource(PhraseOverTimeHandler)
-legislator_lookup_handler = Resource(LegislatorLookupHandler)
+
+if getattr(settings, 'USE_LOCKSMITH', False):
+    from locksmith.auth.authentication import PistonKeyAuthentication
+
+    class Authorizer(PistonKeyAuthentication):
+        def challenge(self):
+            resp = HttpResponse("Authorization Required: \n"
+        "obtain a key at http://services.sunlightlabs.com/accounts/register/")
+            resp.status_code = 401
+            return resp
+
+    authorizer = Authorizer()
+
+else:
+    authorizer = None
+
+Resource = piston.resource.Resource
+
+
+popular_phrase_handler = Resource(PopularPhraseHandler, authentication=authorizer)
+phrase_by_category_handler = Resource(PhraseByCategoryHandler, authentication=authorizer)
+phrase_over_time_handler = Resource(PhraseOverTimeHandler, authentication=authorizer)
+legislator_lookup_handler = Resource(LegislatorLookupHandler, authentication=authorizer)
 
 
 urlpatterns = patterns('',

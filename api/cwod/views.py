@@ -7,7 +7,7 @@ sys.path.append(os.pardir)
 from django.http import HttpResponse
 from django.shortcuts import get_list_or_404
 
-from solr.api import *
+from solr.api import most_frequent_phrases, phrase_by_category, phrase_over_time
 from piston.handler import BaseHandler
 from piston.resource import Resource
 from bioguide.models import *
