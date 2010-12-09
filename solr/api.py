@@ -83,6 +83,7 @@ def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=Non
 
     args['facet'] = "true"
     args['facet.date'] = 'date'
+    args['facet.field'] = 'date'
 
     # Limit number of results to 100 at a time.
     args['facet.limit'] = 100
