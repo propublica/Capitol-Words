@@ -115,8 +115,3 @@ class LegislatorLookupHandler(BaseHandler):
                                         'state': legislator.state,
                                         'congress': legislator.congress, })
         return results
-
-
-def index(request):
-    return HttpResponse('index')
-
