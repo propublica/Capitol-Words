@@ -175,7 +175,7 @@ def db_bioguide_lookup(lastname, year, position, state=None):
                              last AS lastname
                         FROM bioguide_legislator 
                                             WHERE last = ?
-                                            AND   year = ?
+                                            AND   congress = ?
                                             AND   position = ?"""
 
     args = [lastname.upper(),
@@ -185,5 +185,6 @@ def db_bioguide_lookup(lastname, year, position, state=None):
         query += " AND state = ?"
         args.append(state)
 
+    fields = ['bioguide', 'party', 'state', 'firstname', 'lastname', ]
     cursor.execute(query, args)
-    return list(cursor.fetchall())
+    return [dict(zip(fields, x)) for x in cursor.fetchall()]
