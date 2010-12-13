@@ -182,7 +182,7 @@ def db_bioguide_lookup(lastname, year, position, state=None):
             congresses[year],
             position.title(),]
     if state:
-        query += " AND state = ?"
+        query += " AND state = ? COLLATE NOCASE"
         args.append(abbr(state))
 
     fields = ['bioguide', 'party', 'state', 'firstname', 'lastname', ]
