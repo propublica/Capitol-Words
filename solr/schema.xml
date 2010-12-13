@@ -37,6 +37,7 @@
                 words="stopwords.txt"
                 enablePositionIncrements="true"
                 />
+            <filter class="solr.PorterStemFilterFactory"/>
         </analyzer>
     </fieldType>
 
@@ -56,6 +57,7 @@
                 words="stopwords.txt"
                 enablePositionIncrements="true"
                 />
+            <filter class="solr.PorterStemFilterFactory"/>
         </analyzer>
     </fieldType>
 
