@@ -111,18 +111,15 @@ class SolrDoc(object):
         else:
             position = 'representative'
 
-        # add some redundancy into the bioguide lookup (servers can be sketchy)
-        tries = 1
-        data = False # use False because bioguide_lookup returns None if no data found.
-        while data == False and tries < 3:
-            try:
-                data = db_bioguide_lookup(lastname, self.year, position, state)
-            except:
-                tries += 1
+        data = db_bioguide_lookup(lastname, self.year, position, state)
 
         if not data or len(data) > 1:
             print data
-            print 'No data or too many responses for %s, %s, %s, %s' % (lastname, self.year, position, state)
+            msg = 'No data or too many responses for %s, %s, %s, %s\n' % (lastname, self.year, position, state)
+            print msg
+            logfile = initialize_logfile()
+            logfile.write(msg)
+            logfile.flush()
             return None
         xml = ''
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_bioguide', data[0]['bioguide'])
