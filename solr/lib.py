@@ -183,7 +183,7 @@ def db_bioguide_lookup(lastname, year, position, state=None):
             position.title(),]
     if state:
         query += " AND state = ?"
-        args.append(state)
+        args.append(abbr(state))
 
     fields = ['bioguide', 'party', 'state', 'firstname', 'lastname', ]
     cursor.execute(query, args)
