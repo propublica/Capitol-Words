@@ -174,11 +174,11 @@ def db_bioguide_lookup(lastname, year, position, state=None):
                              first AS firstname,
                              last AS lastname
                         FROM bioguide_legislator 
-                                            WHERE last = ?
+                                            WHERE last = ? COLLATE NOCASE
                                             AND   congress = ?
                                             AND   position = ?"""
 
-    args = [lastname.upper(),
+    args = [lastname,
             congresses[year],
             position.title(),]
     if state:
