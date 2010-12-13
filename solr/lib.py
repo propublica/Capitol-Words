@@ -2,7 +2,7 @@
 
 ''' useful supporting functions '''
 
-from settings import API_KEY
+from settings import API_KEY, DB_PATH
 
 from BeautifulSoup import BeautifulSoup
 import urllib2, urllib, re
@@ -150,7 +150,7 @@ def bioguide_lookup(lastname, year, position=None, state=None):
 
 def db_bioguide_lookup(lastname, year, position, state=None):
     import sqlite3
-    conn = sqlite3.connection('../api/capitolwords')
+    conn = sqlite3.Connection(DB_PATH)
     cursor = conn.cursor()
 
     congresses = {'2010': '111',
