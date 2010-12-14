@@ -10,7 +10,7 @@ from httplib import HTTPConnection
 import xml.dom.minidom as xml
 from xml.parsers.expat import ExpatError
 import sys, os, re
-from lib import bioguide_lookup, db_bioguide_lookup
+from lib import bioguide_lookup, db_bioguide_lookup, fallback_bioguide_lookup
 from settings import *
 import datetime
 
