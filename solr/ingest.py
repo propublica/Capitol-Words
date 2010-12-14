@@ -114,13 +114,16 @@ class SolrDoc(object):
         data = db_bioguide_lookup(lastname, self.year, position, state)
 
         if not data or len(data) > 1:
-            print data
-            msg = 'No data or too many responses for %s, %s, %s, %s\n' % (lastname, self.year, position, state)
-            print msg
-            logfile = initialize_logfile()
-            logfile.write(msg)
-            logfile.flush()
-            return None
+            data = fallback_bioguide_lookup(lastname, self.year, position, state)
+            if not data:
+                print data
+                msg = 'No data or too many responses for %s, %s, %s, %s\n' % (lastname, self.year, position, state)
+                print msg
+                logfile = initialize_logfile()
+                logfile.write(msg)
+                logfile.flush()
+                return None
+
         xml = ''
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_bioguide', data[0]['bioguide'])
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_party', data[0]['party'])
