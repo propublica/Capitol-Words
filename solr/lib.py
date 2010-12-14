@@ -175,16 +175,25 @@ def db_bioguide_lookup(lastname, year, position, state=None):
                              last AS lastname
                         FROM bioguide_legislator 
                                             WHERE last = ? COLLATE NOCASE
-                                            AND   congress = ?
-                                            AND   position = ?"""
+                                            AND   congress = ?"""
 
     args = [lastname,
             congresses[year],
-            position.title(),]
+            ]
     if state:
         query += " AND state = ? COLLATE NOCASE"
         args.append(abbr(state))
 
+    if position == 'senator':
+        query += " AND position = 'Senator' "
+    else:
+        """Because the position passed to this function is
+        determined by the chamber from which the text comes,
+        delegates and resident commissioners will be missed.
+        """
+        query += " AND position IN ('Delegate', 'Representative', 'Resident Commissioner') "
+
     fields = ['bioguide', 'party', 'state', 'firstname', 'lastname', ]
     cursor.execute(query, args)
     return [dict(zip(fields, x)) for x in cursor.fetchall()]
+
