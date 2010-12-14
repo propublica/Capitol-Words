@@ -2,7 +2,7 @@
 
 ''' useful supporting functions '''
 
-from settings import API_KEY, DB_PATH
+from settings import API_KEY, DB_PATH, BIOGUIDE_LOOKUP_PATH
 
 from BeautifulSoup import BeautifulSoup
 import urllib2, urllib, re
@@ -197,3 +197,17 @@ def db_bioguide_lookup(lastname, year, position, state=None):
     cursor.execute(query, args)
     return [dict(zip(fields, x)) for x in cursor.fetchall()]
 
+
+def fallback_bioguide_lookup(name, year, position, state=''):
+    """Some lawmakers are routinely referred to in a way that
+    means they won't be found using db_bioguide_lookup.  These
+    lawmakers should be placed in a pipe-delimited file
+    in BIOGUIDE_LOOKUP_PATH, e.g.:
+    J000126|eddie bernice johnson|2009|representative|texas
+    D000299|lincoln diaz-balart|2009|representative|florida
+    """
+    import csv
+    with open(BIOGUIDE_LOOKUP_PATH, 'r') as fh:
+        for row in csv.reader(fh, delimiter='|'):
+            if '|'.join(row[1:]) == '|'.join([name, year, position, state, ]):
+                return row[0]
