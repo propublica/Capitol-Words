@@ -207,7 +207,18 @@ def fallback_bioguide_lookup(name, year, position, state=''):
     D000299|lincoln diaz-balart|2009|representative|florida
     """
     import csv
+    import sqlite3
+    conn = sqlite3.Connection(DB_PATH)
+    cursor = conn.cursor()
+
+    if state is None:
+        state = ''
+
     with open(BIOGUIDE_LOOKUP_PATH, 'r') as fh:
         for row in csv.reader(fh, delimiter='|'):
             if '|'.join(row[1:]) == '|'.join([name, year, position, state, ]):
-                return row[0]
+                cursor.execute("""SELECT bioguide_id, party, state, first, last
+                                        FROM bioguide_legislator
+                                        WHERE bioguide_id = ? LIMIT 1""", [row[0], ])
+                fields = ['bioguide', 'party', 'state', 'firstname', 'lastname', ]
+                return [dict(zip(fields, x)) for x in cursor.fetchall()]
