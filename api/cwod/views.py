@@ -2,7 +2,7 @@ from operator import itemgetter
 import sys
 import os
 
-sys.path.append(os.pardir)
+sys.path.append(os.path.abspath(os.path.dirname(__file__))+'/../../')
 
 from django.http import HttpResponse
 from django.shortcuts import get_list_or_404
