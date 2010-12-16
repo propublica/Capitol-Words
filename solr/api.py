@@ -198,7 +198,7 @@ def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, minc
 
 
 def most_frequent_phrases(n=1, start_date=None, end_date=None, entity_type=None, 
-    entity_name=None, page=0):
+    entity_name=None, page=0, stemmed=False):
 
     if isinstance(start_date, basestring):
         start_date = dateparse(start_date).strftime('%d/%m/%Y')
@@ -215,7 +215,10 @@ def most_frequent_phrases(n=1, start_date=None, end_date=None, entity_type=None,
     # return counts only, not the documents themselves
     args['rows'] = 0
     if n == 1:
-        args['facet.field'] = 'unigrams'
+        if stemmed == 'true':
+            args['facet.field'] = 'unigrams_stemmed'
+        else:
+            args['facet.field'] = 'unigrams'
     elif n == 2:
         args['facet.field'] = 'bigrams'
     elif n == 3:
