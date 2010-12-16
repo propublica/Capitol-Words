@@ -215,7 +215,7 @@ def most_frequent_phrases(n=1, start_date=None, end_date=None, entity_type=None,
     # return counts only, not the documents themselves
     args['rows'] = 0
     if n == 1:
-        args['facet.field'] = 'text'
+        args['facet.field'] = 'unigrams'
     elif n == 2:
         args['facet.field'] = 'bigrams'
     elif n == 3:
