@@ -7,7 +7,7 @@ sys.path.append(os.pardir)
 from django.http import HttpResponse
 from django.shortcuts import get_list_or_404
 
-from solr.api import most_frequent_phrases, phrase_by_category, phrase_over_time
+from solr.api import most_frequent_phrases, phrase_by_category, phrase_over_time, full_text_search
 from piston.handler import BaseHandler
 from piston.resource import Resource
 from bioguide.models import *
@@ -89,6 +89,19 @@ class PhraseOverTimeHandler(GenericHandler):
 
         dates.sort(key=itemgetter('date'))
         return dates
+
+
+class FullTextSearchHandler(GenericHandler):
+    def __init__(self):
+        super(FullTextSearchHandler, self).__init__(full_text_search)
+
+    def create_results_list(self, data, *args, **kwargs):
+        #return data[0]['response'].keys()
+        return [{'bioguide': x.get('speaker_bioguide'),
+                 'date': x['date'].rstrip('T00:00:00Z'),
+                 'speaking': x.get('speaking'), } 
+                 for x in data[0]['response']['docs'] ]
+        return data
 
 
 class LegislatorLookupHandler(BaseHandler):

@@ -29,6 +29,7 @@ popular_phrase_handler = Resource(PopularPhraseHandler, authentication=authorize
 phrase_by_category_handler = Resource(PhraseByCategoryHandler, authentication=authorizer)
 phrase_over_time_handler = Resource(PhraseOverTimeHandler, authentication=authorizer)
 legislator_lookup_handler = Resource(LegislatorLookupHandler, authentication=authorizer)
+fulltext_search_handler = Resource(FullTextSearchHandler, authentication=authorizer)
 
 
 urlpatterns = patterns('',
@@ -46,5 +47,7 @@ urlpatterns = patterns('',
         url(r'^phrases\.(?P<emitter_format>\w+)$', popular_phrase_handler),
 
         url(r'^legislators\.(?P<emitter_format>\w+)$', legislator_lookup_handler),
+
+        url(r'^text\.(?P<emitter_format>\w+)$', fulltext_search_handler),
 
 )
