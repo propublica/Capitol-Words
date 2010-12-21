@@ -229,7 +229,7 @@ if __name__ == '__main__':
         print "Checking Congressional Record for %s" % date
         if CRScraper().retrieve_by_date(date):
             print 'Will now sleep for one minute before retrieving next record...zzz...'
-            time.sleep(60) 
+            time.sleep(30) 
         else:
             if len(dates) == 1:
                 sys.exit()
