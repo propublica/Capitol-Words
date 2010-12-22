@@ -63,7 +63,7 @@ def solr_api_call(args):
     return responses
 
 def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=None, 
-    end_date=None, granularity='day', mincount=1, page=0):
+    end_date=None, granularity='day', mincount=1, page=0, chamber=''):
     ''' find occurences of a specific phrase over time. returns counts. expects
     date in dd/mm/yyyy format. if 'start' and 'end' date are none, defaults
     to all time. entity information (type and name) limits results to the entity
@@ -132,6 +132,25 @@ def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=Non
         q = '''%s:"%s" AND text:"%s"''' % (field_name, field_value, phrase)
     else:
         q = '''text:"%s"''' % (phrase)
+
+    # chamber can be any or all of:
+    # house
+    # senate
+    # extensions
+    #
+    # Multiple chambers can be selected
+    # by separating them with pipes.
+    if chamber:
+        valid_chambers = ['house',
+                          'senate',
+                          'extensions', ]
+        selected_chambers = []
+        for chamber in chamber.lower().split('|'):
+            if chamber in valid_chambers:
+                selected_chambers.append(chamber)
+        if selected_chambers:
+            q += ' AND (%s)' % ' OR '.join([x.title() for x in selected_chambers])
+
     args['q'] = q 
 
     # return counts only, not the documents themselves
@@ -143,7 +162,8 @@ def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=Non
     # remove any cruft and format nicely. 
     return json_resp
 
-def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, mincount=1, sort='false'):
+def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, mincount=1, sort='false',
+        chamber=''):
     '''finds occurences of a specific phrase by entity_type. expects
     dates in dd/mm/yyyy format. if 'start' and 'end' date are none, defaults
     to all time. the mincount argument controls whether counts are returned for all
@@ -187,6 +207,25 @@ def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, minc
         end = as_solr_date(end_date)
         daterange = '''date:[%s TO %s]''' % (start, end)
         q = '''(%s AND %s)''' % (q, daterange)
+
+    # chamber can be any or all of:
+    # house
+    # senate
+    # extensions
+    #
+    # Multiple chambers can be selected
+    # by separating them with pipes.
+    if chamber:
+        valid_chambers = ['house',
+                          'senate',
+                          'extensions', ]
+        selected_chambers = []
+        for chamber in chamber.lower().split('|'):
+            if chamber in valid_chambers:
+                selected_chambers.append(chamber)
+        if selected_chambers:
+            q += ' AND (%s)' % ' OR '.join([x.title() for x in selected_chambers])
+
     args['q'] = q 
 
     # return counts only, not the documents themselves
@@ -200,7 +239,7 @@ def phrase_by_category(phrase, entity_type, start_date=None, end_date=None, minc
 
 
 def most_frequent_phrases(n=1, start_date=None, end_date=None, entity_type=None, 
-    entity_name=None, page=0, stemmed=False):
+    entity_name=None, page=0, stemmed=False, chamber=''):
 
     if isinstance(start_date, basestring):
         start_date = dateparse(start_date).strftime('%d/%m/%Y')
@@ -260,6 +299,24 @@ def most_frequent_phrases(n=1, start_date=None, end_date=None, entity_type=None,
         # at this point if neither of the above constraints have been set, then
         # use a wildcard search
         args['q'] = "*:*"     
+
+    # chamber can be any or all of:
+    # house
+    # senate
+    # extensions
+    #
+    # Multiple chambers can be selected
+    # by separating them with pipes.
+    if chamber:
+        valid_chambers = ['house',
+                          'senate',
+                          'extensions', ]
+        selected_chambers = []
+        for chamber in chamber.lower().split('|'):
+            if chamber in valid_chambers:
+                selected_chambers.append(chamber)
+        if selected_chambers:
+            args['q'] += ' AND (%s)' % ' OR '.join([x.title() for x in selected_chambers])
 
     # do the api call
     json_resp = solr_api_call(args)
