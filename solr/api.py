@@ -63,7 +63,7 @@ def solr_api_call(args):
     return responses
 
 def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=None, 
-    end_date=None, granularity='day', mincount=0, page=0):
+    end_date=None, granularity='day', mincount=1, page=0):
     ''' find occurences of a specific phrase over time. returns counts. expects
     date in dd/mm/yyyy format. if 'start' and 'end' date are none, defaults
     to all time. entity information (type and name) limits results to the entity
@@ -113,6 +113,8 @@ def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=Non
     else:
         date_gap_value = '+1DAY'
     args['facet.date.gap'] = date_gap_value
+
+    args['facet.mincount'] = mincount
 
     # specify actual search parameters, including limiting by entity if
     # specified. if entity_type and entity_value are specified, then the search
