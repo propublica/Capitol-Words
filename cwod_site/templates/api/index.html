@@ -12,6 +12,7 @@
         <h1>Capitol Words API</h1>
 
         <h2>dates.json</h2>
+        <p>Find the popularity of a phrase over a period of time.</p>
         <h3>Required arguments</h3>
         <ul>
             <li>phrase 
@@ -59,14 +60,19 @@
         </ul>
         <h3>Examples</h3>
         <ul>
-            <li><a href="/api/dates.json?phrase=united+states">dates.json?phrase=united+states</a>
-            <li><a href="/api/dates.json?phrase=united+states&entity_type=state&entity_value=VA">dates.json?phrase=united+states&entity_type=state&entity_value=VA</a>
-            <li><a href="/api/dates.json?phrase=united+states">dates.json?phrase=united+states&start_date=2010-01-01&end_date=2010-06-01</a>
-            <li><a href="/api/dates.json?phrase=united+states">dates.json?phrase=united+states&start_date=2010-01-01&end_date=2010-06-01&granularity=month</a>
+            <li>Get a list of how many times the phrase "united states" appears in the Congressional Record on each day in the most recent Congress:<br> 
+                <a href="/api/dates.json?phrase=united+states">dates.json?phrase=united+states</a>
+            <li>Get a list of how many times the phrase "united states" was said by legislators from Virginia on each day of the most recent Congres:<br>
+                <a href="/api/dates.json?phrase=united+states&entity_type=state&entity_value=VA">dates.json?phrase=united+states&entity_type=state&entity_value=VA</a>
+            <li>Get a list of how many times the phrase "united States" appears in the Congressional Record on each day between Jan. 1, 2010, and June 1, 2010:<br>
+                <a href="/api/dates.json?phrase=united+states">dates.json?phrase=united+states&start_date=2010-01-01&end_date=2010-06-01</a>
+                <li>Get a list of how many times the phrase "united states" appears in the Congressional Record in each month between January and June, 2010:<br>
+                <a href="/api/dates.json?phrase=united+states">dates.json?phrase=united+states&start_date=2010-01-01&end_date=2010-06-01&granularity=month</a>
         </ul>
 
 
         <h2>phrases/{entity_type}.json</h2>
+        <p>Find the popularity of a phrase for the given entity.</p>
         <p>{entity_type} must be one of:</p>
         <ul>
             <li>legislator</li>
@@ -96,9 +102,12 @@
         </ul>
         <h3>Examples</h3>
         <ul>
-            <li><a href="/api/phrases/legislator.json?phrase=obama+administration">/phrases/legislator.json?phrase=obama+administration</a></li>
-            <li><a href="/api/phrases/legislator.json?phrase=obama+administration">/phrases/legislator.json?phrase=obama+administration&sort=true</a></li>
-            <li><a href="/api/phrases/legislator.json?phrase=obama+administration&start_date=2010-01-01&end_date=2010-06-01">/phrases/legislator.json?phrase=obama+administration&start_date=2010-01-01&end_date=2010-06-01</a></li>
+            <li>Get a list of how many times the phrase "obama administration" was said by each legislator in the most recent Congress:<br>
+            <a href="/api/phrases/legislator.json?phrase=obama+administration">/phrases/legislator.json?phrase=obama+administration</a></li>
+            <li>Get a list of how many times the phrase "obama administration" was said by each legislator in the most recent Congress, sorted by the number of results for each legislator:<br>
+            <a href="/api/phrases/legislator.json?phrase=obama+administration">/phrases/legislator.json?phrase=obama+administration&sort=true</a></li>
+            <li>Get a list of how many times the phrase "obama administration" was said by each legislator between Jan. 1, 2010, and June 1, 2010:
+            <a href="/api/phrases/legislator.json?phrase=obama+administration&start_date=2010-01-01&end_date=2010-06-01">/phrases/legislator.json?phrase=obama+administration&start_date=2010-01-01&end_date=2010-06-01</a></li>
         </ul>
 
         <h2>phrases.json</h2>
@@ -141,11 +150,12 @@
         </ul>
         <h3>Examples</h3>
         <ul>
-            <li><a href="/api/phrases.json">/phrases.json</a></li>
-            <li><a href="/api/phrases.json?top=50">/phrases.json?top=50</a></li>
-            <li><a href="/api/phrases.json?top=50&n=3">/phrases.json?top=50&n=3</a></li>
-            <li><a href="/api/phrases.json?start_date=2010-01-01&end_date=2010-06-01">/phrases.json?start_date=2010-01-01&end_date=2010-06-01</a></li>
-            <li><a href="/api/phrases.json?top=50&n=3&entity_type=party&entity_name=Democrat">/phrases.json?top=50&n=3&entity_type=party&entity_name=Democrat</a></li>
+            <li>List the top words in the most recent Congress:<br>
+            <a href="/api/phrases.json">/phrases.json</a></li>
+            <li>List the top two-word phrases between Jan. 1 and June 1, 2010:<br>
+            <a href="/api/phrases.json?n=2&start_date=2010-01-01&end_date=2010-06-01">/phrases.json?start_date=2010-01-01&end_date=2010-06-01&n=2</a></li>
+            <li>List the top three-word phrases by Democrats in the most recent Congress:<br> 
+            <a href="/api/phrases.json?n=3&entity_type=party&entity_name=Democrat">/phrases.json?top=50&n=3&entity_type=party&entity_name=Democrat</a></li>
         </ul>
 
         <h2>legislators.json</h2>
@@ -157,7 +167,50 @@
         </ul>
         <h3>Examples</h3>
         <ul>
-            <li><a href="/api/legislators.json?bioguide_id=R000053">/legislators.json?bioguide_id=R000053</a></li>
+            <li>Get information on the legislator with bioguide ID R000053:<br>
+            <a href="/api/legislators.json?bioguide_id=R000053">/legislators.json?bioguide_id=R000053</a></li>
+        </ul>
+
+        <h2>text.json</h2>
+        <p>Full-text search</p>
+        <h3>Optional arguments</h3>
+        <ul>
+            <li>query
+            <p>The text to search for.</p>
+            <li>start_date
+                <p>Limit results to those starting at the given date.</p>
+                <p>If this argument is supplied, end_date is required.</p>
+            </li>
+            <li>end_date
+                <p>Limit results to those ending at the given date.</p>
+                <p>If this argument is supplied, start_date is required.</p>
+            </li>
+            <li>entity_type
+                <p>The entity type.</p>
+                <p>Valid values:</p>
+                <ul>
+                    <li>state</li>
+                    <li>party</li>
+                    <li>legislator</li>
+                    <li>bioguide</li>
+                </ul>
+                <p>If this argument is supplied, entity_value is required.</p>
+            </li>
+            <li>entity_value
+                <p>The value of the entity given in entity_type.</p>
+                <p>If this argument is supplied, entity_type is required.</p>
+            </li>
+            <li>page
+                <p>The page of results to show.</p>
+                <p>100 results are shown at a time. To get more than 100 results, use the page parameter.</p>
+            </li>
+        </ul>
+        <h3>Examples</h3>
+        <ul>
+            <li>Get a list of pieces of text with the phrase "obama administration" in them:<br> 
+            <a href="/api/text.json?query=obama+administration">/text.json?query=obama+administration</a>
+            <li>Get a list of pieces of text by Republicans with the phrase "health care debate" in them:<br> 
+            <a href="/api/text.json?query=health+care+debate&entity_type=party&entity_name=Republican">/text.json?query=health+care+debate&entity_type=party&entity_name=Republican</a></li>
         </ul>
 
     </body>
