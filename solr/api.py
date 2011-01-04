@@ -353,11 +353,11 @@ def full_text_search(query=None, start_date=None, end_date=None, entity_type=Non
     if entity_type and entity_name:
         if entity_type == 'state':
             field_name = 'speaker_state'
-        if entity_type == 'party':
+        elif entity_type == 'party':
             field_name = 'speaker_party'
-        if entity_type == 'legislator':
+        elif entity_type == 'legislator':
             field_name = 'speaker'
-        if entity_type == 'bioguide':
+        elif entity_type == 'bioguide':
             field_name = 'speaker_bioguide'
         else:
             raise NotImplementedError(entity_type)
