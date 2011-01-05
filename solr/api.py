@@ -326,7 +326,7 @@ def most_frequent_phrases(n=1, start_date=None, end_date=None, entity_type=None,
 
 
 def full_text_search(query=None, start_date=None, end_date=None, entity_type=None,
-        entity_name=None, page=0):
+        entity_name=None, cr_pages=None, page=0):
 
     if isinstance(start_date, basestring):
         start_date = dateparse(start_date).strftime('%d/%m/%Y')
@@ -362,6 +362,9 @@ def full_text_search(query=None, start_date=None, end_date=None, entity_type=Non
         else:
             raise NotImplementedError(entity_type)
         q.append('''%s:%s''' % (field_name, entity_name))
+
+    if cr_pages:
+        q.append('pages:%s' % cr_pages)
 
     args = {'rows': 100,
             'start': int(page) * 100,
