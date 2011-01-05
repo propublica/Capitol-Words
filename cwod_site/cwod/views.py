@@ -1,4 +1,5 @@
 from operator import itemgetter
+import re
 import sys
 import os
 
@@ -99,7 +100,10 @@ class FullTextSearchHandler(GenericHandler):
         #return data[0]['response'].keys()
         return [{'bioguide': x.get('speaker_bioguide'),
                  'date': x['date'].rstrip('T00:00:00Z'),
-                 'speaking': x.get('speaking'), } 
+                 'speaking': x.get('speaking'), 
+                 'title': x.get('document_title', ''),
+                 'origin_url': create_gpo_url(x.get('crdoc', '')),
+                 } 
                  for x in data[0]['response']['docs'] ]
         return data
 
@@ -128,3 +132,18 @@ class LegislatorLookupHandler(BaseHandler):
                                         'state': legislator.state,
                                         'congress': legislator.congress, })
         return results
+
+
+def create_gpo_url(crdoc):
+    """Convert the path used for the crdoc field to
+    a URL that can be used to retrieve the full text
+    of the document from the GPO.
+    """
+    m = re.search(r'(CREC-(\d{4}-\d{2}-\d{2}).*?)\.xml', crdoc)
+    if not m:
+        return ''
+
+    id, date = m.groups()
+    url = 'http://origin.www.gpo.gov/fdsys/pkg/CREC-%s/html/%s.htm' % (date, id)
+    return url
+
