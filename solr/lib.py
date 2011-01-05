@@ -153,7 +153,9 @@ def db_bioguide_lookup(lastname, year, position, state=None):
     conn = sqlite3.Connection(DB_PATH)
     cursor = conn.cursor()
 
-    congresses = {'2010': '111',
+    congresses = {'2012': '112',
+                  '2011': '112',
+                  '2010': '111',
                   '2009': '111',
                   '2008': '110',
                   '2007': '110',
