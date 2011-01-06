@@ -343,7 +343,7 @@ def full_text_search(query=None, start_date=None, end_date=None, entity_type=Non
     q = []
 
     if query:
-        q.append("speaking:'%s'" % query.strip('"'))
+        q.append('speaking:"%s"' % query.strip('"'))
 
     if start_date and end_date:
         start = as_solr_date(start_date)
