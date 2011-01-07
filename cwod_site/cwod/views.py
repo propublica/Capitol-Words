@@ -102,7 +102,7 @@ class FullTextSearchHandler(GenericHandler):
             params[str(k)] = v
         data = self.func([], **params)
         results = self.create_results_list(data, *args, **kwargs)
-        data = {'results': results, 'parameters': kwargs, }
+        data = {'results': results, 'parameters': params, }
         return data
 
     def create_results_list(self, data, *args, **kwargs):
