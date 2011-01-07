@@ -96,16 +96,27 @@ class FullTextSearchHandler(GenericHandler):
     def __init__(self):
         super(FullTextSearchHandler, self).__init__(full_text_search)
 
+    def read(self, request, *args, **kwargs):
+        params = {}
+        for k, v in request.GET.iteritems():
+            params[str(k)] = v
+        data = self.func([], **params)
+        results = self.create_results_list(data, *args, **kwargs)
+        data = {'results': results, 'parameters': kwargs, }
+        return data
+
     def create_results_list(self, data, *args, **kwargs):
-        #return data[0]['response'].keys()
         return [{'bioguide': x.get('speaker_bioguide'),
-                 'date': x['date'].rstrip('T00:00:00Z'),
+                 'date': re.sub(r'T\d\d\:\d\d:\d\dZ$', '', x['date']),
                  'speaking': x.get('speaking'), 
                  'title': x.get('document_title', ''),
                  'origin_url': create_gpo_url(x.get('crdoc', '')),
+                 'speaker_first': x.get('speaker_firstname'),
+                 'speaker_last': x.get('speaker_lastname'),
+                 'speaker_party': x.get('speaker_party'),
+                 'speaker_state': x.get('speaker_state'),
                  } 
                  for x in data[0]['response']['docs'] ]
-        return data
 
 
 class LegislatorLookupHandler(BaseHandler):

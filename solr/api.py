@@ -325,49 +325,36 @@ def most_frequent_phrases(n=1, start_date=None, end_date=None, entity_type=None,
     return json_resp
 
 
-def full_text_search(query=None, start_date=None, end_date=None, entity_type=None,
-        entity_name=None, cr_pages=None, page=0):
-
-    if isinstance(start_date, basestring):
-        start_date = dateparse(start_date).strftime('%d/%m/%Y')
-    if isinstance(end_date, basestring):
-        end_date = dateparse(end_date).strftime('%d/%m/%Y')
-
-    if start_date and end_date:
-        date_start_value = as_solr_date(start_date)
-        date_end_value = as_solr_date(end_date)
-    else:
-        date_start_value = as_solr_date(settings.OLDEST_DATE)
-        date_end_value = 'NOW/DAY+1DAY'
-
+def full_text_search(*args, **kwargs):
     q = []
 
-    if query:
-        q.append('speaking:"%s"' % query.strip('"'))
+    if 'date' in kwargs:
+        date = dateparse(date)
+        start = kwargs['date'].strftime('%d/%m/%Y')
+        end = (kwargs['date'] + datetime.timedelta(1)).strftime('%d/%m/%Y')
+        q.append("date:[%s TO %s]" % (start, end))
 
-    if start_date and end_date:
-        start = as_solr_date(start_date)
-        end = as_solr_date(end_date)
-        q.append('''date:[%s TO %s]''' % (start, end))
+    elif 'start_date' in kwargs and 'end_date' in kwargs:
+        start = dateparse(kwargs['start']).strftime('%d/%m/%Y')
+        end = dateparse(kwargs['start']).strftime('%d/%m/%Y')
+        q.append("date:[%s TO %s]" % (start, end))
 
-    if entity_type and entity_name:
-        if entity_type == 'state':
-            field_name = 'speaker_state'
-        elif entity_type == 'party':
-            field_name = 'speaker_party'
-        elif entity_type == 'legislator':
-            field_name = 'speaker'
-        elif entity_type == 'bioguide':
-            field_name = 'speaker_bioguide'
-        else:
-            raise NotImplementedError(entity_type)
-        q.append('''%s:%s''' % (field_name, entity_name))
+    if 'phrase' in kwargs:
+        q.append('speaking:"%s"' % kwargs['phrase'])
 
-    if cr_pages:
-        q.append('pages:%s' % cr_pages)
+    entities = {'state': 'speaker_state',
+                'party': 'speaker_party',
+                'legislator': 'speaker',
+                'bioguide': 'speaker_bioguide', 
+                'cr_pages': 'pages',
+                }
+
+    for k, v in entities.iteritems():
+        if k in kwargs:
+            q.append('%s:%s' % (v, kwargs[k]))
 
     args = {'rows': 100,
-            'start': int(page) * 100,
+            'start': int(kwargs.get('page', 0)) * 100,
             }
     if len(q):
         args['q'] = '(%s)' % ' AND '.join(q)
@@ -375,6 +362,4 @@ def full_text_search(query=None, start_date=None, end_date=None, entity_type=Non
         args['q'] = '*:*'
 
     json_resp = solr_api_call(args)
-
     return json_resp
-
