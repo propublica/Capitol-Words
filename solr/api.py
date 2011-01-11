@@ -3,6 +3,7 @@
 ''' A set of functions that give specific views into the solr documents,
 returning nicely formatted statistics.  '''
 
+import datetime
 import urllib, urllib2, sys, os
 import settings
 try:
@@ -310,15 +311,15 @@ def full_text_search(*args, **kwargs):
     q = []
 
     if 'date' in kwargs:
-        date = dateparse(date)
-        start = kwargs['date'].strftime('%d/%m/%Y')
-        end = (kwargs['date'] + datetime.timedelta(1)).strftime('%d/%m/%Y')
-        q.append("date:[%s TO %s]" % (start, end))
+        date = dateparse(kwargs['date'])
+        start = date.strftime('%d/%m/%Y')
+        end = (date + datetime.timedelta(1)).strftime('%d/%m/%Y')
+        q.append("date:[%s TO %s]" % (as_solr_date(start), as_solr_date(end)))
 
     elif 'start_date' in kwargs and 'end_date' in kwargs:
-        start = dateparse(kwargs['start']).strftime('%d/%m/%Y')
-        end = dateparse(kwargs['start']).strftime('%d/%m/%Y')
-        q.append("date:[%s TO %s]" % (start, end))
+        start = dateparse(kwargs['start_date']).strftime('%d/%m/%Y')
+        end = dateparse(kwargs['end_date']).strftime('%d/%m/%Y')
+        q.append("date:[%s TO %s]" % (as_solr_date(start), as_solr_date(end)))
 
     if 'phrase' in kwargs:
         q.append('speaking:"%s"' % kwargs['phrase'])
@@ -328,13 +329,20 @@ def full_text_search(*args, **kwargs):
                 'legislator': 'speaker',
                 'bioguide': 'speaker_bioguide', 
                 'cr_pages': 'pages',
+                'volume': 'volume',
                 }
 
     for k, v in entities.iteritems():
         if k in kwargs:
             q.append('%s:%s' % (v, kwargs[k]))
 
-    args = {'rows': 100,
+    try:
+        per_page = int(kwargs.get('per_page', 100))
+    except ValueError:
+        per_page = 100
+    if per_page > 100:
+        per_page = 100
+    args = {'rows': per_page,
             'start': int(kwargs.get('page', 0)) * 100,
             }
     if len(q):
