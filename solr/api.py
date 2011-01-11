@@ -13,6 +13,8 @@ except:
 
 from dateutil.parser import parse as dateparse
 
+from lib import volume_lookup
+
 
 # return dicts of dates and frequency counts, plus links back to the raw ascii
 # documents
@@ -323,6 +325,10 @@ def full_text_search(*args, **kwargs):
 
     if 'phrase' in kwargs:
         q.append('speaking:"%s"' % kwargs['phrase'])
+
+    if 'congress' in kwargs:
+        volumes = volume_lookup(kwargs['congress'], kwargs.get('session'))
+        q.append('volume:(%s)' % ' OR '.join([volumes, ])
 
     entities = {'state': 'speaker_state',
                 'party': 'speaker_party',

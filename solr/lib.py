@@ -224,3 +224,20 @@ def fallback_bioguide_lookup(name, year, position, state=''):
                                         WHERE bioguide_id = ? LIMIT 1""", [row[0], ])
                 fields = ['bioguide', 'party', 'state', 'firstname', 'lastname', ]
                 return [dict(zip(fields, x)) for x in cursor.fetchall()]
+
+
+def volume_lookup(congress, session=None):
+    import sqlite3
+    conn = sqlite3.Connection(DB_PATH)
+    cursor = conn.cursor()
+
+    query = """SELECT volume FROM cwod_congressionalrecordvolume
+                    WHERE congress = ?"""
+    args = [congress, ]
+
+    if session:
+        query += " AND session = ?"""
+        args.append([session, ])
+
+    cursor.execute(query, args)
+    return [x[0] for x in cursor.fetchall()]
