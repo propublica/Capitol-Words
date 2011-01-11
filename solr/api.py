@@ -332,6 +332,17 @@ def full_text_search(*args, **kwargs):
             volumes = ['0', ]
         q.append('volume:(%s)' % ' OR '.join(volumes))
 
+    if 'chamber' in kwargs:
+        valid_chambers = ['house',
+                          'senate',
+                          'extensions', ]
+        selected_chambers = []
+        for chamber in kwargs['chamber'].lower().split('|'):
+            if chamber in valid_chambers:
+                selected_chambers.append(chamber)
+        if selected_chambers:
+            q.append('chamber:(%s)' % ' OR '.join([x.title() for x in selected_chambers]))
+
     entities = {'state': 'speaker_state',
                 'party': 'speaker_party',
                 'legislator': 'speaker',
