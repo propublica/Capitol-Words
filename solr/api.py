@@ -324,7 +324,7 @@ def full_text_search(*args, **kwargs):
         q.append("date:[%s TO %s]" % (as_solr_date(start), as_solr_date(end)))
 
     if 'phrase' in kwargs:
-        q.append('speaking:"%s"' % kwargs['phrase'])
+        q.append('speaking:%s' % kwargs['phrase'])
 
     if 'congress' in kwargs:
         volumes = volume_lookup(kwargs['congress'], kwargs.get('session'))
