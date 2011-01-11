@@ -236,8 +236,8 @@ def volume_lookup(congress, session=None):
     args = [congress, ]
 
     if session:
-        query += " AND session = ?"""
-        args.append([session, ])
+        query += " AND session = ?"
+        args.append(session)
 
     cursor.execute(query, args)
-    return [x[0] for x in cursor.fetchall()]
+    return [str(x[0]) for x in cursor.fetchall()]

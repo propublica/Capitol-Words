@@ -328,7 +328,9 @@ def full_text_search(*args, **kwargs):
 
     if 'congress' in kwargs:
         volumes = volume_lookup(kwargs['congress'], kwargs.get('session'))
-        q.append('volume:(%s)' % ' OR '.join([volumes, ])
+        if not volumes:
+            volumes = ['0', ]
+        q.append('volume:(%s)' % ' OR '.join(volumes))
 
     entities = {'state': 'speaker_state',
                 'party': 'speaker_party',
