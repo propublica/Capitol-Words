@@ -36,31 +36,12 @@ def solr_api_call(args):
     ''' manages the actual API call. adds common query parameters, and handles
     pagination if necessary.'''
 
-    # pagination settings
-    if not 'rows' in args:
-        rows = 50
-        args['rows'] = rows
-    else: rows = args['rows']
-    if args['rows'] != 0:
-        start = 0
-        args['start'] = start
-
     # return results in json format
     args['wt'] = 'json'
     
-    # pagination
-    responses = []
-    if rows != 0:
-        while (start == 0 or start < num_found):
-            resp = encode_and_retrieve(args)
-            responses.append(resp)
-            num_found = resp['response']['numFound']
-            start = start + rows 
-    else:
-        resp = encode_and_retrieve(args)
-        responses.append(resp)
+    response = encode_and_retrieve(args)
 
-    return responses
+    return [response, ]
 
 def phrase_over_time(phrase, entity_type=None, entity_value=None, start_date=None, 
     end_date=None, granularity='day', mincount=1, page=0, chamber=''):
