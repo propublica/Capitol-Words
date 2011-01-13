@@ -37,15 +37,11 @@ class GenericHandler(BaseHandler):
 
     def read(self, request, *args, **kwargs):
         params = {}
-        for key, val in request.GET.items():
-            if key in self.allowed_keys:
-                params[str(key)] = val
+        for k, v in request.GET.items():
+            params[str(k)] = v
 
-        for key, val in kwargs.items():
-            if key in self.allowed_keys:
-                params[str(key)] = val
-
-        data = self.func(**params)
+        params.update(kwargs)
+        data = self.func([], **params)
 
         results = self.create_results_list(data, *args, **kwargs)
 
@@ -66,7 +62,7 @@ class PhraseByCategoryHandler(GenericHandler):
     def read(self, request, *args, **kwargs):
         entity_type = kwargs.get('entity_type')
         if entity_type == 'legislator':
-            kwargs['results_keys'] = ['legislator_id', 'count', ]
+            kwargs['results_keys'] = ['bioguide', 'count', ]
         elif entity_type == 'state':
             kwargs['results_keys'] = ['state', 'count', ]
         elif entity_type == 'party':
