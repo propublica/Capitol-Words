@@ -144,6 +144,7 @@ class Command(BaseCommand):
         for collection in ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ]:
             db[collection].ensure_index([('ngram', pymongo.ASCENDING), ])
         """
+        '''
         # Remove the entries from the last granule inserted,
         # to avoid duplicates.
         last_entry = db['unigrams'].find().sort('_id', -1)[0]
@@ -154,6 +155,7 @@ class Command(BaseCommand):
         # reindex them. 
         # TODO: Create a unique index to avoid duplicates.
         granules = db['unigrams'].distinct('granule')
+        '''
 
         """
         if date:
@@ -179,8 +181,8 @@ class Command(BaseCommand):
             ids = data['facet_counts']['facet_fields']['id'][::2]
 
             for id in ids:
-                if id.split('.')[0] in granules:
-                    continue
+                #if id.split('.')[0] in granules:
+                #    continue
 
                 print id
 
