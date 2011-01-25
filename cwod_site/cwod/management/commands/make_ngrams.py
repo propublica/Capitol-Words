@@ -53,8 +53,9 @@ class Command(BaseCommand):
 
 
                 # Remove unnecessary punctuation
-                sentence = re.sub(r"(\/|--|`|'|\(|\)\;\?)", ' ', sentence)
+                sentence = re.sub(r"(\/|--|`|\(|\)\;\?)", ' ', sentence)
                 sentence = re.sub(r"(\.|,)", '', sentence)
+                sentence = re.sub(r"''", '', sentence)
 
                 #words = nltk.tokenize.word_tokenize(sentence)
                 words = sentence.split()
