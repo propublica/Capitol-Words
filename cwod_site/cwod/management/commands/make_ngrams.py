@@ -1,10 +1,11 @@
-import re
 from collections import defaultdict
-import json
-import urllib2
+from httplib import HTTPConnection
 from optparse import make_option
-import sys
 import csv
+import json
+import re
+import sys
+import urllib2
 
 from django.core.management.base import BaseCommand
 
@@ -12,6 +13,7 @@ from pymongo import Connection
 
 import nltk
 from dateutil.parser import parse as dateparse
+import lxml.etree
 
 
 connection = Connection()
@@ -49,9 +51,10 @@ class Command(BaseCommand):
             sentences = nltk.tokenize.sent_tokenize(graf.replace('\n', '').lower())
             for sentence in sentences:
 
+
                 # Remove unnecessary punctuation
-                sentence = re.sub(r"(\/|--\,|`|'|\(|\)\;\?)", ' ', sentence)
-                sentence = re.sub(r"\.", '', sentence)
+                sentence = re.sub(r"(\/|--|`|'|\(|\)\;\?)", ' ', sentence)
+                sentence = re.sub(r"(\.|,)", '', sentence)
 
                 #words = nltk.tokenize.word_tokenize(sentence)
                 words = sentence.split()
@@ -100,6 +103,39 @@ class Command(BaseCommand):
         db[field].insert(doc)
 
 
+    def save_to_solr(self, doc):
+        self.error = None
+        con = HTTPConnection('localhost:8984')
+        con.putrequest('POST', '/solr/update/')
+        con.putheader('content-length', str(len(doc)))
+        con.putheader('content-type', 'text/xml; charset=UTF-8')
+        con.endheaders()
+        con.send(doc)
+        r = con.getresponse()
+        if str(r.status) == '200':
+            self.status = 'OK'
+            #print r.read()
+            self.commit()
+        else:
+            self.error = '%d: %s' % (r.status, r.read())
+            print self.error
+
+    def commit(self):
+        DATA = '<commit/>'
+        con = HTTPConnection('localhost:8984')
+        con.putrequest('POST', '/solr/update/')
+        con.putheader('content-length', str(len(DATA)))
+        con.putheader('content-type', 'text/xml; charset=UTF-8')
+        con.endheaders()
+        con.send(DATA)
+        r = con.getresponse()
+        if not str(r.status) == '200':
+            print 'error'
+            #print r.read()
+            #print r.status
+        print 'Commit response: %s' % r.read()
+
+
     def handle(self, *args, **options):
 
         date = options['date']
@@ -131,13 +167,45 @@ class Command(BaseCommand):
 
                 speaking = doc.get('speaking', [])
                 quote = doc.get('quote', [])
-                doc['date'] = dateparse(doc['date'])
+                #doc['date'] = dateparse(doc['date'])
+
 
                 for n in range(1,6):
-                    ngrams = defaultdict(int)
-                    for ngram in self.make_ngrams(text=speaking+quote, n=n):
-                        ngrams[ngram] += 1
+                    add = lxml.etree.Element('add')
 
-                    for ngram, count in ngrams.iteritems():
-                        self.save_ngram(doc, n, ngram, count)
+                    #ngrams = defaultdict(int)
+                    for index, ngram in enumerate(self.make_ngrams(text=speaking+quote, n=n)):
+
+                        mapping = [('id', '%s.%s.%s' % (id, n, index)),
+                                   ('crdoc', doc['crdoc']),
+                                   ('docid', doc['id']),
+                                   ('n', n),
+                                   ('ngram', ' '.join(ngram)),
+                                   ('document_title', doc.get('document_title')),
+                                   ('granule', re.search(r'(CREC-.*?)\.xml', doc['crdoc']).groups()[0]),
+                                   ('volume', doc['volume']),
+                                   ('number', doc['number']),
+                                   ('date', doc['date']),
+                                   ('chamber', doc.get('chamber', doc['pages'][0])),
+                                   ('pages', doc['pages']),
+                                   ('speaker_raw', doc.get('speaker_raw')),
+                                   ('speaker_state', doc.get('speaker_state')),
+                                   ('speaker_party', doc.get('speaker_party')),
+                                   ('speaker_bioguide', doc.get('speaker_bioguide')),
+                                   ('speaker_firstname', doc.get('speaker_firstname')),
+                                   ('speaker_lastname', doc.get('speaker_lastname')),
+                                   ]
+
+                        crdoc = lxml.etree.SubElement(add, 'doc')
+
+                        for tagname, value in mapping:
+                            lxml.etree.SubElement(crdoc, 'field', {'name': tagname, }).text = str(value)
+
+                    self.save_to_solr(lxml.etree.tostring(add))
+
+                        #ngrams[ngram] += 1
+                        #print ngram
+
+                    #for ngram, count in ngrams.iteritems():
+                    #    self.save_ngram(doc, n, ngram, count)
 
