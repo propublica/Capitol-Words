@@ -146,12 +146,12 @@ class PhraseOverTimeHandler(GenericHandler):
 
     def read(self, request, *args, **kwargs):
 
-        q = ['ngram:"%s"' % request.GET.get('phrase'), ]
+        kwargs['q'] = ['ngram:"%s"' % request.GET.get('phrase'), ]
 
         if 'start_date' in request.GET and 'end_date' in request.GET:
             start = dateparse(request.GET['start_date']).strftime('%d/%m/%Y')
             end = dateparse(request.GET['end_date']).strftime('%d/%m/%Y')
-            q.append("date:[%s TO %s]" % (self.as_solr_date(start), self.as_solr_date(end)))
+            kwargs['q'].append("date:[%s TO %s]" % (self.as_solr_date(start), self.as_solr_date(end)))
         else:
             start = self.as_solr_date(settings.OLDEST_DATE)
             end = 'NOW/DAY+1DAY'
