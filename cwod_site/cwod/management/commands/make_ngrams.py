@@ -8,6 +8,7 @@ import csv
 
 from django.core.management.base import BaseCommand
 
+import pymongo
 from pymongo import Connection
 
 import nltk
@@ -34,6 +35,7 @@ class Command(BaseCommand):
                '&facet.mincount=1'
                '&rows=0'
                '&facet.field=date'
+               '&facet.sort=index'
                '&wt=json'
                '&facet.method=enum'
                '&facet=true'
@@ -101,14 +103,30 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
+        # Create indexes
+        """
+        for collection in ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ]:
+            db[collection].ensure_index([('ngram', pymongo.ASCENDING), ])
+        """
+        # Remove the entries from the last granule inserted,
+        # to avoid duplicates.
+        last_entry = db['unigrams'].find().sort('_id', -1)[0]
+        for collection in ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ]:
+            db[collection].remove({'granule': last_entry['granule']})
 
-        date = options['date']
+        # Get a list of indexed granules so we don't
+        # reindex them. 
+        # TODO: Create a unique index to avoid duplicates.
+        granules = db['unigrams'].distinct('granule')
 
+        """
         if date:
             dates = [date, ]
 
         else:
             dates = self.list_dates()
+        """
+        dates = self.list_dates()
 
         for date in dates:
             url = ('http://localhost:8983/solr/select'
@@ -118,12 +136,16 @@ class Command(BaseCommand):
                    '&facet.field=id'
                    '&wt=json'
                    '&facet=true'
+                   '&facet.sort=index'
                    '&facet.limit=1000000') % date
 
             data = json.loads(urllib2.urlopen(url).read())
             ids = data['facet_counts']['facet_fields']['id'][::2]
 
             for id in ids:
+                if id.split('.')[0] in granules:
+                    continue
+
                 print id
 
                 url = 'http://localhost:8983/solr/select?q=id:%s&wt=json' % id
