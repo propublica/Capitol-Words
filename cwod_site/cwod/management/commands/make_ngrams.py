@@ -53,7 +53,7 @@ class Command(BaseCommand):
 
 
                 # Remove unnecessary punctuation
-                sentence = re.sub(r"(\/|--|`|\(|\)\;\?)", ' ', sentence)
+                sentence = re.sub(r"(\/|--|`|\(|\)|\;|\?)", ' ', sentence)
                 sentence = re.sub(r"(\.|,)", '', sentence)
                 sentence = re.sub(r"''", '', sentence)
 
