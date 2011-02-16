@@ -4,6 +4,8 @@ from django.http import HttpResponse
 
 from views import *
 
+from mongo_views import *
+
 import piston.resource
 
 
@@ -26,8 +28,9 @@ Resource = piston.resource.Resource
 
 
 popular_phrase_handler = Resource(PopularPhraseHandler, authentication=authorizer)
+phrase_tree_handler = Resource(PhraseTreeHandler, authentication=authorizer)
 phrase_by_category_handler = Resource(PhraseByCategoryHandler, authentication=authorizer)
-phrase_over_time_handler = Resource(PhraseOverTimeHandler, authentication=authorizer)
+phrase_over_time_handler = Resource(MongoPhraseOverTimeHandler, authentication=authorizer)
 legislator_lookup_handler = Resource(LegislatorLookupHandler, authentication=authorizer)
 fulltext_search_handler = Resource(FullTextSearchHandler, authentication=authorizer)
 
@@ -45,6 +48,8 @@ urlpatterns = patterns('',
         url(r'^phrases\/(?P<entity_type>\w+)\.(?P<emitter_format>\w+)$', phrase_by_category_handler),
 
         url(r'^phrases\.(?P<emitter_format>\w+)$', popular_phrase_handler),
+
+        url(r'^tree\.(?P<emitter_format>\w+)$', phrase_tree_handler),
 
         url(r'^legislators\.(?P<emitter_format>\w+)$', legislator_lookup_handler),
 

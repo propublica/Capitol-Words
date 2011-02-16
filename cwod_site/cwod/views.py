@@ -5,6 +5,9 @@ import urllib
 import urllib2
 
 from django.conf import settings
+from django.shortcuts import get_list_or_404, get_object_or_404
+
+from bioguide.models import *
 
 from piston.handler import BaseHandler
 from piston.resource import Resource
@@ -67,12 +70,12 @@ class GenericHandler(BaseHandler):
             date = dateparse(request.GET['date'])
             start = date.strftime('%d/%m/%Y')
             end = (date + datetime.timedelta(1)).strftime('%d/%m/%Y')
-            q.append("date:[%s TO %s]" % (as_solr_date(start), as_solr_date(end)))
+            q.append("date:[%s TO %s]" % (self.as_solr_date(start), self.as_solr_date(end)))
 
         elif 'start_date' in request.GET and 'end_date' in request.GET:
             start = dateparse(request.GET['start_date']).strftime('%d/%m/%Y')
             end = dateparse(request.GET['end_date']).strftime('%d/%m/%Y')
-            q.append("date:[%s TO %s]" % (as_solr_date(start), as_solr_date(end)))
+            q.append("date:[%s TO %s]" % (self.as_solr_date(start), self.as_solr_date(end)))
 
         if 'chamber' in request.GET:
             valid_chambers = ['house',
@@ -85,22 +88,30 @@ class GenericHandler(BaseHandler):
             if selected_chambers:
                 q.append('chamber:(%s)' % ' OR '.join([x.title() for x in selected_chambers]))
 
+        # n can be set either as a request parameter or in kwargs
+        n = kwargs.get('n', request.GET.get('n', 1))
+
+        facet_field = {'1': 'unigrams', 
+                       '2': 'bigrams', 
+                       '3': 'trigrams', 
+                       '4': 'quadgrams', 
+                       '5': 'pentagrams'}.get(n, '1')
+
         params = {'q': '(%s)' % ' AND '.join(q),
                   'facet': 'true',
-                  'facet.field': 'ngram',
+                  'facet.field': facet_field,
                   'facet.limit': per_page,
                   'facet.offset': offset,
                   'facet.mincount': '1',
                   'facet.sort': 'count',
+                  'facet.method': 'enum',
                   'rows': '0',
                   'wt': 'json',
                   }
 
         params.update(kwargs.get('params', {}))
-        print params
 
-        url = 'http://localhost:%s/solr/select?%s' % (kwargs.get('port', '8984'), urllib.urlencode(params))
-        print url
+        url = 'http://localhost:%s/solr/select?%s' % (kwargs.get('port', '8983'), urllib.urlencode(params))
 
         data = json.loads(urllib2.urlopen(url).read())
         return self.format_for_return(data, *args, **kwargs)
@@ -111,7 +122,8 @@ class PopularPhraseHandler(GenericHandler):
     """
 
     def read(self, request, *args, **kwargs):
-        kwargs['q'] = ['n:%s' % request.GET.get('n', '1'), ]
+        #kwargs['q'] = ['n:%s' % request.GET.get('n', '1'), ]
+        kwargs['q'] = ['id:CREC*', ]
         return super(PopularPhraseHandler, self).read(request, *args, **kwargs)
 
 
@@ -122,8 +134,7 @@ class PhraseByCategoryHandler(GenericHandler):
             # error
             pass
 
-        kwargs['q'] = ['ngram:"%s"' % request.GET.get('phrase'), ]
-        print kwargs
+        kwargs['q'] = ['text:"%s"' % request.GET.get('phrase'), ]
 
         facet_field = {'legislator': 'speaker_bioguide',
                        'state': 'speaker_state',
@@ -140,6 +151,28 @@ class PhraseByCategoryHandler(GenericHandler):
 
         kwargs['params'] = {'facet.field': facet_field, }
         return super(PhraseByCategoryHandler, self).read(request, *args, **kwargs)
+
+
+class PhraseTreeHandler(GenericHandler):
+
+    def read(self, request, *args, **kwargs):
+        kwargs['q'] = ['id:CREC*', ]
+
+        phrase = request.GET['phrase'].lower()
+        if phrase:
+            phrase += ' '
+
+        kwargs['params'] = {'facet.prefix': phrase, }
+
+        pieces = request.GET['phrase'].split()
+        n = len(pieces)+1
+        if n > 5:
+            n = '5'
+        else:
+            n = str(n)
+        kwargs['n'] = n
+
+        return super(PhraseTreeHandler, self).read(request, *args, **kwargs)
 
 
 class PhraseOverTimeHandler(GenericHandler):
@@ -190,7 +223,6 @@ class FullTextSearchHandler(GenericHandler):
                             'rows': per_page,
                             'start': offset,
                             }
-        print kwargs['params']
         kwargs['port'] = '8983'
         return super(FullTextSearchHandler, self).read(request, *args, **kwargs)
 
