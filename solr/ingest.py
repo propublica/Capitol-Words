@@ -14,6 +14,46 @@ from lib import bioguide_lookup, db_bioguide_lookup, fallback_bioguide_lookup
 from settings import *
 import datetime
 
+import lxml.etree
+import nltk
+
+
+def make_ngrams(xml):
+    xml = '<doc>%s</doc>' % xml
+    doc = lxml.etree.fromstring(xml)
+    speaking = doc.xpath('field[@name="speaking"]')
+    quotes = doc.xpath('field[@name="quote"]')
+
+    text = [x.text for x in speaking] + [x.text for x in quotes]
+
+    fields = ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ]
+    #ngrams = dict([(n, []) for n in range(1, len(fields)+1)])
+    ngrams = ''
+
+    for graf in text:
+        sentences = nltk.tokenize.sent_tokenize(graf.replace('\n', '').lower())
+        for sentence in sentences:
+            # Remove unnecessary punctuation
+            sentence = re.sub(r"(\/|--|`|\(|\)|\;|\?)", ' ', sentence)
+            sentence = re.sub(r"\.", '', sentence)
+            sentence = re.sub(r'(\d),(\d)', r'\1\2', sentence)
+            sentence = re.sub(r"''", '', sentence)
+            sentence = re.sub(r', ', ' ', sentence)
+
+            #words = nltk.tokenize.word_tokenize(sentence)
+            words = sentence.split()
+
+            # Remove punctuation-only tokens
+            words = [x for x in words if re.search(r'[a-z]', x)]
+
+            for n, field in enumerate(fields):
+                for ngram in nltk.util.ngrams(words, n+1):
+                    ngrams += '<field name="%s">%s</field>\n' % (field,
+                                                                 ' '.join(ngram))
+
+    return ngrams
+
+
 class SolrDoc(object):
     def __init__(self, file):
         self.status = None
@@ -206,7 +246,8 @@ class SolrDoc(object):
         for idx, body in enumerate(self.document_bodies):
             document_id_field = self.make_solr_id(idx)
             metadata_fields = self.get_metadata()
-            solrdoc = '''<add><doc>\n''' + document_id_field + metadata_fields + body + '''\n</doc></add>'''
+            ngram_fields = make_ngrams(body)
+            solrdoc = '''<add><doc>\n''' + document_id_field + metadata_fields + ngram_fields + body + '''\n</doc></add>'''
             self.post(solrdoc)
             self.commit()
         if not len(self.document_bodies):
