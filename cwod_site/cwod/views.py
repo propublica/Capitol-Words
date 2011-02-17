@@ -28,7 +28,7 @@ class GenericHandler(BaseHandler):
                 'volume': 'volume', }
 
     FIELDS = ['unigrams', 'bigrams', 'trigrams', 'quadgrams',
-              'pentragrams', ]
+              'pentagrams', ]
 
     def as_solr_date(self, datestring):
         ''' converts a string in the form dd/mm/yyyy to a solr date of
@@ -111,7 +111,7 @@ class GenericHandler(BaseHandler):
                   'facet.limit': per_page,
                   'facet.offset': offset,
                   'facet.mincount': '1',
-                  'facet.sort': 'count',
+                  'facet.sort': request.GET.get('sort', 'count'),
                   'facet.method': 'enumtermfreq',
                   'rows': '0',
                   'wt': 'json',
