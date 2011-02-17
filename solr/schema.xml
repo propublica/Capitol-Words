@@ -98,6 +98,7 @@
    <!-- the ShingleFilterFactory produces n-grams. Note that stopwords are 
         removed. Ideally, we would have a stop list for n-grams. -->
     <fieldType name="bigrams" class="solr.TextField" positionIncrementGap="1" >
+        <!--
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
             <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" 
@@ -110,8 +111,10 @@
                 outputUnigrams="false" 
             />
        </analyzer>
+        //-->
     </fieldType>
     <fieldType name="trigrams" class="solr.TextField" positionIncrementGap="1" >
+        <!--
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
             <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" 
@@ -124,9 +127,11 @@
                 outputUnigrams="false" 
             />
        </analyzer>
+        //-->
     </fieldType>
 
     <fieldType name="quadgrams" class="solr.TextField" positionIncrementGap="1" >
+        <!--
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
             <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" 
@@ -139,9 +144,11 @@
                 outputUnigrams="false" 
             />
        </analyzer>
+       //-->
     </fieldType>
 
     <fieldType name="pentagrams" class="solr.TextField" positionIncrementGap="1" >
+        <!--
         <analyzer>
             <tokenizer class="solr.WhitespaceTokenizerFactory"/>
             <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" 
@@ -154,6 +161,7 @@
                 outputUnigrams="false" 
             />
        </analyzer>
+       //-->
     </fieldType>
 
 
@@ -242,6 +250,8 @@
 <copyField source="speaker_bioguide" dest="speaker"/>
 <copyField source="speaking" dest="text"/>
 <copyField source="quote" dest="text"/>
+<copyField source="unigrams" dest="unigrams_stemmed"/>
+<!--
 <copyField source="speaking" dest="unigrams"/>
 <copyField source="quote" dest="unigrams"/>
 <copyField source="speaking" dest="unigrams_stemmed"/>
@@ -254,5 +264,5 @@
 <copyField source="quote" dest="quadgrams"/>
 <copyField source="speaking" dest="pentagrams"/>
 <copyField source="quote" dest="pentagrams"/>
-
+//-->
 </schema>
