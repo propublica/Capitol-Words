@@ -1,3 +1,4 @@
+from itertools import groupby
 import re
 import datetime
 import json
@@ -25,6 +26,9 @@ class GenericHandler(BaseHandler):
                 'bioguide': 'speaker_bioguide',
                 'cr_pages': 'pages',
                 'volume': 'volume', }
+
+    FIELDS = ['unigrams', 'bigrams', 'trigrams', 'quadgrams',
+              'pentragrams', ]
 
     def as_solr_date(self, datestring):
         ''' converts a string in the form dd/mm/yyyy to a solr date of
@@ -90,12 +94,16 @@ class GenericHandler(BaseHandler):
 
         # n can be set either as a request parameter or in kwargs
         n = kwargs.get('n', request.GET.get('n', 1))
+        error = {'error': 'The value given for the parameter "n" is invalid. An integer between one and five is required.', 
+                 'results': [], }
+        try:
+            n = int(n)
+        except ValueError:
+            return error
+        if n not in range(1, 6):
+            return error
 
-        facet_field = {'1': 'unigrams', 
-                       '2': 'bigrams', 
-                       '3': 'trigrams', 
-                       '4': 'quadgrams', 
-                       '5': 'pentagrams'}.get(n, '1')
+        facet_field = self.FIELDS[n-1]
 
         params = {'q': '(%s)' % ' AND '.join(q),
                   'facet': 'true',
@@ -104,7 +112,7 @@ class GenericHandler(BaseHandler):
                   'facet.offset': offset,
                   'facet.mincount': '1',
                   'facet.sort': 'count',
-                  'facet.method': 'enum',
+                  'facet.method': 'enumtermfreq',
                   'rows': '0',
                   'wt': 'json',
                   }
@@ -113,7 +121,29 @@ class GenericHandler(BaseHandler):
 
         url = 'http://localhost:%s/solr/select?%s' % (kwargs.get('port', '8983'), urllib.urlencode(params))
 
-        data = json.loads(urllib2.urlopen(url).read())
+        results = urllib2.urlopen(url).read()
+
+        # If faceting on the date field, remove the time, showing only the date.
+        if params['facet.field'] == 'date':
+            results = results.replace('T12:00:00Z', '')
+            data = json.loads(results)
+
+            # If the granularity is other than 'day' (the default), we
+            # need to group the results by whatever that granularity is.
+            granularity = kwargs.get('granularity')
+            if granularity != 'day':
+                y = {'year': 1, 'month': 2}.get(granularity, 'month')
+                data = self.format_for_return(data, *args, **kwargs) 
+                data = [{'date': x[0], 
+                         'count': sum([x['count'] for x in x[1]])} 
+                            for x in 
+                                groupby(data, lambda x: '-'.join(x[granularity].split('-')[:y]))
+                        ]
+                return data
+
+        else:
+            data = json.loads(results)
+
         return self.format_for_return(data, *args, **kwargs)
 
 
@@ -122,7 +152,6 @@ class PopularPhraseHandler(GenericHandler):
     """
 
     def read(self, request, *args, **kwargs):
-        #kwargs['q'] = ['n:%s' % request.GET.get('n', '1'), ]
         kwargs['q'] = ['id:CREC*', ]
         return super(PopularPhraseHandler, self).read(request, *args, **kwargs)
 
@@ -131,16 +160,14 @@ class PhraseByCategoryHandler(GenericHandler):
 
     def read(self, request, *args, **kwargs):
         if not 'phrase' in request.GET:
-            # error
-            pass
+            return {'error': 'A value for the "phrase" parameter is required.', 'results': []}
 
         phrase = request.GET.get('phrase')
         n = len(phrase.split())
         try:
-            field = ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ][n-1]
+            field = self.FIELDS[n-1]
         except IndexError:
-            pass
-            # error: phrase is too long
+            return {'error': 'The value given for the "phrase" parameter is too long. A phrase of five words or fewer is required.', 'results': []}
 
         kwargs['q'] = ['%s:"%s"' % (field, phrase.strip('"')), ]
 
@@ -152,8 +179,7 @@ class PhraseByCategoryHandler(GenericHandler):
                        }.get(kwargs.get('entity_type'))
 
         if not facet_field:
-            #error
-            pass
+            return {'error': 'Invalid entity type.', 'results': []} 
 
         kwargs['results_keys'] = [kwargs['entity_type'], 'count', ]
 
@@ -187,33 +213,31 @@ class PhraseOverTimeHandler(GenericHandler):
 
     def read(self, request, *args, **kwargs):
 
-        kwargs['q'] = ['ngram:"%s"' % request.GET.get('phrase'), ]
+        phrase = request.GET.get('phrase')
+        if not phrase:
+            return {'error': 'A value for the "phrase" parameter is required.', 'results': []}
+        n = len(phrase.split())
+        if n not in range(1, 6):
+            return {'error': 'The value given for the parameter "n" is invalid. An integer between one and five is required.', 'results': [], }
 
-        if 'start_date' in request.GET and 'end_date' in request.GET:
-            start = dateparse(request.GET['start_date']).strftime('%d/%m/%Y')
-            end = dateparse(request.GET['end_date']).strftime('%d/%m/%Y')
-            kwargs['q'].append("date:[%s TO %s]" % (self.as_solr_date(start), self.as_solr_date(end)))
-        else:
-            start = self.as_solr_date(settings.OLDEST_DATE)
-            end = 'NOW/DAY+1DAY'
+        field = self.FIELDS[n-1]
+        kwargs['q'] = ['%s:"%s"' % (field, phrase), ]
 
-        granularity = {'year': '+1YEARS',
-                       'month': '+1MONTHS',
-                       'week': '+7DAYS',
+        granularity = {'year': 'year',
+                       'month': 'month',
+                       'week': 'week',
                        'congress': '',
-                       'day': '+1DAY',
+                       'day': 'day',
                         }.get(request.GET.get('granularity', 'day'), 'day')
 
         params = {'facet.field': 'date',
-                  'facet.date': 'date',
-                  'facet.date.start': start,
-                  'facet.date.end': end,
-                  'facet.date.gap': granularity,
+                  'facet.limit': '-1',
                   'facet.sort': 'index',
                   }
         kwargs['params'] = params
+        kwargs['granularity'] = granularity
 
-        kwargs['results_keys'] = [request.GET.get('granularity', 'day'), 'count', ]
+        kwargs['results_keys'] = [granularity, 'count', ]
         return super(PhraseOverTimeHandler, self).read(request, *args, **kwargs)
 
 
