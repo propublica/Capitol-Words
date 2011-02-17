@@ -134,7 +134,15 @@ class PhraseByCategoryHandler(GenericHandler):
             # error
             pass
 
-        kwargs['q'] = ['text:"%s"' % request.GET.get('phrase'), ]
+        phrase = request.GET.get('phrase')
+        n = len(phrase.split())
+        try:
+            field = ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ][n-1]
+        except IndexError:
+            pass
+            # error: phrase is too long
+
+        kwargs['q'] = ['%s:"%s"' % (field, phrase.strip('"')), ]
 
         facet_field = {'legislator': 'speaker_bioguide',
                        'state': 'speaker_state',
