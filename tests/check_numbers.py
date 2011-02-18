@@ -11,7 +11,7 @@ import urllib2
 class TestSolrNumbers(unittest.TestCase):
 
     def setUp(self):
-        self.limit = 100
+        self.limit = 20
         self.solrdoc_counts = defaultdict(list)
         self.cache_solrdoc_counts()
         self.fields = ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams',]
@@ -68,15 +68,15 @@ class TestSolrNumbers(unittest.TestCase):
         field = self.fields[n-1]
         for phrase, count in self.get_top_phrases(field):
             total_date_count = self.get_total_date_count(phrase, field)
-            solrdoc_count = self.get_solrdoc_count(phrase, field)
+            #solrdoc_count = self.get_solrdoc_count(phrase, field)
             # Use a percentage for solrdoc phrase counts, because sometimes
             # documents get skipped.
-            solrdoc_pct_of_total = solrdoc_count / float(total_date_count)
+            #solrdoc_pct_of_total = solrdoc_count / float(total_date_count)
             yield {'phrase': phrase,
                    'top_count': count,
                    'date_count': total_date_count, 
-                   'solrdoc_count': solrdoc_count,
-                   'solrdoc_pct': solrdoc_pct_of_total,
+                   #'solrdoc_count': solrdoc_count,
+                   #'solrdoc_pct': solrdoc_pct_of_total,
                    }
 
     def top_bioguide_ids_for_phrase(self, phrase):
@@ -110,10 +110,11 @@ class TestSolrNumbers(unittest.TestCase):
     def test_ngrams(self):
         for n in range(1,6):
             for result in self.ngram_number_test(n):
+                print result
                 self.assertEqual(result['top_count'],
                                  result['date_count'])
-                if result['solrdoc_pct'] != 1:
-                    print result
+                #if result['solrdoc_pct'] != 1:
+                #    print result
                     #self.fail("solrdoc_pct is less than .9 percent of the top count")
 
                 for bioguide_id, count in self.top_bioguide_ids_for_phrase(result['phrase']):
