@@ -9,6 +9,7 @@ from django.conf import settings
 from django.shortcuts import get_list_or_404, get_object_or_404
 
 from bioguide.models import *
+from cwod.models import NgramDateCount
 
 from piston.handler import BaseHandler
 from piston.resource import Resource
@@ -213,6 +214,10 @@ class PhraseOverTimeHandler(GenericHandler):
 
     def read(self, request, *args, **kwargs):
 
+        n = request.GET.get('n')
+        if n:
+            return counts_over_time(request, *args, **kwargs)
+
         phrase = request.GET.get('phrase')
         if not phrase:
             return {'error': 'A value for the "phrase" parameter is required.', 'results': []}
@@ -239,6 +244,31 @@ class PhraseOverTimeHandler(GenericHandler):
 
         kwargs['results_keys'] = [granularity, 'count', ]
         return super(PhraseOverTimeHandler, self).read(request, *args, **kwargs)
+
+
+class CountsOverTimeHandler(GenericHandler):
+    """Show the number of ngram instances
+    for given dates."""
+
+    def read(self, request, *args, **kwargs):
+        kwargs.update(request.GET)
+        return counts_over_time(request, *args, **kwargs)
+
+
+def counts_over_time(request, *args, **kwargs):
+    n = request.GET.get('n', 1)
+    try:
+        n = int(n)
+    except ValueError:
+        return {'error': 'The value given for the parameter "n" is invalid. An integer between one and five is required.', 'results': [], }
+
+    kw = {'n': n, }
+    if 'start_date' in kwargs:
+        kw['date__gte'] = start_date
+    if 'end_date' in request.GET:
+        kw['date__lte'] = end_date
+
+    return NgramDateCount.objects.filter(**kw).values('date', 'count')
 
 
 class FullTextSearchHandler(GenericHandler):
