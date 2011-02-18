@@ -38,6 +38,18 @@ class GenericHandler(BaseHandler):
         solr_date = "%s-%s-%sT00:00:00Z" % (year, month, day)
         return solr_date
 
+    def smooth(self, data, smoothing):
+        """Use a moving average to smooth a list of numbers.
+        >>> smooth([1,8,23,5,90,100,110,30,20,10,9,1])
+        >>> [...]
+        """
+        for n, i in enumerate(data):
+            if n-smoothing < 0:
+                nums = data[:n+smoothing]
+            else:
+                nums = data[n-smoothing:n+smoothing]
+            yield sum(nums)/float(len(nums))
+
     def format_for_return(self, data, *args, **kwargs):
         key = data['facet_counts']['facet_fields'].keys()[0]
         data = data['facet_counts']['facet_fields'][key]
@@ -127,6 +139,11 @@ class GenericHandler(BaseHandler):
 
         results = urllib2.urlopen(url).read()
 
+        show_totals = False
+        show_percentages = False
+        smoothing = 0
+        granularity = kwargs.get('granularity')
+
         # If faceting on the date field, remove the time, showing only the date.
         if params['facet.field'] == 'date':
             results = results.replace('T12:00:00Z', '')
@@ -138,22 +155,28 @@ class GenericHandler(BaseHandler):
             if request.GET.get('totals') == 'true' or request.GET.get('percentages') == 'true':
                 date_counts = dict(counts_over_time(**kwargs))
                 for i in data:
-                    total = date_counts.get(dateparse(i['day']).date(), 0)
+                    total = date_counts.get(dateparse(i[granularity]).date(), 0)
                     if request.GET.get('percentages') == 'true':
+                        show_percentages = True
                         i['percentage'] = i['count'] / float(total)
                     if request.GET.get('totals') == 'true':
+                        show_percentages = True
                         i['total'] = total
 
             # If the granularity is other than 'day' (the default), we
             # need to group the results by whatever that granularity is.
-            granularity = kwargs.get('granularity')
             if granularity != 'day':
                 y = {'year': 1, 'month': 2}.get(granularity, 'month')
-                data = [{'date': x[0], 
-                         'count': sum([x['count'] for x in x[1]])} 
-                            for x in 
-                                groupby(data, lambda x: '-'.join(x[granularity].split('-')[:y]))
-                        ]
+                data = []
+                for x in groupby(data, lambda x: '-'.join(x[granularity].split('-')[:y])):
+                    row = {'date': x[0],
+                           'count': sum([x['count'] for x in x[1]])}
+                    if show_totals:
+                        row.update({'total': sum([x['total'] for x in x[1]])})
+                    if show_percentages:
+                        row.update({'percentage': sum([x['percentage'] for x in x[1]])})
+                    data.append(row)
+
             return data
 
         else:
