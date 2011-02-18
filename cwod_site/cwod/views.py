@@ -73,14 +73,17 @@ class GenericHandler(BaseHandler):
 
         if 'date' in request.GET:
             date = dateparse(request.GET['date'])
+            kwargs.update({'date': date})
             start = date.strftime('%d/%m/%Y')
             end = (date + datetime.timedelta(1)).strftime('%d/%m/%Y')
             q.append("date:[%s TO %s]" % (self.as_solr_date(start), self.as_solr_date(end)))
 
         elif 'start_date' in request.GET and 'end_date' in request.GET:
-            start = dateparse(request.GET['start_date']).strftime('%d/%m/%Y')
-            end = dateparse(request.GET['end_date']).strftime('%d/%m/%Y')
-            q.append("date:[%s TO %s]" % (self.as_solr_date(start), self.as_solr_date(end)))
+            start = dateparse(request.GET['start_date'])
+            end = dateparse(request.GET['end_date'])
+            kwargs.update({'start': start, 'end': end, })
+            q.append("date:[%s TO %s]" % (self.as_solr_date(start.strftime('%d/%m/%y')), 
+                                          self.as_solr_date(end.strftime('%d/%m/%y'))))
 
         if 'chamber' in request.GET:
             valid_chambers = ['house',
@@ -128,19 +131,28 @@ class GenericHandler(BaseHandler):
         if params['facet.field'] == 'date':
             results = results.replace('T12:00:00Z', '')
             data = json.loads(results)
+            data = self.format_for_return(data, *args, **kwargs) 
+
+            # If the client wants to show the total number
+            # of ngrams on each date, get the numbers.
+            if request.GET.get('totals') == 'true':
+                date_counts = dict(counts_over_time(**kwargs))
+                for i in data:
+                    i['total'] = date_counts.get(dateparse(i['day']).date(), 0)
+                    if request.GET.get('percentages') == 'true':
+                        i['percentage'] = i['count'] / float(i['total'])
 
             # If the granularity is other than 'day' (the default), we
             # need to group the results by whatever that granularity is.
             granularity = kwargs.get('granularity')
             if granularity != 'day':
                 y = {'year': 1, 'month': 2}.get(granularity, 'month')
-                data = self.format_for_return(data, *args, **kwargs) 
                 data = [{'date': x[0], 
                          'count': sum([x['count'] for x in x[1]])} 
                             for x in 
                                 groupby(data, lambda x: '-'.join(x[granularity].split('-')[:y]))
                         ]
-                return data
+            return data
 
         else:
             data = json.loads(results)
@@ -214,9 +226,11 @@ class PhraseOverTimeHandler(GenericHandler):
 
     def read(self, request, *args, **kwargs):
 
+        """
         n = request.GET.get('n')
         if n:
             return counts_over_time(request, *args, **kwargs)
+        """
 
         phrase = request.GET.get('phrase')
         if not phrase:
@@ -241,22 +255,14 @@ class PhraseOverTimeHandler(GenericHandler):
                   }
         kwargs['params'] = params
         kwargs['granularity'] = granularity
+        kwargs['n'] = n
 
         kwargs['results_keys'] = [granularity, 'count', ]
         return super(PhraseOverTimeHandler, self).read(request, *args, **kwargs)
 
 
-class CountsOverTimeHandler(GenericHandler):
-    """Show the number of ngram instances
-    for given dates."""
-
-    def read(self, request, *args, **kwargs):
-        kwargs.update(request.GET)
-        return counts_over_time(request, *args, **kwargs)
-
-
-def counts_over_time(request, *args, **kwargs):
-    n = request.GET.get('n', 1)
+def counts_over_time(*args, **kwargs):
+    n = kwargs.get('n', 1)
     try:
         n = int(n)
     except ValueError:
@@ -265,10 +271,10 @@ def counts_over_time(request, *args, **kwargs):
     kw = {'n': n, }
     if 'start_date' in kwargs:
         kw['date__gte'] = start_date
-    if 'end_date' in request.GET:
+    if 'end_date' in kwargs:
         kw['date__lte'] = end_date
 
-    return NgramDateCount.objects.filter(**kw).values('date', 'count')
+    return NgramDateCount.objects.filter(**kw).values_list('date', 'count')
 
 
 class FullTextSearchHandler(GenericHandler):
