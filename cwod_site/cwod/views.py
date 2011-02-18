@@ -135,12 +135,14 @@ class GenericHandler(BaseHandler):
 
             # If the client wants to show the total number
             # of ngrams on each date, get the numbers.
-            if request.GET.get('totals') == 'true':
+            if request.GET.get('totals') == 'true' or request.GET.get('percentages') == 'true':
                 date_counts = dict(counts_over_time(**kwargs))
                 for i in data:
-                    i['total'] = date_counts.get(dateparse(i['day']).date(), 0)
+                    total = date_counts.get(dateparse(i['day']).date(), 0)
                     if request.GET.get('percentages') == 'true':
-                        i['percentage'] = i['count'] / float(i['total'])
+                        i['percentage'] = i['count'] / float(total)
+                    if request.GET.get('totals') == 'true':
+                        i['total'] = total
 
             # If the granularity is other than 'day' (the default), we
             # need to group the results by whatever that granularity is.
