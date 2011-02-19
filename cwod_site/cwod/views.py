@@ -92,7 +92,7 @@ class GenericHandler(BaseHandler):
             start = dateparse(request.GET['start_date'])
             end = dateparse(request.GET['end_date'])
             kwargs.update({'start': start, 'end': end, })
-            q.append("date:[%s TO %s]" % (self.as_solr_date(start.strftime('%d/%m/%y')), 
+            q.append("date:[%s TO %s]" % (self.as_solr_date(start.strftime('%d/%m/%y')),
                                           self.as_solr_date(end.strftime('%d/%m/%y'))))
 
         if 'chamber' in request.GET:
@@ -108,7 +108,7 @@ class GenericHandler(BaseHandler):
 
         # n can be set either as a request parameter or in kwargs
         n = kwargs.get('n', request.GET.get('n', 1))
-        error = {'error': 'The value given for the parameter "n" is invalid. An integer between one and five is required.', 
+        error = {'error': 'The value given for the parameter "n" is invalid. An integer between one and five is required.',
                  'results': [], }
         try:
             n = int(n)
@@ -133,7 +133,9 @@ class GenericHandler(BaseHandler):
 
         params.update(kwargs.get('params', {}))
 
-        url = 'http://localhost:%s/solr/select?%s' % (kwargs.get('port', '8983'), urllib.urlencode(params))
+        url = 'http://%s:%s/solr/select?%s' % (settings.SOLR_SERVER,
+                                               settings.SOLR_PORT,
+                                               urllib.urlencode(params))
 
         results = urllib2.urlopen(url).read()
 
@@ -146,7 +148,7 @@ class GenericHandler(BaseHandler):
         if params['facet.field'] == 'date':
             results = results.replace('T12:00:00Z', '')
             data = json.loads(results)
-            data = self.format_for_return(data, *args, **kwargs) 
+            data = self.format_for_return(data, *args, **kwargs)
 
             # If the client wants to show the total number
             # of ngrams on each date, get the numbers.
@@ -233,7 +235,7 @@ class PhraseByCategoryHandler(GenericHandler):
                        }.get(kwargs.get('entity_type'))
 
         if not facet_field:
-            return {'error': 'Invalid entity type.', 'results': []} 
+            return {'error': 'Invalid entity type.', 'results': []}
 
         kwargs['results_keys'] = [kwargs['entity_type'], 'count', ]
 
@@ -325,7 +327,6 @@ class FullTextSearchHandler(GenericHandler):
                             'rows': per_page,
                             'start': offset,
                             }
-        kwargs['port'] = '8983'
         return super(FullTextSearchHandler, self).read(request, *args, **kwargs)
 
     def format_for_return(self, data, *args, **kwargs):
