@@ -495,8 +495,7 @@ class CRParser(object):
                         annotator.register_tag_open(self.re_speaking, '<speaking name="%s">' % self.current_speaker, group='start')
 
             if not self.intitle and not self.inlongquote and not self.inrollcall:
-                #annotator.register_tag_open(self.re_startshortquote, '<quote speaker="%s">' % self.current_speaker)
-                pass
+                annotator.register_tag_open(self.re_startshortquote, '<quote speaker="%s">' % self.current_speaker)
 
             # note: the endquote tag needs to be registered BEFORE the end
             # speaking tag, because the quote tag should appear before (be
@@ -705,8 +704,7 @@ class CRParser(object):
         # if a quote starts we are "in a quote" but we stay in that quote until
         # we detect it ends. 
         if not self.inlongquote and re.search(self.re_startshortquote, theline):
-            #self.inquote = True
-            pass
+            self.inquote = True
 
         # debugging..
         print 'in title? %s' % self.intitle
