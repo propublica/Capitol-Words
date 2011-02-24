@@ -40,8 +40,6 @@ class GenericHandler(BaseHandler):
 
     def smooth(self, data, smoothing):
         """Use a moving average to smooth a list of numbers.
-        >>> smooth([1,8,23,5,90,100,110,30,20,10,9,1])
-        >>> [...]
         """
         for n, i in enumerate(data):
             if n-smoothing < 0:
@@ -141,8 +139,8 @@ class GenericHandler(BaseHandler):
 
         results = urllib2.urlopen(url).read()
 
-        show_totals = False
-        show_percentages = False
+        show_totals = request.GET.get('totals', 'false') == 'true'
+        show_percentages = request.GET.get('percentages', 'false') == 'true'
         smoothing = 0
         granularity = kwargs.get('granularity')
 
@@ -154,30 +152,47 @@ class GenericHandler(BaseHandler):
 
             # If the client wants to show the total number
             # of ngrams on each date, get the numbers.
-            if request.GET.get('totals') == 'true' or request.GET.get('percentages') == 'true':
+            if show_totals or show_percentages:
                 date_counts = dict(counts_over_time(**kwargs))
                 for i in data:
                     total = date_counts.get(dateparse(i[granularity]).date(), 0)
-                    if request.GET.get('percentages') == 'true':
-                        show_percentages = True
+                    if show_percentages:
                         i['percentage'] = i['count'] / float(total)
-                    if request.GET.get('totals') == 'true':
-                        show_percentages = True
+                    if show_totals:
                         i['total'] = total
 
             # If the granularity is other than 'day' (the default), we
             # need to group the results by whatever that granularity is.
             if granularity != 'day':
-                y = {'year': 1, 'month': 2}.get(granularity, 'month')
-                data = []
-                for x in groupby(data, lambda x: '-'.join(x[granularity].split('-')[:y])):
-                    row = {'date': x[0],
-                           'count': sum([x['count'] for x in x[1]])}
+                try:
+                    y = {'year': 1, 'month': 2}[granularity]
+                except KeyError:
+                    return {'error': 'Invalid value given for "granularity" parameter. Valid options are "day", "month" and "year".', 'results': [], }
+                rows = []
+                for date, grouper in groupby(data, lambda x: '-'.join(x[granularity].split('-')[:y])):
+                    grouper = list(grouper)
+                    row = {'date': date,
+                           'count': sum([x['count'] for x in grouper])}
                     if show_totals:
-                        row.update({'total': sum([x['total'] for x in x[1]])})
+                        row.update({'total': sum([x['total'] for x in grouper])})
                     if show_percentages:
-                        row.update({'percentage': sum([x['percentage'] for x in x[1]])})
-                    data.append(row)
+                        row.update({'percentage': sum([x['percentage'] for x in grouper])})
+                    rows.append(row)
+                data = rows
+
+            smoothing = int(request.GET.get('smoothing', 0))
+            if smoothing != 0:
+                smoothing = int(request.GET['smoothing'])
+                smoothed = list(self.smooth([x['count'] for x in data], smoothing))
+                for n, i in enumerate(data):
+                    i['raw_count'] = i['count']
+                    i['count'] = smoothed[n]
+                    if show_percentages:
+                        i['percentage'] = i['count'] / float(i['total'])
+
+            if granularity == 'day' and smoothing == 0:
+                for row in data:
+                    row['raw_count'] = row['count']
 
             return data
 
@@ -216,6 +231,7 @@ class PhraseByCategoryHandler(GenericHandler):
                        'party': 'speaker_party',
                        'bioguide': 'speaker_bioguide',
                        'volume': 'volume',
+                       'chamber': 'chamber',
                        }.get(kwargs.get('entity_type'))
 
         if not facet_field:
@@ -252,13 +268,6 @@ class PhraseTreeHandler(GenericHandler):
 class PhraseOverTimeHandler(GenericHandler):
 
     def read(self, request, *args, **kwargs):
-
-        """
-        n = request.GET.get('n')
-        if n:
-            return counts_over_time(request, *args, **kwargs)
-        """
-
         phrase = request.GET.get('phrase')
         if not phrase:
             return {'error': 'A value for the "phrase" parameter is required.', 'results': []}
