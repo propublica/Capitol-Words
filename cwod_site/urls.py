@@ -9,5 +9,6 @@ urlpatterns = patterns('',
             },
             name='cwod_docs'),
 
-        (r'^api/', include('cwod.urls')),
+        (r'^api/', include('cwod_api.urls')),
+        (r'^/', include('cwod.urls')),
 )
