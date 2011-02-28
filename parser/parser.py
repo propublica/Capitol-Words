@@ -3,7 +3,10 @@
 ''' Parse the plain text version of congressional record documents and mark them up with xml.'''
 
 import re, datetime, os, sys
+import urllib2
 from settings import CWOD_HOME, LOG_DIR
+
+import lxml.etree
 
 DEBUG = False
 
@@ -157,13 +160,12 @@ class CRParser(object):
     re_timestamp =          r'{time}\s\d{4}'
     re_underscore =         r'\s+_+\s+'
     # a new speaker might either be a legislator's name, or a reference to the role of president of presiding officer. 
-    re_newspeaker =         r'^(<bullet> |  )(?P<name>(((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|((The (ACTING )?(PRESIDENT|SPEAKER)( pro tempore)?)|(The PRESIDING OFFICER))( \([A-Za-z.\- ]+\))?)\.'
+    re_newspeaker =         r'^(<bullet> |  )(?P<name>%s|((The (ACTING )?(PRESIDENT|SPEAKER)( pro tempore)?)|(The PRESIDING OFFICER)|(The CLERK))( \([A-Za-z.\- ]+\))?)\.'
 
     # whatever follows the statement of a new speaker marks someone starting to
     # speak. if it's a new paragraph and there's already a current_speaker,
     # then this re is also used to insert the <speaking> tag. 
-#    re_speaking =           r'^(<bullet> |  )((((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|((The (ACTING )?(PRESIDENT|SPEAKER)( pro tempore)?)|(The PRESIDING OFFICER))( \([A-Za-z.\- ]+\))?)\.'
-    re_speaking =           r'^(<bullet> |  )((((((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|((The (ACTING )?(PRESIDENT|SPEAKER)( pro tempore)?)|(The PRESIDING OFFICER))( \([A-Za-z.\- ]+\))?))\. )?(?P<start>.)'
+    re_speaking =           r'^(<bullet> |  )((((((Mr)|(Ms)|(Mrs))\. [A-Za-z \-]+(of [A-Z][a-z]+)?)|((The (ACTING )?(PRESIDENT|SPEAKER)( pro tempore)?)|(The PRESIDING OFFICER)|(The CLERK))( \([A-Za-z.\- ]+\))?))\. )?(?P<start>.)'
     re_startshortquote =    r'``'
     re_endshortquote =      r"''"
     re_billheading =        r'\s+SEC.[A-Z_0-9. \-()\[\]]+'
@@ -302,8 +304,68 @@ class CRParser(object):
     def parse(self):
         ''' parses a raw senate document and returns the same document marked
         up with XML '''
+        self.get_metadata()
         self.markup_preamble()
+
+    def download_mods_file(self):
+        path = os.path.split(self.filename)[0]
+        pieces = path.split('/')
+        year, month, day = pieces[-3:]
+        url = 'http://www.gpo.gov/fdsys/pkg/CREC-%(year)s-%(month)s-%(day)s/mods.xml' % locals()
+        print 'No mods file found locally. Downloading from %s' % url
+        page = urllib2.urlopen(url).read()
+        fh = open(os.path.join(path, 'mods.xml'), 'w')
+        fh.write(page)
+        fh.close()
+        self.get_metadata()
+
+    def get_metadata(self):
+        path, filename = os.path.split(self.filename)
+        xml_filename = os.path.join(path, 'mods.xml')
+        granule = filename.split('.')[0]
+
+        try:
+            xml = open(xml_filename, 'r').read()
+        except IOError:
+            self.download_mods_file()
         
+        # Remove namespace to make using xpath easier.
+        xml = xml.replace('xmlns="http://www.loc.gov/mods/v3" ', '')
+        doc = lxml.etree.fromstring(xml)
+        self.volume = doc.xpath('extension/volume')[0].text
+        self.issue = doc.xpath('extension/issue')[0].text
+        self.congress = doc.xpath('extension/congress')[0].text
+        print self.volume
+        print self.issue
+        print self.congress
+        try:
+            item = doc.xpath('//relatedItem[@ID="id-%s"]' % granule)[0]
+        except IndexError:
+            print 'Item not found in xml: %s' % granule
+            sys.exit(1)
+
+        # Get the document title
+        self.document_title = item.xpath('titleInfo/title')[0].text
+        print self.document_title
+
+        # Get the names of the members of Congress listed
+        self.members = []
+        for member in item.xpath('extension/congMember'):
+            data = member.attrib
+            data.update({'name': member.xpath('name')[0].text, })
+            self.members.append(data)
+        self.re_newspeaker = self.re_newspeaker % '|'.join([x['name'] for x in self.members])
+        print self.re_newspeaker
+
+        self.referenced_by = []
+        for related_item in item.xpath('relatedItem'):
+            if related_item.attrib.get('type') == 'isReferencedBy':
+                for identifier in related_item.xpath('identifier'):
+                    data = identifier.attrib
+                    data.update({'text': identifier.text, })
+                    print data
+                    self.referenced_by.append(data)
+
     def markup_preamble(self):
         self.currentline = 1
         theline = self.rawlines[self.currentline]
@@ -475,14 +537,12 @@ class CRParser(object):
                 # will only match on first line of the roll call
                 annotator.register_tag_open(self.re_rollcall, '<rollcall>')
             elif self.new_paragraph:
-                annotator.register_tag_open(self.re_longquotestart, '<quote speaker="%s">' % self.current_speaker, group='start')
+                annotator.register_tag_open(self.re_longquotestart, '<speaking name="%s" quote="true">' % self.current_speaker, group='start')
                 if self.recorder:
                     annotator.register_tag_open(self.re_startofline, '<recorder>')
-                    #annotator.register_tag_open(self.re_recorderstart, '<recorder>', 'start')
-                    #annotator.register_tag_open(self.re_recorder_fuzzy, '<recorder>', 'start')
                 annotator.register_tag(self.re_newspeaker, '<speaker name="%s">' % self.current_speaker, group='name')
                 if self.return_from_quote_interjection(theline):
-                    annotator.register_tag_open(self.re_longquotebody, '<quote speaker="%s">' % self.current_speaker, group='start')
+                    annotator.register_tag_open(self.re_longquotebody, '<speaker name="%s" quote="true">' % self.current_speaker, group='start')
                 if not self.recorder and not self.inlongquote:
                     # check the current speaker-- if it's the recorder, then
                     # even though this isn't a "known" recorder sentence,
@@ -495,7 +555,8 @@ class CRParser(object):
                         annotator.register_tag_open(self.re_speaking, '<speaking name="%s">' % self.current_speaker, group='start')
 
             if not self.intitle and not self.inlongquote and not self.inrollcall:
-                annotator.register_tag_open(self.re_startshortquote, '<quote speaker="%s">' % self.current_speaker)
+                pass
+            #    annotator.register_tag_open(self.re_startshortquote, '<quote speaker="%s">' % self.current_speaker)
 
             # note: the endquote tag needs to be registered BEFORE the end
             # speaking tag, because the quote tag should appear before (be
@@ -504,7 +565,9 @@ class CRParser(object):
             # will do for now. 
             if not self.inlongquote and not self.intitle and not self.inrollcall:
                 if self.inquote:
-                    annotator.register_tag_close(self.re_endshortquote, '</quote>')
+                    #annotator.register_tag_close(self.re_endshortquote, '</quote>')
+                    #annotator.register_tag_close(self.re_endshortquote, '</speaking>')
+                    pass
 
             if self.paragraph_ends():
                 if self.inrollcall: 
@@ -515,7 +578,8 @@ class CRParser(object):
                 elif self.inlongquote:
                     if self.longquote_ends():
                         print 'i think the longquote ends'
-                        annotator.register_tag_close(self.re_endofline, '</quote>')
+                        #annotator.register_tag_close(self.re_endofline, '</quote>')
+                        annotator.register_tag_close(self.re_endofline, '</speaking>')
                 elif self.intitle:
                     pass
                 #  this specific set of states usually means we're somewhere
@@ -542,10 +606,13 @@ class CRParser(object):
             # get the next line and do it all again
             self.currentline +=1
             theline = self.get_line()
-            while theline and not theline.strip():
+            while theline is not None and not theline.strip():
                 self.currentline += 1
+                print 'currentline: %d' % self.currentline
                 theline = self.get_line()
+
             if not theline:
+            #if theline is None:
                 # end of file
                 self.xml.append('</CRDoc>')
 
@@ -934,6 +1001,8 @@ def parse_directory(path, interactive=False):
     for file in os.listdir(path):
         # we don't process the daily digest or front matter. 
         if file.find('FrontMatter') != -1 or file.find('PgD') != -1:
+            continue
+        if not file.endswith('.txt'):
             continue
         if interactive:
             resp = raw_input("process file %s? (y/n/q) " % file)
