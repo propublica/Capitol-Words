@@ -85,8 +85,8 @@ class SolrDoc(object):
 
     def set_metadata(self):
         ''' each solr document generated from this CR document will share the
-        same metadata. assemble a string containing that metadata.''' 
-        
+        same metadata. assemble a string containing that metadata.'''
+
         numeric_months = {
             'january' : '01',
             'february' : '02',
@@ -124,13 +124,13 @@ class SolrDoc(object):
         for tag in ['volume', 'number', 'chamber', 'pages']:
             tag_content = self.get_text(tag)
             self.metadata_xml += '''<field name="%s">%s</field>\n''' % (tag, tag_content)
-   
+
         # the dummy field has the same value for all documents, and provides an
         # anchor when we want to do a wildcard search on all terms in a
-        # specific field. 
-        self.metadata_xml += '''<field name="dummy">dummyvalue</field>\n''' 
-        
-    
+        # specific field.
+        self.metadata_xml += '''<field name="dummy">dummyvalue</field>\n'''
+
+
     def get_metadata(self):
         return self.metadata_xml
 
@@ -177,13 +177,13 @@ class SolrDoc(object):
         tln = self.dom.documentElement.childNodes
 
         # break the CR document into sections. a new section starts when the
-        # speaker changes. 
+        # speaker changes.
         sectionstarts = []
         for node in tln:
             if node.nodeName == 'speaker' or node.nodeName == 'recorder':
                 sectionstarts.append(node)
         # add a control item onto the end of this list so we don't go off the
-        # end when iterating over it below. 
+        # end when iterating over it below.
         sectionstarts.append(None)
 
         sections = []
@@ -203,7 +203,7 @@ class SolrDoc(object):
 
             # identify the current speaker
             # remove the speaker/recorder tags
-            # replace <speaking> tags by <field name=speaking"> 
+            # replace <speaking> tags by <field name=speaking">
             # replace <quote> tags by <field name="quote">
             re_speaker = r'<speaker name="(?P<current_speaker>.*?)">.*?</speaker>'
             re_recorder = r'<recorder>'
@@ -212,26 +212,26 @@ class SolrDoc(object):
             re_speaking = r'<speaking name=.*?>'
             re_title = r'<title>'
             re_endtag = r'</.*?>'
-            
+
             someone_speaking = re.search(re_speaker, body)
             if someone_speaking:
                 current_speaker = someone_speaking.group('current_speaker').lower()
             else:
                 current_speaker = 'recorder'
             # XXX add in more info about the speaker
-            #speaker_fields = self.get_speakerinfo(current_speaker)) 
+            #speaker_fields = self.get_speakerinfo(current_speaker))
 
             body = re.sub(re_speaker, '', body)
             body = re.sub(re_recorder, '<field name="speaking">', body)
             body = re.sub(re_rollcall, '<field name="rollcall">', body)
             body = re.sub(re_quote, '<field name="quote">', body)
             body = re.sub(re_speaking, '<field name="speaking">', body)
-            body = re.sub(re_title, '<field name="title">', body) 
+            body = re.sub(re_title, '<field name="title">', body)
             body = re.sub(re_endtag, '</field>', body)
 
             speaker_line = '''<field name="speaker_raw">%s</field>\n''' % current_speaker
-            if (current_speaker != 'recorder' and not re.search('pro tempore', current_speaker) 
-                and not re.search('president', current_speaker) 
+            if (current_speaker != 'recorder' and not re.search('pro tempore', current_speaker)
+                and not re.search('president', current_speaker)
                 and not re.search('presiding', current_speaker)):
                 speaker_metadata = self.get_speaker_metadata(current_speaker)
                 if speaker_metadata == None:
@@ -248,12 +248,22 @@ class SolrDoc(object):
             metadata_fields = self.get_metadata()
             ngram_fields = make_ngrams(body)
             solrdoc = '''<add><doc>\n''' + document_id_field + metadata_fields + ngram_fields + body + '''\n</doc></add>'''
+            self.save_doc(solrdoc, idx)
             self.post(solrdoc)
             self.commit()
         if not len(self.document_bodies):
             self.status = 'OK'
             self.warning  = 'No document body. Skipping.'
-                
+
+    def save_doc(self, solrdoc, idx):
+        xml = lxml.etree.fromstring(solrdoc)
+        path = os.path.join(SOLR_DOC_PATH, '%schunk%d.xml' % (
+            os.path.split(self.filename)[1].strip('xml'),
+            idx)
+            )
+        with open(path, 'w') as fh:
+            fh.write(lxml.etree.tostring(xml, pretty_print=True))
+
     def post(self, payload):
         """ Add a document to index """
         con = HTTPConnection('localhost:8983')
@@ -297,7 +307,7 @@ class SolrDoc(object):
                 if kid.nodeName not in valid_tags:
                     print 'replacing invalid tag %s' % kid.nodeName
                     # get it's inner contents and replace the invalid tag with
-                    # what's inside it. 
+                    # what's inside it.
                     parent = kid.parentNode
                     grandkids = kid.childNodes
                     parent.removeChild(kid)
@@ -306,24 +316,24 @@ class SolrDoc(object):
                 check_kids(kid)
 
         valid_tags = [
-            u'doc', u'add', u'#text', u'volume', u'number', u'weekday', u'month', u'day', 
-            u'year', u'chamber', u'pages', u'document_title', u'speaker', u'speaking', 
+            u'doc', u'add', u'#text', u'volume', u'number', u'weekday', u'month', u'day',
+            u'year', u'chamber', u'pages', u'document_title', u'speaker', u'speaking',
             u'quote', u'recorder', 'title', 'rollcall']
         root = self.dom.firstChild
         check_kids(root)
-    
+
     def process(self):
         self.validate()
         self.set_metadata()
         self.build_document_bodies()
         self.assemble_and_submit()
-       
+
 def initialize_logfile():
     ''' returns a filelike object'''
     if not os.path.exists(os.path.join(CWOD_HOME, LOG_DIR)):
         os.mkdir(os.path.join(CWOD_HOME, LOG_DIR))
     logfile = open(os.path.join(CWOD_HOME, LOG_DIR, 'ingest.log'), 'a')
-    return logfile 
+    return logfile
 
 def solr_ingest_file(filename):
     print '***   ' + filename + '   ***'
@@ -341,7 +351,7 @@ def solr_ingest_dir(path):
     for filename in os.listdir(path):
         full_path = os.path.join(path, filename)
         try:
-            solr_ingest_file(full_path) 
+            solr_ingest_file(full_path)
         except Exception, e:
             today = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             logfile.write('%s: Error processing file %s\n' % (today, full_path))
