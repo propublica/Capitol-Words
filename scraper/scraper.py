@@ -74,18 +74,24 @@ class CRScraper(object):
         # iterate over the html files in the zipfile, extracting the
         # ascii-formatted <pre> section and saving the file as raw textfiles
         zip = zipfile.ZipFile(tmpfile)
-        html_files = [doc for doc in zip.namelist() if doc.endswith('.htm')]   
-        num_expected_files = len(html_files)
+        files = [doc for doc in zip.namelist() if re.search(r'\.(htm|xml)$', doc)]
+        num_expected_files = len(files)
         errors = 0
-        for f in html_files:
+        for f in files:
             doc = zip.read(f)
-            filename = os.path.basename(f).split('.')[0]+'.txt'
+            if f.endswith('htm'):
+                filename = os.path.basename(f).split('.')[0]+'.txt'
+            else:
+                filename = os.path.basename(f)
             saveas = os.path.join(save_path, filename)
             if not os.path.exists(saveas):
                 # re.DOTALL is important - it tells 'dot' (.) to match newline character.
                 findraw = re.compile(r'<body><pre>(?P<raw>.*)</pre></body>', re.DOTALL)
                 try:
-                    raw = findraw.search(doc).group('raw')
+                    if f.endswith('htm'):
+                        raw = findraw.search(doc).group('raw')
+                    else:
+                        raw = doc
                     out = open(saveas, 'w')
                     out.write(raw)
                     out.close()
@@ -93,7 +99,8 @@ class CRScraper(object):
                     errors += 1
                     print 'Problem downloading file %s. Error:' % saveas
                     print e
-            else: print 'file %s already exists. skipping.' % saveas
+            else:
+                print 'file %s already exists. skipping.' % saveas
         
         # do some sanity checking
         if errors or len(os.listdir(save_path)) != num_expected_files:
