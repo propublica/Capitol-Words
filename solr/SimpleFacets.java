@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A class that generates simple Facet information for a request.
  *
- * More advanced facet implementations may compose or subclass this class 
+ * More advanced facet implementations may compose or subclass this class
  * to leverage any of it's functionality.
  */
 public class SimpleFacets {
@@ -170,7 +170,7 @@ public class SimpleFacets {
       res.add("facet_queries", getFacetQueryCounts());
       res.add("facet_fields", getFacetFieldCounts());
       res.add("facet_dates", getFacetDateCounts());
-      
+
     } catch (Exception e) {
       SolrException.logOnce(SolrCore.log, "Exception during facet counts", e);
       res.add("exception", SolrException.toStr(e));
@@ -179,7 +179,7 @@ public class SimpleFacets {
   }
 
   /**
-   * Returns a list of facet counts for each of the facet queries 
+   * Returns a list of facet counts for each of the facet queries
    * specified in the params
    *
    * @see FacetParams#FACET_QUERY
@@ -270,7 +270,7 @@ public class SimpleFacets {
 
 
   /**
-   * Returns a list of value constraints and the associated facet counts 
+   * Returns a list of value constraints and the associated facet counts
    * for each facet field specified in the params.
    *
    * @see FacetParams#FACET_FIELD
@@ -307,12 +307,12 @@ public class SimpleFacets {
       int count = searcher.numDocs(new TermQuery(t.createTerm(internal)), base);
       res.add(term, count);
     }
-    return res;    
+    return res;
   }
 
 
   /**
-   * Returns a count of the documents in the set which do not have any 
+   * Returns a count of the documents in the set which do not have any
    * terms for for the specified field.
    *
    * @see FacetParams#FACET_MISSING
@@ -333,7 +333,7 @@ public class SimpleFacets {
           else if (o2==null) return 1;
           return ((String)o1).compareTo((String)o2);
         }
-      }; 
+      };
 
   /**
    * Use the Lucene FieldCache to get counts for each unique field value in <code>docs</code>.
@@ -427,7 +427,7 @@ public class SimpleFacets {
           off=0;
         }
 
-        for (; i<nTerms; i++) {          
+        for (; i<nTerms; i++) {
           int c = counts[i];
           if (c<mincount || --off>=0) continue;
           if (--lim<0) break;
@@ -439,12 +439,12 @@ public class SimpleFacets {
     if (missing) {
       res.add(null, getFieldMissingCount(searcher,docs,fieldName));
     }
-    
+
     return res;
   }
 
   /**
-   * Returns a list of terms in the specified field along with the 
+   * Returns a list of terms in the specified field along with the
    * corresponding count of documents in the set that match that constraint.
    * This method uses the FilterCache to get the intersection count between <code>docs</code>
    * and the DocSet for each term in the filter.
@@ -468,11 +468,11 @@ public class SimpleFacets {
     IndexReader r = searcher.getReader();
     FieldType ft = schema.getFieldType(field);
 
-    final int maxsize = limit>=0 ? offset+limit : Integer.MAX_VALUE-1;    
+    final int maxsize = limit>=0 ? offset+limit : Integer.MAX_VALUE-1;
     final BoundedTreeSet<CountPair<String,Integer>> queue = (sort.equals("count") || sort.equals("true")) ? new BoundedTreeSet<CountPair<String,Integer>>(maxsize) : null;
     final NamedList res = new NamedList();
 
-    int min=mincount-1;  // the smallest value in the top 'N' values    
+    int min=mincount-1;  // the smallest value in the top 'N' values
     int off=offset;
     int lim=limit>=0 ? limit : Integer.MAX_VALUE;
 
@@ -480,7 +480,7 @@ public class SimpleFacets {
     TermEnum te = r.terms(new Term(field,startTerm));
     TermDocs td = r.termDocs();
 
-    if (docs.size() >= mincount) { 
+    if (docs.size() >= mincount) {
     do {
       Term t = te.term();
 
@@ -537,14 +537,14 @@ public class SimpleFacets {
     }
 
     te.close();
-    td.close();    
+    td.close();
 
     return res;
   }
 
 
   /**
-   * Returns a list of terms in the specified field along with the 
+   * Returns a list of terms in the specified field along with the
    * corresponding count of documents in the set that match that constraint.
    * This method uses the FilterCache to get the intersection count between <code>docs</code>
    * and the DocSet for each term in the filter.
@@ -556,11 +556,6 @@ public class SimpleFacets {
   public NamedList getFacetTermEnumFreqCounts(SolrIndexSearcher searcher, DocSet docs, String field, int offset, int limit, int mincount, boolean missing, String sort, String prefix)
     throws IOException {
 
-    /* :TODO: potential optimization...
-    * cache the Terms with the highest docFreq and try them first
-    * don't enum if we get our max from them
-    */
-
     // Minimum term docFreq in order to use the filterCache for that term.
     int minDfFilterCache = params.getFieldInt(field, FacetParams.FACET_ENUM_CACHE_MINDF, 0);
 
@@ -568,11 +563,12 @@ public class SimpleFacets {
     IndexReader r = searcher.getReader();
     FieldType ft = schema.getFieldType(field);
 
-    final int maxsize = limit>=0 ? offset+limit : Integer.MAX_VALUE-1;    
-    final BoundedTreeSet<CountPair<String,Integer>> queue = (sort.equals("count") || sort.equals("true")) ? new BoundedTreeSet<CountPair<String,Integer>>(maxsize) : null;
+    final int maxsize = limit>=0 ? offset+limit : Integer.MAX_VALUE-1;
+
+    final BoundedTreeSet<CountPair<String,Double>> queue = (sort.equals("count") || sort.equals("true") || sort.equals("relative")) ? new BoundedTreeSet<CountPair<String,Double>>(maxsize) : null;
     final NamedList res = new NamedList();
 
-    int min=mincount-1;  // the smallest value in the top 'N' values    
+    double min=(double) mincount-1;  // the smallest value in the top 'N' values
     int off=offset;
     int lim=limit>=0 ? limit : Integer.MAX_VALUE;
 
@@ -619,7 +615,7 @@ public class SimpleFacets {
      *
      * To get the values we're after when faceting on non-ngram fields,
      * we'll need to get the frequency of a given term or all terms in
-     * the documents we look at, while still faceting on the non-ngram 
+     * the documents we look at, while still faceting on the non-ngram
      * field.
      */
     if (docs.size() >= mincount) {
@@ -638,30 +634,48 @@ public class SimpleFacets {
           if (df>0 && df>min) {
 
             int c;
+            int totalTermFreq; // Term frequency for this term in all documents.
+            double relativeFreq;
 
             td.seek(te);
             c=0;
+            relativeFreq=0;
+            totalTermFreq = 0;
+
             while (td.next()) {
 
-              // This works for ngram faceting:
-              if (filtererField.equals("")) {
-                  if (docs.exists(td.doc())) c+=td.freq(); 
-              } else {
-                  // This seems to work for non-ngram faceting (if filtererField and givenTerm are set)
-                  tdFilterer.seek(teFilterer);
-                  if (docs.exists(td.doc())) {
+              if (docs.exists(td.doc())) {
+                  // This works for ngram faceting:
+                  if (filtererField.equals("")) {
+                      if (docs.exists(td.doc())) c+=td.freq();
+                  } else {
+                      // This seems to work for non-ngram faceting (if filtererField and givenTerm are set)
+                      // Faceting on something like date or party.
+
+                      // Can tdFilterer.seek be moved to line 607 so we don't repeat it in every loop?
+                      tdFilterer.seek(teFilterer);
                       if (tdFilterer.skipTo(td.doc())) {
                           c += tdFilterer.freq();
                       }
                   }
               }
+
+              totalTermFreq += td.freq();
             }
+
+            relativeFreq = (double) c / (double) totalTermFreq;
 
             if (sort.equals("count") || sort.equals("true")) {
               if (c>min) {
-                queue.add(new CountPair<String,Integer>(t.text(), c));
+                queue.add(new CountPair<String,Double>(t.text(), (double) c));
                 if (queue.size()>=maxsize) min=queue.last().val;
               }
+            } else if (sort.equals("relative")) {
+                // If sort is relative, queue needs to be <CountPair<String,Double>>. By default it's <String,Integer>
+                if (relativeFreq>min) {
+                    queue.add(new CountPair<String,Double>(t.text(), relativeFreq));
+                    if (queue.size()>=maxsize) min=queue.last().val;
+                }
             } else {
               if (c >= mincount && --off<0) {
                 if (--lim<0) break;
@@ -673,8 +687,8 @@ public class SimpleFacets {
         } while (te.next());
     }
 
-    if (sort.equals("count") || sort.equals("true")) {
-      for (CountPair<String,Integer> p : queue) {
+    if (sort.equals("count") || sort.equals("true") || sort.equals("relative")) {
+      for (CountPair<String,Double> p : queue) {
         if (--off>=0) continue;
         if (--lim<0) break;
         res.add(ft.indexedToReadable(p.key), p.val);
@@ -686,13 +700,13 @@ public class SimpleFacets {
     }
 
     te.close();
-    td.close();    
+    td.close();
 
     return res;
   }
 
   /**
-   * Returns a list of value constraints and the associated facet counts 
+   * Returns a list of value constraints and the associated facet counts
    * for each facet date field, range, and interval specified in the
    * SolrParams
    *
@@ -705,9 +719,9 @@ public class SimpleFacets {
     final NamedList resOuter = new SimpleOrderedMap();
     final String[] fields = params.getParams(FacetParams.FACET_DATE);
     final Date NOW = new Date();
-    
+
     if (null == fields || 0 == fields.length) return resOuter;
-    
+
     final IndexSchema schema = searcher.getSchema();
     for (String f : fields) {
       parseParams(FacetParams.FACET_DATE, f);
@@ -743,7 +757,7 @@ public class SimpleFacets {
           (SolrException.ErrorCode.BAD_REQUEST,
            "date facet 'end' is not a valid Date string: " + endS, e);
       }
-          
+
       if (end.before(start)) {
         throw new SolrException
           (SolrException.ErrorCode.BAD_REQUEST,
@@ -753,14 +767,14 @@ public class SimpleFacets {
       final String gap = required.getFieldParam(f,FacetParams.FACET_DATE_GAP);
       final DateMathParser dmp = new DateMathParser(ft.UTC, Locale.US);
       dmp.setNow(NOW);
-      
+
       try {
-        
+
         Date low = start;
         while (low.before(end)) {
           dmp.setNow(low);
           String label = ft.toExternal(low);
-          
+
           Date high = dmp.parseMath(gap);
           if (end.before(high)) {
             if (params.getFieldBool(f,FacetParams.FACET_DATE_HARD_END,false)) {
@@ -782,7 +796,7 @@ public class SimpleFacets {
           (SolrException.ErrorCode.BAD_REQUEST,
            "date facet 'gap' is not a valid Date Math string: " + gap, e);
       }
-      
+
       // explicitly return the gap and end so all the counts are meaningful
       resInner.add("gap", gap);
       resInner.add("end", end);
@@ -798,9 +812,9 @@ public class SimpleFacets {
 
         // no matter what other values are listed, we don't do
         // anything if "none" is specified.
-        if (! others.contains(FacetDateOther.NONE) ) {          
+        if (! others.contains(FacetDateOther.NONE) ) {
           boolean all = others.contains(FacetDateOther.ALL);
-        
+
           if (all || others.contains(FacetDateOther.BEFORE)) {
             resInner.add(FacetDateOther.BEFORE.toString(),
                          rangeCount(sf,null,start,false,false));
@@ -816,7 +830,7 @@ public class SimpleFacets {
         }
       }
     }
-    
+
     return resOuter;
   }
 
@@ -836,9 +850,9 @@ public class SimpleFacets {
     Query rangeQ = ((DateField)(sf.getType())).getRangeQuery(null, sf,low,high,iLow,iHigh);
     return searcher.numDocs(rangeQ ,base);
   }
-  
+
   /**
-   * A simple key=>val pair whose natural order is such that 
+   * A simple key=>val pair whose natural order is such that
    * <b>higher</b> vals come before lower vals.
    * In case of tie vals, then <b>lower</b> keys come before higher keys.
    */
