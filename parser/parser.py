@@ -4,6 +4,7 @@
 
 import re, datetime, os, sys
 import urllib2
+from xml.sax.saxutils import escape
 from settings import CWOD_HOME, LOG_DIR
 
 import lxml.etree
@@ -70,7 +71,7 @@ class Regex(object):
                 indexes[end].append(tag)
 
         if len(indexes):
-            print indexes
+            #print indexes
 
             # we need to split the string into substrings between each pair of
             # (sorted) indices, eg. at index_n and index_n+1. a substring is
@@ -160,7 +161,7 @@ class CRParser(object):
     re_timestamp =          r'{time}\s\d{4}'
     re_underscore =         r'\s+_+\s+'
     # a new speaker might either be a legislator's name, or a reference to the role of president of presiding officer. 
-    re_newspeaker =         r'^(<bullet> |  )(?P<name>%s|((The (ACTING )?(PRESIDENT|SPEAKER)( pro tempore)?)|(The PRESIDING OFFICER)|(The CLERK))( \([A-Za-z.\- ]+\))?)\.'
+    re_newspeaker =         r'^(<bullet> |  )(?P<name>%s|((The (ACTING )?(PRESIDENT|SPEAKER)( pro tempore)?)|(The PRESIDING OFFICER)|(The CLERK)|(The VICE PRESIDENT))( \([A-Za-z.\- ]+\))?)\.'
 
     # whatever follows the statement of a new speaker marks someone starting to
     # speak. if it's a new paragraph and there's already a current_speaker,
@@ -175,7 +176,7 @@ class CRParser(object):
     re_startofline =        r'^'
     re_alltext =            r"^\s+(?P<text>\S([\S ])+)"
     re_rollcall =           r'\[Roll(call)?( Vote)? No. \d+.*\]'
-    re_allcaps =            r'^[^a-z]+$'
+    re_allcaps =            r'^[A-Z][^a-z]*$'
 
     re_recorderstart =      (r'^\s+(?P<start>'
                              + r'(The (assistant )?legislative clerk read as follows)'
@@ -269,6 +270,7 @@ class CRParser(object):
         "NOTICES OF HEARINGS" : "",
         "REPORTS OF COMMITTEES DURING ADJOURNMENT" : "",
         "MEASURES DISCHARGED" : "",
+        "REPORTS OF COMMITTEES ON PUBLIC BILLS AND RESOLUTIONS": "",
     }
 
     def __init__(self, abspath):
@@ -277,8 +279,26 @@ class CRParser(object):
 
         # file data
         self.filename = abspath
+        print self.filename
         fp = open(abspath)
-        self.rawlines = fp.readlines()
+
+        #self.rawlines = fp.readlines()
+
+        # Remove page numbers.
+        self.rawlines = []
+        newpage = False
+        for line in fp.readlines():
+            if re.search(self.re_newpage, line):
+                # If this is a newpage line, remove the previous line from self.rawlines
+                newpage = True
+                self.rawlines.pop()
+                newpage = True
+                continue
+            if newpage:
+                newpage = False
+                continue
+            self.rawlines.append(line)
+
         self.date = None
 
         # state information
@@ -291,6 +311,7 @@ class CRParser(object):
         self.inlongquote = False
         self.newspeaker = False
         self.inrollcall = False
+        self.is_bullet = False
 
         # output
         self.xml = ['<CRDoc>', ]
@@ -299,7 +320,11 @@ class CRParser(object):
     def spaces_indented(self, theline):
         ''' returns the number of spaces by which the line is indented. '''
         re_textstart = r'\S'
-        return re.search(re_textstart, theline).start()
+        m = re.search(re_textstart, theline)
+        if m:
+            return m.start()
+        return 0
+        #return re.search(re_textstart, theline).start()
         
     def parse(self):
         ''' parses a raw senate document and returns the same document marked
@@ -335,9 +360,7 @@ class CRParser(object):
         self.volume = doc.xpath('extension/volume')[0].text
         self.issue = doc.xpath('extension/issue')[0].text
         self.congress = doc.xpath('extension/congress')[0].text
-        print self.volume
-        print self.issue
-        print self.congress
+        self.session = doc.xpath('//session')[0].text
         try:
             item = doc.xpath('//relatedItem[@ID="id-%s"]' % granule)[0]
         except IndexError:
@@ -346,7 +369,6 @@ class CRParser(object):
 
         # Get the document title
         self.document_title = item.xpath('titleInfo/title')[0].text
-        print self.document_title
 
         # Get the names of the members of Congress listed
         self.members = []
@@ -355,7 +377,6 @@ class CRParser(object):
             data.update({'name': member.xpath('name')[0].text, })
             self.members.append(data)
         self.re_newspeaker = self.re_newspeaker % '|'.join([x['name'] for x in self.members])
-        print self.re_newspeaker
 
         self.referenced_by = []
         for related_item in item.xpath('relatedItem'):
@@ -363,7 +384,7 @@ class CRParser(object):
                 for identifier in related_item.xpath('identifier'):
                     data = identifier.attrib
                     data.update({'text': identifier.text, })
-                    print data
+                    #print data
                     self.referenced_by.append(data)
 
     def markup_preamble(self):
@@ -377,7 +398,7 @@ class CRParser(object):
         annotator.register_tag(self.re_day, '<day>', group='day')
         annotator.register_tag(self.re_year, '<year>', group='year')
         xml_line = annotator.apply()
-        print xml_line
+        #print xml_line
         self.xml.append(xml_line)
         self.markup_chamber()
 
@@ -387,7 +408,7 @@ class CRParser(object):
         annotator = XMLAnnotator(theline)
         annotator.register_tag(self.re_chamber, '<chamber>')
         xml_line = annotator.apply()
-        print xml_line
+        #print xml_line
         self.xml.append(xml_line)
         self.markup_pages()    
         
@@ -397,8 +418,10 @@ class CRParser(object):
         annotator = XMLAnnotator(theline)
         annotator.register_tag(self.re_pages, '<pages>', group='pages')
         xml_line = annotator.apply()
-        print xml_line
+        #print xml_line
         self.xml.append(xml_line)
+        self.xml.append('<congress>%s</congress>' % self.congress)
+        self.xml.append('<session>%s</session>' % self.session)
         self.markup_title()
 
     def clean_line(self, theline):
@@ -412,7 +435,7 @@ class CRParser(object):
         # note: dont strip whitespace when cleaning the lines because
         # whitespace is often the only indicator of the line's purpose or
         # function. 
-        return theline
+        return escape(theline)
 
     def get_line(self, offset=0):
         if self.currentline+offset > len(self.rawlines)-1:
@@ -451,44 +474,55 @@ class CRParser(object):
 
         # if it's not a specially formatted title and it's not indented enough,
         # then it's probably missing a title altogether
-        if self.spaces_indented(theline) < MIN_TITLE_INDENT and not self.is_special_title(theline):
+        if self.spaces_indented(theline) < MIN_TITLE_INDENT and not self.is_special_title(self.document_title):
             self.markup_paragraph()
 
         else:
-            # whew, we made it to a regular old title to parse. 
-            annotator = XMLAnnotator(theline)
-            annotator.register_tag_open(self.re_title_start, '<document_title>')
-            self.currentline +=1
-            theline = self.get_line()
-            
-            # check if the title finished on the sameline it started on:
-            if not theline.strip():
-                annotator.register_tag_close(self.re_title_end, '</document_title>')
-                xml_line = annotator.apply()
-                print xml_line
-                self.xml.append(xml_line)
-
+            if self.is_special_title(self.document_title):
+                self.currentline +=1
+                theline = self.get_line()
+                self.xml.append('<document_title>%s</document_title>\n' % self.document_title)
+                self.markup_special_document()
             else:
-                # either way we need to apply the tags to the title start. 
-                xml_line = annotator.apply()
-                print xml_line 
-                self.xml.append(xml_line)
-                # now find the title end
-                while theline.strip():
-                    self.currentline +=1
-                    theline = self.get_line()
-                # once we hit an empty line, we know the end of the *previous* line
-                # is the end of the title. 
-                theline = self.get_line(-1) 
-                annotator = XMLAnnotator(theline)
-                annotator.register_tag_close(self.re_title_end, '</document_title>')
-                xml_line = annotator.apply()
-                print xml_line
-                self.xml.append(xml_line)
+                # regular title
+                #annotator = XMLAnnotator(theline)
+                #annotator.register_tag_open(self.re_title_start, '<document_title>')
+                self.currentline +=1
+                theline = self.get_line()
+                self.xml.append('<document_title>%s</document_title>\n' % self.document_title)
 
-            # note that as we exit this function, the current line is one PAST
-            # the end of the title, which should generally be a blank line. 
-            self.markup_paragraph()
+                # note that as we exit this function, the current line is one PAST
+                # the end of the title, which should generally be a blank line. 
+                self.markup_paragraph()
+
+
+    def markup_special_document(self):
+        # get to the first line 
+        theline = self.get_line()
+        while not theline.strip():
+            self.currentline += 1
+            theline = self.get_line()
+
+        self.document_first_line = True
+        annotator = XMLAnnotator(theline)
+        annotator.register_tag_open(self.re_startofline, '<recorder>')
+        self.xml.append('<recorder>')
+        while theline:
+            annotator = XMLAnnotator(theline)
+
+            self.currentline += 1
+            theline = self.get_line()
+            while theline is not None and not theline.strip():
+                self.currentline += 1
+                theline = self.get_line()
+
+            xml_line = annotator.apply()
+            self.xml.append(xml_line)
+
+            if not theline:
+                self.xml.append('</recorder>')
+                self.xml.append('</CRDoc>')
+
 	
     def set_speaker(self, theline):
         # checks if there is a new speaker, and if so, set the current_speaker
@@ -497,11 +531,12 @@ class CRParser(object):
         new_speaker = re.search(self.re_newspeaker, theline)
         if new_speaker:
             name = new_speaker.group('name')
-            self.current_speaker = name # XXX TODO this should be a unique ID
+            self.current_speaker = name
         return self.current_speaker
 
     def check_bullet(self, theline):
         if theline.find('<bullet>') >= 0:
+            self.is_bullet = True
             self.rawlines[self.currentline] = self.rawlines[self.currentline].replace('<bullet>', ' ')
             # now start at the end of the document and walk up the doc, to find
             # the closing bullet tag. 
@@ -526,8 +561,15 @@ class CRParser(object):
 
         # remove <bullet> tags if they exist
         theline = self.check_bullet(theline)
+        bullet = ''
+        if self.is_bullet:
+            bullet = ' bullet="true"'
         self.document_first_line = True
         while theline:
+            if list(set(theline.strip())) == ['-',] or len(theline.strip()) == 0:
+                self.currentline +=1
+                theline = self.get_line()
+                continue
             self.preprocess_state(theline)
             annotator = XMLAnnotator(theline)
             if self.intitle:
@@ -537,12 +579,12 @@ class CRParser(object):
                 # will only match on first line of the roll call
                 annotator.register_tag_open(self.re_rollcall, '<rollcall>')
             elif self.new_paragraph:
-                annotator.register_tag_open(self.re_longquotestart, '<speaking name="%s" quote="true">' % self.current_speaker, group='start')
+                annotator.register_tag_open(self.re_longquotestart, '<speaking name="%s" quote="true"%s>' % (self.current_speaker, bullet), group='start')
                 if self.recorder:
                     annotator.register_tag_open(self.re_startofline, '<recorder>')
                 annotator.register_tag(self.re_newspeaker, '<speaker name="%s">' % self.current_speaker, group='name')
                 if self.return_from_quote_interjection(theline):
-                    annotator.register_tag_open(self.re_longquotebody, '<speaker name="%s" quote="true">' % self.current_speaker, group='start')
+                    annotator.register_tag_open(self.re_longquotebody, '<speaker name="%s" quote="true"%s>' % (self.current_speaker, bullet), group='start')
                 if not self.recorder and not self.inlongquote:
                     # check the current speaker-- if it's the recorder, then
                     # even though this isn't a "known" recorder sentence,
@@ -552,7 +594,7 @@ class CRParser(object):
                         annotator.register_tag_open(self.re_speaking, '<recorder>', group='start')
                         self.recorder=True
                     else: 
-                        annotator.register_tag_open(self.re_speaking, '<speaking name="%s">' % self.current_speaker, group='start')
+                        annotator.register_tag_open(self.re_speaking, '<speaking name="%s"%s>' % (self.current_speaker, bullet), group='start')
 
             if not self.intitle and not self.inlongquote and not self.inrollcall:
                 pass
@@ -577,7 +619,7 @@ class CRParser(object):
                     annotator.register_tag_close(self.re_endofline, '</recorder>')
                 elif self.inlongquote:
                     if self.longquote_ends():
-                        print 'i think the longquote ends'
+                        #print 'i think the longquote ends'
                         #annotator.register_tag_close(self.re_endofline, '</quote>')
                         annotator.register_tag_close(self.re_endofline, '</speaking>')
                 elif self.intitle:
@@ -587,8 +629,9 @@ class CRParser(object):
                 #  stray </speaking> tags. 
                 elif (self.current_speaker == 'recorder' and self.inlongquote == False and self.inrollcall == False
                     and self.recorder == False and self.inquote == False and self.intitle == False):
-                    print "UNRECOGNIZED STATE (but that's ok): %s" % theline
-                else:
+                    #print "UNRECOGNIZED STATE (but that's ok): %s" % theline
+                    pass
+                elif self.current_speaker:
                     annotator.register_tag_close(self.re_endofline, '</speaking>')
 
             #if (self.current_speaker == 'recorder' and self.inlongquote == False and self.inrollcall == False
@@ -597,7 +640,7 @@ class CRParser(object):
             #    annotator.register_tag(self.re_alltext, '<unknown>', group='text')
  
             xml_line = annotator.apply()
-            print xml_line
+            #print xml_line
             self.xml.append(xml_line)
 
             # do some post processing
@@ -608,7 +651,7 @@ class CRParser(object):
             theline = self.get_line()
             while theline is not None and not theline.strip():
                 self.currentline += 1
-                print 'currentline: %d' % self.currentline
+                #print 'currentline: %d' % self.currentline
                 theline = self.get_line()
 
             if not theline:
@@ -647,34 +690,41 @@ class CRParser(object):
                 tagname = taginfo[0]
                 if re.search(re_opentag, tagname):
                     active.append(taginfo)
-                    print active
+                    #print active
                 elif re.search(re_closetag, tagname):
-                    print 'line: %s' % self.xml[taginfo[3]].strip('\n')
-                    print 'comparing %s and %s' % (active[-1][0], tagname)
+                    #print 'line: %s' % self.xml[taginfo[3]].strip('\n')
+                    #print 'comparing %s and %s' % (active[-1][0], tagname)
                     if len(active) and self.matching_tags(active[-1][0], tagname):
                         del active[-1]
                     else:
                         print 'no match-- orphaned\n'
                         orphans.append(taginfo)
         # append any remaining, unclosed open tags to the orphan list
+        if len(orphans):
+            logfile = initialize_logfile()
+            logfile.write('%s : orphaned tags\n' % self.filename)
         orphans.extend(active)
         # BUT, we don't want to remove the CRDoc tags
         save = []
         for orphan in orphans:
             if orphan[0] == '<CRDoc>' or orphan[0] == '</CRDoc>':
-                print 'saving crdoc tag', orphan[0]
+                #print 'saving crdoc tag', orphan[0]
                 save.append(orphan)
         for s in save:
             orphans.remove(s)
 
+        """
         print 'Before Validation:\n'
         print ''.join(self.xml)
         print self.filename
         print '\n\n'
+        """
 
+        """
         print 'Orphaned Tags:\n'
         for orphan in orphans:
             print orphan, self.xml[orphan[3]]
+        """
         
         for orphan in orphans:
             linenum = orphan[3]
@@ -685,11 +735,13 @@ class CRParser(object):
             end = orphan[2]
             self.xml[linenum] = theline[:start]+theline[end:]
 
+        """
         print '\nAfter Validation:\n'
         print ''.join(self.xml)
         print self.filename
         print '\n\n'
         print orphans
+        """
         return
 
     def longquote_ends(self):
@@ -698,6 +750,7 @@ class CRParser(object):
 
         offset = 1
         theline = self.get_line(offset)
+
         while theline and not theline.strip():
             offset += 1
             theline = self.get_line(offset)
@@ -774,6 +827,7 @@ class CRParser(object):
             self.inquote = True
 
         # debugging..
+        """
         print 'in title? %s' % self.intitle
         print 'new paragraph? %s' % self.new_paragraph
         if self.current_speaker:
@@ -784,6 +838,7 @@ class CRParser(object):
         print 'in recorder? %s' % self.recorder
         print 'in quote? %s' % self.inquote
         print 'in roll call? %s' % self.inrollcall
+        """
 
     def postprocess_state(self, theline):
         ''' in certain cases where a state ends on a line, we only want to note
@@ -798,14 +853,14 @@ class CRParser(object):
         if (not self.recorder and not self.inlongquote 
             and not self.intitle and not self.current_speaker):
             # this is a wierd state we shouldn't be in
-            print ''.join(self.rawlines)
+            #print ''.join(self.rawlines)
             objdata = self.__dict__
-            print objdata['xml']
+            #print objdata['xml']
             del objdata['xml']
             del objdata['rawlines']
-            print ''
-            print objdata
-            print ''
+            #print ''
+            #print objdata
+            #print ''
             message = 'Unrecognized state while parsing %s.\n' % self.filename
             self.error_flag = True
             raise UnrecognizedCRDoc(message)
@@ -836,7 +891,7 @@ class CRParser(object):
         was only briefly interrupted for the reader to make a comment. but we
         still need to treat it like a new paragraph. '''
 
-        if not self.rawlines[self.currentline] == theline:
+        if not escape(self.rawlines[self.currentline]) == theline:
             message = 'current line and index are not aligned'
             self.error_flag = True
             raise AlignmentError(message)
@@ -909,7 +964,7 @@ class CRParser(object):
     def is_title(self, theline, offset=0):
         #self.current_line +offset must be the index for theline
         local_offset = self.currentline + offset
-        if not self.rawlines[local_offset] == theline:
+        if not escape(self.rawlines[local_offset]) == theline:
             message = 'current line and index are not aligned'
             self.error_flag = True
             raise AlignmentError(message)
@@ -923,11 +978,13 @@ class CRParser(object):
             return True
         if self.is_centered(theline) and self.spaces_indented(theline) > 0:
             if (empty(line_above) and self.is_centered(line_below)):
-                print 'line above empty'
+                #print 'line above empty'
                 return True
             if (empty(line_below) and self.is_centered(line_above)):
-                print 'line below empty'
-                return True
+                if self.inlongquote:
+                    return False
+                else:
+                    return True
             if (self.is_centered(line_above) and self.is_centered(line_below)):
                 if self.inlongquote:
                     return False
