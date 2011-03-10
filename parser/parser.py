@@ -4,7 +4,7 @@
 
 import re, datetime, os, sys
 import urllib2
-from xml.sax.saxutils import escape
+from xml.sax.saxutils import escape, unescape
 from settings import CWOD_HOME, LOG_DIR
 
 import lxml.etree
@@ -161,7 +161,7 @@ class CRParser(object):
     re_timestamp =          r'{time}\s\d{4}'
     re_underscore =         r'\s+_+\s+'
     # a new speaker might either be a legislator's name, or a reference to the role of president of presiding officer. 
-    re_newspeaker =         r'^(<bullet> |  )(?P<name>%s|((The (ACTING )?(PRESIDENT|SPEAKER)( pro tempore)?)|(The PRESIDING OFFICER)|(The CLERK)|(The VICE PRESIDENT))( \([A-Za-z.\- ]+\))?)\.'
+    re_newspeaker =         r'^(<bullet> |  )(?P<name>%s|((The ((ACTING|Acting) )?(PRESIDENT|SPEAKER|CHAIR(MAN)?)( pro tempore)?)|(The PRESIDING OFFICER)|(The CLERK)|(The VICE PRESIDENT))( \([A-Za-z.\- ]+\))?)\.'
 
     # whatever follows the statement of a new speaker marks someone starting to
     # speak. if it's a new paragraph and there's already a current_speaker,
@@ -267,7 +267,6 @@ class CRParser(object):
 		"TEXT OF AMENDMENTS" : "",
 		"MEASURES PLACED ON THE CALENDAR" : "",
 		"EXECUTIVE CALENDAR" : "",
-        "NOTICES OF HEARINGS" : "",
         "REPORTS OF COMMITTEES DURING ADJOURNMENT" : "",
         "MEASURES DISCHARGED" : "",
         "REPORTS OF COMMITTEES ON PUBLIC BILLS AND RESOLUTIONS": "",
@@ -482,7 +481,8 @@ class CRParser(object):
                 self.currentline +=1
                 theline = self.get_line()
                 self.xml.append('<document_title>%s</document_title>\n' % self.document_title)
-                self.markup_special_document()
+                #self.markup_special_document()
+                self.markup_paragraph()
             else:
                 # regular title
                 #annotator = XMLAnnotator(theline)
@@ -535,7 +535,7 @@ class CRParser(object):
         return self.current_speaker
 
     def check_bullet(self, theline):
-        if theline.find('<bullet>') >= 0:
+        if unescape(theline).find('<bullet>') >= 0:
             self.is_bullet = True
             self.rawlines[self.currentline] = self.rawlines[self.currentline].replace('<bullet>', ' ')
             # now start at the end of the document and walk up the doc, to find
@@ -554,6 +554,22 @@ class CRParser(object):
         standard recorder comments, long and short quotes, etc. '''
         
         # get to the first line 
+        theline = self.get_line()
+        while not theline.strip():
+            self.currentline += 1
+            theline = self.get_line()
+
+        if self.is_title(theline):
+            annotator = XMLAnnotator(theline)
+            annotator.register_tag_open(self.re_title, '<title>', group='title')
+            while(self.is_title(theline)):
+                self.currentline += 1
+                theline = self.get_line()
+            annotator.register_tag_close(self.re_title_end, '</title>')
+            xml_line = annotator.apply()
+            self.xml.append(xml_line)
+            self.currentline +=1
+
         theline = self.get_line()
         while not theline.strip():
             self.currentline += 1
@@ -863,6 +879,9 @@ class CRParser(object):
             #print ''
             message = 'Unrecognized state while parsing %s.\n' % self.filename
             self.error_flag = True
+            logfile = initialize_logfile()
+            logfile.write('%s: Unrecognized state\n' % self.filename)
+            logfile.flush()
             raise UnrecognizedCRDoc(message)
 
         # if there's one or more complete quotes (start and end) on a line, or
