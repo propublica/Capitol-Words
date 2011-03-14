@@ -6,10 +6,11 @@ import urllib
 import urllib2
 
 from django.conf import settings
+from django.db.models import *
 from django.shortcuts import get_list_or_404, get_object_or_404
 
 from bioguide.models import *
-from cwod.models import NgramDateCount
+from cwod_api.models import NgramDateCount
 
 from piston.handler import BaseHandler
 from piston.resource import Resource
@@ -23,10 +24,13 @@ class GenericHandler(BaseHandler):
 
     ENTITIES = {'state': 'speaker_state',
                 'party': 'speaker_party',
-                'legislator': 'speaker',
-                'bioguide': 'speaker_bioguide',
+                #'legislator': 'speaker',
+                'bioguide_id': 'speaker_bioguide',
                 'cr_pages': 'pages',
-                'volume': 'volume', }
+                'volume': 'volume', 
+                'congress': 'congress',
+                'session': 'session',
+                }
 
     FIELDS = ['unigrams', 'bigrams', 'trigrams', 'quadgrams',
               'pentagrams', ]
@@ -57,7 +61,7 @@ class GenericHandler(BaseHandler):
 
         results_keys = kwargs.get('results_keys', ['phrase', 'count', ])
         results = [dict(zip(results_keys, x)) for x in zip(phrases, counts)]
-        return results
+        return {'results': results}
 
     def get_pagination(self, request):
         try:
@@ -79,7 +83,8 @@ class GenericHandler(BaseHandler):
 
         for k, v in self.ENTITIES.iteritems():
             if k in request.GET:
-                q.append('%s:%s' % (v, request.GET[k]))
+                if request.GET[k]: # Make sure value isn't blank
+                    q.append('%s:%s' % (v, request.GET[k]))
 
         if 'date' in request.GET:
             date = dateparse(request.GET['date'])
@@ -106,6 +111,10 @@ class GenericHandler(BaseHandler):
             if selected_chambers:
                 q.append('chamber:(%s)' % ' OR '.join([x.title() for x in selected_chambers]))
 
+        if 'legislator' in request.GET:
+            # Search the speaker_fullname field.
+            pass
+
         # n can be set either as a request parameter or in kwargs
         n = kwargs.get('n', request.GET.get('n', 1))
         error = {'error': 'The value given for the parameter "n" is invalid. An integer between one and five is required.',
@@ -131,10 +140,31 @@ class GenericHandler(BaseHandler):
                   'wt': 'json',
                   }
 
-        params.update(kwargs.get('params', {}))
 
-        url = 'http://%s:%s/solr/select?%s' % (settings.SOLR_SERVER,
-                                               settings.SOLR_PORT,
+        # Handle granularity.
+        params.update(kwargs.get('params', {}))
+        granularity = kwargs.get('granularity')
+        if granularity and params['facet.field'] == 'date':
+            if granularity == 'month':
+                params['facet.field'] = 'year_month'
+            elif granularity == 'year':
+                params['facet.field'] = 'year'
+
+        if request.GET.get('congress'):
+            try:
+                servers = [settings.SOLR_SERVERS[request.GET['congress']], ]
+            except KeyError:
+                return {'error': 'Invalid congress', 'results': []}
+        else:
+            servers = settings.SOLR_SERVERS.values()
+
+        params['shards'] = []
+        for server, port in servers:
+            params['shards'].append('%s:%s/solr' % (server, port))
+        params['shards'] = ','.join(params['shards'])
+
+        url = 'http://%s:%s/solr/select?%s' % (server,
+                                               port,
                                                urllib.urlencode(params))
 
         results = urllib2.urlopen(url).read()
@@ -142,47 +172,33 @@ class GenericHandler(BaseHandler):
         show_totals = request.GET.get('totals', 'false') == 'true'
         show_percentages = request.GET.get('percentages', 'false') == 'true'
         smoothing = 0
-        granularity = kwargs.get('granularity')
 
         # If faceting on the date field, remove the time, showing only the date.
-        if params['facet.field'] == 'date':
+        if params['facet.field'] in ('date', 'year_month', 'year'):
             results = results.replace('T12:00:00Z', '')
             data = json.loads(results)
-            data = self.format_for_return(data, *args, **kwargs)
+            data = self.format_for_return(data, *args, **kwargs)['results']
+
+            smoothing = int(request.GET.get('smoothing', 0))
 
             # If the client wants to show the total number
             # of ngrams on each date, get the numbers.
-            if show_totals or show_percentages:
+            if show_totals or show_percentages or smoothing != 0:
                 date_counts = dict(counts_over_time(**kwargs))
                 for i in data:
-                    total = date_counts.get(dateparse(i[granularity]).date(), 0)
+                    if granularity == 'day':
+                        total = date_counts.get(dateparse(i[granularity]).date(), 0)
+                    else:
+                        total = date_counts.get(int(i[granularity]), 0)
                     if show_percentages:
-                        i['percentage'] = i['count'] / float(total)
-                    if show_totals:
+                        if total:
+                            i['percentage'] = i['count'] / float(total)
+                        else:
+                            i['percentage'] = 0
+                    if show_totals or show_percentages or smoothing != 0:
                         i['total'] = total
 
-            # If the granularity is other than 'day' (the default), we
-            # need to group the results by whatever that granularity is.
-            if granularity != 'day':
-                try:
-                    y = {'year': 1, 'month': 2}[granularity]
-                except KeyError:
-                    return {'error': 'Invalid value given for "granularity" parameter. Valid options are "day", "month" and "year".', 'results': [], }
-                rows = []
-                for date, grouper in groupby(data, lambda x: '-'.join(x[granularity].split('-')[:y])):
-                    grouper = list(grouper)
-                    row = {'date': date,
-                           'count': sum([x['count'] for x in grouper])}
-                    if show_totals:
-                        row.update({'total': sum([x['total'] for x in grouper])})
-                    if show_percentages:
-                        row.update({'percentage': sum([x['percentage'] for x in grouper])})
-                    rows.append(row)
-                data = rows
-
-            smoothing = int(request.GET.get('smoothing', 0))
             if smoothing != 0:
-                smoothing = int(request.GET['smoothing'])
                 smoothed = list(self.smooth([x['count'] for x in data], smoothing))
                 for n, i in enumerate(data):
                     i['raw_count'] = i['count']
@@ -194,7 +210,20 @@ class GenericHandler(BaseHandler):
                 for row in data:
                     row['raw_count'] = row['count']
 
-            return data
+            # If the mincount is 0, remove any leading
+            # and trailing items with counts of 0, but
+            # leave any internal items with counts of 0.
+            if params['facet.mincount'] == '0' and kwargs.get('trim', 'false') == 'true':
+                start, stop = 0, 0
+                for start, row in enumerate(data):
+                    if row['raw_count'] > 0:
+                        break
+                for stop, row in enumerate(reversed(data)):
+                    if row['raw_count'] > 0:
+                        break
+                data = data[start:len(data)-stop]
+
+            return {'results': data, }
 
         else:
             data = json.loads(results)
@@ -205,7 +234,6 @@ class GenericHandler(BaseHandler):
 class PopularPhraseHandler(GenericHandler):
     """Most frequent phrases.
     """
-
     def read(self, request, *args, **kwargs):
         kwargs['q'] = ['id:CREC*', ]
         return super(PopularPhraseHandler, self).read(request, *args, **kwargs)
@@ -229,7 +257,7 @@ class PhraseByCategoryHandler(GenericHandler):
         facet_field = {'legislator': 'speaker_bioguide',
                        'state': 'speaker_state',
                        'party': 'speaker_party',
-                       'bioguide': 'speaker_bioguide',
+                       'bioguide_id': 'speaker_bioguide',
                        'volume': 'volume',
                        'chamber': 'chamber',
                        }.get(kwargs.get('entity_type'))
@@ -288,10 +316,12 @@ class PhraseOverTimeHandler(GenericHandler):
         params = {'facet.field': 'date',
                   'facet.limit': '-1',
                   'facet.sort': 'index',
+                  'facet.mincount': request.GET.get('mincount', 1),
                   }
         kwargs['params'] = params
         kwargs['granularity'] = granularity
         kwargs['n'] = n
+        kwargs['trim'] = request.GET.get('trim', 'false')
 
         kwargs['results_keys'] = [granularity, 'count', ]
         return super(PhraseOverTimeHandler, self).read(request, *args, **kwargs)
@@ -309,6 +339,11 @@ def counts_over_time(*args, **kwargs):
         kw['date__gte'] = start_date
     if 'end_date' in kwargs:
         kw['date__lte'] = end_date
+    
+    if kwargs.get('granularity') == 'month':
+        return NgramDateCount.objects.extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month').annotate(Sum('count'))
+    elif kwargs.get('granularity') == 'year':
+        return NgramDateCount.objects.extra(select={"year": 'EXTRACT(YEAR FROM date)'}).values_list('year').annotate(Sum('count'))
 
     return NgramDateCount.objects.filter(**kw).values_list('date', 'count')
 
@@ -316,13 +351,19 @@ def counts_over_time(*args, **kwargs):
 class FullTextSearchHandler(GenericHandler):
 
     def read(self, request, *args, **kwargs):
+        """
         if 'phrase' not in request.GET:
             # error
             pass
+        """
 
         per_page, offset = self.get_pagination(request)
 
-        kwargs['q'] = ['text:"%s"' % request.GET['phrase'], ]
+        if 'phrase' in request.GET:
+            kwargs['q'] = ['text:"%s"' % request.GET['phrase'], ]
+        else:
+            kwargs['q'] = ['dummy:"dummyvalue"',]
+
         kwargs['params'] = {'facet': 'false',
                             'rows': per_page,
                             'start': offset,
@@ -330,7 +371,8 @@ class FullTextSearchHandler(GenericHandler):
         return super(FullTextSearchHandler, self).read(request, *args, **kwargs)
 
     def format_for_return(self, data, *args, **kwargs):
-        return [{'bioguide': x.get('speaker_bioguide'),
+        num_found = data['response']['numFound']
+        results = [{'bioguide_id': x.get('speaker_bioguide'),
                  'date': re.sub(r'T\d\d\:\d\d:\d\dZ$', '', x['date']),
                  'speaking': x.get('speaking'),
                  'title': x.get('document_title', ''),
@@ -339,8 +381,13 @@ class FullTextSearchHandler(GenericHandler):
                  'speaker_last': x.get('speaker_lastname'),
                  'speaker_party': x.get('speaker_party'),
                  'speaker_state': x.get('speaker_state'),
+                 'speaker_raw': x.get('speaker_raw'),
+                 'pages': x.get('pages'),
+                 'congress': x.get('congress'),
+                 'session': x.get('session'),
                  }
                  for x in data['response']['docs'] ]
+        return {'num_found': num_found, 'results': results, }
 
 
 class LegislatorLookupHandler(BaseHandler):
