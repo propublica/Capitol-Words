@@ -390,7 +390,7 @@ class SolrDoc(object):
         valid_tags = [
             u'doc', u'add', u'#text', u'volume', u'number', u'weekday', u'month', u'day',
             u'year', u'chamber', u'pages', u'document_title', u'speaker', u'speaking',
-            u'quote', u'recorder', 'title', 'rollcall', 'congress', 'session',]
+            u'quote', u'recorder', 'title', 'rollcall', 'congress', 'session', 'bullet', ]
         root = self.dom.firstChild
         check_kids(root)
 
