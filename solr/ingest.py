@@ -8,6 +8,7 @@ have one speaker per solr document.'''
 
 from httplib import HTTPConnection
 import xml.dom.minidom as xml
+from xml.sax.saxutils import escape, unescape
 from xml.parsers.expat import ExpatError
 import sys, os, re
 from lib import bioguide_lookup, db_bioguide_lookup, fallback_bioguide_lookup
@@ -16,6 +17,8 @@ import datetime
 
 import lxml.etree
 import nltk
+
+from django.template.defaultfilters import slugify
 
 
 def make_ngrams(xml):
@@ -31,10 +34,16 @@ def make_ngrams(xml):
     ngrams = ''
 
     for graf in text:
-        sentences = nltk.tokenize.sent_tokenize(graf.replace('\n', '').lower())
+        sentences = nltk.tokenize.sent_tokenize(graf.replace('\n', ' ').replace('  ', ' ').lower())
         for sentence in sentences:
+            end_punctuation = sentence[-1]
+            if end_punctuation in ['.', '?', '!', ]:
+                end_punctuation = [end_punctuation,]
+            else:
+                end_punctuation = []
+
             # Remove unnecessary punctuation
-            sentence = re.sub(r"(\/|--|`|\(|\)|\;|\?)", ' ', sentence)
+            sentence = re.sub(r"(\/|--|`|\(|\)|\;|\:|\?)", ' ', sentence)
             sentence = re.sub(r"\.", '', sentence)
             sentence = re.sub(r'(\d),(\d)', r'\1\2', sentence)
             sentence = re.sub(r"''", '', sentence)
@@ -44,7 +53,7 @@ def make_ngrams(xml):
             words = sentence.split()
 
             # Remove punctuation-only tokens
-            words = [x for x in words if re.search(r'[a-z]', x)]
+            words = [x.rstrip('-').strip("'") for x in words if re.search(r'[a-z]', x)] + end_punctuation
 
             for n, field in enumerate(fields):
                 for ngram in nltk.util.ngrams(words, n+1):
@@ -52,6 +61,25 @@ def make_ngrams(xml):
                                                                  ' '.join(ngram))
 
     return ngrams
+
+
+def find_bills(xml):
+    """Find any ngrams that are bill numbers.
+    """
+    xml = '<doc>%s</doc>' % xml
+    doc = lxml.etree.fromstring(xml)
+    speaking = doc.xpath('field[@name="speaking"]')
+    quotes = doc.xpath('field[@name="quote"]')
+
+    text = [x.text for x in speaking] + [x.text for x in quotes]
+
+    regex = re.compile(r'(?:H|S)\. ?(?:(?:J|R)\. )?(?:Con\. )?(?:Res\. )?\d+')
+
+    bills = []
+    for graf in text:
+        bills += regex.findall(graf)
+
+    return '\n'.join(['<field name="bill">%s</field>' % bill for bill in set(bills)]) + '\n'
 
 
 class SolrDoc(object):
@@ -70,13 +98,17 @@ class SolrDoc(object):
     def get_text(self, uniquetag):
         ''' only use this for unique tags that appear once in the document'''
         re_tag_content = r'<.*?>(?P<content>.*?)</.*?>'
-        nodexml = self.dom.getElementsByTagName(uniquetag)[0].toxml()
+        try:
+            nodexml = self.dom.getElementsByTagName(uniquetag)[0].toxml()
+        except IndexError:
+            print 'get_text error. uniquetag: %s' % uniquetag
+            return ''
         tag_content = re.search(re_tag_content, nodexml, re.DOTALL)
         if tag_content:
             text = tag_content.group('content')
             return text
         else:
-            return None
+            return ''
 
     def make_solr_id(self, num):
         uid = os.path.basename(self.filename).strip('xml')+'chunk%d' % num
@@ -113,15 +145,26 @@ class SolrDoc(object):
         # subtle handling of such date queries.
         date = "%s-%s-%sT12:00:00Z" % (year, numeric_months[month.lower()],
         day)
+        page_id =  re.search(r'Pg([A-Z][-0-9]+)', self.filename).groups()[0]
         # store the original file this came from so we can go back to it
         self.metadata_xml = '''<field name="crdoc">%s</field>\n''' % self.filename
+        self.metadata_xml = '''<field name="page_id">%s</field>\n''' % page_id
         self.metadata_xml += '''<field name="date">%s</field>\n''' % date
+        self.metadata_xml += '''<field name="year">%s</field>\n''' % year
+        self.metadata_xml += '''<field name="month">%s</field>\n''' % numeric_months[month.lower()]
+        self.metadata_xml += '''<field name="day">%s</field>\n''' % self.get_text('day')
+        self.metadata_xml += '''<field name="year_month">%s%s</field>\n''' % (year, numeric_months[month.lower()])
 
         if self.dom.getElementsByTagName('document_title'):
             doc_title = self.get_text('document_title')
-            self.metadata_xml += '''<field name="document_title">%s</field>\n''' % doc_title
+        else:
+            doc_title = self.get_title_from_mods_file()
 
-        for tag in ['volume', 'number', 'chamber', 'pages']:
+        self.metadata_xml += '''<field name="document_title">%s</field>\n''' % doc_title
+        slug = slugify(doc_title)[:50]
+        self.metadata_xml += '''<field name="slug">%s</field>\n''' % slug
+
+        for tag in ['volume', 'number', 'chamber', 'pages', 'congress', 'session',]:
             tag_content = self.get_text(tag)
             self.metadata_xml += '''<field name="%s">%s</field>\n''' % (tag, tag_content)
 
@@ -129,6 +172,22 @@ class SolrDoc(object):
         # anchor when we want to do a wildcard search on all terms in a
         # specific field.
         self.metadata_xml += '''<field name="dummy">dummyvalue</field>\n'''
+
+    def get_title_from_mods_file(self):
+        path, filename = os.path.split(self.filename)
+        granule = filename.split('.')[0]
+        raw_path = path.replace('xml', 'raw')
+        mods_path = os.path.join(raw_path, 'mods.xml')
+        fh = open(mods_path, 'r')
+        xml = fh.read().replace('xmlns="http://www.loc.gov/mods/v3" ', '')
+        doc = lxml.etree.fromstring(xml)
+        try:
+            item = doc.xpath('//relatedItem[@ID="id-%s"]' % granule)[0]
+        except IndexError:
+            print 'Item not found in xml: %s' % granule
+
+        document_title = escape(item.xpath('titleInfo/title')[0].text)
+        return document_title
 
 
     def get_metadata(self):
@@ -160,7 +219,7 @@ class SolrDoc(object):
                 msg = 'No data or too many responses for %s, %s, %s, %s\n' % (lastname, self.year, position, state)
                 print msg
                 logfile = initialize_logfile()
-                logfile.write(msg)
+                logfile.write('%s: %s' % (self.filename, msg))
                 logfile.flush()
                 return None
 
@@ -243,21 +302,34 @@ class SolrDoc(object):
         ''' generate a proper solr document '''
         # add metadata
         # replace xml with proper solr fields
+        logfile = initialize_logfile()
         for idx, body in enumerate(self.document_bodies):
             document_id_field = self.make_solr_id(idx)
             metadata_fields = self.get_metadata()
             ngram_fields = make_ngrams(body)
-            solrdoc = '''<add><doc>\n''' + document_id_field + metadata_fields + ngram_fields + body + '''\n</doc></add>'''
-            self.save_doc(solrdoc, idx)
-            self.post(solrdoc)
-            self.commit()
+            bill_fields = find_bills(body)
+            solrdoc = '''<add><doc>\n''' + document_id_field + metadata_fields + ngram_fields + bill_fields + body + '''\n</doc></add>'''
+            try:
+                self.save_doc(solrdoc, idx)
+            except lxml.etree.XMLSyntaxError:
+                print '    lxml.etree.XMLSyntaxError'
+                logfile.write('%s: lxml.etree.XMLSyntaxError\n' % self.filename)
+                logfile.flush()
+                continue
+            if sys.argv[-1] != '--solrdocs-only':
+                self.post(solrdoc)
+                self.commit()
         if not len(self.document_bodies):
             self.status = 'OK'
             self.warning  = 'No document body. Skipping.'
 
     def save_doc(self, solrdoc, idx):
+        p = [SOLR_DOC_PATH, ] + os.path.split(self.filename)[0].split('/')[-3:]
+        path = os.path.join(*p)
+        if not os.path.exists(path):
+            os.makedirs(path)
         xml = lxml.etree.fromstring(solrdoc)
-        path = os.path.join(SOLR_DOC_PATH, '%schunk%d.xml' % (
+        path = os.path.join(path, '%schunk%d.xml' % (
             os.path.split(self.filename)[1].strip('xml'),
             idx)
             )
@@ -318,7 +390,7 @@ class SolrDoc(object):
         valid_tags = [
             u'doc', u'add', u'#text', u'volume', u'number', u'weekday', u'month', u'day',
             u'year', u'chamber', u'pages', u'document_title', u'speaker', u'speaking',
-            u'quote', u'recorder', 'title', 'rollcall']
+            u'quote', u'recorder', 'title', 'rollcall', 'congress', 'session',]
         root = self.dom.firstChild
         check_kids(root)
 
@@ -361,6 +433,7 @@ def solr_ingest_dir(path):
 if __name__ == '__main__' :
 
     filename = sys.argv[1]
+    print filename
     solr_ingest_file(filename)
 
 
