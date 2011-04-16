@@ -21,65 +21,94 @@ import nltk
 from django.template.defaultfilters import slugify
 
 
-def make_ngrams(xml):
-    xml = '<doc>%s</doc>' % xml
-    doc = lxml.etree.fromstring(xml)
-    speaking = doc.xpath('field[@name="speaking"]')
-    quotes = doc.xpath('field[@name="quote"]')
-
-    text = [x.text for x in speaking] + [x.text for x in quotes]
+def make_ngrams(xml, filename):
+    text = re.findall(r'<field name="speaking">(.*?)<\/field>', xml, re.S)
 
     fields = ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ]
-    #ngrams = dict([(n, []) for n in range(1, len(fields)+1)])
-    ngrams = ''
+    ngrams = []
+
+    # Identify bills at the end of sentences.
+    # Should be able to train the sentence tokenizer
+    # to know that bill names aren't sentence delimiters.
+    bill_regex = re.compile(r'(?:H|S)\. ?(?:(?:J|R)\. ?)?(?:Con\. ?)?(?:Res\. ?)?$')
 
     for graf in text:
-        sentences = nltk.tokenize.sent_tokenize(graf.replace('\n', ' ').replace('  ', ' ').lower())
-        for sentence in sentences:
-            end_punctuation = sentence[-1]
-            if end_punctuation in ['.', '?', '!', ]:
-                end_punctuation = [end_punctuation,]
-            else:
-                end_punctuation = []
+        graf = re.sub(r' +', ' ', graf.replace('\n', ' '))
+        sentences = nltk.tokenize.sent_tokenize(graf)
 
-            # Remove unnecessary punctuation
-            sentence = re.sub(r"(\/|--|`|\(|\)|\;|\:|\?)", ' ', sentence)
-            sentence = re.sub(r"\.", '', sentence)
-            sentence = re.sub(r'(\d),(\d)', r'\1\2', sentence)
-            sentence = re.sub(r"''", '', sentence)
-            sentence = re.sub(r', ', ' ', sentence)
+        done = []
 
-            #words = nltk.tokenize.word_tokenize(sentence)
-            words = sentence.split()
+        for n, sentence in enumerate(sentences):
 
-            # Remove punctuation-only tokens
-            words = [x.rstrip('-').strip("'") for x in words if re.search(r'[a-z]', x)] + end_punctuation
+            if n in done:
+                continue
 
-            for n, field in enumerate(fields):
-                for ngram in nltk.util.ngrams(words, n+1):
-                    ngrams += '<field name="%s">%s</field>\n' % (field,
-                                                                 ' '.join(ngram))
+            sentence = re.sub(r'<.*?>', '', unescape(sentence))
 
-    return ngrams
+            # Handle problem of bill numbers being split into new sentences.
+            if bill_regex.search(sentence):
+                try:
+                    if re.search(r'[0-9]+\.', sentences[n+1]):
+                        sentence = ' '.join([sentence, sentences[n+1]])
+                        done.append(n+1)
+                except IndexError:
+                    pass
+            done.append(n)
+
+
+            # Adapted From Natural Language Processing with Python
+            regex = r'''(?x) 
+            ([A-Z]\.)+                                      # Abbreviations (U.S.A., etc.)
+          | ([A-Z]+\&[A-Z]+)                                # Internal ampersands (AT&T, etc.)
+          | (Mr\.|Dr\.|Mrs\.|Ms\.)                          # Mr., Mrs., etc.
+          | \d*\.\d+                                        # Numbers with decimal points.
+          | \d\d?:\d\d                                      # Times.
+          | \$?[,0-9]+                                      # Numbers with thousands separators.
+          | (((a|A)|(p|P))\.(m|M)\.)                        # a.m., p.m., A.M., P.M.
+          | \w+((-|')\w+)*                                  # Words with optional internal hyphens.
+          | \$?\d+(\.\d+)?%?                                # Currency and percentages.
+          | \.\.\.                                          # Ellipsis
+          | [][.,;"'?():-_`]
+            '''
+
+            # Tokenize the sentence into unigrams
+            # and do some cleanup of the tokens
+            words = [re.sub(r',', '', x.lower().rstrip('-').strip("'"))
+                        for x in nltk.regexp_tokenize(sentence, regex)
+                        if re.search(r'[a-z0-9.?!]', x.lower())]
+
+            ngrams += [item for sublist in [['<field name="%s">%s</field>' % (field, escape(' '.join(ngram))) 
+                            for ngram in nltk.util.ngrams(words, n+1)]
+                                for n, field in enumerate(fields)] for item in sublist]
+
+    return '\n'.join(ngrams)
 
 
 def find_bills(xml):
     """Find any ngrams that are bill numbers.
     """
-    xml = '<doc>%s</doc>' % xml
-    doc = lxml.etree.fromstring(xml)
-    speaking = doc.xpath('field[@name="speaking"]')
-    quotes = doc.xpath('field[@name="quote"]')
-
-    text = [x.text for x in speaking] + [x.text for x in quotes]
-
+    text = re.findall(r'<field name="speaking">(.*?)<\/field>', xml, re.S)
     regex = re.compile(r'(?:H|S)\. ?(?:(?:J|R)\. )?(?:Con\. )?(?:Res\. )?\d+')
-
     bills = []
     for graf in text:
         bills += regex.findall(graf)
-
     return '\n'.join(['<field name="bill">%s</field>' % bill for bill in set(bills)]) + '\n'
+
+
+numeric_months = {
+    'january' : '01',
+    'february' : '02',
+    'march': '03',
+    'april': '04',
+    'may': '05',
+    'june': '06',
+    'july': '07',
+    'august': '08',
+    'september': '09',
+    'october': '10',
+    'november': '11',
+    'december': '12',
+}
 
 
 class SolrDoc(object):
@@ -119,20 +148,6 @@ class SolrDoc(object):
         ''' each solr document generated from this CR document will share the
         same metadata. assemble a string containing that metadata.'''
 
-        numeric_months = {
-            'january' : '01',
-            'february' : '02',
-            'march': '03',
-            'april': '04',
-            'may': '05',
-            'june': '06',
-            'july': '07',
-            'august': '08',
-            'september': '09',
-            'october': '10',
-            'november': '11',
-            'december': '12',
-        }
 
         # date format: 1995-12-31T23:59:59Z
         day = self.get_text('day')
@@ -148,17 +163,20 @@ class SolrDoc(object):
         page_id =  re.search(r'Pg([A-Z][-0-9]+)', self.filename).groups()[0]
         # store the original file this came from so we can go back to it
         self.metadata_xml = '''<field name="crdoc">%s</field>\n''' % self.filename
-        self.metadata_xml = '''<field name="page_id">%s</field>\n''' % page_id
+        self.metadata_xml += '''<field name="page_id">%s</field>\n''' % page_id
         self.metadata_xml += '''<field name="date">%s</field>\n''' % date
         self.metadata_xml += '''<field name="year">%s</field>\n''' % year
         self.metadata_xml += '''<field name="month">%s</field>\n''' % numeric_months[month.lower()]
         self.metadata_xml += '''<field name="day">%s</field>\n''' % self.get_text('day')
         self.metadata_xml += '''<field name="year_month">%s%s</field>\n''' % (year, numeric_months[month.lower()])
 
+        """
         if self.dom.getElementsByTagName('document_title'):
             doc_title = self.get_text('document_title')
         else:
             doc_title = self.get_title_from_mods_file()
+        """
+        doc_title = self.get_title_from_mods_file()
 
         self.metadata_xml += '''<field name="document_title">%s</field>\n''' % doc_title
         slug = slugify(doc_title)[:50]
@@ -210,12 +228,20 @@ class SolrDoc(object):
         else:
             position = 'representative'
 
-        data = db_bioguide_lookup(lastname, self.year, position, state)
+        day = self.get_text('day')
+        month = self.get_text('month')
+        year = self.get_text('year')
+        date = '%s-%s-%s' % (year, numeric_months[month.lower()], day)
+
+        if chamber == 'extensions':
+            chamber = 'house'
+
+        #data = db_bioguide_lookup(lastname, self.get_text('congress'), position, state)
+        data = db_bioguide_lookup(lastname, self.get_text('congress'), chamber, date, state)
 
         if not data or len(data) > 1:
-            data = fallback_bioguide_lookup(lastname, self.year, position, state)
+            data = fallback_bioguide_lookup(speaker, self.get_text('congress'), position)
             if not data:
-                print data
                 msg = 'No data or too many responses for %s, %s, %s, %s\n' % (lastname, self.year, position, state)
                 print msg
                 logfile = initialize_logfile()
@@ -228,7 +254,10 @@ class SolrDoc(object):
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_party', data[0]['party'])
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_state', data[0]['state'])
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_firstname', data[0]['firstname'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_middlename', data[0]['middlename'])
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_lastname', data[0]['lastname'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_title', data[0]['title'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_district', data[0]['district'])
         return xml
 
     def build_document_bodies(self):
@@ -268,7 +297,7 @@ class SolrDoc(object):
             re_recorder = r'<recorder>'
             re_rollcall = r'<rollcall>'
             re_quote = r'<quote speaker=.*?>'
-            re_speaking = r'<speaking name=.*?>'
+            re_speaking = r'<speaking (quote="true" )?(speaker|name)=.*?>'
             re_title = r'<title>'
             re_endtag = r'</.*?>'
 
@@ -306,7 +335,7 @@ class SolrDoc(object):
         for idx, body in enumerate(self.document_bodies):
             document_id_field = self.make_solr_id(idx)
             metadata_fields = self.get_metadata()
-            ngram_fields = make_ngrams(body)
+            ngram_fields = make_ngrams(body, self.filename)
             bill_fields = find_bills(body)
             solrdoc = '''<add><doc>\n''' + document_id_field + metadata_fields + ngram_fields + bill_fields + body + '''\n</doc></add>'''
             try:
@@ -328,13 +357,15 @@ class SolrDoc(object):
         path = os.path.join(*p)
         if not os.path.exists(path):
             os.makedirs(path)
-        xml = lxml.etree.fromstring(solrdoc)
+        #xml = lxml.etree.fromstring(solrdoc)
         path = os.path.join(path, '%schunk%d.xml' % (
             os.path.split(self.filename)[1].strip('xml'),
             idx)
             )
+        print path
         with open(path, 'w') as fh:
-            fh.write(lxml.etree.tostring(xml, pretty_print=True))
+            #fh.write(lxml.etree.tostring(xml, pretty_print=True))
+            fh.write(solrdoc)
 
     def post(self, payload):
         """ Add a document to index """
