@@ -1,11 +1,12 @@
 from optparse import make_option
+import os
 import datetime
 import json
 import urllib
 import urllib2
 
 from django.core.management.base import BaseCommand
-from cwod.models import NgramDateCount
+from cwod_api.models import NgramDateCount
 
 from dateutil.parser import parse as dateparse
 
@@ -23,6 +24,7 @@ class DateCounter(object):
                 break
             curr += datetime.timedelta(1)
 
+    """
     def make_url(self, field, date):
         start = date.strftime('%Y-%m-%dT00:00:00Z')
         end = date.strftime('%Y-%m-%dT23:59:59Z')
@@ -38,12 +40,26 @@ class DateCounter(object):
                 'wt': 'json', }
         body = urllib.urlencode(data)
         url = 'http://localhost:8983/solr/select?%s' % body
+        print url
         return url
 
     def count(self, field, date):
         url = self.make_url(field, date)
         data = json.loads(urllib2.urlopen(url).read())
         return sum(data['facet_counts']['facet_fields'][field][1::2])
+    """
+
+    def make_path(self, date):
+        root = '/opt/solr/data/capwords/solrdocs'
+        return os.path.join(root, str(date.year), date.strftime('%m'), date.strftime('%d'))
+
+    def count(self, field, date):
+        path = self.make_path(date)
+        all_filename = 'all-%s-%s-%s.xml' % (date.year, date.strftime('%m'), date.strftime('%d'))
+        if os.path.exists(os.path.join(path, all_filename)):
+            result = os.popen('''grep '"%s">' %s | wc -l''' % (field, os.path.join(path, all_filename)))
+            return int(list(result)[0].strip())
+        return 0
 
 
 class Command(BaseCommand):
@@ -100,7 +116,9 @@ class Command(BaseCommand):
                 num = counter.count(field, date)
                 if num == 0:
                     continue
-                NgramDateCount.objects.create(n=n,
-                                              date=date,
-                                              count=num)
+                ngramcount, created = NgramDateCount.objects.get_or_create(n=n,
+                                                                           date=date,
+                                                                           defaults={'count': 0})
+                ngramcount.count = num
+                ngramcount.save()
                 print date, field, num
