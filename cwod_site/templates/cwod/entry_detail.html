@@ -1,0 +1,85 @@
+{% extends "cwod/base.html" %}
+{% load media %}
+{% load capwords %}
+{% load typogrify_tags %}
+
+{% block title %}{{ metadata.title|smart_title }} | {{ block.super }}{% endblock title %}
+
+{% block content %}
+            <div id="main">
+                <div id="internalHead">
+                    <div id="social icons">
+
+                    </div>
+                    <h2>{{ metadata.title|smart_title|typogrify }}</h2>
+                </div>
+                <div id="ltColumn">
+                    <article class="module">
+                        <header>
+						<div class="rightHeader withAction">
+                            <dl class="metaData tip">
+								<dt>Volume</dt>
+                                <dd class="withBar">Volume {{ metadata.volume }} , Number {{ metadata.number }} </dd>
+								<dt>Pages</dt>
+                                <dd class="withBar">Pages {{ metadata.pages }}</dd>
+								<dt>Legislative Body</dt>
+                                <dd class="withBar">{% ifequal metadata.chamber 'Extensions' %}Extensions of Remarks{% else %}{{ metadata.chamber }}{% endifequal %}</dd>
+								<dt>Date</dt>
+                                <dd><a href="{% url cwod_date_detail metadata.date.year metadata.date|date:"m" metadata.date|date:"d" %}">{{ metadata.date|date:"l, N j, Y" }}</a></dd> 
+							</dl>
+							<div class="clear"></div>
+                        </div>
+						</header>
+                        <div class="crContent">
+                        {% for chunk in chunks %}
+							<div class="crSpeaker">
+                            {% if chunk.bioguide_id %}
+                                {% with chunk|legislator_lookup as legislator %}
+                                <h4><a href="{% url cwod_legislator_detail bioguide_id=chunk.bioguide_id slug=legislator.slug %}">{{ legislator.honorific }} {{ legislator.name }}</a></h4>
+								<div id="legislatorDetail">
+                                    <img class="legislatorImage" alt="legislator photo" src="{% legislator_thumbnail chunk.bioguide_id 40x50 %}"/>
+                                    <dl class="metaData">
+                                        <dt>Party</dt>
+                                        <dd class="withBar">{{ legislator.party }}</dd>
+                                        <dt>State</dt>
+                                        <dd>{{ chunk.speaker_state }}</dd>
+                                    </dl>
+                                </div>
+                                {% endwith %}
+                            {% endif %}
+                            {% for graf in chunk.speaking %}
+                            <p {% if not chunk.bioguide_id %}class="nobioguide"{% endif %}>{{ graf|typogrify }}</p>
+                            {% endfor %}
+                            <div class="clear"></div>
+                        </div>
+                        {% endfor %}
+
+                    </article> 
+                </div>  
+
+                <div id="rtColumn">
+                    <div class="leftModule">
+                        <div class="leftHeader">
+                            <h4>Similar entries</h4>
+                        </div>
+                        <ul class="crList">
+                            {% for entry in similar_entries %}
+                            <li>
+                            <h5><a href="{% entry_detail_url entry.origin_url entry.document_title %}">{{ entry.document_title|smart_title|typogrify }}</a></h5>
+                            <span class="pages">{{ entry.date|date_parse|date:"F j, Y" }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+
+                </div>
+
+                </div>    
+                <div class="clear"></div>
+            </div>
+        </div>
+
+    <!-- Emphasis requires Prototype //-->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/prototype/1.7.0.0/prototype.js"></script>
+    {% js "js/emphasis.js" %}
+
+{% endblock content %}

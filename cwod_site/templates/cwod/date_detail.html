@@ -1,0 +1,96 @@
+{% extends "cwod/base.html" %}
+{% load capwords %}
+{% load typogrify_tags %}
+
+{% block title %}{{ date|date:"F j, Y" }} | {{ block.super }}{% endblock title %}
+
+{% block content %}
+            <div id="main">
+                <div id="internalHead">
+                    <div id="social icons">
+
+                    </div>
+					<div id="legislatorDetail">
+                        <h2 class="withButton">{{ date|date:"F j, Y" }}</h2>
+                        <a class="editResults" href="{% url cwod_month_detail date.year date|date:"m" %}">Select a different date</a>
+						<div class="clear"></div>
+					</div>
+
+                    <div class="clear"></div>
+                </div>
+                <div id="ltColumn">
+
+                    <div class="module">
+                        <div class="rightHeader">
+                            <h3>Entries in the Congressional Record</h3>
+                        </div>
+                        Jump to:
+                        {% for chamber, entry_list in entries %}
+                        <a href="#{{ chamber|slugify }}">{{ chamber }}</a>&nbsp;
+                        {% endfor %}
+                        <br/><br/>
+                        {% for chamber, entry_list in entries %}
+                            {% if entry_list %}
+                            <h4 id="{{ chamber|slugify }}">{{ chamber }}</h4>
+                            <br/>
+                            <table class="crEntries">
+                                <tbody>
+                                {% for entry in entry_list %}
+                                    <tr class="{% cycle 'odd' 'even' %}">
+                                        <td>
+                                            <table>
+                                                <tr>
+                                                    <td class="entTitle"><a href="{% entry_detail_url entry.0.2 entry.0.0 %}">{{ entry.0.0|title|typogrify }}</a></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="legislators">
+                                                        {% for member in entry.1|to_list|slice:"5" %}{% if member %}{{ member }}{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}{% if entry.1|length > 5 %}, others{%endif %}
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            {% endif %}
+                        {% endfor %}
+
+                    </div>
+                </div>  
+                <div id="rtColumn">
+                    <div class="leftModule">
+                        <div class="leftHeader">
+                            <h4>Top Words and Phrases</h4>
+                            <span class="tip">{{ date|date:"F j, Y" }}</span>
+                        </div>
+                        <ol class="barChart">
+                            {% for term in popular_terms|slice:"10" %}
+                            <li>
+                                <span class="tagValue" style="width:100%">100%</span>
+                                <span class="tagNumber"></span>
+                                <span class="barChartTitle"><a href="{% url cwod_term_detail term.ngram %}">{{ term.ngram }}</a></span>
+                            </li>
+                            {% endfor %}
+                        </ol>    
+                    </div>
+                    <div class="leftModule">
+                        <div class="leftHeader">
+                            <h4>Similar dates</h4>
+                        </div>
+                        <ol class="barChart">
+                            {% for similar_date in similar_dates|slice:"10" %}
+                            <li>
+                                <span class="tagValue" style="width:0%;"></span> 
+                                <span class="tagNumber"></span>
+                                <span class="barChartTitle"><a href="{% url cwod_date_detail similar_date.year similar_date|date:"m" similar_date|date:"d" %}">{{ similar_date|date:"F j, Y" }}</a></span>
+                            </li>
+                            {% endfor %}
+                        </ol>
+                    </div>
+                </div>    
+                <div class="clear"></div>
+            </div>
+        </div>
+
+{% endblock %}

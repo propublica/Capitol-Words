@@ -1,0 +1,11 @@
+{% extends "cwod/base.html" %}
+
+{% block content %}
+{% for result in results %}
+<div>
+    {% for graf in result.speaking %}
+    <p>{{ graf }}</p>
+    {% endfor %}
+</div>
+{% endfor %}
+{% endblock %}

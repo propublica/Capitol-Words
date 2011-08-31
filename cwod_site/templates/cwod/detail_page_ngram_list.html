@@ -1,0 +1,24 @@
+<div class="ngramMenu">
+    Phrase size:
+    <ol>
+        <li class="unigrams">One word</li>
+        <li class="bigrams">Two words</li>
+        <li class="trigrams">Three words</li>
+        <li class="quadgrams">Four words</li>
+        <li class="pentagrams">Five words</li>
+    </ol>
+</div>
+{% for gram_type, ngram_list in ngrams %}
+<ol class="barChart" id="{{ gram_type }}">
+    {% for ngram in ngram_list %}
+    <li>
+        <span class="tagValue" style="width:{{ ngram.ngram_pct }}%;">
+            <span class="tagPercent">{{ ngram.ngram_pct }}</span>
+            <span class="tagNumber">{{ ngram.count }}</span> 
+        </span> 
+        <span class="barChartTitle"><a href="{% url cwod_term_detail term=ngram.ngram %}">{{ ngram.ngram }}</a></span>
+    </li>
+    {% endfor %}
+</ol>
+{% endfor %}
+

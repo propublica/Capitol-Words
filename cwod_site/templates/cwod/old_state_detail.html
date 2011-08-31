@@ -1,0 +1,74 @@
+{% extends "cwod/base.html" %}
+
+{% load capwords %}
+{% load humanize %}
+
+{% block head %}
+<title>{{ state_name }} | Capitol Words</title>
+{% endblock head %}
+
+{% block content %}
+
+<h1>{{ state_name }}</h1>
+
+    <h2>Current members of Congress</h2>
+    <ul>
+    {% for body, legislators in bodies %}
+        {% if legislators %}
+        <li><h4>{{ body }}</h4>
+        <ul>
+        {% for legislator in legislators %}
+            <li>
+                <img src="{% legislator_thumbnail legislator.bioguide_id 40x50 %}"/> 
+                <a href="{% url cwod_legislator_detail bioguide_id=legislator.bioguide_id slug=legislator.slug %}">{{ legislator.honorific }} {{ legislator.name }}</a>, 
+                {{ legislator.party }}{% ifequal body 'House' %}-{{ legislator.district|ordinal }}{% endifequal %}
+            </li>
+        {% endfor %}
+        </ul>
+        </li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+
+
+    <h2>Top words</h2>
+    <ul>
+    {% for unigram in top_unigrams %}
+    <li><a href="{% url cwod_term_detail term=unigram %}">{{ unigram }}</a></li>
+    {% endfor %}
+    </ul>
+
+    <h3>Recent entries</h3>
+    <ul>
+    {% for entry in entries %}
+        <h4>{{ entry.title }}</h4>
+        <h4>{{ entry.date }}</h4>
+        <h4>{{ entry.speaker_first }} {{ entry.speaker_last }} ({{ entry.speaker_party }})</h4>
+        {% for graf in entry.speaking|slice:"2" %}
+        <p>{{ graf }}</p>
+        {% endfor %}
+    {% endfor %}
+    </ul>
+
+    <h3>Similar states</h3>
+    <ul>
+        {% for state in similar_states %}
+        <li><a href="{% url cwod_state_detail state=state.state %}">{{ state.state|state_abbrev_to_full }}</a> {{ state.distance }}</li>
+        {% endfor %}
+    </ul>
+
+    {% comment %}
+    <h3>{{ state_name }}'s top words compared to other states</h3>
+    <ul>
+    {% for unigram, states in other_states %}
+        <h4>{{ unigram }}</h4>
+        <ul>
+        {% for state in states %}
+            <li>{{ state }}</li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+    </ul>
+    {% endcomment %}
+
+{% endblock content %}

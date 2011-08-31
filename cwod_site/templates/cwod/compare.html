@@ -1,0 +1,156 @@
+{% extends "cwod/base.html" %}
+
+{% load capwords %}
+{% load typogrify_tags %}
+
+
+{% block title %}{{ term }} | {{ block.super }}{% endblock title %}
+
+{% block content %}
+<style type="text/css">
+    .termHolder { float: left; width: 220px; }
+    .chart img { border: 0; }
+    .compareResult h4 { display: none; }
+</style>
+    <div id="main">
+
+        <div id="internalHead">
+            <h2 class="withButton">Compare words and phrases</h2>
+            <div class="clear"></div>
+        </div>
+
+        <div id="ltColumn" class="withButton">
+            <div class="module">
+                <form name="termSelect" id="termSelect" class="normalForm">
+                    <div class="termHolder">
+                        <label for="terma">Word/phrase</label> 
+                        <input class="termCompare" type="text" id="terma" value="Word/phrase"/>
+
+                        <div class="clear"></div>
+
+                        <label for="statea">State</label>
+                        <select name="statea" id="statea">
+                            <option value="">All states</option> 
+                            <option value="AL">Alabama</option> 
+                            <option value="AK">Alaska</option> 
+                            <option value="AZ">Arizona</option> 
+                            <option value="AR">Arkansas</option> 
+                            <option value="CA">California</option> 
+                            <option value="CO">Colorado</option> 
+                            <option value="CT">Connecticut</option> 
+                        </select>
+
+                        <div class="clear"></div>
+
+                        <label for="partya">Party</label>
+                        <select name="partya" id="partya">
+                            <option value="">All parties</option>
+                            <option value="D">Democrats</option>
+                            <option value="R">Republicans</option>
+                        </select>
+                    </div>
+
+                    <div class="termHolder">
+                        <label for="termb">Word/phrase</label> 
+                        <input class="termCompare" type="text" id="termb" value="Word/phrase"/>
+
+                        <div class="clear"></div>
+
+                        <label for="stateb">State</label>
+                        <select name="stateb" id="stateb">
+                            <option value="">All states</option> 
+                            <option value="AL">Alabama</option> 
+                            <option value="AK">Alaska</option> 
+                            <option value="AZ">Arizona</option> 
+                            <option value="AR">Arkansas</option> 
+                            <option value="CA">California</option> 
+                            <option value="CO">Colorado</option> 
+                            <option value="CT">Connecticut</option> 
+                        </select>
+
+                        <div class="clear"></div>
+
+                        <label for="partyb">Party</label>
+                        <select name="partyb" id="partyb">
+                            <option value="">All parties</option>
+                            <option value="D">Democrats</option>
+                            <option value="R">Republicans</option>
+                        </select>
+
+                    </div>
+                    <div class="termHolder">
+                        <label for="termc">Word/phrase</label> 
+                        <input class="termCompare" type="text" id="termc" value="Word/phrase"/>
+
+                        <div class="clear"></div>
+
+                        <label for="statec">State</label>
+                        <select name="statec" id="statec">
+                            <option value="">All states</option> 
+                            <option value="AL">Alabama</option> 
+                            <option value="AK">Alaska</option> 
+                            <option value="AZ">Arizona</option> 
+                            <option value="AR">Arkansas</option> 
+                            <option value="CA">California</option> 
+                            <option value="CO">Colorado</option> 
+                            <option value="CT">Connecticut</option> 
+                        </select>
+
+                        <div class="clear"></div>
+
+                        <label for="partyc">Party</label>
+                        <select name="partyc" id="partyc">
+                            <option value="">All parties</option>
+                            <option value="D">Democrats</option>
+                            <option value="R">Republicans</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="clear"></div>
+
+        <span id="submit">Submit</span>
+
+        <div id="chart"></div>
+
+        <div class="module">
+
+            <div id="a" class="termHolder compareResult">
+                <h4>Popularity by party</h4>
+                <div class="partyPieChart"></div>
+
+                <h4>Popularity by state</h4>
+                <ol class="barChart stateBarChart"></ol>
+
+                <h4>Mentioned most often by</h4>
+                <ol class="barChart legislatorBarChart"></ol>
+            </div>
+
+            <div id="b" class="termHolder compareResult">
+                <h4>Popularity by party</h4>
+                <div class="partyPieChart"></div>
+
+                <h4>Popularity by state</h4>
+                <ol class="barChart stateBarChart"></ol>
+
+                <h4>Mentioned most often by</h4>
+                <ol class="barChart legislatorBarChart"></ol>
+            </div>
+
+            <div id="c" class="termHolder compareResult">
+                <h4>Popularity by party</h4>
+                <div class="partyPieChart"></div>
+
+                <h4>Popularity by state</h4>
+                <ol class="barChart stateBarChart"></ol>
+
+                <h4>Mentioned most often by</h4>
+                <ol class="barChart legislatorBarChart"></ol>
+            </div>
+
+        </div>
+
+    </div>
+{% endblock content %}

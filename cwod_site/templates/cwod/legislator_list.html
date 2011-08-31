@@ -1,0 +1,38 @@
+{% extends "cwod/base.html" %}
+
+{% block title %} Legislators | {{ block.super }}{% endblock title %}
+
+{% block content %}
+
+<h3>Current members of Congress</h3>
+{% regroup current_legislators by chamber as legislators_by_chamber %}
+{% for chamber in legislators_by_chamber %}
+    <h4>{{ chamber.grouper }}</h4>
+    {% regroup chamber.list by verbose_party as legislators_by_party %}
+    {% for party in legislators_by_party %}
+        <h5>{{ party.grouper }}s</h5>
+        <ul>
+            {% for legislator in party.list %}
+                {% include "cwod/legislator_list_item.html" %}
+            {% endfor %}
+        </ul>
+    {% endfor %}
+{% endfor %}
+
+
+<h3>Past members of Congress</h3>
+{% regroup past_legislators by chamber as legislators_by_chamber %}
+{% for chamber in legislators_by_chamber %}
+    <h4>{{ chamber.grouper }}</h4>
+    {% regroup chamber.list by verbose_party as legislators_by_party %}
+    {% for party in legislators_by_party %}
+        <h5>{{ party.grouper }}s</h5>
+        <ul>
+            {% for legislator in party.list %}
+                {% include "cwod/legislator_list_item.html" %}
+            {% endfor %}
+        </ul>
+    {% endfor %}
+{% endfor %}
+
+{% endblock content %}

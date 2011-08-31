@@ -1,0 +1,17 @@
+{% load capwords %}
+{% load typogrify_tags %}
+
+                    <div class="module">
+                        <div class="rightHeader">
+                            <h3>Congressional Record entries</h3>
+                        </div>
+                        <ul>
+                            {% for entry in entries %}
+                            <li>
+                            <h5><a href="{% entry_detail_url entry.origin_url entry.title %}">{{ entry.title|title|typogrify }}</a></h5>
+                            <p>{{ entry.speaker_first }} {{ entry.speaker_last }}, {{ entry.speaker_party }}-{{ entry.speaker_state }}</p>
+                                <p>{{ entry.speaking.0 }}</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>

@@ -1,0 +1,365 @@
+<!doctype html>
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>        <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>        <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>        <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+    <head>
+    
+        <meta charset="utf-8">
+        <meta name="description" content="">
+
+        <title>Capitol Words</title>
+    
+        <link rel="stylesheet" href="main.css" type="text/css" media="screen" />
+        <!--[if IE 7]>{% css "styles/buggy_7.css" %}<![endif]-->
+    
+    </head>
+    <body>
+        <div id="containerWrapper">
+        <div id="container">
+            <header>
+                <nav>
+                    <ul>
+                        <li class="last"><a href="#">Calendar</a></li>
+                        <li><a href="#">Congress</a></li>
+                        <li><a href="#">Parties</a></li>
+                        <li><a href="#">Legislators</a></li>
+                    </ul>  
+                    <div class="clear"></div>  
+                </nav>    
+                <h1><a href="/">Capitol Words <small>a project of the Sunlight Foundation</small></a></h1>
+                <ul id="mainActions">
+                    <li>
+                        <form id="mainSearch" action="/search/" method="get">
+                            <label>Search</label>
+                            <input id="id_search" type="text"/>
+                            <button class="searchBtn" type="submit">
+                                <span>Search</span>
+                            </button>
+                        </form>
+                    </li>
+                    <li id="betweenItem">
+                        <span>or</span>
+                    </li>    
+                    <li>
+                        <a href="#">Compare Congressional Words and/or Phrases</a>
+                    </li>
+                </ul>
+                <div class="clear"></div>
+            </header>
+            <div id="main">
+                <div id="internalHead">
+                    <div id="social icons">
+
+                    </div>
+                    <h2 class="withButton">&#8220;War&#8221;</h2>
+                    <a id="compareBtn" class="buttonLink fullButton" href="#">Compare &#8220;War&#8221;</a>
+                    <div class="clear"></div>
+                    <div class="editResults">
+                        <span>for all states, parties and all legislators</span>
+                        <a href="#">Edit</a>
+                    </div>
+                    <div id="timeFilterWrapper">
+                        <form id="timeFilter" class="actionItem" action="" method="">
+                            <label>Current View</label>
+                            <select name="time">
+                                <option value="time">Time Frame</option>
+                            </select>
+                        </form>    
+                    </div>
+                </div>
+                <div id="ltColumn">
+                    <div class="module">
+                        <div class="rightHeader withAction">
+                            <h3>Mentions of &#8220;War&#8221; Over Time</h3>
+                            <span class="tip">Current Time Frame</span>
+                        </div>
+                        <form class="actionItem" action="" method="">
+                            <ul class="partyBreakdown">
+                                <li><label><input class="radio" type="radio" name="word" />Overall</label></li> 
+                                <li><label><input class="radio" type="radio" name="word" />Party</label></li> 
+                            </ul>
+                            <div class="clear"></div>
+                        </form>
+                        <div class="chart"></div>
+                    </div> 
+                    <div class="module">
+                        <div class="rightHeader">
+                            <h3>Frequency in Which Legislators Mention &#8220;War&#8221;</h3>
+                            <span class="tip">Current Time Frame</span>
+                        </div>
+                        <ol class="barChart">
+                            <li>
+                                <span class="tagValue" style="width:100%;">
+									<span class="tagPercent">100%</span>
+									<span class="tagNumber"><a href="#">30</a></span> 
+								</span> 
+                                <span class="barChartTitle"><a href="#">Legislator Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:80%;">
+									<span class="tagPercent">80%</span>
+									<span class="tagNumber"><a href="#">30</a></span> 
+								</span> 
+                                <span class="barChartTitle"><a href="#">Legislator Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:80%;">
+									<span class="tagPercent">80%</span>
+									<span class="tagNumber"><a href="#">30</a></span> 
+								</span> 
+                                <span class="barChartTitle"><a href="#">Legislator Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:70%;">
+									<span class="tagPercent">70%</span>
+									<span class="tagNumber"><a href="#">30</a></span>
+								</span> 
+                                <span class="barChartTitle"><a href="#">Legislator Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:70%;">
+									<span class="tagPercent">70%</span>
+									<span class="tagNumber"><a href="#">30</a></span> 
+								</span> 
+                                <span class="barChartTitle"><a href="#">Legislator Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:60%;">
+									<span class="tagPercent">60%</span>
+									<span class="tagNumber"><a href="#">30</a></span> 
+								</span> 
+                                <span class="barChartTitle"><a href="#">Legislator Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:60%;">
+									<span class="tagPercent">60%</span>
+									<span class="tagNumber"><a href="#">30</a></span> 
+								</span> 
+                                <span class="barChartTitle"><a href="#">Legislator Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:50%;">
+									<span class="tagPercent">50%</span>
+									<span class="tagNumber"><a href="#">30</a></span>
+								</span> 
+                                <span class="barChartTitle"><a href="#">Legislator Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:50%;">
+									<span class="tagPercent">50%</span>
+									<span class="tagNumber"><a href="#">30</a></span> 
+								</span> 
+                                <span class="barChartTitle"><a href="#">Legislator Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:40%;">
+									<span class="tagPercent">40%</span>
+									<span class="tagNumber"><a href="#">30</a></span> 
+								</span> 
+                                <span class="barChartTitle"><a href="#">Legislator Name</a></span>
+                            </li>
+                        </ol>    
+                    </div>
+                    <div class="module">
+                        <div class="rightHeader">
+                            <h3>&#8220;War&#8221; in the Congressional Record</h3>
+                        </div>
+						<table>
+							<thead>
+								<tr>
+									<th class="sort legName">Name</th>
+									<th class="sort entTitle">Entry Title</th>
+									<th class="sort entDate">Date</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="odd">
+									<td><a href="">Legislator Name</a></td>
+									<td><a href="">Title of This Entry in the Congressional...</a></td>
+									<td>07-30-2011</td>
+								</tr>
+								<tr>
+									<td><a href="">Legislator Name</a></td>
+									<td><a href="">Title of This Entry in the Congressional...</a></td>
+									<td>07-27-2011</td>
+								</tr>
+								<tr class="odd">
+									<td><a href="">Legislator Name</a></td>
+									<td><a href="">Title of This Entry in the Congressional...</a></td>
+									<td>06-23-2011</td>
+								</tr>
+								<tr>
+									<td><a href="">Legislator Name</a></td>
+									<td><a href="">Title of This Entry in the Congressional...</a></td>
+									<td>06-22-2011</td>
+								</tr>
+								<tr class="odd">
+									<td><a href="">Legislator Name</a></td>
+									<td><a href="">Title of This Entry in the Congressional...</a></td>
+									<td>06-13-2011</td>
+								</tr>
+							</tbody>
+						</table>
+                    </div>
+                </div>  
+                <div id="rtColumn">
+                    <div class="leftModule">
+                        <div class="leftHeader">
+                            <h4>Popularity of &#8220;War&#8221; by State</h4>
+                            <span class="tip">Current Time Frame</span>
+                        </div>
+                        <ol class="barChart">
+                            <li>
+                                <span class="tagValue" style="width:100%;">100%</span> 
+                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="barChartTitle"><a href="#">State Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:80%;">80%</span> 
+                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="barChartTitle"><a href="#">State Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:80%;">80%</span> 
+                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="barChartTitle"><a href="#">State Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:70%;">70%</span> 
+                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="barChartTitle"><a href="#">State Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:50%;">50%</span> 
+                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="barChartTitle"><a href="#">State Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:40%;">40%</span> 
+                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="barChartTitle"><a href="#">State Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:40%;">40%</span> 
+                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="barChartTitle"><a href="#">State Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:30%;">30%</span> 
+                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="barChartTitle"><a href="#">State Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:30%;">30%</span> 
+                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="barChartTitle"><a href="#">State Name</a></span>
+                            </li>
+                            <li>
+                                <span class="tagValue" style="width:30%;">30%</span> 
+                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="barChartTitle"><a href="#">State Name</a></span>
+                            </li>
+                        </ol>    
+                    </div>
+                    <div class="leftModule">
+                        <h4>Popularity of &#8220;War&#8221; by Party</h4>
+                        <span class="tip">Current Time Frame</span>
+						<div class="chart">
+							<img src="images/placeholder_pie.png" style="border: 0;" width="257" height="126" alt="Placeholder Pie">
+	                    </div>
+                    </div>
+                </div>    
+                <div class="clear"></div>
+            </div>
+        </div>
+        <footer>
+            <div id="navWrapper">
+                <nav>
+                    <ul>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul> 
+                    <div class="clear"></div>   
+                </nav>  
+            </div>  
+            <div id="footerContentWrapper">
+                <div id="footerContent">
+                    <div id="popularPages">
+                        <h5>Most Popular Pages</h5>
+                        <ol>
+                            <li><a href="#">Page Name</a></li>
+                            <li><a href="#">Page Name</a></li>
+                            <li><a href="#">Page Name</a></li>
+                            <li><a href="#">Page Name</a></li>
+                            <li><a href="#">Page Name</a></li>
+                        </ol>    
+                    </div>    
+                    <div id="popularWords">
+                        <h5>Most Popular Word per Congressional Session</h5>
+                        <table>
+                            <tbody>
+                                <tr class="odd">
+                                    <td><span class="date">January 1, 2010</span></td>
+                                    <td><a href="#">Word of the Day</a></td>
+                                    <td>Spoken 300 times</td>
+                                </tr>  
+                                <tr>
+                                    <td><span class="date">January 1, 2010</span></td>
+                                    <td><a href="#">Word of the Day</a></td>
+                                    <td>Spoken 300 times</td>
+                                </tr>
+                                <tr class="odd">
+                                    <td><span class="date">January 1, 2010</span></td>
+                                    <td><a href="#">Word of the Day</a></td>
+                                    <td>Spoken 300 times</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="date">January 1, 2010</span></td>
+                                    <td><a href="#">Word of the Day</a></td>
+                                    <td>Spoken 300 times</td>
+                                </tr>
+                                <tr class="odd">
+                                    <td><span class="date">January 1, 2010</span></td>
+                                    <td><a href="#">Word of the Day</a></td>
+                                    <td>Spoken 300 times</td>
+                                </tr>  
+                            <tbody>    
+                        </table>  
+                   </div>
+                  <div class="clear"></div>
+                </div>
+            </div>
+            <div id="footerSunlight">
+                <div id="bottomFooter">
+                    <a id="sfLogo" href="http://www.sunlightfoundation.com">Sunlight Foundation</a>
+                    <p id="privacyPolicy">Founded in 2006, the Sunlight Foundation is a non-partisan non-profit that uses cutting-edge technology and ideas to make government transparent and accountable. Visit SunlightFoundation.com to learn more.</p>
+                    <div class="clear"></div>
+                    <div id="signup">
+                        <div id="signupText">
+                            <h6>Like this project and want to discover and support others like it?</h6>
+                            <span>Join the Sunlight Foundation's open government community to learn more</span>
+                        </div>
+                        <form id="signUp" action="" method="">
+                            <ul>
+                                <li>
+                                    <input type="text" name="email"/>
+                                </li>
+                                <li>
+                                    <input type="text" name="zip"/>
+                                </li>
+                                <li>
+                                    <button class="fullButton" type="submit">
+                                        <span>Sign Up</span>
+                                    </button>
+                                </li>    
+                            </ul>   
+                            <div class="clear"></div>
+                        </form>    
+                    </div>    
+                </div> 
+            </div>   
+        </footer>        
+    </body>
+</html> 
