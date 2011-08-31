@@ -8,9 +8,12 @@
 
 {% block content %}
 <style type="text/css">
-    .termHolder { float: left; width: 220px; }
-    .chart img { border: 0; }
+    .termHolder { float: left; width: 220px; margin-right: 40px; }
+    #chart img { border: 0 !important; }
     .compareResult h4 { display: none; }
+    .compareResult .partyPieChart { margin: 40px 0; }
+    .compareResult ol { margin-bottom: 40px; }
+    .compareResult .partyPieChart img { border: 0 !important }
 </style>
     <div id="main">
 
@@ -30,14 +33,7 @@
 
                         <label for="statea">State</label>
                         <select name="statea" id="statea">
-                            <option value="">All states</option> 
-                            <option value="AL">Alabama</option> 
-                            <option value="AK">Alaska</option> 
-                            <option value="AZ">Arizona</option> 
-                            <option value="AR">Arkansas</option> 
-                            <option value="CA">California</option> 
-                            <option value="CO">Colorado</option> 
-                            <option value="CT">Connecticut</option> 
+                            {% include "cwod/state_select.html" %}
                         </select>
 
                         <div class="clear"></div>
@@ -58,14 +54,7 @@
 
                         <label for="stateb">State</label>
                         <select name="stateb" id="stateb">
-                            <option value="">All states</option> 
-                            <option value="AL">Alabama</option> 
-                            <option value="AK">Alaska</option> 
-                            <option value="AZ">Arizona</option> 
-                            <option value="AR">Arkansas</option> 
-                            <option value="CA">California</option> 
-                            <option value="CO">Colorado</option> 
-                            <option value="CT">Connecticut</option> 
+                            {% include "cwod/state_select.html" %}
                         </select>
 
                         <div class="clear"></div>
@@ -86,14 +75,7 @@
 
                         <label for="statec">State</label>
                         <select name="statec" id="statec">
-                            <option value="">All states</option> 
-                            <option value="AL">Alabama</option> 
-                            <option value="AK">Alaska</option> 
-                            <option value="AZ">Arizona</option> 
-                            <option value="AR">Arkansas</option> 
-                            <option value="CA">California</option> 
-                            <option value="CO">Colorado</option> 
-                            <option value="CT">Connecticut</option> 
+                            {% include "cwod/state_select.html" %}
                         </select>
 
                         <div class="clear"></div>
@@ -107,22 +89,30 @@
                     </div>
                 </form>
             </div>
-        </div>
 
         <div class="clear"></div>
 
-        <span id="submit">Submit</span>
+        {#<span id="submit">Submit</span>#}
+        <span id="compareBtn" class="buttonLink fullButton compareSubmit">Compare</em></span>
 
-        <div id="chart"></div>
+        <div id="chart">
+            <img src="http://chart.apis.google.com/chart?cht=lc&chs=800x300&chf=bg,s,00000000&chxt=x,y&chxl=0:|1996|1998|2000|2002|2004|2006|2008|2010|1:|&chxp=0,0,12,25,38,51,63,76,89|1,100&chls=2&chg=0,50,2,5" alt="Blank graph"/>
+        </div>
 
         <div class="module">
 
             <div id="a" class="termHolder compareResult">
                 <h4>Popularity by party</h4>
-                <div class="partyPieChart"></div>
+                <div class="partyPieChart">
+                    <img src="http://chart.apis.google.com/chart?cht=p&chs=220x150&chd=s:1&chf=bg,s,00000000&chco=4f4747" alt="Blank pie chart"/>
+                </div>
+
+                <div class="clear"></div>
 
                 <h4>Popularity by state</h4>
                 <ol class="barChart stateBarChart"></ol>
+
+                <div class="clear"></div>
 
                 <h4>Mentioned most often by</h4>
                 <ol class="barChart legislatorBarChart"></ol>
@@ -130,10 +120,16 @@
 
             <div id="b" class="termHolder compareResult">
                 <h4>Popularity by party</h4>
-                <div class="partyPieChart"></div>
+                <div class="partyPieChart">
+                    <img src="http://chart.apis.google.com/chart?cht=p&chs=220x150&chd=s:1&chf=bg,s,00000000&chco=4f4747" alt="Blank pie chart"/>
+                </div>
+
+                <div class="clear"></div>
 
                 <h4>Popularity by state</h4>
                 <ol class="barChart stateBarChart"></ol>
+
+                <div class="clear"></div>
 
                 <h4>Mentioned most often by</h4>
                 <ol class="barChart legislatorBarChart"></ol>
@@ -141,10 +137,16 @@
 
             <div id="c" class="termHolder compareResult">
                 <h4>Popularity by party</h4>
-                <div class="partyPieChart"></div>
+                <div class="partyPieChart">
+                    <img src="http://chart.apis.google.com/chart?cht=p&chs=220x150&chd=s:1&chf=bg,s,00000000&chco=4f4747" alt="Blank pie chart"/>
+                </div>
+
+                <div class="clear"></div>
 
                 <h4>Popularity by state</h4>
                 <ol class="barChart stateBarChart"></ol>
+
+                <div class="clear"></div>
 
                 <h4>Mentioned most often by</h4>
                 <ol class="barChart legislatorBarChart"></ol>
@@ -153,4 +155,9 @@
         </div>
 
     </div>
+
+    </div>
+
+    <div class="clear"></div>
+
 {% endblock content %}
