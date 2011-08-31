@@ -24,33 +24,8 @@ class DateCounter(object):
                 break
             curr += datetime.timedelta(1)
 
-    """
-    def make_url(self, field, date):
-        start = date.strftime('%Y-%m-%dT00:00:00Z')
-        end = date.strftime('%Y-%m-%dT23:59:59Z')
-
-        data = {'q': 'date:[%s TO %s]' % (start, end),
-                'facet': 'true',
-                'facet.field': field,
-                'facet.sort': 'index',
-                'facet.mincount': 1,
-                'facet.method': 'enumtermfreq',
-                'rows': 0,
-                'facet.limit': -1,
-                'wt': 'json', }
-        body = urllib.urlencode(data)
-        url = 'http://localhost:8983/solr/select?%s' % body
-        print url
-        return url
-
-    def count(self, field, date):
-        url = self.make_url(field, date)
-        data = json.loads(urllib2.urlopen(url).read())
-        return sum(data['facet_counts']['facet_fields'][field][1::2])
-    """
-
     def make_path(self, date):
-        root = '/opt/solr/data/capwords/solrdocs'
+        root = '/opt/data/solrdocs'
         return os.path.join(root, str(date.year), date.strftime('%m'), date.strftime('%d'))
 
     def count(self, field, date):
@@ -99,11 +74,11 @@ class Command(BaseCommand):
             n = int(n)
             enumerator = [(n, counter.fields[n-1]),]
         else:
-            enumerator = enumerate(counter.fields)
+            enumerator = list(enumerate(counter.fields))
 
         dates = []
         if date:
-            dates = [dateparse(date),]
+            dates = [dateparse(date).date(),]
         elif start_date and end_date:
             dates = counter.dates(dateparse(start_date).date(), dateparse(end_date).date())
         elif start_date and not end_date:
@@ -111,8 +86,9 @@ class Command(BaseCommand):
         else:
             dates = counter.dates(datetime.date(2009, 1, 1), datetime.date.today())
 
-        for n, field in enumerator:
-            for date in dates:
+        for date in dates:
+            for n, field in enumerator:
+                print date, n, field
                 num = counter.count(field, date)
                 if num == 0:
                     continue

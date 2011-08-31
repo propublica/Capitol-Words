@@ -1,8 +1,11 @@
 from django.conf.urls.defaults import *
 from django.conf import settings
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.views.generic.simple import direct_to_template
 
 from views import *
+
 
 #from mongo_views import *
 
@@ -31,19 +34,28 @@ popular_phrase_handler = Resource(PopularPhraseHandler, authentication=authorize
 phrase_tree_handler = Resource(PhraseTreeHandler, authentication=authorizer)
 phrase_by_category_handler = Resource(PhraseByCategoryHandler, authentication=authorizer)
 phrase_over_time_handler = Resource(PhraseOverTimeHandler, authentication=authorizer)
+chart_handler = Resource(ChartHandler, authentication=authorizer)
 legislator_lookup_handler = Resource(LegislatorLookupHandler, authentication=authorizer)
 fulltext_search_handler = Resource(FullTextSearchHandler, authentication=authorizer)
+doclist_handler = Resource(DocListHandler, authentication=authorizer)
+docdetail_handler = Resource(DocDetailHandler, authentication=authorizer)
+billdetail_handler = Resource(BillDetailHandler, authentication=authorizer)
+bill_list_handler = Resource(BillListHandler, authentication=authorizer)
+similar_document_handler = Resource(SimilarDocumentHandler, authentication=authorizer)
 
 
 urlpatterns = patterns('',
 
         url(r'^$',
-            'django.views.generic.simple.direct_to_template',
+            login_required(direct_to_template),
+            #'django.views.generic.simple.direct_to_template',
             {'template': 'api/index.html',
             },
             name='cwod_docs'),
 
         url(r'^dates\.(?P<emitter_format>\w+)$', phrase_over_time_handler),
+
+        url(r'^chart\/(?P<chart_type>\w+)\.(?P<emitter_format>\w+)$', chart_handler),
 
         url(r'^phrases\/(?P<entity_type>\w+)\.(?P<emitter_format>\w+)$', phrase_by_category_handler),
 
@@ -54,5 +66,15 @@ urlpatterns = patterns('',
         url(r'^legislators\.(?P<emitter_format>\w+)$', legislator_lookup_handler),
 
         url(r'^text\.(?P<emitter_format>\w+)$', fulltext_search_handler),
+
+        url(r'^documents\.(?P<emitter_format>\w+)$', doclist_handler),
+
+        url(r'^document\.(?P<emitter_format>\w+)$', docdetail_handler),
+
+        url(r'^bill\.(?P<emitter_format>\w+)$', billdetail_handler),
+
+        url(r'^bills\.(?P<emitter_format>\w+)$', bill_list_handler),
+
+        url(r'^similar\.(?P<emitter_format>\w+)$', similar_document_handler),
 
 )

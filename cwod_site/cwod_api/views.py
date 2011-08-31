@@ -1,3 +1,5 @@
+from collections import defaultdict
+from operator import itemgetter
 from itertools import groupby
 import re
 import datetime
@@ -10,12 +12,16 @@ from django.db.models import *
 from django.shortcuts import get_list_or_404, get_object_or_404
 
 from bioguide.models import *
-from cwod_api.models import NgramDateCount
+from cwod_api.models import *
 
 from piston.handler import BaseHandler
 from piston.resource import Resource
 
 from dateutil.parser import parse as dateparse
+from dateutil.relativedelta import relativedelta
+from pygooglechart import SimpleLineChart, PieChart2D, Axis
+
+from smooth import smooth
 
 
 class GenericHandler(BaseHandler):
@@ -24,12 +30,14 @@ class GenericHandler(BaseHandler):
 
     ENTITIES = {'state': 'speaker_state',
                 'party': 'speaker_party',
-                #'legislator': 'speaker',
                 'bioguide_id': 'speaker_bioguide',
                 'cr_pages': 'pages',
                 'volume': 'volume', 
                 'congress': 'congress',
                 'session': 'session',
+                'id': 'id',
+                'slug': 'slug',
+                'page_id': 'page_id',
                 }
 
     FIELDS = ['unigrams', 'bigrams', 'trigrams', 'quadgrams',
@@ -41,16 +49,6 @@ class GenericHandler(BaseHandler):
         day, month, year = datestring.strip().split('/')
         solr_date = "%s-%s-%sT00:00:00Z" % (year, month, day)
         return solr_date
-
-    def smooth(self, data, smoothing):
-        """Use a moving average to smooth a list of numbers.
-        """
-        for n, i in enumerate(data):
-            if n-smoothing < 0:
-                nums = data[:n+smoothing]
-            else:
-                nums = data[n-smoothing:n+smoothing]
-            yield sum(nums)/float(len(nums))
 
     def format_for_return(self, data, *args, **kwargs):
         key = data['facet_counts']['facet_fields'].keys()[0]
@@ -71,7 +69,7 @@ class GenericHandler(BaseHandler):
         if per_page > self.DEFAULT_PER_PAGE:
             per_page = self.DEFAULT_PER_PAGE
 
-        offset = int(request.GET.get('page', 0)) * self.DEFAULT_PER_PAGE
+        offset = int(request.GET.get('page', 0)) * per_page
         return per_page, offset
 
 
@@ -85,6 +83,9 @@ class GenericHandler(BaseHandler):
             if k in request.GET:
                 if request.GET[k]: # Make sure value isn't blank
                     q.append('%s:%s' % (v, request.GET[k]))
+            if k in kwargs:
+                if kwargs[k]:
+                    q.append('%s:%s' % (v, kwargs[k]))
 
         if 'date' in request.GET:
             date = dateparse(request.GET['date'])
@@ -97,8 +98,8 @@ class GenericHandler(BaseHandler):
             start = dateparse(request.GET['start_date'])
             end = dateparse(request.GET['end_date'])
             kwargs.update({'start': start, 'end': end, })
-            q.append("date:[%s TO %s]" % (self.as_solr_date(start.strftime('%d/%m/%y')),
-                                          self.as_solr_date(end.strftime('%d/%m/%y'))))
+            q.append("date:[%s TO %s]" % (self.as_solr_date(start.strftime('%d/%m/%Y')),
+                                          self.as_solr_date(end.strftime('%d/%m/%Y'))))
 
         if 'chamber' in request.GET:
             valid_chambers = ['house',
@@ -133,13 +134,15 @@ class GenericHandler(BaseHandler):
                   'facet.field': facet_field,
                   'facet.limit': per_page,
                   'facet.offset': offset,
-                  'facet.mincount': '1',
+                  'facet.mincount': request.GET.get('mincount', 1),
                   'facet.sort': request.GET.get('sort', 'count'),
                   'facet.method': 'enumtermfreq',
                   'rows': '0',
                   'wt': 'json',
                   }
 
+        if kwargs.get('sort'):
+            params['sort'] = kwargs['sort']
 
         # Handle granularity.
         params.update(kwargs.get('params', {}))
@@ -150,23 +153,10 @@ class GenericHandler(BaseHandler):
             elif granularity == 'year':
                 params['facet.field'] = 'year'
 
-        if request.GET.get('congress'):
-            try:
-                servers = [settings.SOLR_SERVERS[request.GET['congress']], ]
-            except KeyError:
-                return {'error': 'Invalid congress', 'results': []}
-        else:
-            servers = settings.SOLR_SERVERS.values()
-
-        params['shards'] = []
-        for server, port in servers:
-            params['shards'].append('%s:%s/solr' % (server, port))
-        params['shards'] = ','.join(params['shards'])
-
-        url = 'http://%s:%s/solr/select?%s' % (server,
-                                               port,
+        url = 'http://%s:%s/solr/select?%s' % (settings.SOLR_SERVER,
+                                               settings.SOLR_PORT,
                                                urllib.urlencode(params))
-
+        print url
         results = urllib2.urlopen(url).read()
 
         show_totals = request.GET.get('totals', 'false') == 'true'
@@ -192,19 +182,19 @@ class GenericHandler(BaseHandler):
                         total = date_counts.get(int(i[granularity]), 0)
                     if show_percentages:
                         if total:
-                            i['percentage'] = i['count'] / float(total)
+                            i['percentage'] = (i['count'] / float(total))*100
                         else:
                             i['percentage'] = 0
                     if show_totals or show_percentages or smoothing != 0:
                         i['total'] = total
 
             if smoothing != 0:
-                smoothed = list(self.smooth([x['count'] for x in data], smoothing))
+                smoothed = list(smooth([x['count'] for x in data], smoothing))
                 for n, i in enumerate(data):
                     i['raw_count'] = i['count']
                     i['count'] = smoothed[n]
                     if show_percentages:
-                        i['percentage'] = i['count'] / float(i['total'])
+                        i['percentage'] = (i['count'] / float(i['total']))*100
 
             if granularity == 'day' and smoothing == 0:
                 for row in data:
@@ -216,10 +206,12 @@ class GenericHandler(BaseHandler):
             if params['facet.mincount'] == '0' and kwargs.get('trim', 'false') == 'true':
                 start, stop = 0, 0
                 for start, row in enumerate(data):
-                    if row['raw_count'] > 0:
+                    #if row['raw_count'] > 0:
+                    if row.get('raw_count', row.get('count')) > 0:
                         break
                 for stop, row in enumerate(reversed(data)):
-                    if row['raw_count'] > 0:
+                    #if row['raw_count'] > 0:
+                    if row.get('raw_count', row.get('count')) > 0:
                         break
                 data = data[start:len(data)-stop]
 
@@ -242,17 +234,18 @@ class PopularPhraseHandler(GenericHandler):
 class PhraseByCategoryHandler(GenericHandler):
 
     def read(self, request, *args, **kwargs):
-        if not 'phrase' in request.GET:
+        if not 'phrase' in request.GET and not 'phrase' in kwargs:
             return {'error': 'A value for the "phrase" parameter is required.', 'results': []}
 
-        phrase = request.GET.get('phrase')
+        phrase = request.GET.get('phrase') or kwargs.get('phrase')
+        phrase = ' '.join(tokenize(phrase))
         n = len(phrase.split())
         try:
             field = self.FIELDS[n-1]
         except IndexError:
             return {'error': 'The value given for the "phrase" parameter is too long. A phrase of five words or fewer is required.', 'results': []}
 
-        kwargs['q'] = ['%s:"%s"' % (field, phrase.strip('"')), ]
+        kwargs['q'] = ['%s:"%s"' % (field, phrase.strip('"').lower()), ]
 
         facet_field = {'legislator': 'speaker_bioguide',
                        'state': 'speaker_state',
@@ -292,11 +285,31 @@ class PhraseTreeHandler(GenericHandler):
 
         return super(PhraseTreeHandler, self).read(request, *args, **kwargs)
 
+def tokenize(term):
+    from nltk import regexp_tokenize
+
+    # Adapted From Natural Language Processing with Python
+    regex = r'''(?x) 
+    ([A-Z]\.)+                                      # Abbreviations (U.S.A., etc.)
+  | ([A-Z]+\&[A-Z]+)                                # Internal ampersands (AT&T, etc.)
+  | (Mr\.|Dr\.|Mrs\.|Ms\.)                          # Mr., Mrs., etc.
+  | \d*\.\d+                                        # Numbers with decimal points.
+  | \d\d?:\d\d                                      # Times.
+  | \$?[,0-9]+                                      # Numbers with thousands separators.
+  | (((a|A)|(p|P))\.(m|M)\.)                        # a.m., p.m., A.M., P.M.
+  | \w+((-|')\w+)*                                  # Words with optional internal hyphens.
+  | \$?\d+(\.\d+)?%?                                # Currency and percentages.
+  | \.\.\.                                          # Ellipsis
+  | [][.,;"'?():-_`]
+    '''
+    return regexp_tokenize(term, regex)
+
 
 class PhraseOverTimeHandler(GenericHandler):
 
     def read(self, request, *args, **kwargs):
-        phrase = request.GET.get('phrase')
+        phrase = request.GET.get('phrase') or kwargs.get('phrase')
+        phrase = ' '.join(tokenize(phrase))
         if not phrase:
             return {'error': 'A value for the "phrase" parameter is required.', 'results': []}
         n = len(phrase.split())
@@ -304,7 +317,16 @@ class PhraseOverTimeHandler(GenericHandler):
             return {'error': 'The value given for the parameter "n" is invalid. An integer between one and five is required.', 'results': [], }
 
         field = self.FIELDS[n-1]
-        kwargs['q'] = ['%s:"%s"' % (field, phrase), ]
+
+        if request.GET.get('stem') == 'true':
+            from nltk.stem import PorterStemmer
+            stemmer = PorterStemmer()
+            stemmed = stemmer.stem(phrase.lower())
+            print stemmed
+            kwargs['q'] = ['stemmed_%s:"%s"' % (field, stemmed), ]
+
+        else:
+            kwargs['q'] = ['%s:"%s"' % (field, phrase.lower()), ]
 
         granularity = {'year': 'year',
                        'month': 'month',
@@ -314,8 +336,8 @@ class PhraseOverTimeHandler(GenericHandler):
                         }.get(request.GET.get('granularity', 'day'), 'day')
 
         params = {'facet.field': 'date',
-                  'facet.limit': '-1',
-                  'facet.sort': 'index',
+                  'facet.limit': request.GET.get('per_page', '-1'),
+                  'facet.sort': request.GET.get('sort', 'index'),
                   'facet.mincount': request.GET.get('mincount', 1),
                   }
         kwargs['params'] = params
@@ -325,6 +347,251 @@ class PhraseOverTimeHandler(GenericHandler):
 
         kwargs['results_keys'] = [granularity, 'count', ]
         return super(PhraseOverTimeHandler, self).read(request, *args, **kwargs)
+
+
+class ChartHandler(GenericHandler):
+
+    def read(self, request, *args, **kwargs):
+        self.request = request
+        if kwargs.get('chart_type') == 'timeline':
+            handler = PhraseOverTimeHandler()
+            if request.GET.get('split_by_party') == 'true':
+                resultsets = {}
+                for party in ['R', 'D', ]:
+                    kwargs['party'] = party
+                    resultsets[party] = handler.read(request, *args, **kwargs)
+                return {'results': {'url': self._partyline(resultsets), }, }
+
+            elif request.GET.get('compare') == 'true':
+                phrases = request.GET.get('phrases', '').split(',')[:5] # Max of 5 phrases
+                parties = request.GET.get('parties', '').split(',')
+                states = request.GET.get('states', '').split(',')
+                #chambers = request.GET.get('chambers', '').split(',')
+
+                colors = ['000000', 'FF0000', '00FF00', '0000FF', 'F00F00', ]
+
+                metadata = []
+                legend_items = []
+                months = None
+
+                key = 'count'
+                if self.request.GET.get('percentages') == 'true':
+                    key = 'percentage'
+
+                granularity = self.request.GET.get('granularity')
+
+                width = int(request.GET.get('width', 575))
+                height = int(request.GET.get('height', 300))
+                chart = SimpleLineChart(width, height)
+                chart.set_line_style(0, thickness=2) # Set line thickness
+                chart.set_grid(0, 50, 2, 5) # Set gridlines
+                chart.fill_solid('bg', '00000000') # Make the background transparent
+                chart.set_colours(colors)
+                maxcount = 0
+
+                # Use phrases as a baseline; that is, assume that
+                # there's a corresponding value for the other filters.
+                # If a filter doesn't have as many values as the number
+                # of phrases, the corresponding phrase will not be
+                # filtered.
+                # (However, if a value is set for 'party' or 'state'
+                # in the querystring, that will override any values
+                # set in 'phrases' or 'parties.')
+                for n, phrase in enumerate(phrases):
+                    kwargs['phrase'] = phrase
+                    legend = phrase
+                    try:
+                        kwargs['party'] = parties[n]
+                    except IndexError:
+                        pass
+
+                    try:
+                        kwargs['state'] = states[n]
+                    except IndexError:
+                        pass
+
+                    if kwargs.get('party') and kwargs.get('state'):
+                        legend += ' (%(party)s, %(state)s)' % kwargs
+                    elif kwargs.get('party'):
+                        legend += ' (%(party)s)' % kwargs
+                    elif kwargs.get('state'):
+                        legend += ' (%(state)s)' % kwargs
+
+                    legend_items.append(legend)
+
+                    data = handler.read(request, *args, **kwargs)
+                    results = data['results']
+                    counts = [x.get(key) for x in results]
+                    if max(counts) > maxcount:
+                        maxcount = max(counts)
+
+                    chart.add_data(counts)
+                    metadata.append(kwargs)
+
+                # Duplicated code; should move into separate function.
+                if self.request.GET.get('granularity') == 'month':
+                    if not months:
+                        months = [x['month'] for x in results]
+                        januaries = [x for x in months if x.endswith('01')]
+                        january_indexes = [months.index(x) for x in januaries]
+                        january_percentages = [int((x/float(len(months)))*100) for x in january_indexes]
+                        index = chart.set_axis_labels(Axis.BOTTOM, [x[:4] for x in januaries[::2]])
+                        chart.set_axis_positions(index, [x for x in january_percentages[::2]])
+
+                chart.y_range = (0, maxcount)
+
+                if key == 'percentage':
+                    label = '%.4f' % maxcount
+                else:
+                    label = int(maxcount)
+
+                index = chart.set_axis_labels(Axis.LEFT, [label,])
+                chart.set_axis_positions(index, [100,])
+
+                # Always include a legend when comparing.
+                chart.set_legend(legend_items)
+
+                return {'results': {'metadata': metadata, 'url': chart.get_url()}}
+                #return resultsets
+
+            else:
+                data = handler.read(request, *args, **kwargs)
+                return {'results': {'url': self._line(data['results']), }, }
+
+        elif kwargs.get('chart_type') == 'pie':
+            handler = PhraseByCategoryHandler()
+            kwargs['entity_type'] = request.GET.get('entity_type')
+            data = handler.read(request, *args, **kwargs)
+            return {'results': {'url': self._pie(data['results']), }, }
+
+        return {'error': 'Invalid chart type.', }
+
+    def _pie(self, results):
+        chart = PieChart2D(300, 220)
+        data = defaultdict(int)
+        if self.request.GET.get('entity_type') == 'party':
+            to_include = ['R', 'D', ]
+            for result in results:
+                if result['party'] in to_include:
+                    data[result['party']] = result['count']
+                else:
+                    data['Other'] += result['count']
+
+        data = data.items()
+        counts = [x[1] for x in data]
+        labels = [x[0] for x in data]
+
+        party_colors = {'R': 'bb3110', 
+                        'D': '295e72', 
+                        'Other': 'efefef'}
+        colors = [party_colors.get(label) for label in labels]
+
+        chart.add_data(counts)
+        if self.request.GET.get('labels', 'true') != 'false':
+            chart.set_pie_labels(labels)
+        chart.set_colours(colors)
+        chart.fill_solid('bg', '00000000') # Make the background transparent
+        return chart.get_url()
+
+    def _line(self, results):
+        key = 'count'
+        if self.request.GET.get('percentages') == 'true':
+            key = 'percentage'
+        counts = [x.get(key) for x in results]
+        maxcount = max(counts)
+
+        granularity = self.request.GET.get('granularity')
+        times = [x.get(granularity) for x in results]
+
+        width = int(self.request.GET.get('width', 575))
+        height = int(self.request.GET.get('height', 300))
+        chart = SimpleLineChart(width, height, y_range=(0, max(counts)))
+        chart.add_data(counts)
+        chart.set_line_style(0, thickness=2) # Set line thickness
+        chart.set_colours(['E0B300',])
+        chart.fill_solid('bg', '00000000') # Make the background transparent
+        chart.set_grid(0, 50, 2, 5) # Set gridlines
+
+        if self.request.GET.get('granularity') == 'month':
+            months = [x['month'] for x in results]
+            januaries = [x for x in months if x.endswith('01')]
+            january_indexes = [months.index(x) for x in januaries]
+            january_percentages = [int((x/float(len(months)))*100) for x in january_indexes]
+            index = chart.set_axis_labels(Axis.BOTTOM, [x[:4] for x in januaries[::2]])
+            chart.set_axis_positions(index, [x for x in january_percentages[::2]])
+
+        if key == 'percentage':
+            label = '%.4f' % maxcount
+        else:
+            label = int(maxcount)
+        index = chart.set_axis_labels(Axis.LEFT, [label,]) 
+        chart.set_axis_positions(index, [100,])
+
+        if self.request.GET.get('legend', 'true') != 'false':
+            chart.set_legend([self.request.GET.get('phrase'), ])
+
+        return chart.get_url()
+
+    def _partyline(self, party_results):
+        if self.request.GET.get('percentages') == 'true':
+            key = 'percentage'
+        else:
+            key = 'count'
+
+        maxcount = 0
+        allcounts = []
+        granularity = self.request.GET.get('granularity')
+        months = []
+
+        for party, results in party_results.iteritems():
+            counts = [x.get(key) for x in results['results']]
+            allcounts.append(counts)
+            if max(counts) > maxcount:
+                maxcount = max(counts)
+
+            if granularity == 'month':
+                months = [x['month'] for x in results['results']]
+                januaries = [x for x in months if x.endswith('01')]
+                january_indexes = [months.index(x) for x in januaries]
+                january_percentages = [int((x/float(len(months)))*100) for x in january_indexes]
+                
+            #times = [x.get(granularity) for x in results['results']]
+
+        width = int(self.request.GET.get('width', 575))
+        height = int(self.request.GET.get('height', 318))
+        chart = SimpleLineChart(width, height, y_range=(0, max(counts)))
+
+        chart.fill_solid('bg', '00000000') # Make the background transparent
+        chart.set_grid(0, 50, 2, 5) # Set gridlines
+
+        if granularity == 'month':
+            index = chart.set_axis_labels(Axis.BOTTOM, [x[:4] for x in januaries[::2]])
+            chart.set_axis_positions(index, [x for x in january_percentages[::2]])
+
+        if key == 'percentage':
+            label = '%.4f' % maxcount
+        else:
+            label = int(maxcount)
+        index = chart.set_axis_labels(Axis.LEFT, [label,]) 
+        chart.set_axis_positions(index, [100,])
+
+        for n, counts in enumerate(allcounts):
+            chart.add_data(counts)
+            chart.set_line_style(n, thickness=2) # Set line thickness
+
+        colors = {'R': 'bb3110', 'D': '295e72', }
+        chart_colors = []
+        chart_legend = []
+        for k in party_results.keys():
+            chart_colors.append(colors.get(k, '000000'))
+            chart_legend.append(k)
+            chart.legend_position = 'b'
+
+        chart.set_colours(chart_colors)
+
+        if self.request.GET.get('legend', 'true') != 'false':
+            chart.set_legend(chart_legend)
+        return chart.get_url()
 
 
 def counts_over_time(*args, **kwargs):
@@ -348,43 +615,87 @@ def counts_over_time(*args, **kwargs):
     return NgramDateCount.objects.filter(**kw).values_list('date', 'count')
 
 
+class SimilarDocumentHandler(GenericHandler):
+    
+    def read(self, request, *args, **kwargs):
+        doc_id = request.GET.get('id')
+        #params = {'q': 'id:%s AND speaker_bioguide:[\'\' TO *]' % origin_id,
+        params = {'q': 'id:%s' % doc_id,
+                  'mlt': 'true',
+                  'mlt.fl': 'speaking,document_title',
+                  'mlt.mindf': 1,
+                  'mlt.mintf': 1,
+                  'fl': 'score,document_title,date,crdoc',
+                  'mlt.match_included': 'false',
+                  'wt': 'json',
+                  'mlt.rows': 10,
+                  }
+
+        url = 'http://%s:%s/solr/mlt?%s' % (settings.SOLR_SERVER,
+                                            settings.SOLR_PORT,
+                                            urllib.urlencode(params))
+
+        results = urllib2.urlopen(url).read()
+        data = json.loads(results)
+
+        docs = set()
+        for doc in data['response']['docs']:
+            docs.add((create_gpo_url(doc['crdoc']), doc['document_title'], doc['score'], doc['date']))
+
+        fields = ['origin_url', 'document_title', 'score', 'date', ]
+        docs = [dict(zip(fields, doc)) for doc in docs]
+        docs.sort(key=itemgetter('score'), reverse=True)
+        return {'results': docs}
+
+
 class FullTextSearchHandler(GenericHandler):
 
     def read(self, request, *args, **kwargs):
-        """
-        if 'phrase' not in request.GET:
-            # error
-            pass
-        """
 
         per_page, offset = self.get_pagination(request)
 
+        sort = None
+
         if 'phrase' in request.GET:
-            kwargs['q'] = ['text:"%s"' % request.GET['phrase'], ]
+            kwargs['q'] = ['speaking:"%s"' % request.GET['phrase'], ]
+            sort = None
         else:
-            kwargs['q'] = ['dummy:"dummyvalue"',]
+            kwargs['q'] = ['*:*',]
+            #sort = 'id asc'
+
+        if request.GET.get('cr_pages') or request.GET.get('page_id'):
+            per_page = '1000'
 
         kwargs['params'] = {'facet': 'false',
                             'rows': per_page,
                             'start': offset,
+                            #'sort': 'id asc',
                             }
+        if request.GET.get('sort'):
+            kwargs['params']['sort'] = request.GET['sort']
+
         return super(FullTextSearchHandler, self).read(request, *args, **kwargs)
 
     def format_for_return(self, data, *args, **kwargs):
         num_found = data['response']['numFound']
         results = [{'bioguide_id': x.get('speaker_bioguide'),
-                 'date': re.sub(r'T\d\d\:\d\d:\d\dZ$', '', x['date']),
-                 'speaking': x.get('speaking'),
-                 'title': x.get('document_title', ''),
-                 'origin_url': create_gpo_url(x.get('crdoc', '')),
-                 'speaker_first': x.get('speaker_firstname'),
-                 'speaker_last': x.get('speaker_lastname'),
-                 'speaker_party': x.get('speaker_party'),
-                 'speaker_state': x.get('speaker_state'),
-                 'speaker_raw': x.get('speaker_raw'),
-                 'pages': x.get('pages'),
-                 'congress': x.get('congress'),
-                 'session': x.get('session'),
+                    'date': re.sub(r'T\d\d\:\d\d:\d\dZ$', '', x['date']),
+                    'speaking': x.get('speaking'),
+                    'title': x.get('document_title', ''),
+                    'origin_url': create_gpo_url(x.get('crdoc', '')),
+                    'speaker_first': x.get('speaker_firstname'),
+                    'speaker_last': x.get('speaker_lastname'),
+                    'speaker_party': x.get('speaker_party'),
+                    'speaker_state': x.get('speaker_state'),
+                    'speaker_raw': x.get('speaker_raw'),
+                    'pages': x.get('pages'),
+                    'congress': x.get('congress'),
+                    'session': x.get('session'),
+                    'bills': x.get('bill'),
+                    'chamber': x.get('chamber'),
+                    'volume': x.get('volume'),
+                    'number': x.get('number'),
+                    'order': int(x.get('id', 0).split('.chunk')[1])
                  }
                  for x in data['response']['docs'] ]
         return {'num_found': num_found, 'results': results, }
@@ -397,23 +708,159 @@ class LegislatorLookupHandler(BaseHandler):
         if not bioguide_id:
             return {}
 
-        legislators = get_list_or_404(Legislator, bioguide_id=bioguide_id)
+        legislators = LegislatorRole.objects.filter(bioguide_id=bioguide_id).order_by('-end_date')
+        if not legislators:
+            return {}
         legislator = legislators[0]
 
         results = {
                 'bioguide_id': bioguide_id,
-                'prefix': legislator.prefix,
                 'first': legislator.first,
+                'middle': legislator.middle,
                 'last': legislator.last,
-                'suffix': legislator.suffix,
-                'sessions': [],
+                'state': legislator.state,
+                'district': legislator.district,
+                'full_name': legislator.name(),
+                'slug': legislator.slug(),
+                'honorific': legislator.honorific(),
+                'party': legislator.party,
                 }
+        """
         for legislator in legislators:
             results['sessions'].append({'position': legislator.position,
                                         'party': legislator.party,
                                         'state': legislator.state,
                                         'congress': legislator.congress, })
+        """
         return results
+
+
+class BillDetailHandler(BaseHandler):
+
+    fields = ('slug', 'bill', 'congress', 'bill_title', 'last_action', 'last_action_date',
+              'summary', 'url', 'source',
+                ('sponsor',
+                    ('first', 'middle', 'last', 'position', 'party', 'state', ),
+                ),
+                ('cosponsors',
+                    ('first', 'middle', 'last', 'position', 'party', 'state', ),
+                ),
+                ('crdoc_set',
+                    ('slug', 'page_id', 'document_title', 'date', 'chamber', 'session',
+                        ('legislators',
+                            ('first', 'middle', 'last', 'position', 'party', 'state', ),
+                        ),
+                    ),
+                ),
+            )
+
+    def read(self, request, *args, **kwargs):
+        congress = request.GET.get('congress')
+        slug = request.GET.get('slug')
+        if not congress or not slug:
+            return {'error': 'Congress and slug required', }
+
+        try:
+            bill = Bill.objects.get(congress=congress, slug=slug)
+        except Bill.DoesNotExist:
+            return {'error': 'Bill not found', }
+
+        return bill
+
+
+class BillListHandler(BaseHandler):
+
+    fields = ('slug', 'bill', 'bill_title', 'source', 
+              ('crdoc_set',
+                  ('page_id', ),
+              ),
+             )
+
+    def read(self, request, *args, **kwargs):
+        congress = request.GET.get('congress')
+        if not congress:
+            return {'error': 'Congress is required', }
+
+        bills = Bill.objects.filter(congress=congress)
+        return bills
+
+
+class DocListHandler(BaseHandler):
+
+    fields = ('document_title', 'slug', 'chamber', 'page_id', 
+                ('legislators', 
+                    ('first', 'middle', 'last', 'position', 'party', 'state', ), 
+                ),
+                ('bills',
+                    ('bill', 'bill_title', ),
+                ),
+                ('representativesentence_set',
+                    ('sentence', ),
+                ),
+            )
+    exclude = ('id', re.compile('^private_'))
+
+    #required_fields = ('year', 'month', 'day', 'congress', 'session', )
+
+    def read(self, request, *args, **kwargs):
+        year = request.GET.get('year')
+        month = request.GET.get('month')
+        day = request.GET.get('day')
+
+        congress = request.GET.get('congress')
+        session = request.GET.get('session')
+
+        if year and month and day:
+            return CRDoc.objects.filter(date__day=day,
+                                        date__year=year,
+                                        date__month=month,
+                                        congress=congress,
+                                        session=session
+                                        ).order_by('page_id')
+
+        elif year and month:
+            return CRDoc.objects.filter(date__year=year,
+                                        date__month=month,
+                                        congress=congress,
+                                        session=session
+                                        ).order_by('date').values_list('date', flat=True).distinct()
+
+        elif year:
+            return CRDoc.objects.filter(date__year=year,
+                                        congress=congress,
+                                        session=session
+                                        ).order_by('date').values_list('date__month', flat=True).distinct()
+
+class DocDetailHandler(BaseHandler):
+    fields = ('document_title', 'slug', 'chamber', 'page_id', 'date', 'congress', 'session',
+                ('legislators',
+                    ('first', 'middle', 'last', 'position', 'party', 'state', 'bioguide_id', ), 
+                ),
+                ('bills',
+                    ('bill', 'bill_title', ),
+                ),
+                ('representativesentence_set',
+                    ('sentence', ),
+                ),
+                ('similar_documents', 
+                    ('document_title', 'slug', 'chamber', 'page_id', 'date', 'congress', 'session', 
+                        ('legislators',
+                            ('first', 'middle', 'last', 'position', 'party', 'state', 'bioguide_id', ), 
+                        ),
+                    ),
+                ),
+            )
+    exclude = ('id', re.compile('^private_'))
+
+    def read(self, request, *args, **kwargs):
+        congress = request.GET.get('congress')
+        session = request.GET.get('session')
+        page_id = request.GET.get('page_id')
+
+        return CRDoc.objects.get(congress=congress,
+                                 session=session,
+                                 page_id=page_id)
+
 
 
 def create_gpo_url(crdoc):
