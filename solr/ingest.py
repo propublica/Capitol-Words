@@ -189,7 +189,7 @@ class SolrDoc(object):
         # the dummy field has the same value for all documents, and provides an
         # anchor when we want to do a wildcard search on all terms in a
         # specific field.
-        self.metadata_xml += '''<field name="dummy">dummyvalue</field>\n'''
+        #self.metadata_xml += '''<field name="dummy">dummyvalue</field>\n'''
 
     def get_title_from_mods_file(self):
         path, filename = os.path.split(self.filename)
@@ -249,15 +249,19 @@ class SolrDoc(object):
                 logfile.flush()
                 return None
 
+        match = data[0]
+        #for k, v in match.iteritems():
+        #    match[k] = v.encode('utf-8')
+
         xml = ''
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_bioguide', data[0]['bioguide'])
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_party', data[0]['party'])
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_state', data[0]['state'])
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_firstname', data[0]['firstname'])
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_middlename', data[0]['middlename'])
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_lastname', data[0]['lastname'])
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_title', data[0]['title'])
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_district', data[0]['district'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_bioguide', match['bioguide'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_party', match['party'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_state', match['state'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_firstname', match['firstname'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_middlename', match['middlename'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_lastname', match['lastname'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_title', match['title'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_district', match['district'])
         return xml
 
     def build_document_bodies(self):
@@ -324,7 +328,11 @@ class SolrDoc(object):
                 speaker_metadata = self.get_speaker_metadata(current_speaker)
                 if speaker_metadata == None:
                     speaker_metadata = ''
-            else: speaker_metadata = ''
+            else: 
+                speaker_metadata = ''
+            speaker_line = speaker_line.encode('utf-8')
+            body = body.encode('utf-8')
+            speaker_metadata = speaker_metadata.encode('utf-8')
             self.document_bodies.append(speaker_line + speaker_metadata + body)
 
     def assemble_and_submit(self):
@@ -337,7 +345,14 @@ class SolrDoc(object):
             metadata_fields = self.get_metadata()
             ngram_fields = make_ngrams(body, self.filename)
             bill_fields = find_bills(body)
-            solrdoc = '''<add><doc>\n''' + document_id_field + metadata_fields + ngram_fields + bill_fields + body + '''\n</doc></add>'''
+            solrdoc = u'<add><doc>\n'
+            solrdoc += document_id_field
+            solrdoc += metadata_fields
+            solrdoc += ngram_fields
+            solrdoc += bill_fields
+            solrdoc += unicode(body, errors='replace')
+            solrdoc += '\n</doc></add>'
+            #solrdoc = '''<add><doc>\n''' + document_id_field + metadata_fields + ngram_fields + bill_fields + body + '''\n</doc></add>'''
             try:
                 self.save_doc(solrdoc, idx)
             except lxml.etree.XMLSyntaxError:
@@ -365,7 +380,7 @@ class SolrDoc(object):
         print path
         with open(path, 'w') as fh:
             #fh.write(lxml.etree.tostring(xml, pretty_print=True))
-            fh.write(solrdoc)
+            fh.write(solrdoc.encode('utf-8'))
 
     def post(self, payload):
         """ Add a document to index """

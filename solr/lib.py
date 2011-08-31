@@ -2,7 +2,7 @@
 
 ''' useful supporting functions '''
 
-from settings import API_KEY, DB_PATH, BIOGUIDE_LOOKUP_PATH
+from settings import API_KEY, DB_PATH, BIOGUIDE_LOOKUP_PATH, DB_PARAMS
 
 from BeautifulSoup import BeautifulSoup
 import urllib2, urllib, re
@@ -148,43 +148,62 @@ def bioguide_lookup(lastname, year, position=None, state=None):
     else: return None
 
 
-def db_bioguide_lookup(lastname, year, position, state=None):
-    import sqlite3
-    conn = sqlite3.Connection(DB_PATH)
-    cursor = conn.cursor()
+def db_bioguide_lookup(lastname, congress, chamber, date, state=None):
+    import MySQLdb
+    cursor = MySQLdb.Connection(*DB_PARAMS, use_unicode=True).cursor()
 
-    congresses = {'2012': '112',
-                  '2011': '112',
-                  '2010': '111',
-                  '2009': '111',
-                  '2008': '110',
-                  '2007': '110',
-                  '2006': '109',
-                  '2005': '109',
-                  '2004': '108',
-                  '2003': '108',
-                  '2002': '107',
-                  '2001': '107',
-                  '2000': '106',
-                  '1999': '106', }
+    query = """SELECT 
+                        bioguide_id AS bioguide,
+                        first       AS firstname,
+                        middle      AS middlename,
+                        last        AS lastname,
+                        party       AS party,
+                        title       AS title,
+                        state       AS state,
+                        district    AS district
+                FROM bioguide_legislatorrole
+                WHERE
+                        LOWER(last)    = %s
+                    AND congress       = %s
+                    AND LOWER(chamber) = %s
+                    AND begin_date    <= %s
+                    AND end_date      >= %s
+            """
+    args = [lastname.lower(),
+            congress,
+            chamber.lower(),
+            date,
+            date, ]
+    if state:
+        query += " AND state = %s"
+        args.append(abbr(state).upper())
+
+    cursor.execute(query, args)
+    fields = ['bioguide', 'firstname', 'middlename', 'lastname', 'party', 
+                'title', 'state', 'district', ]
+    cursor.execute(query, args)
+    return [dict(zip(fields, x)) for x in cursor.fetchall()]
 
 
+def _db_bioguide_lookup(lastname, congress, position, state=None):
+    import MySQLdb
+    cursor = MySQLdb.Connection(*DB_PARAMS).cursor()
 
     query = """SELECT bioguide_id AS bioguide,
                              party AS party,
                              state AS state,
                              first AS firstname,
-                             last AS lastname
+                             CONCAT(last, ' ', suffix) AS lastname
                         FROM bioguide_legislator 
-                                            WHERE last = ? COLLATE NOCASE
-                                            AND   congress = ?"""
+                                            WHERE LOWER(last) = %s
+                                            AND   congress = %s"""
 
-    args = [lastname,
-            congresses[year],
+    args = [lastname.lower(),
+            congress,
             ]
     if state:
-        query += " AND state = ? COLLATE NOCASE"
-        args.append(abbr(state))
+        query += " AND state = %s"
+        args.append(abbr(state).upper())
 
     if position == 'senator':
         query += " AND position = 'Senator' "
@@ -200,7 +219,7 @@ def db_bioguide_lookup(lastname, year, position, state=None):
     return [dict(zip(fields, x)) for x in cursor.fetchall()]
 
 
-def fallback_bioguide_lookup(name, year, position, state=''):
+def fallback_bioguide_lookup(name, congress, position):
     """Some lawmakers are routinely referred to in a way that
     means they won't be found using db_bioguide_lookup.  These
     lawmakers should be placed in a pipe-delimited file
@@ -209,19 +228,17 @@ def fallback_bioguide_lookup(name, year, position, state=''):
     D000299|lincoln diaz-balart|2009|representative|florida
     """
     import csv
-    import sqlite3
-    conn = sqlite3.Connection(DB_PATH)
-    cursor = conn.cursor()
-
-    if state is None:
-        state = ''
+    import MySQLdb
+    cursor = MySQLdb.Connection(*DB_PARAMS, use_unicode=True).cursor()
 
     with open(BIOGUIDE_LOOKUP_PATH, 'r') as fh:
         for row in csv.reader(fh, delimiter='|'):
-            if '|'.join(row[1:]) == '|'.join([name, year, position, state, ]):
+            if '|'.join(row[1:]) == '|'.join([name, congress, position, ]):
                 cursor.execute("""SELECT bioguide_id, party, state, first, last
                                         FROM bioguide_legislator
-                                        WHERE bioguide_id = ? LIMIT 1""", [row[0], ])
+                                        WHERE bioguide_id = %s 
+                                              AND congress = %s
+                                        LIMIT 1""", [row[0], congress, ])
                 fields = ['bioguide', 'party', 'state', 'firstname', 'lastname', ]
                 return [dict(zip(fields, x)) for x in cursor.fetchall()]
 
