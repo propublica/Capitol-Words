@@ -1,13 +1,186 @@
+from collections import defaultdict
+import datetime
+import itertools
 import json
+import re
+from operator import itemgetter
+
+from dateutil.parser import parse as dateparse
 
 from django.conf import settings
-from django.http import Http404, HttpResponse
+from django.contrib.localflavor.us.us_states import US_STATES, STATE_CHOICES
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse, NoReverseMatch
+from django.db import connections, DatabaseError
+from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from capitolwords import capitolwords
+from bioguide.models import *
+from capitolwords import capitolwords, ApiError
+from ngrams.models import *
 
-capitolwords = capitolwords(api_key=settings.SUNLIGHT_API_KEY)
+
+capitolwords = capitolwords(api_key=settings.SUNLIGHT_API_KEY, domain='localhost:8000/api')
+
+# These are used in a regular expression so must be escaped.
+# From NLTK
+STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 
+             'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 
+             'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 
+             'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 
+             'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 
+             'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 
+             'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 
+             'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 
+             'with', 'about', 'against', 'between', 'into', 'through', 'during', 
+             'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 
+             'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 
+             'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 
+             'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 
+             'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 
+             'should', 'now', '\.', '\?', '\!', ]
+
+from cwod.hide_view import hide_view
+
+
+@login_required
+def faster_term_detail(request, term):
+    # For better URLs, replace spaces with underscores
+    if re.search(r'\s', term):
+        url = reverse('cwod_term_detail', kwargs={'term': re.sub(r'\s+', '_', term)})
+        return HttpResponsePermanentRedirect(url)
+
+    if request.GET.get('js') == 'false':
+        return term_detail(request, term)
+
+    term = re.sub(r'_', ' ', term)
+
+    # Recent entries
+    all_entries = capitolwords.text(phrase=term, bioguide_id="['' TO *]", sort='date desc,score desc', per_page=50)
+
+    # Only show one entry for each Congressional Record page.
+    entries = []
+    urls = []
+    for entry in all_entries:
+        if entry['origin_url'] in urls:
+            continue
+        urls.append(entry['origin_url'])
+        entries.append(entry)
+
+    entries = _highlight_entries(entries, term)
+
+    uri = request.build_absolute_uri()
+    if '?' in uri:
+        no_js_uri = uri + '&js=false'
+    else:
+        no_js_uri = uri + '?js=false'
+
+    return render_to_response('cwod/term_detail.html',
+                              {'term': term,
+                               'entries': entries,
+                               'needs_js': True,
+                               'no_js_uri': no_js_uri,
+                               'state_choices': US_STATES,
+                              }, context_instance=RequestContext(request))
+
+@login_required
+def term_detail(request, term):
+
+    # For better URLs, replace spaces with underscores
+    if re.search(r'\s', term):
+        url = reverse('cwod_term_detail', kwargs={'term': re.sub(r'\s+', '_', term)})
+        return HttpResponsePermanentRedirect(url)
+
+    term = re.sub(r'_', ' ', term)
+
+    stem = request.GET.get('stem', 'false')
+
+    # Timeline
+    timeline_kwargs = {'phrase': term,
+                       'granularity': 'month',
+                       'percentages': 'true',
+                       #'smoothing': 4,
+                       'mincount': 0,
+                       'stem': stem,
+                       'legend': 'false', }
+    timeline_url = capitolwords.timeline(**timeline_kwargs)
+    timeline_kwargs.update({'split_by_party': 'true', 'legend': 'true', })
+    party_timeline_url = capitolwords.timeline(**timeline_kwargs)
+
+    # custom timeline
+    custom_timeline_url = timeline_url
+    party = request.GET.get('party')
+    state = request.GET.get('state')
+    bioguide_id = request.GET.get('bioguide_id')
+    if party or state or bioguide_id:
+        try:
+            custom_timeline_url = capitolwords.timeline(**{'phrase': term,
+                                                         'granularity': 'month',
+                                                         'percentages': 'true',
+                                                         'mincount': 0,
+                                                         'party': party,
+                                                         'state': state,
+                                                         'bioguide_id': bioguide_id,
+                                                         'stem': stem,
+                                                         })
+        except ApiError:
+            custom_timeline_url = 'error'
+
+    """
+    popular_dates = sorted(capitolwords.phrase_by_date_range(phrase=term, per_page=15, sort='count', percentages='true'), 
+                           key=itemgetter('percentage'), 
+                           reverse=True)[:10]
+    popular_dates = [dateparse(x['day']).date() for x in popular_dates]
+    """
+
+    # Word tree
+    """
+    tree = capitolwords.wordtree(phrase=term)
+    tree = [x for x in tree if not re.search(r' (%s)$' % '|'.join(STOPWORDS), x['phrase']) and x['count'] > 1]
+    """
+
+    # Party pie chart
+    party_pie_url = capitolwords.piechart(phrase=term,
+                                          entity_type='party',
+                                          labels='true')
+
+    # Commonly said be these legislators
+    legislators = capitolwords.phrase_by_entity_type('legislator', phrase=term, sort='relative', per_page=10)
+    for legislator in legislators:
+        legislator['legislator'] = LegislatorRole.objects.filter(bioguide_id=legislator['legislator']).order_by('-congress').select_related()[0]
+
+    # Popularity by state
+    states = capitolwords.phrase_by_entity_type('state', phrase=term, sort='relative', per_page=10)
+
+    # Recent entries
+    all_entries = capitolwords.text(phrase=term, bioguide_id="['' TO *]", sort='date desc,score desc', per_page=50)
+
+    # Only show one entry for each Congressional Record page.
+    entries = []
+    urls = []
+    for entry in all_entries:
+        if entry['origin_url'] in urls:
+            continue
+        urls.append(entry['origin_url'])
+        entries.append(entry)
+
+    entries = _highlight_entries(entries, term)
+
+    return render_to_response('cwod/term_detail.html',
+                              {'term': term,
+                               'timeline_url': timeline_url['url'],
+                               'party_timeline_url': party_timeline_url['url'],
+                               'custom_timeline_url': custom_timeline_url,
+                               #'popular_dates': popular_dates,
+                               'party_pie_url': party_pie_url['url'],
+                               'legislators': legislators,
+                               'states': states,
+                               #'tree': tree,
+                               'entries': entries,
+                               'search': request.GET.get('search') == '1',
+                               'state_choices': US_STATES,
+                              }, context_instance=RequestContext(request))
 
 
 def congress_list(request):
@@ -26,20 +199,161 @@ def congress_pagerange_detail(request, congress, session, pagerange):
     return
 
 
+@login_required
 def legislator_list(request):
-    return
+    current_legislators = LegislatorRole.objects.filter(
+            end_date__gte=datetime.date.today()
+        ).order_by('chamber', 'party', 'last', 'first')
+
+    past_legislators = LegislatorRole.objects.exclude(
+            bioguide_id__in=LegislatorRole.objects.filter(end_date__gte=datetime.date.today()),
+            congress__lt=104
+        ).order_by('chamber', 'party', 'last', 'first')
+
+    current_bioguides = list(LegislatorRole.objects.filter(end_date__gte=datetime.date.today()).values_list('bioguide_id', flat=True))
+    query = """SELECT * FROM 
+                (SELECT * FROM bioguide_legislatorrole ORDER BY end_date DESC) a 
+               WHERE bioguide_id NOT IN (%s)
+               GROUP BY bioguide_id 
+               ORDER BY chamber, party, last, first""" % ('%s,' * len(current_bioguides)).strip(',')
+
+    past_legislators = LegislatorRole.objects.raw(query, params=tuple(current_bioguides))
 
 
-def legislator_detail(request, bioguide_id):
-    return
+    return render_to_response('cwod/legislator_list.html',
+                              {'current_legislators': current_legislators,
+                               'past_legislators': past_legislators, 
+                              }, context_instance=RequestContext(request))
+
+
+def legislator_lookup(bioguide_id):
+    legislators = LegislatorRole.objects.filter(bioguide_id=bioguide_id).order_by('-congress')
+    if not legislators:
+        return None
+    return legislators[0]
+
+GRAM_NAMES = ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ]
+
+@login_required
+def legislator_detail(request, bioguide_id, slug):
+    legislator = legislator_lookup(bioguide_id)
+    if not legislator:
+        raise Http404
+
+    if legislator.slug() != slug:
+        raise Http404
+
+    similar_legislators = []
+    for i in get_similar_entities('bioguide', bioguide_id)[:10]:
+        i['legislator'] = legislator_lookup(i['bioguide'])
+        similar_legislators.append(i)
+
+    ngrams = {}
+    for n in range(1, 6):
+        ngrams[GRAM_NAMES[n-1]] = NgramsByBioguide.objects.filter(bioguide_id=bioguide_id, n=n)[:30]
+    ngrams = ngrams.iteritems()
+    #ngrams.sort(lambda x, y: cmp(x.ngram_pct(), y.ngram_pct()), reverse=True)
+
+    entries = capitolwords.text(bioguide_id=bioguide_id, sort='date desc', per_page=5)
+
+    return render_to_response('cwod/legislator_detail.html',
+                              {'legislator': legislator,
+                               'similar_legislators': similar_legislators,
+                               'entries': entries,
+                               'ngrams': ngrams,
+                              }, context_instance=RequestContext(request))
 
 
 def state_list(request):
     return
 
 
+def _highlight_entries(entries, term):
+    for entry in entries:
+        match = None
+        for graf in entry['speaking']:
+            graf = graf.replace('\n', '')
+            versions_of_term = re.findall(term, graf, re.I)
+            if versions_of_term:
+                match = re.sub('(%s)' % '|'.join([x for x in set(versions_of_term)]), 
+                               r'<em>\1</em>', graf)
+                break
+        entry['match'] = match
+    return entries
+
+
+def all_popular_terms(entity_type, entity, limit=50):
+    terms = []
+    for i in range(1, 6):
+        terms += get_popular_ngrams(i, entity_type, entity, limit)
+    return sorted(terms, key=itemgetter('tfidf'), reverse=True)
+
+
+def get_popular_ngrams(n, entity_type, entity, limit=50):
+    cursor = connections['ngrams'].cursor()
+    table = 'tfidf__%sgrams__%s' % (['uni', 'bi', 'tri', 'quad', 'penta'][n-1], entity_type)
+    try:
+        cursor.execute("SELECT * FROM %s left outer join stopwords on word = ngram WHERE word is null and %s = %%s order by tfidf*(diversity+1) desc limit %s" % (table, entity_type, limit), [entity, ])
+    except DatabaseError:
+        return []
+    fields = [x[0] for x in cursor.description]
+    return [dict(zip(fields, x)) for x in cursor.fetchall()]
+
+
+def get_similar_entities(entity_type, entity):
+    cursor = connections['ngrams'].cursor()
+    cursor.execute("SELECT b, cosine_distance FROM distance_%s WHERE a = %%s AND cosine_distance != 1 ORDER BY cosine_distance DESC" % entity_type, [entity, ])
+    return [dict(zip([entity_type, 'distance', ], x)) for x in cursor.fetchall()]
+
+
+@login_required
 def state_detail(request, state):
-    return
+    state_name = dict(STATE_CHOICES).get(state)
+    if not state_name:
+        raise Http404
+
+    entries = capitolwords.text(state=state, sort='date desc,score desc', per_page=5)
+    ngrams = {}
+    for n in range(1, 6):
+        ngrams[GRAM_NAMES[n-1]] = NgramsByState.objects.filter(state=state, n=n)[:30]
+    ngrams = ngrams.iteritems()
+
+    similar_states = get_similar_entities('state', state)
+
+    legislators = LegislatorRole.objects.filter(state=state, end_date__gte=datetime.date.today()).order_by('last')
+
+    def sort_districts(x, y):
+        try:
+            x_district = int(x.district)
+        except ValueError:
+            x_district = 0
+        try:
+            y_district = int(y.district)
+        except ValueError:
+            y_district = 0
+        return cmp(x_district, y_district)
+
+    legislators = sorted(legislators, sort_districts)
+
+    bodies = {'House': [], 'Senate': [], }
+    for legislator in legislators:
+        if legislator.title.startswith('Senator'):
+            bodies['Senate'].append(legislator)
+        else:
+            bodies['House'].append(legislator)
+
+    bodies = sorted(bodies.items(), key=itemgetter(0), reverse=True)
+
+
+    return render_to_response('cwod/state_detail.html',
+            {'state': state,
+             'state_name': state_name, 
+             'entries': entries,
+             'ngrams': ngrams,
+             #'other_states': other_states,
+             'similar_states': similar_states,
+             'bodies': bodies,
+             }, context_instance=RequestContext(request))
 
 
 def party_list(request):
@@ -53,3 +367,110 @@ def party_detail(request, party):
 def wordtree(request):
     return
 
+
+@login_required
+def date_detail(request, year, month, day):
+    date = datetime.date(year=int(year), month=int(month), day=int(day))
+
+    popular_terms = all_popular_terms('date', date)
+    entries = entries_for_date(date)
+
+    by_chamber = {'House': [], 'Senate': [], 'Extensions of Remarks': [], }
+    similar_dates = get_similar_dates(date)
+
+    return render_to_response('cwod/date_detail.html',
+                              {'date': date,
+                               'popular_terms': popular_terms,
+                               'entries': entries,
+                               'similar_dates': similar_dates,
+                              }, context_instance=RequestContext(request))
+
+@login_required
+def month_detail(request, year, month):
+    return HttpResponse('month_detail')
+
+
+def get_similar_dates(date):
+    cursor = connections['ngrams'].cursor()
+    cursor.execute("SELECT b FROM distance_date WHERE a = %s AND cosine_distance != 1 ORDER BY cosine_distance DESC", [date, ])
+    return [x[0] for x in cursor.fetchall()]
+
+
+def entries_for_date(date):
+    page = 0
+    chambers = {'Extensions': defaultdict(set),
+                'House': defaultdict(set),
+                'Senate': defaultdict(set)}
+    while True:
+        response = capitolwords.text(date=date, sort='id desc', page=page)
+        for entry in response:
+            chambers[entry['chamber']][(entry['title'], entry['pages'], entry['origin_url'])].add(entry['speaker_last'])
+        if len(response) < 50:
+            break
+        page += 1
+
+    chambers['Extensions of Remarks'] = chambers['Extensions']
+    del(chambers['Extensions'])
+    for k, v in chambers.iteritems():
+        chambers[k] = sorted(v.items(), lambda x, y: cmp(x[0][1], y[0][1]))
+    return chambers.items()
+
+
+def get_similar_entries(chunks, num=10):
+    to_use = sorted([x for x in chunks if x.get('bioguide_id')], lambda x, y: cmp(len(x['speaking']), len(y['speaking'])), reverse=True)
+
+    similar = []
+    for chunk in to_use[:5]:
+        chunk_id = '%s.chunk%s' % (re.search(r'html\/(CREC.*?)\.', chunk['origin_url']).groups()[0], chunk['order'])
+        similar += capitolwords.similar(id=chunk_id)
+
+    # Don't show the entry we're getting similar entries for.
+    similar = [x for x in similar if x['origin_url'] != chunk['origin_url']]
+    similar.sort(key=itemgetter('score'), reverse=True)
+
+    return similar[:num]
+
+
+@login_required
+def entry_detail(request, year, month, day, page_id, slug):
+    date = datetime.date(year=int(year), month=int(month), day=int(day))
+    chunks = []
+    page = 0
+    while True:
+        response = capitolwords.text(date=date, page_id=page_id, sort='id asc', page=page)
+        chunks += response
+        if len(response) < 1000:
+            break
+        page += 1
+
+    chunks.sort(key=itemgetter('order'))
+
+    similar_entries = get_similar_entries(chunks)
+
+    metadata = chunks[0]
+    year, month, day = [int(x) for x in metadata['date'].split('-')]
+    metadata['date'] = datetime.date(year=year, month=month, day=day)
+
+    return render_to_response('cwod/entry_detail.html',
+                              {'date': date,
+                               'page_id': page_id,
+                               'chunks': chunks,
+                               'metadata': metadata,
+                               #'entries': entries_for_date(date),
+                               'similar_entries': similar_entries,
+                               }, context_instance=RequestContext(request))
+
+@login_required
+def search(request):
+    #return HttpResponse(request.GET.get('term', ''))
+    term = request.GET.get('term', '')
+    url = reverse('cwod_term_detail', kwargs={'term': term}) + '?search=1'
+    return HttpResponsePermanentRedirect(url)
+
+
+@login_required
+def term_compare(request):
+    #pieces = request.path.split('/')[1:]
+    return render_to_response('cwod/compare.html',
+                              {},
+                              context_instance=RequestContext(request))

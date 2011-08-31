@@ -1,9 +1,40 @@
 from django.conf.urls.defaults import *
+from django.conf import settings
 
 from cwod.views import *
 
 
 urlpatterns = patterns('',
+
+        url(r'^search\/?$',
+            search,
+            {},
+            name='cwod_search'),
+
+        url(r'^date\/(?P<year>\d{4})\/(?P<month>\d\d)\/(?P<day>\d\d)\/(?P<page_id>[-A-Z0-9]+)-(?P<slug>[-\w]+)\/?$',
+            entry_detail,
+            {},
+            name='cwod_entry_detail'),
+
+        url(r'^date\/(?P<year>\d{4})\/(?P<month>\d\d)\/(?P<day>\d\d)\/?$',
+            date_detail,
+            {},
+            name='cwod_date_detail'),
+
+        url(r'^date\/(?P<year>\d{4})\/(?P<month>\d\d)\/?$',
+            month_detail,
+            {},
+            name='cwod_month_detail'),
+
+        url(r'^term\/(?P<term>.*?)\/?$',
+            faster_term_detail,
+            {},
+            name='cwod_term_detail'),
+
+        url(r'^compare\/',
+            term_compare,
+            {},
+            name='cwod_term_compare'),
 
         url(r'^congress\/?$',
             congress_list,
@@ -30,7 +61,7 @@ urlpatterns = patterns('',
             {},
             name='cwod_legislator_list'),
 
-        url(r'legislator\/(?P<bioguide_id>[A-Z][0-9]+)\/?$',
+        url(r'legislator\/(?P<bioguide_id>[A-Z][0-9]+)-(?P<slug>[-\w]+)\/?$',
             legislator_detail,
             {},
             name='cwod_legislator_detail'),
@@ -40,7 +71,7 @@ urlpatterns = patterns('',
             {},
             name='cwod_state_list'),
 
-        url(r'^state\/(?P<state>[A-Z]+)?$',
+        url(r'^state\/(?P<state>[A-Z]+)\/?$',
             state_detail,
             {},
             name='cwod_state_detail'),
@@ -50,7 +81,7 @@ urlpatterns = patterns('',
             {},
             name='cwod_party_list'),
 
-        url(r'^party\/(?P<party>\w+)?$',
+        url(r'^party\/(?P<party>\w+)\/?$',
             party_detail,
             {},
             name='cwod_party_detail'),
@@ -59,6 +90,8 @@ urlpatterns = patterns('',
             wordtree,
             {},
             name='cwod_wordtree'),
+
+        url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 
         url(r'^$',
             'django.views.generic.simple.direct_to_template',
