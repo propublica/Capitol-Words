@@ -47,7 +47,7 @@
                         <span>or</span>
                     </li>    
                     <li>
-                        <a href="#">Compare Congressional Words and/or Phrases</a>
+                    <a href="{% url cwod_term_compare %}">Compare Congressional Words and/or Phrases</a>
                     </li>
                 </ul>
                 <div class="clear"></div>
@@ -145,7 +145,7 @@
         </footer>        
         {% block javascript %}
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-        {% js "js/capwords.js" %}
+        {% js "js/capwords.js?v=52132234" %}
         {% endblock javascript %}
     </body>
 </html> 

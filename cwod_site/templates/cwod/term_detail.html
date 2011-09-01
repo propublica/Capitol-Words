@@ -23,7 +23,7 @@
 
                     </div>
                     <h2 class="withButton">{{ term }}</h2>
-                    <a id="compareBtn" class="buttonLink fullButton" href="#">Compare <em>{{ term }}</em></a>
+                    <a id="compareBtn" class="buttonLink fullButton" href="{% url cwod_term_compare %}">Compare <em>{{ term }}</em></a>
                     <div class="clear"></div>
                 </div>
                 <div id="ltColumn">
@@ -134,7 +134,10 @@
                         <h4>Popularity by party</h4>
                         <div class="chart" id="partyPieChart">
                             {% if party_pie_url %}
-                            <img src="{{ party_pie_url }}" alt="Pie chart of occurrences of '{{ term }}' by party" style="border: 0;"/>
+                            <img class="realChart" src="{{ party_pie_url }}" alt="Pie chart of occurrences of '{{ term }}' by party" style="border: 0;"/>
+                            {% else %}
+                            <img class="realChart" src="{{ party_pie_url }}" alt="Pie chart of occurrences of '{{ term }}' by party" style="border: 0; display: none;"/>
+                            <img class="default" src="" style="display: none;"/>
                             {% endif %}
                         </div>
                     </div>

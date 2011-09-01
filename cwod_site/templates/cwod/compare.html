@@ -2,6 +2,7 @@
 
 {% load capwords %}
 {% load typogrify_tags %}
+{% load media %}
 
 
 {% block title %}{{ term }} | {{ block.super }}{% endblock title %}
@@ -9,11 +10,16 @@
 {% block content %}
 <style type="text/css">
     .termHolder { float: left; width: 220px; margin-right: 40px; }
+    .termHolder select { width: 100%; }
+    .termHolder label { display: none; }
+    .termHolder input { width: 200px; }
     #chart img { border: 0 !important; }
-    .compareResult h4 { display: none; }
-    .compareResult .partyPieChart { margin: 40px 0; }
-    .compareResult ol { margin-bottom: 40px; }
+    .compareResult .partyPieChart { margin-bottom: 40px; }
     .compareResult .partyPieChart img { border: 0 !important }
+    .compareResult h4 { display: none; }
+    .termLabelHeader { height: 20px; margin: 10px 0; }
+    img.realChart { display: none; }
+    .compareResult a { text-align: right; }
 </style>
     <div id="main">
 
@@ -92,23 +98,31 @@
 
         <div class="clear"></div>
 
-        {#<span id="submit">Submit</span>#}
-        <span id="compareBtn" class="buttonLink fullButton compareSubmit">Compare</em></span>
+        <div style="margin-left: 300px; margin-top: 20px;">
+        <a href="#" style="float: none !important;" id="compareBtn" class="buttonLink fullButton compareSubmit">Compare</a>
+        </div>
 
         <div id="chart">
-            <img src="http://chart.apis.google.com/chart?cht=lc&chs=800x300&chf=bg,s,00000000&chxt=x,y&chxl=0:|1996|1998|2000|2002|2004|2006|2008|2010|1:|&chxp=0,0,12,25,38,51,63,76,89|1,100&chls=2&chg=0,50,2,5" alt="Blank graph"/>
+            <img class="default" src="http://chart.apis.google.com/chart?cht=lc&chs=800x300&chf=bg,s,00000000&chxt=x,y&chxl=0:|1996|1998|2000|2002|2004|2006|2008|2010|1:|&chxp=0,0,12,25,38,51,63,76,89|1,100&chls=2&chg=0,50,2,5" alt="Blank graph"/>
+            <img class="realChart" src="http://chart.apis.google.com/chart?cht=lc&chs=800x300&chf=bg,s,00000000&chxt=x,y&chxl=0:|1996|1998|2000|2002|2004|2006|2008|2010|1:|&chxp=0,0,12,25,38,51,63,76,89|1,100&chls=2&chg=0,50,2,5" alt="Blank graph"/>
         </div>
 
         <div class="module">
 
             <div id="a" class="termHolder compareResult">
-                <h4>Popularity by party</h4>
+                <div class="termLabelHeader">
+                    <h4 class="termLabel"></h4>
+                </div>
                 <div class="partyPieChart">
-                    <img src="http://chart.apis.google.com/chart?cht=p&chs=220x150&chd=s:1&chf=bg,s,00000000&chco=4f4747" alt="Blank pie chart"/>
+                    <img class="default" src="http://chart.apis.google.com/chart?cht=p&chs=220x150&chd=s:1&chf=bg,s,00000000&chco=4f4747" alt="Blank pie chart"/>
+                    <img class="realChart" src="http://chart.apis.google.com/chart?cht=p&chs=220x150&chd=s:1&chf=bg,s,00000000&chco=4f4747" alt="Blank pie chart"/>
                 </div>
 
-                <div class="clear"></div>
+                <a class="moreInfo" href="#"></a>
 
+                <div style="margin-bottom:30px;" class="clear"></div>
+
+                {% comment %}
                 <h4>Popularity by state</h4>
                 <ol class="barChart stateBarChart"></ol>
 
@@ -116,16 +130,23 @@
 
                 <h4>Mentioned most often by</h4>
                 <ol class="barChart legislatorBarChart"></ol>
+                {% endcomment %}
             </div>
 
             <div id="b" class="termHolder compareResult">
-                <h4>Popularity by party</h4>
+                <div class="termLabelHeader">
+                    <h4 class="termLabel"></h4>
+                </div>
                 <div class="partyPieChart">
-                    <img src="http://chart.apis.google.com/chart?cht=p&chs=220x150&chd=s:1&chf=bg,s,00000000&chco=4f4747" alt="Blank pie chart"/>
+                    <img class="default" src="http://chart.apis.google.com/chart?cht=p&chs=220x150&chd=s:1&chf=bg,s,00000000&chco=4f4747" alt="Blank pie chart"/>
+                    <img class="realChart" src="http://chart.apis.google.com/chart?cht=p&chs=220x150&chd=s:1&chf=bg,s,00000000&chco=4f4747" alt="Blank pie chart"/>
                 </div>
 
-                <div class="clear"></div>
+                <a class="moreInfo" href="#"></a>
 
+                <div style="margin-bottom:30px;" class="clear"></div>
+
+                {% comment %}
                 <h4>Popularity by state</h4>
                 <ol class="barChart stateBarChart"></ol>
 
@@ -133,16 +154,23 @@
 
                 <h4>Mentioned most often by</h4>
                 <ol class="barChart legislatorBarChart"></ol>
+                {% endcomment %}
             </div>
 
             <div id="c" class="termHolder compareResult">
-                <h4>Popularity by party</h4>
+                <div class="termLabelHeader">
+                    <h4 class="termLabel"></h4>
+                </div>
                 <div class="partyPieChart">
-                    <img src="http://chart.apis.google.com/chart?cht=p&chs=220x150&chd=s:1&chf=bg,s,00000000&chco=4f4747" alt="Blank pie chart"/>
+                    <img class="default" src="http://chart.apis.google.com/chart?cht=p&chs=220x150&chd=s:1&chf=bg,s,00000000&chco=4f4747" alt="Blank pie chart"/>
+                    <img class="realChart" src="http://chart.apis.google.com/chart?cht=p&chs=220x150&chd=s:1&chf=bg,s,00000000&chco=4f4747" alt="Blank pie chart"/>
                 </div>
 
-                <div class="clear"></div>
+                <a class="moreInfo" href="#"></a>
 
+                <div style="margin-bottom:30px;" class="clear"></div>
+
+                {% comment %}
                 <h4>Popularity by state</h4>
                 <ol class="barChart stateBarChart"></ol>
 
@@ -150,6 +178,7 @@
 
                 <h4>Mentioned most often by</h4>
                 <ol class="barChart legislatorBarChart"></ol>
+                {% endcomment %}
             </div>
 
         </div>
@@ -159,5 +188,6 @@
     </div>
 
     <div class="clear"></div>
+    {% js "js/spin.min.js" %}
 
 {% endblock content %}
