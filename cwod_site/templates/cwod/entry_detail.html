@@ -58,6 +58,7 @@
                 </div>  
 
                 <div id="rtColumn">
+                    {% if similar_entries %}
                     <div class="leftModule">
                         <div class="leftHeader">
                             <h4>Similar entries</h4>
@@ -70,9 +71,8 @@
                             </li>
                             {% endfor %}
                         </ul>
-
-                </div>
-
+                    </div>
+                    {% endif %}
                 </div>    
                 <div class="clear"></div>
             </div>
@@ -80,6 +80,6 @@
 
     <!-- Emphasis requires Prototype //-->
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/prototype/1.7.0.0/prototype.js"></script>
-    {% js "js/emphasis.js" %}
+    {% js "js/emphasis/emphasis.js" %}
 
 {% endblock content %}
