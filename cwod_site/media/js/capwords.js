@@ -304,7 +304,7 @@ CapitolWords.submitCompareForm = function () {
 
     }
 
-    /*
+
     (function (window, undefined) {
         var History = window.History;
         if (!History.enabled) {
@@ -324,13 +324,17 @@ CapitolWords.submitCompareForm = function () {
                 piece.push(escape(item.state || ''));
                 urlPieces.push(piece.join(':'));
             }
-            return urlPieces.join('/');
+            return '/compare/' + urlPieces.join('/');
         };
-        History.pushState({state: 1}, "State 1", buildUrl(items));
-        window.console.log(buildUrl(items));
+        var terms = [];
+        for (i in items) {
+            terms.push(items[i].term);
+        }
+        var title = 'Comparing ' + terms.join(', ') + ' | Capitol Words';
+        History.pushState({}, title, buildUrl(items));
 
      })(window);
-     */
+
 
     CapitolWords.compare(items);
 
@@ -383,6 +387,35 @@ CapitolWords.submitCompareForm = function () {
 $j(document).ready(
 
         function () {
+
+            if (window.location.pathname.match(/^\/compare/)) {
+                var hash = History.getState().hash;
+                var comparePath = hash.replace(/^\/compare\//, '').split('?')[0]
+                var pieces = comparePath.match(/.*?:.*?:.*?(?:\/|$)/g)
+                if (pieces) {
+
+                    var piece,
+                        parts,
+                        term,
+                        party,
+                        state,
+                        element;
+                    var divs = ['a', 'b', 'c'];
+
+                    for (i in pieces) {
+                        piece = pieces[i];
+                        parts = piece.split(':');
+                        term = parts[0];
+                        party = parts[1];
+                        state = parts[2];
+                        $j("#term" + divs[i]).val(term);
+                        $j("#party" + divs[i]).val(party);
+                        $j("#state" + divs[i]).val(state);
+                    }
+
+                    CapitolWords.submitCompareForm();
+                }
+            }
 
             if (typeof termDetailTerm !== 'undefined') {
                 CapitolWords.populateTermDetailPage(termDetailTerm);
