@@ -41,8 +41,6 @@ STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
              'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 
              'should', 'now', '\.', '\?', '\!', ]
 
-from cwod.hide_view import hide_view
-
 
 @login_required
 def faster_term_detail(request, term):
@@ -371,16 +369,21 @@ def wordtree(request):
 @login_required
 def date_detail(request, year, month, day):
     date = datetime.date(year=int(year), month=int(month), day=int(day))
-
-    popular_terms = all_popular_terms('date', date)
     entries = entries_for_date(date)
+    if not entries:
+        raise Http404
+
+    ngrams = {}
+    for n in range(1, 6):
+        ngrams[GRAM_NAMES[n-1]] = NgramsByDate.objects.filter(date=date, n=n)[:30]
+    ngrams = ngrams.iteritems()
 
     by_chamber = {'House': [], 'Senate': [], 'Extensions of Remarks': [], }
     similar_dates = get_similar_dates(date)
 
     return render_to_response('cwod/date_detail.html',
                               {'date': date,
-                               'popular_terms': popular_terms,
+                               'ngrams': ngrams,
                                'entries': entries,
                                'similar_dates': similar_dates,
                               }, context_instance=RequestContext(request))
@@ -401,13 +404,21 @@ def entries_for_date(date):
     chambers = {'Extensions': defaultdict(set),
                 'House': defaultdict(set),
                 'Senate': defaultdict(set)}
+    has_entries = False
     while True:
         response = capitolwords.text(date=date, sort='id desc', page=page)
+
+        if response and not has_entries:
+            has_entries = True
+
         for entry in response:
             chambers[entry['chamber']][(entry['title'], entry['pages'], entry['origin_url'])].add(entry['speaker_last'])
         if len(response) < 50:
             break
         page += 1
+
+    if not has_entries:
+        return []
 
     chambers['Extensions of Remarks'] = chambers['Extensions']
     del(chambers['Extensions'])
