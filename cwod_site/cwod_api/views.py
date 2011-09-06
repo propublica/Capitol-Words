@@ -398,6 +398,8 @@ class ChartHandler(GenericHandler):
                 # in the querystring, that will override any values
                 # set in 'phrases' or 'parties.')
                 for n, phrase in enumerate(phrases):
+                    if not phrase.strip():
+                        continue
                     kwargs['phrase'] = phrase
                     legend = phrase
                     try:
@@ -467,7 +469,19 @@ class ChartHandler(GenericHandler):
         return {'error': 'Invalid chart type.', }
 
     def _pie(self, results):
-        chart = PieChart2D(300, 220)
+        width = self.request.GET.get('width')
+        height = self.request.GET.get('height')
+        if width:
+            width = int(width)
+        else:
+            width = 300
+
+        if height:
+            height = int(height)
+        else:
+            height = 220
+
+        chart = PieChart2D(width, height)
         data = defaultdict(int)
         if self.request.GET.get('entity_type') == 'party':
             to_include = ['R', 'D', ]
