@@ -87,7 +87,7 @@ CapitolWords.getPartyGraph = function (term) {
     });
 };
 
-CapitolWords.getPartyPieChart = function (term, div, width, height) {
+CapitolWords.getPartyPieChart = function (term, div, width, height, callback) {
     if (typeof width === 'undefined') {
         width = '';
     }
@@ -107,8 +107,18 @@ CapitolWords.getPartyPieChart = function (term, div, width, height) {
         success: function (data) {
             var results = data['results'];
             var imgUrl = results['url'];
-            var imgTag = '<img src="' + imgUrl + '" alt="Pie chart of occurrences of ' + term + ' by party" style="border: 0;"/>';
-            div.html(imgTag);
+            div.find('.default').fadeOut('slow', function () {
+                div
+                    .find('.realChart')
+                    .attr("src", imgUrl)
+                    .attr("alt", "Pie chart of occurrences of " + term + " by party")
+                    .fadeIn('slow', function () {
+                        if (typeof callback !== 'undefined') {
+                            callback(term, div);
+                        }
+                     });
+            });
+
         }
     });
 };
@@ -210,6 +220,8 @@ CapitolWords.populateTermDetailPage = function (term) {
     this.getPartyGraph(term);
 };
 
+var spinner;
+
 CapitolWords.compare = function (toCompare) {
     var url = 'http://capitolwords.org/api/chart/timeline.json';
     var terms = [];
@@ -241,25 +253,57 @@ CapitolWords.compare = function (toCompare) {
         success: function (data) {
             var results = data['results'];
             var imgUrl = results['url'];
-            //$j("#chart").html('<img src="' + imgUrl + '"/>');
-            $j("#chart img").attr("src", imgUrl);
+            $j("#chart img.default").fadeOut('slow', function () {
+                $j("#chart img.realChart").attr("src", imgUrl).fadeIn('slow');
+            });
+            spinner.stop();
         }
     });
 };
 
+CapitolWords.itemsToCompare = [];
+
 CapitolWords.submitCompareForm = function () {
+
+    // spinner options.
+    var opts = {
+      lines: 12, // The number of lines to draw
+      length: 7, // The length of each line
+      width: 5, // The line thickness
+      radius: 10, // The radius of the inner circle
+      color: '#000', // #rbg or #rrggbb
+      speed: 1, // Rounds per second
+      trail: 100, // Afterglow percentage
+      shadow: true // Whether to render a shadow
+    };
+    var target = document.getElementById('chart');
+    spinner = new Spinner(opts).spin(target);
+
     var item;
     var items = [];
     var divs = ['a', 'b', 'c'];
     var div;
 
     for (i=0; i<3; i++) {
+        var thisItem = {};
+        element = $j("#state" + divs[i]);
+        if (element.val() && element.val() != '') {
+            thisItem['state'] = element.val();
+        }
+
+        element = $j("#party" + divs[i]);
+        if (element.val() && element.val() != '') {
+            thisItem['party'] = element.val();
+        }
+
         element = $j("#term" + divs[i]);
         if (element.val() && element.val() != 'Word/phrase') {
-            items.push({'term': element.val()})
+            thisItem['term'] = element.val();
+            items.push(thisItem); // Only use this item if a term is entered.
         }
+
     }
-    
+
     /*
     (function (window, undefined) {
         var History = window.History;
@@ -290,12 +334,48 @@ CapitolWords.submitCompareForm = function () {
 
     CapitolWords.compare(items);
 
+    var compareItemHashes = function (a, b) {
+        if (typeof a === 'undefined' || typeof b === 'undefined') {
+            return false;
+        }
+
+        if (a.term != b.term) {
+            return false;
+        }
+        if (a.party != b.party) {
+            return false;
+        }
+        if (a.state != b.state) {
+            return false;
+        }
+        return true;
+    }
+
     for (i in items) {
-        item = items[i];        
+
+        // If nothing has changed for this item, skip it.
+        if (compareItemHashes(items[i], CapitolWords.itemsToCompare[i]) !== false) {
+            continue
+        } else {
+            CapitolWords.itemsToCompare[i] = items[i];
+        }
+
+        item = items[i];
         div = divs[i];
-        CapitolWords.getPartyPieChart(item['term'], $j("#" + div + " .partyPieChart"), 220, 150);
-        //CapitolWords.getStatePopularity(item['term'], $j("#" + div + " .stateBarChart"));
-        //CapitolWords.getLegislatorPopularity(item['term'], $j("#" + div + " .legislatorBarChart"));
+
+        $j("#" + div + " h4.termLabel'").fadeOut();
+
+        $j("#" + div + " img.realChart").fadeOut('slow', function () { });
+        $j("#" + div + " a.moreInfo").attr('href', '').html('');
+        $j("#" + div + " img.default").fadeIn('slow', function () { });
+
+
+        CapitolWords.getPartyPieChart(item['term'], $j("#" + div + " .partyPieChart"), 220, 150, 
+                                      function (term, div) {
+                                        div.parent().find('h4.termLabel').html(term).fadeIn('slow');
+                                        div.parent().find('a.moreInfo').attr('href', '/term/' + term).html('more information on "' + term + '"');
+                                      });
+
     }
 };
 
