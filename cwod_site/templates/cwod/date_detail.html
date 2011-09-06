@@ -26,7 +26,9 @@
                         </div>
                         Jump to:
                         {% for chamber, entry_list in entries %}
+                        {% if entry_list %}
                         <a href="#{{ chamber|slugify }}">{{ chamber }}</a>&nbsp;
+                        {% endif %}
                         {% endfor %}
                         <br/><br/>
                         {% for chamber, entry_list in entries %}
@@ -64,15 +66,30 @@
                             <h4>Top Words and Phrases</h4>
                             <span class="tip">{{ date|date:"F j, Y" }}</span>
                         </div>
-                        <ol class="barChart">
-                            {% for term in popular_terms|slice:"10" %}
-                            <li>
-                                <span class="tagValue" style="width:100%">100%</span>
-                                <span class="tagNumber"></span>
-                                <span class="barChartTitle"><a href="{% url cwod_term_detail term.ngram %}">{{ term.ngram }}</a></span>
-                            </li>
+                        <div class="ngramMenu">
+                            Phrase size:
+                            <ol>
+                                <li class="unigrams">One word</li>
+                                <li class="bigrams">Two words</li>
+                                <li class="trigrams">Three words</li>
+                                <li class="quadgrams">Four words</li>
+                                <li class="pentagrams">Five words</li>
+                            </ol>
+                            {% for gram_type, ngram_list in ngrams %}
+                            <ol class="barChart" id="{{ gram_type }}">
+                                {% for ngram in ngram_list %}
+                                <li>
+                                    <span class="tagValue" style="width:{{ ngram.ngram_pct }}%;">
+                                        <span class="tagPercent">{{ ngram.ngram_pct }}</span>
+                                        <span class="tagNumber">{{ ngram.count }}</span> 
+                                    </span> 
+                                    <span class="barChartTitle"><a href="{% url cwod_term_detail term=ngram.ngram %}">{{ ngram.ngram }}</a></span>
+                                </li>
+                                {% endfor %}
+                            </ol>
                             {% endfor %}
-                        </ol>    
+                        </div>
+
                     </div>
                     <div class="leftModule">
                         <div class="leftHeader">
