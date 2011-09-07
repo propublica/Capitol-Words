@@ -20,6 +20,7 @@ from piston.resource import Resource
 from dateutil.parser import parse as dateparse
 from dateutil.relativedelta import relativedelta
 from pygooglechart import SimpleLineChart, PieChart2D, Axis
+import numpy
 
 from smooth import smooth
 
@@ -128,6 +129,7 @@ class GenericHandler(BaseHandler):
             return error
 
         facet_field = self.FIELDS[n-1]
+        #q.append('-document_title:"earmark declaration"')
 
         params = {'q': '(%s)' % ' AND '.join(q),
                   'facet': 'true',
@@ -194,7 +196,11 @@ class GenericHandler(BaseHandler):
                     i['raw_count'] = i['count']
                     i['count'] = smoothed[n]
                     if show_percentages:
-                        i['percentage'] = (i['count'] / float(i['total']))*100
+                        pct = (i['count'] / float(i['total']))*100
+                        if pct == numpy.inf:
+                            continue
+                        else:
+                            i['percentage'] = pct
 
             if granularity == 'day' and smoothing == 0:
                 for row in data:
@@ -368,7 +374,7 @@ class ChartHandler(GenericHandler):
                 states = request.GET.get('states', '').split(',')
                 #chambers = request.GET.get('chambers', '').split(',')
 
-                colors = ['000000', 'FF0000', '00FF00', '0000FF', 'F00F00', ]
+                colors = ['8E2844', 'A85B08', 'AF9703', ]
 
                 metadata = []
                 legend_items = []
@@ -383,7 +389,6 @@ class ChartHandler(GenericHandler):
                 width = int(request.GET.get('width', 575))
                 height = int(request.GET.get('height', 300))
                 chart = SimpleLineChart(width, height)
-                chart.set_line_style(0, thickness=2) # Set line thickness
                 chart.set_grid(0, 50, 2, 5) # Set gridlines
                 chart.fill_solid('bg', '00000000') # Make the background transparent
                 chart.set_colours(colors)
@@ -398,6 +403,8 @@ class ChartHandler(GenericHandler):
                 # in the querystring, that will override any values
                 # set in 'phrases' or 'parties.')
                 for n, phrase in enumerate(phrases):
+                    chart.set_line_style(n, thickness=2) # Set line thickness
+
                     if not phrase.strip():
                         continue
                     kwargs['phrase'] = phrase
@@ -444,6 +451,7 @@ class ChartHandler(GenericHandler):
 
                 if key == 'percentage':
                     label = '%.4f' % maxcount
+                    label += '%'
                 else:
                     label = int(maxcount)
 
@@ -536,6 +544,7 @@ class ChartHandler(GenericHandler):
 
         if key == 'percentage':
             label = '%.4f' % maxcount
+            label += '%'
         else:
             label = int(maxcount)
         index = chart.set_axis_labels(Axis.LEFT, [label,]) 
@@ -622,9 +631,9 @@ def counts_over_time(*args, **kwargs):
         kw['date__lte'] = end_date
     
     if kwargs.get('granularity') == 'month':
-        return NgramDateCount.objects.extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month').annotate(Sum('count'))
+        return NgramDateCount.objects.filter(**kw).extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month').annotate(Sum('count'))
     elif kwargs.get('granularity') == 'year':
-        return NgramDateCount.objects.extra(select={"year": 'EXTRACT(YEAR FROM date)'}).values_list('year').annotate(Sum('count'))
+        return NgramDateCount.objects.filter(**kw).extra(select={"year": 'EXTRACT(YEAR FROM date)'}).values_list('year').annotate(Sum('count'))
 
     return NgramDateCount.objects.filter(**kw).values_list('date', 'count')
 
@@ -720,7 +729,20 @@ class LegislatorLookupHandler(BaseHandler):
     def read(self, request, *args, **kwargs):
         bioguide_id = request.GET.get('bioguide_id', None)
         if not bioguide_id:
-            return {}
+            legislators = []
+            allowed_params = ['chamber', 'party', 'congress', 'state', ]
+            for k, v in request.GET.iteritems():
+                if k in allowed_params and v:
+                    kwargs[k] = v
+            for legislator in LegislatorRole.objects.filter(**kwargs).order_by('last'):
+                legislators.append({'name': unicode(legislator),
+                                    'state': legislator.state,
+                                    'party': legislator.party,
+                                    'chamber': legislator.chamber,
+                                    'bioguide_id': legislator.bioguide_id,
+                                    'slug': legislator.slug(),
+                                    'congress': legislator.congress, })
+            return {'results': legislators}
 
         legislators = LegislatorRole.objects.filter(bioguide_id=bioguide_id).order_by('-end_date')
         if not legislators:
