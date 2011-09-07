@@ -15,6 +15,7 @@ from django.db import connections, DatabaseError
 from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.views.generic.simple import direct_to_template
 
 from bioguide.models import *
 from capitolwords import capitolwords, ApiError
@@ -40,6 +41,13 @@ STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
              'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 
              'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 
              'should', 'now', '\.', '\?', '\!', ]
+
+
+def index(request):
+    if request.user.is_authenticated():
+        return direct_to_template(request, template='cwod/index.html')
+
+    return direct_to_template(request, template='index.html')
 
 
 @login_required
