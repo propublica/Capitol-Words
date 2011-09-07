@@ -261,6 +261,39 @@ CapitolWords.compare = function (toCompare) {
     });
 };
 
+
+CapitolWords.populateLegislatorList = function (legislators) {
+    var buildTable = function () {
+        $j("table#legislatorList tbody").empty();
+        var legislator;
+        var tr;
+        var klass;
+        for (i in legislators) {
+            legislator = legislators[i];
+            if (i % 2 == 0) {
+                klass = 'even';
+            } else {
+                klass = 'odd';
+            }
+            tr = '';
+            tr += '<tr class="' + klass + '">';
+            tr += '<td><img class="legislatorImage" alt="legislator photo" src="http://assets.sunlightfoundation.com/moc/40x50/' + legislator.bioguide_id + '.jpg" /></td>';
+            tr += '<td><a href="/legislator/' + legislator.bioguide_id + '-' + legislator.slug + '">' + legislator.name + '</a></td>';
+            tr += '<td>' + legislator.state + '</td>';
+            tr += '<td>' + legislator.party + '</td>';
+            tr += '<td>' + legislator.chamber + '</td>';
+            tr += '</tr>';
+            $j("table#legislatorList tbody").append(tr);
+        }
+        $j("table#legislatorList tbody").fadeIn('fast', function () {
+            $j("img").error(function(){
+                $j(this).hide();
+            });
+        });
+    }
+    $j("table#legislatorList tbody").fadeOut('fast', buildTable);
+}
+
 CapitolWords.itemsToCompare = [];
 
 CapitolWords.submitCompareForm = function () {
@@ -383,6 +416,22 @@ CapitolWords.submitCompareForm = function () {
     }
 };
 
+CapitolWords.legislatorSearch = function () {
+    var data = {'chamber': $j("#chamber").val(),
+                'party': $j("#party").val(),
+                'congress': $j("#congress").val(),
+                'state': $j("#state").val()
+                };
+    $j.ajax({
+        dataType: 'jsonp',
+        url: 'http://capitolwords.org/api/legislators.json',
+        data: data,
+        success: function (data) {
+            CapitolWords.populateLegislatorList(data['results']);
+        }
+    });
+}
+
 
 $j(document).ready(
 
@@ -471,12 +520,20 @@ $j(document).ready(
                     $j(this).val('');
                 }
             });
+
             $j("#termSelect input").bind('blur', function () {
                 if ($j(this).val() == '') {
                     $j(this).val('Word/phrase');
                 }
             });
 
+            $j("#searchFilterButton").bind('click', function () {
+                    CapitolWords.legislatorSearch();
+            });
+
+            if (window.location.pathname.match(/^\/legislator\/?$/)) {
+                CapitolWords.legislatorSearch();
+            }
 
     }
 
