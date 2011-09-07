@@ -201,27 +201,17 @@ def congress_pagerange_detail(request, congress, session, pagerange):
 def legislator_list(request):
     current_legislators = LegislatorRole.objects.filter(
             end_date__gte=datetime.date.today()
-        ).order_by('chamber', 'party', 'last', 'first')
+        ).order_by('last', 'first', 'chamber', 'party')
 
-    past_legislators = LegislatorRole.objects.exclude(
-            bioguide_id__in=LegislatorRole.objects.filter(end_date__gte=datetime.date.today()),
-            congress__lt=104
-        ).order_by('chamber', 'party', 'last', 'first')
-
-    current_bioguides = list(LegislatorRole.objects.filter(end_date__gte=datetime.date.today()).values_list('bioguide_id', flat=True))
-    query = """SELECT * FROM 
-                (SELECT * FROM bioguide_legislatorrole ORDER BY end_date DESC) a 
-               WHERE bioguide_id NOT IN (%s)
-               GROUP BY bioguide_id 
-               ORDER BY chamber, party, last, first""" % ('%s,' * len(current_bioguides)).strip(',')
-
-    past_legislators = LegislatorRole.objects.raw(query, params=tuple(current_bioguides))
-
+    congresses = LegislatorRole.objects.filter(congress__gte=104).values_list('congress', flat=True).distinct().order_by('-congress')
 
     return render_to_response('cwod/legislator_list.html',
                               {'current_legislators': current_legislators,
-                               'past_legislators': past_legislators, 
+                               #'past_legislators': past_legislators,
+                               'congresses': congresses,
+                               'state_choices': US_STATES,
                               }, context_instance=RequestContext(request))
+
 
 
 def legislator_lookup(bioguide_id):
