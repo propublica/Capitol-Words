@@ -248,13 +248,19 @@ CapitolWords.compare = function (toCompare) {
             'percentages': true,
             'mincount': 0,
             'compare': true,
-            'width': 800
+            'width': 860,
+            'height': 340,
+            'smoothing': 0,
+            'start_date': this.startDate(),
+            'end_date': this.endDate(),
+            'trim': this.trimGraph()
         },
         success: function (data) {
             var results = data['results'];
             var imgUrl = results['url'];
-            $j("#chart img.default").fadeOut('slow', function () {
-                $j("#chart img.realChart").attr("src", imgUrl).fadeIn('slow');
+
+            $j("#chart img.default, #compareGraphic img.default").fadeOut('fast', function () {
+                $j("#chart img.realChart, #compareGraphic img.default").attr("src", imgUrl).fadeIn('fast');
             });
             spinner.stop();
         }
@@ -309,7 +315,7 @@ CapitolWords.submitCompareForm = function () {
       trail: 100, // Afterglow percentage
       shadow: true // Whether to render a shadow
     };
-    var target = document.getElementById('chart');
+    var target = document.getElementById('compareGraphic');
     spinner = new Spinner(opts).spin(target);
 
     var item;
@@ -335,6 +341,11 @@ CapitolWords.submitCompareForm = function () {
             items.push(thisItem); // Only use this item if a term is entered.
         }
 
+    }
+
+    if (items.length === 0) {
+        spinner.stop();
+        return;
     }
 
 
@@ -364,7 +375,7 @@ CapitolWords.submitCompareForm = function () {
             terms.push(items[i].term);
         }
         var title = 'Comparing ' + terms.join(', ') + ' | Capitol Words';
-        History.pushState({}, title, buildUrl(items));
+        //History.pushState({}, title, buildUrl(items));
 
      })(window);
 
@@ -407,11 +418,13 @@ CapitolWords.submitCompareForm = function () {
         $j("#" + div + " img.default").fadeIn('slow', function () { });
 
 
-        CapitolWords.getPartyPieChart(item['term'], $j("#" + div + " .partyPieChart"), 220, 150, 
-                                      function (term, div) {
-                                        div.parent().find('h4.termLabel').html(term).fadeIn('slow');
-                                        div.parent().find('a.moreInfo').attr('href', '/term/' + term).html('more information on "' + term + '"');
-                                      });
+        if ($j(".partyPieChart").length != 0) {
+            CapitolWords.getPartyPieChart(item['term'], $j("#" + div + " .partyPieChart"), 220, 150, 
+                                          function (term, div) {
+                                            div.parent().find('h4.termLabel').html(term).fadeIn('slow');
+                                            div.parent().find('a.moreInfo').attr('href', '/term/' + term).html('more information on "' + term + '"');
+                                          });
+        }
 
     }
 };
@@ -432,6 +445,7 @@ CapitolWords.legislatorSearch = function () {
     });
 }
 
+CapitolWords.year_values = [];
 
 $j(document).ready(
 
@@ -535,6 +549,49 @@ $j(document).ready(
                 CapitolWords.legislatorSearch();
             }
 
+            if ($j("#slider-range").length != 0) {
+                var d = new Date();
+                $j("#slider-range").slider({
+                    range: true,
+                    min: 1996,
+                    max: d.getFullYear(),
+                    values: [1996, d.getFullYear()],
+                    slide: function(event, ui) {
+                        $j("#years").val(ui.values[0] + " - " + ui.values[1]);
+                    },
+                    stop: function (event, ui) {
+                        //getGraph(ui.values[0], ui.values[1]);
+                        //window.console.log(ui.values);
+                        CapitolWords.year_values = ui.values;
+                        CapitolWords.submitCompareForm();
+                    }
+                });
+                $j("#years").val( $j( "#slider-range" ).slider( "values", 0 ) +
+                    " - " + $j( "#slider-range" ).slider( "values", 1 ) );
+            }
+
     }
 
 );
+
+CapitolWords.startDate = function () {
+    if (this.year_values[0]) {
+        return this.year_values[0] + '-01-01';
+    }
+    return '1996-01-01';
+}
+
+CapitolWords.endDate = function () {
+    var d = new Date();
+    if (this.year_values[1]) {
+        return this.year_values[1] + '-12-31';
+    }
+    return d.getFullYear() + '-12-31';
+}
+
+CapitolWords.trimGraph = function () {
+    if (this.year_values.length == 2) {
+        return true;
+    }
+    return false;
+}
