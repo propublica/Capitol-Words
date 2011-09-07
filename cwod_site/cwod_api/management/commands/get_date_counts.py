@@ -31,8 +31,8 @@ class DateCounter(object):
     def count(self, field, date):
         path = self.make_path(date)
         all_filename = 'all-%s-%s-%s.xml' % (date.year, date.strftime('%m'), date.strftime('%d'))
-        if os.path.exists(os.path.join(path, all_filename)):
-            result = os.popen('''grep '"%s">' %s | wc -l''' % (field, os.path.join(path, all_filename)))
+        if os.path.exists(path):
+            result = os.popen('''grep '"%s">' %s | wc -l''' % (field, os.path.join(path, 'CREC*.xml')))
             return int(list(result)[0].strip())
         return 0
 
