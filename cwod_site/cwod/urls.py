@@ -95,7 +95,7 @@ urlpatterns = patterns('',
 
         url(r'^$',
             'django.views.generic.simple.direct_to_template',
-            {'template': 'index.html',
+            {'template': 'cwod/index.html',
             },
             name='cwod_home'),
 
