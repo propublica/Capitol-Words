@@ -22,8 +22,8 @@ class GenericHandler(Resource):
                 'month': 'yearmonth',
                 'date': 'date', }
 
-    # The size of a tokenized phrase + 1 will correspond to
-    # the name of the ngram field.
+    # (size of a tokenized phrase) + 1 will correspond to
+    # the index of the name of the ngram field.
     NGRAM_FIELDS = ['unigrams',
                     'bigrams',
                     'trigrams',

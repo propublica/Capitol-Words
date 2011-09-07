@@ -61,7 +61,7 @@
                             {% for i in similar_legislators|slice:"5" %}
 							<li>
                                 <img class="legislatorImage" alt="legislator photo" src="{% legislator_thumbnail i.legislator.bioguide_id 40x50 %}" />
-                                <span class="percentMatch">{{ i.distance }}  Match</span>
+                                {#<span class="percentMatch">{{ i.distance }}  Match</span>#}
                                 <h5><a href="{% url cwod_legislator_detail bioguide_id=i.bioguide slug=i.legislator.slug %}">{{ i.legislator.honorific }} {{ i.legislator.name }}</a></h5>
 								<div class="clear"></div>
 								<dl class="metaData clear">

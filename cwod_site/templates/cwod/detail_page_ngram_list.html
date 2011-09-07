@@ -14,7 +14,7 @@
     <li>
         <span class="tagValue" style="width:{{ ngram.ngram_pct }}%;">
             <span class="tagPercent">{{ ngram.ngram_pct }}</span>
-            <span class="tagNumber">{{ ngram.count }}</span> 
+            <span class="tagNumber">{#{{ ngram.count }}#}</span> 
         </span> 
         <span class="barChartTitle"><a href="{% url cwod_term_detail term=ngram.ngram %}">{{ ngram.ngram }}</a></span>
     </li>
