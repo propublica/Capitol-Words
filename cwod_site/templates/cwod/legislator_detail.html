@@ -52,6 +52,7 @@
                     {% include "cwod/detail_congressional_record_list.html" %}
 
                 </div>  
+                {% if similar_legislators %}
                 <div id="rtColumn">
                     <div class="leftModule">
                         <div class="leftHeader">
@@ -77,6 +78,7 @@
 						</ul>
                     </div>
                 </div>    
+                {% endif %}
                 <div class="clear"></div>
             </div>
         </div>
