@@ -148,6 +148,8 @@
         {% block javascript %}
 
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+
+        {% js "js/underscore/underscore-min.js" %}
         {% js "js/spin/spin.min.js" %}
         <script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="/media/js/history/scripts/compressed/json2.js"><\/script>'); }</script>
         {% js "js/history/scripts/compressed/amplify.store.js" %}
@@ -161,6 +163,7 @@
         {% js "js/jquery.ui/jquery.ui.slider.js" %}
 
 
+        {% js "js/google-chart.js" %}
         {% js "js/capwords.js" %}
         {% endblock javascript %}
 
