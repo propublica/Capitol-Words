@@ -447,7 +447,7 @@ CapitolWords.showChart = function (data, x_labels, x_label_positions) {
     chart.set_colors(['FF0000', '0000FF']);
     chart.set_colors(['8E2844', 'A85B08', 'AF9703']);
     chart.set_legend(this.build_legend());
-    chart.set_axis_labels('y', ['', max]);
+    chart.set_axis_labels('y', ['', max+'%']);
     if (x_labels) {
         chart.set_axis_labels('x', x_labels);
     }

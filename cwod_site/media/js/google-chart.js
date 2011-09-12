@@ -90,14 +90,15 @@
       }
       if (this.chxl) {
         pieces['chxt'] = [];
-        pieces['chxl'] = '';
+        pieces['chxl'] = [];
         _ref = this.chxl;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           axis_labels = _ref[_i];
           index = axis_labels[0], labels = axis_labels[1];
-          pieces['chxl'] = _i + ':|' + labels.join('|');
+          pieces['chxl'].push(_i + ':|' + labels.join('|'));
           pieces['chxt'].push(index);
         }
+        pieces['chxl'] = pieces['chxl'].join('|');
         pieces['chxt'] = pieces['chxt'].join(',');
         if (this.chxp) {
           pieces['chxp'] = '';

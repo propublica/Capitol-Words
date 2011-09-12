@@ -55,11 +55,12 @@ class window.GoogleChart
 
         if (@chxl)
             pieces['chxt'] = []
-            pieces['chxl'] = ''
+            pieces['chxl'] = []
             for axis_labels in @chxl
                 [index, labels] = axis_labels
-                pieces['chxl'] = _i + ':|' + labels.join '|'
+                pieces['chxl'].push(_i + ':|' + labels.join '|')
                 pieces['chxt'].push index
+            pieces['chxl'] = pieces['chxl'].join('|')
             pieces['chxt'] = pieces['chxt'].join ','
 
             if (@chxp)
