@@ -24,16 +24,16 @@
 									    <input id="terma" type="text"/>
 										<ul class="wordFilter">
 											<li>
-												<label>State</label>
-					                            <select name="state">
-					                                <option value="state">Choose a State</option>
+												<label style="display: none;">State</label>
+					                            <select name="state" id="stateA">
+                                                    {% include "cwod/state_select.html" %}
 					                            </select>
 											</li>
-											<li>
-					                            <label>Party</label>
-					                            <select name="party">
-					                                <option value="party">Choose a Party</option>
-					                            </select>
+											<li class="partyA">
+					                            <label style="display: none;">Party</label>
+                                                <input id="partyAAll" type="radio" name="partyA" value="" CHECKED/><label for="partyAAll">All parties</label>
+                                                <input id="partyAD" type="radio" name="partyA" value="D"/><label for="partyAD">Democrats</label>
+                                                <input id="partyAR" type="radio" name="partyA" value="R"/><label for="partyAR">Republicans</label>
 											</li>
 										</ul>
 									</li>
@@ -45,16 +45,16 @@
 									    <input id="termb" type="text"/>
 										<ul class="wordFilter">
 											<li>
-												<label>State</label>
-					                            <select name="state">
-					                                <option value="state">Choose a State</option>
+												<label style="display: none;">State</label>
+					                            <select name="state" id="stateB">
+                                                    {% include "cwod/state_select.html" %}
 					                            </select>
 											</li>
-											<li>
-					                            <label>Party</label>
-					                            <select name="party">
-					                                <option value="party">Choose a Party</option>
-					                            </select>
+											<li class="partyB">
+					                            <label style="display: none;">Party</label>
+                                                <input id="partyBAll" type="radio" name="partyB" value="" CHECKED/><label for="partyBAll">All parties</label>
+                                                <input id="partyBD" type="radio" name="partyB" value="D"/><label for="partyBD">Democrats</label>
+                                                <input id="partyBR" type="radio" name="partyB" value="R"/><label for="partyBR">Republicans</label>
 											</li>
 										</ul>
 									</li>
@@ -63,9 +63,7 @@
 									         <span>Compare</span>
 									     </button>
 									</li>
-									<li class="advanced">
-										 <a href="">filter search</a>
-									</li>
+									<li class="advanced">filter search</li>
 								</ul>
 								<div class="clear"></div>
 							</form>

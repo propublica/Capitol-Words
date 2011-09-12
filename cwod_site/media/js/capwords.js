@@ -381,10 +381,11 @@ CapitolWords.submitHomepageCompareForm = function () {
         data:
         {
             phrase: $j("#terma").val(),
+            state: $j("#stateA").val() || '',
+            party: $j($j(".partyA").children("input[checked=true]")[0]).val(),
             granularity: 'month',
             percentages: true,
             mincount: 0,
-            legend: false
         },
         success: function (data) {
             var aResults = data['results'];
@@ -397,26 +398,27 @@ CapitolWords.submitHomepageCompareForm = function () {
                 url: url,
                 data: {
                     phrase: $j("#termb").val(),
+                    state: $j("#stateB").val() || '',
+                    party: $j($j(".partyB").children("input[checked=true]")[0]).val(),
                     granularity: 'month',
                     percentages: true,
                     mincount: 0,
-                    legend: false
                 },
                 success: function (data) {
-                        var bResults = data['results'];
-                        CapitolWords.b['all'] = bResults;
-                        CapitolWords.b['counts'] = _(bResults).pluck('count');
-                        CapitolWords.b['percentages'] = _(bResults).pluck('percentage');
-                        if (CapitolWords.minMonth || CapitolWords.maxMonth) {
-                            CapitolWords.limit(minMonth, maxMonth);
-                        } else {
-                            var labelPositions = CapitolWords.buildXLabels(CapitolWords.a['all']);
-                            var labels = labelPositions[0];
-                            var positions = labelPositions[1];
-                            CapitolWords.showChart([CapitolWords.a['percentages'], CapitolWords.b['percentages']], labels, positions);
-                        }
+                    var bResults = data['results'];
+                    CapitolWords.b['all'] = bResults;
+                    CapitolWords.b['counts'] = _(bResults).pluck('count');
+                    CapitolWords.b['percentages'] = _(bResults).pluck('percentage');
+                    if (CapitolWords.minMonth || CapitolWords.maxMonth) {
+                        CapitolWords.limit(CapitolWords.minMonth, CapitolWords.maxMonth);
+                    } else {
+                        var labelPositions = CapitolWords.buildXLabels(CapitolWords.a['all']);
+                        var labels = labelPositions[0];
+                        var positions = labelPositions[1];
+                        CapitolWords.showChart([CapitolWords.a['percentages'], CapitolWords.b['percentages']], labels, positions);
                     }
-                });
+                }
+            });
 
         }
     });
@@ -732,6 +734,16 @@ $j(document).ready(
                     " - " + $j( "#slider-range" ).slider( "values", 1 ) );
             }
 
+            $j(".advanced").bind('click', function () {
+                var current = $j(this).html();
+                $j("ul.wordFilter").slideToggle('', function () {
+                    if (current === 'filter search') {
+                        $j(".advanced").html("hide filter");
+                    } else {
+                        $j(".advanced").html("filter search");
+                    }
+                });
+            });
     }
 
 );
