@@ -706,7 +706,7 @@ $j(document).ready(
             // Change which ngram list is shown.
             $j(".ngramMenu li").bind('click', function (x) {
                 var classToShow = $j(this).attr('class');
-                $j(".barChart:visible").hide(0, function () {
+                $j($j(".barChart:visible")[0]).hide(0, function () {
                     $j("ol#" + classToShow).show(0);
                 });
             });
