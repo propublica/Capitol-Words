@@ -315,6 +315,9 @@ class PhraseOverTimeHandler(GenericHandler):
 
     def read(self, request, *args, **kwargs):
         phrase = request.GET.get('phrase') or kwargs.get('phrase')
+        if not phrase:
+            return {'error': 'A value for the "phrase" parameter is required.', 'results': []}
+
         phrase = ' '.join(tokenize(phrase))
         if not phrase:
             return {'error': 'A value for the "phrase" parameter is required.', 'results': []}
@@ -682,6 +685,10 @@ class FullTextSearchHandler(GenericHandler):
         if 'phrase' in request.GET:
             kwargs['q'] = ['speaking:"%s"' % request.GET['phrase'], ]
             sort = None
+            if 'title' in request.GET:
+                kwargs['q'].append('document_title:"%s"' % request.GET['title'])
+        elif 'title' in request.GET:
+            kwargs['q'] = ['document_title:"%s"' % request.GET['title'],]
         else:
             kwargs['q'] = ['*:*',]
             #sort = 'id asc'
