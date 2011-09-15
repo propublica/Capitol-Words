@@ -78,6 +78,10 @@ def state_abbrev_to_full(abbrev):
 def state_abbrev_to_ap(abbrev):
     return AP_STATES.get(abbrev, abbrev)
 
+@register.filter(name='decimal_to_percent')
+def decimal_to_percent(n):
+    return n*100
+
 
 @register.tag(name='legislator_thumbnail')
 def legislator_thumbnail(parser, token):
