@@ -261,7 +261,23 @@ def legislator_detail(request, bioguide_id, slug):
 
 
 def state_list(request):
-    return
+
+    def chunks(l, n):
+        """ Yield successive n-sized chunks from l.
+        """
+        for i in xrange(0, len(l), n):
+            yield l[i:i+n]
+
+    states = []
+    state_choices = dict(STATE_CHOICES)
+    for state in NgramsByState.objects.values_list('state', flat=True).order_by('state').distinct():
+        states.append((state, state_choices[state], NgramsByState.objects.filter(state=state, n=1)[:5]))
+
+    state_chunks = chunks(states, (len(states)+1)/3)
+
+    return render_to_response('cwod/state_list.html',
+                              {'state_chunks': state_chunks,
+                              }, context_instance=RequestContext(request))
 
 
 def _highlight_entries(entries, term):
