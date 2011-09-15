@@ -262,9 +262,7 @@ CapitolWords.compare = function (toCompare) {
             $j("#chart img.default, #compareGraphic img.default").fadeOut('fast', function () {
                 $j("#chart img.realChart, #compareGraphic img.default").attr("src", imgUrl).fadeIn('fast');
             });
-            if (spinner) {
-                spinner.stop();
-            }
+            spinner.stop();
         }
     });
 };
@@ -377,12 +375,21 @@ CapitolWords.submitHomepageCompareForm = function () {
     var div;
     var url = 'http://capitolwords.org/api/dates.json';
 
+    var phraseA = $j("#terma").val();
+    if (phraseA == 'Word or phrase') {
+        phraseA = '';
+    }
+    var phraseB = $j("#termb").val();
+    if (phraseB == 'Word or phrase') {
+        phraseB = '';
+    }
+
     $j.ajax({
         dataType: 'jsonp',
         url: url,
         data:
         {
-            phrase: $j("#terma").val(),
+            phrase: phraseA,
             state: $j("#stateA").val() || '',
             party: $j($j(".partyA input:checked")[0]).val(),
             granularity: 'month',
@@ -399,7 +406,7 @@ CapitolWords.submitHomepageCompareForm = function () {
                 dataType: 'jsonp',
                 url: url,
                 data: {
-                    phrase: $j("#termb").val(),
+                    phrase: phraseB,
                     state: $j("#stateB").val() || '',
                     party: $j($j(".partyB input:checked")[0]).val(),
                     granularity: 'month',
@@ -437,13 +444,18 @@ CapitolWords.build_legend = function () {
     var partyA = $j($j(".partyA input:checked")[0]).val();
     var stateA = $j("#stateA").val();
 
+    var legend = [];
+
     var legendA = termA;
-    if (partyA && stateA) {
-        legendA += ' [' + partyA + '-' + stateA + ']';
-    } else if (partyA) {
-        legendA += ' [' + partyA + ']';
-    } else if (stateA) {
-        legendA += ' [' + stateA + ']';
+    if (termA != 'Word or phrase') {
+        if (partyA && stateA) {
+            legendA += ' [' + partyA + '-' + stateA + ']';
+        } else if (partyA) {
+            legendA += ' [' + partyA + ']';
+        } else if (stateA) {
+            legendA += ' [' + stateA + ']';
+        }
+        legend.push(legendA);
     }
 
     var termB = $j("#termb").val();
@@ -451,16 +463,19 @@ CapitolWords.build_legend = function () {
     var stateB = $j("#stateB").val();
 
     var legendB = termB;
-    if (partyB && stateB) {
-        legendB += ' [' + partyB + '-' + stateB + ']';
-    } else if (partyB) {
-        legendB += ' [' + partyB + ']';
-    } else if (stateB) {
-        legendB += ' [' + stateB + ']';
+    if (termB != 'Word or phrase') {
+        if (partyB && stateB) {
+            legendB += ' [' + partyB + '-' + stateB + ']';
+        } else if (partyB) {
+            legendB += ' [' + partyB + ']';
+        } else if (stateB) {
+            legendB += ' [' + stateB + ']';
+        }
+        legend.push(legendB);
     }
 
-
-    return [legendA, legendB];
+    return legend;
+    //return [legendA, legendB];
 }
 
 CapitolWords.showChart = function (data, x_labels, x_label_positions) {
@@ -476,9 +491,11 @@ CapitolWords.showChart = function (data, x_labels, x_label_positions) {
     }
     chart.set_grid(0, 50, 2, 5);
     chart.set_fill('bg', 's', '00000000');
-    chart.set_colors(['FF0000', '0000FF']);
-    chart.set_colors(['8E2844', 'A85B08', 'AF9703']);
-    chart.set_legend(this.build_legend());
+    colors = ['8E2844', 'A85B08', 'AF9703'];
+    var legend = this.build_legend();
+    chart.set_legend(legend);
+    chart.set_colors(colors.slice(0, legend.length));
+
     chart.set_axis_labels('y', ['', max+'%']);
     if (x_labels) {
         chart.set_axis_labels('x', x_labels);
@@ -531,7 +548,7 @@ CapitolWords.submitCompareForm = function () {
         }
 
         element = $j("#term" + divs[i]);
-        if (element.val() && element.val() != 'Word/phrase') {
+        if (element.val() && element.val() != 'Word or phrase') {
             thisItem['term'] = element.val();
             items.push(thisItem); // Only use this item if a term is entered.
         }
@@ -729,14 +746,14 @@ $j(document).ready(
             });
 
             $j("#termSelect input").bind('focus', function () {
-                if ($j(this).val() == 'Word/phrase') {
+                if ($j(this).val() == 'Word or phrase') {
                     $j(this).val('');
                 }
             });
 
             $j("#termSelect input").bind('blur', function () {
                 if ($j(this).val() == '') {
-                    $j(this).val('Word/phrase');
+                    $j(this).val('Word or phrase');
                 }
             });
 
