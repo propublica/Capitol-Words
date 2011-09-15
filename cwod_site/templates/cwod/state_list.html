@@ -4,6 +4,8 @@
 {% load typogrify_tags %}
 {% load media %}
 
+{% block title %}States | {{ block.super }}{% endblock title %}
+
 {% block content %}
 
 
@@ -13,10 +15,6 @@
                         <div class="clear"></div>
                 </div>
                 <div id="ltColumn" class="index" style="width: 100%">
-                    {% comment %}
-                </div>
-                <div id="rtColumn" class="index">
-                    {% endcomment %}
                     <div class="states module">
                         {% for state_chunk in state_chunks %}
                         <ul class="normalList">
@@ -25,7 +23,7 @@
                             <br/>
                             Top words:
                             {% for ngram in item.2 %}
-                                {{ ngram.ngram }}{% if not forloop.last %},{% endif %}
+                            <em>{{ ngram.ngram }}</em>{% if not forloop.last %},{% endif %}
                             {% endfor %}
                             </li>
                             {% endfor %}
