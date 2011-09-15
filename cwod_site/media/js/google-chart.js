@@ -62,14 +62,15 @@
       return this.types['line'];
     };
     GoogleChart.prototype.chd = function() {
-      var values;
+      var maxValue, values;
+      maxValue = this.max(_(this.data).flatten());
       return this.encoding() + ((function() {
         var _i, _len, _ref, _results;
         _ref = this.data;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           values = _ref[_i];
-          _results.push(this.encode(values));
+          _results.push(this.encode(values, maxValue));
         }
         return _results;
       }).call(this)).join(',');
@@ -134,18 +135,17 @@
         return 's:';
       }
     };
-    GoogleChart.prototype.encode = function(values) {
+    GoogleChart.prototype.encode = function(values, maxValue) {
       if (this.height > 100) {
-        return this.extendedEncode(values);
+        return this.extendedEncode(values, maxValue);
       } else {
-        return this.simpleEncode(values);
+        return this.simpleEncode(values, maxValue);
       }
     };
     GoogleChart.prototype.simpleEncoding = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    GoogleChart.prototype.simpleEncode = function(values) {
-      var chartData, currentValue, maxValue, val, _i, _len;
+    GoogleChart.prototype.simpleEncode = function(values, maxValue) {
+      var chartData, currentValue, val, _i, _len;
       chartData = [];
-      maxValue = this.max(values);
       for (_i = 0, _len = values.length; _i < _len; _i++) {
         currentValue = values[_i];
         if (!isNaN(currentValue && currentValue >= 0)) {
@@ -158,11 +158,10 @@
       return chartData.join('');
     };
     GoogleChart.prototype.extendedMap = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.';
-    GoogleChart.prototype.extendedEncode = function(values) {
-      var chartData, currentValue, mapLength, maxValue, numericalVal, quotient, remainder, scaledVal, _i, _len;
+    GoogleChart.prototype.extendedEncode = function(values, maxValue) {
+      var chartData, currentValue, mapLength, numericalVal, quotient, remainder, scaledVal, _i, _len;
       chartData = '';
       mapLength = this.extendedMap.length;
-      maxValue = this.max(values);
       for (_i = 0, _len = values.length; _i < _len; _i++) {
         currentValue = values[_i];
         numericalVal = new Number(currentValue);

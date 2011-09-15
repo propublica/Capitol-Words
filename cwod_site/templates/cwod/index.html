@@ -21,19 +21,20 @@
 								<ul class="wordCompare">
 									<li class="eachWord">
 										<label>Pick a word or phrase</label>
-									    <input id="terma" type="text"/>
+                                        <input id="terma" class="id_addTerm" type="text"/>
 										<ul class="wordFilter">
 											<li>
-												<label style="display: none;">State</label>
+                                                <label> State</label>
 					                            <select name="state" id="stateA">
                                                     {% include "cwod/state_select.html" %}
 					                            </select>
 											</li>
-											<li class="partyA">
-					                            <label style="display: none;">Party</label>
-                                                <input id="partyAAll" type="radio" name="partyA" value="" CHECKED/><label for="partyAAll">All parties</label>
-                                                <input id="partyAD" type="radio" name="partyA" value="D"/><label for="partyAD">Democrats</label>
-                                                <input id="partyAR" type="radio" name="partyA" value="R"/><label for="partyAR">Republicans</label>
+											<li class="partyA partyChoice clear">
+                                                <ul>
+                                                    <li><label><input id="partyAAll" class="radio" type="radio" name="partyA" value="" CHECKED/>All</label></li>
+                                                    <li><label><input id="partyAD" class="radio" type="radio" name="partyA" value="D"/>Democrats</label></li>
+                                                    <li><label><input id="partyAR" class="radio" type="radio" name="partyA" value="R"/>Republicans</label></li>
+                                                </ul>
 											</li>
 										</ul>
 									</li>
@@ -42,34 +43,36 @@
 									</li>
 									<li class="eachWord">
 										<label>Pick a word or phrase</label>
-									    <input id="termb" type="text"/>
+                                        <input id="termb" class="id_addTerm" type="text"/>
 										<ul class="wordFilter">
 											<li>
-												<label style="display: none;">State</label>
+                                                <label>State</label>
 					                            <select name="state" id="stateB">
                                                     {% include "cwod/state_select.html" %}
 					                            </select>
 											</li>
-											<li class="partyB">
-					                            <label style="display: none;">Party</label>
-                                                <input id="partyBAll" type="radio" name="partyB" value="" CHECKED/><label for="partyBAll">All parties</label>
-                                                <input id="partyBD" type="radio" name="partyB" value="D"/><label for="partyBD">Democrats</label>
-                                                <input id="partyBR" type="radio" name="partyB" value="R"/><label for="partyBR">Republicans</label>
+											<li class="partyB partyChoice clear">
+                                                <ul>
+                                                    <li><label><input id="partyBAll" class="radio" type="radio" name="partyB" value="" CHECKED/>All</label>
+                                                    <li><label><input id="partyBD" class="radio" type="radio" name="partyB" value="D"/>Democrats</label>
+                                                    <li><label><input id="partyBR" class="radio" type="radio" name="partyB" value="R"/>Republicans</label>
+                                                </ul>
 											</li>
 										</ul>
 									</li>
 									<li class="submit">
-										 <span id="compareBtn" class="compareSubmit buttonLink fullButton" type="submit">
-									         <span>Compare</span>
+										 <button id="compareBtn" class="compareSubmit buttonLink fullButton" type="button">
+									         <span class="compareSubmit">Compare</span>
 									     </button>
+										<div class="clear advanced">
+											 <span>advanced</span>
+										</div>
 									</li>
-									<li class="advanced">filter search</li>
 								</ul>
-								<div class="clear"></div>
 							</form>
-					</div>
+                        </div>
 					<div id="compareGraphic">
-                        <img class="default" width="860" height="340" src="http://chart.apis.google.com/chart?cht=lc&chs=860x340&chf=bg,s,00000000&chxt=x,y&chxl=0:|1996|1998|2000|2002|2004|2006|2008|2010|1:|&chxp=0,0,12,25,38,51,63,76,89|1,100&chls=2&chg=0,50,2,5" alt="Blank graph" style="border: 0;"/>
+                        <img class="default" width="860" height="340" src="http://chart.apis.google.com/chart?cht=lc&chs=860x340&chd=&chg=0,50,2,5&chf=bg,s,00000000&chco=8E2844,A85B08,AF9703&chdlp=t|l" style="border: 0;"/>
                         <div id="slider-range"></div>
 					</div>
 					<div id="todaysStats">

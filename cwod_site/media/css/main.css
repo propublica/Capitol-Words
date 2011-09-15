@@ -142,9 +142,7 @@ h5 { font-weight: normal; font-size: 140%; margin-bottom: 15px; }
 .leftHeader { margin-bottom: 20px;}
 
 #internalHead {  border-bottom: 1px dotted #4a4342; padding-bottom: 10px; background: url(../img/bg_headerLine.png) left 15px no-repeat; padding-left: 30px; }
-#compareBtn { float: right; cursor: pointer; }
-
-li.advanced { cursor: pointer; text-decoration: underline; color: #b99004; }
+#compareBtn { float: right; }
 
 input { padding: 5px 8px; background: #e6e4e2 url(../img/bg_input.png) left bottom repeat-x; -moz-border-radius: 5px; -webkit-border-radius: 5px; border: 1px solid #021017; }
 
@@ -227,7 +225,7 @@ input { padding: 5px 8px; background: #e6e4e2 url(../img/bg_input.png) left bott
 
 #signUp { padding-top: 5px;}
 #signUp input { margin-right: 10px;}
-#signUp button { padding: 2px 15px; background: url("images/bg_button.png") left top repeat-x #706363;}
+#signUp button { padding: 2px 15px; background: url("img/bg_button.png") left top repeat-x #706363;}
 
 #navWrapper { background: url(../img/bg_footerNav.jpg) center top repeat-x; height: 48px;}
 #navWrapper li { background-color: #494141; padding: 0 20px; margin-top: 5px; margin-top: 12px;}
@@ -279,7 +277,7 @@ th {text-transform: uppercase;}
 #rtColumn .chart{margin-bottom: 30px;}
 .legName{width: 33%;}
 .entTitle{width: 50%}
-.sort{padding-left: 23px;background: url('images/sort_double.png') 10px center no-repeat;}
+.sort{padding-left: 23px;background: url('img/sort_double.png') 10px center no-repeat;}
 
 #searchCompare{background: url(../img/bg_secondTitle.png) top left repeat; padding: 30px 30px 30px 30px; margin: 0 25px 30px 0; display: visible;}
 #searchCompare h5 { margin-bottom: 30px}
@@ -287,7 +285,7 @@ th {text-transform: uppercase;}
 #searchCompare h5 tip{ font-style: italic; font-size: 80%}
 
 .addTerm label{display: none;}
-.addTerm #id_addTerm { width: 325px; padding: 5px 8px; background: #ffffff url(../img/bg_input.png) left bottom repeat-x; -moz-border-radius: 5px; -webkit-border-radius: 5px; border: 1px solid #021017; }
+.addTerm .id_addTerm { width: 325px; padding: 5px 8px; background: #ffffff url(../img/bg_input.png) left bottom repeat-x; -moz-border-radius: 5px; -webkit-border-radius: 5px; border: 1px solid #021017; }
 
 .addTerm {width: 423px;}
 
@@ -307,31 +305,31 @@ th {text-transform: uppercase;}
 #searchCompare ul>li ul.terms>li {display: inline}
 #searchCompare ul>li.filterBy ul>li {display: block; padding: 0 0;}
 
-#searchCompare .filterBy{ background: url('images/bg_border_vert.png') top left no-repeat; padding: 0 30px 0 30px;}
+#searchCompare .filterBy{ background: url('img/bg_border_vert.png') top left no-repeat; padding: 0 30px 0 30px;}
 #searchCompare .filterBy label{ width: 28px; display: inline-block}
 #searchCompare .filterBy li{margin-bottom: 15px}
-#searchCompare select{ margin-left: 10px; width: 160px;}
-#searchCompare .submit{background: url('images/bg_border_vert.png') top left no-repeat; padding: 0 0 0 30px;}
+#searchCompare select{ margin-left: 10px; width: 233px;}
+#searchCompare .submit{background: url('img/bg_border_vert.png') top left no-repeat; padding: 0 0 0 30px;}
 
 #fullColumn #searchCompare, #fullColumn #compareGraphic{ margin-left: -30px; width: 890px; margin-bottom: 50px}
 
-#compareGraphic {background: url(../img/bg_secondTitle.png) top left repeat; padding: 30px 30px 30px 30px; margin: -19px 25px 30px 0; display: visible;}
+#compareGraphic {background: url(../img/bg_secondTitle.png) top left repeat; padding: 20px 30px 30px 30px; margin: -19px 25px 30px 0; display: visible;}
 
 .thirdColumn {float: left; background: url(../img/bg_secondTitle.png) top left repeat; padding: 30px 30px 30px 30px; margin: -19px 25px 30px 0; display: visible; width: 240px;}
 .three.thirdColumn {margin-right: 0;}
 
 #todaysStats {margin-left: -30px}
 
-.crList li{background:url('images/bg_border.png') top right no-repeat; padding: 15px 0;}
+.crList li{background:url('img/bg_border.png') top right no-repeat; padding: 15px 0;}
 .crList li.active{
-	background: url('images/bg_border.png') top right no-repeat, url('images/cr_arrow.png') left center no-repeat;
-	background: url('images/bg_border.png') top right no-repeat, url('images/cr_arrow.png') left center no-repeat, -moz-linear-gradient(left, rgba(42,34,34,0) 12%, rgba(42,34,34,0.4) 35%, rgba(42,34,34,0.4) 65%, rgba(42,34,34,0) 100%); /* FF3.6+ */
-	background: url('images/bg_border.png') top right no-repeat, url('images/cr_arrow.png') left center no-repeat, -webkit-gradient(linear, left top, right top, color-stop(12%,rgba(42,34,34,0)), color-stop(35%,rgba(42,34,34,0.4)), color-stop(65%,rgba(42,34,34,0.4)), color-stop(100%,rgba(42,34,34,0))); /* Chrome,Safari4+ */
-	background: url('images/bg_border.png') top right no-repeat, url('images/cr_arrow.png') left center no-repeat, -webkit-linear-gradient(left, rgba(42,34,34,0) 12%,rgba(42,34,34,0.4) 35%,rgba(42,34,34,0.4) 65%,rgba(42,34,34,0) 100%); /* Chrome10+,Safari5.1+ */
-	background: url('images/bg_border.png') top right no-repeat, url('images/cr_arrow.png') left center no-repeat, -o-linear-gradient(left, rgba(42,34,34,0) 12%,rgba(42,34,34,0.4) 35%,rgba(42,34,34,0.4) 65%,rgba(42,34,34,0) 100%); /* Opera11.10+ */
-	background: url('images/bg_border.png') top right no-repeat, url('images/cr_arrow.png') left center no-repeat, -ms-linear-gradient(left, rgba(42,34,34,0) 12%,rgba(42,34,34,0.4) 35%,rgba(42,34,34,0.4) 65%,rgba(42,34,34,0) 100%); /* IE10+ */
+	background: url('img/bg_border.png') top right no-repeat, url('img/cr_arrow.png') left center no-repeat;
+	background: url('img/bg_border.png') top right no-repeat, url('img/cr_arrow.png') left center no-repeat, -moz-linear-gradient(left, rgba(42,34,34,0) 12%, rgba(42,34,34,0.4) 35%, rgba(42,34,34,0.4) 65%, rgba(42,34,34,0) 100%); /* FF3.6+ */
+	background: url('img/bg_border.png') top right no-repeat, url('img/cr_arrow.png') left center no-repeat, -webkit-gradient(linear, left top, right top, color-stop(12%,rgba(42,34,34,0)), color-stop(35%,rgba(42,34,34,0.4)), color-stop(65%,rgba(42,34,34,0.4)), color-stop(100%,rgba(42,34,34,0))); /* Chrome,Safari4+ */
+	background: url('img/bg_border.png') top right no-repeat, url('img/cr_arrow.png') left center no-repeat, -webkit-linear-gradient(left, rgba(42,34,34,0) 12%,rgba(42,34,34,0.4) 35%,rgba(42,34,34,0.4) 65%,rgba(42,34,34,0) 100%); /* Chrome10+,Safari5.1+ */
+	background: url('img/bg_border.png') top right no-repeat, url('img/cr_arrow.png') left center no-repeat, -o-linear-gradient(left, rgba(42,34,34,0) 12%,rgba(42,34,34,0.4) 35%,rgba(42,34,34,0.4) 65%,rgba(42,34,34,0) 100%); /* Opera11.10+ */
+	background: url('img/bg_border.png') top right no-repeat, url('img/cr_arrow.png') left center no-repeat, -ms-linear-gradient(left, rgba(42,34,34,0) 12%,rgba(42,34,34,0.4) 35%,rgba(42,34,34,0.4) 65%,rgba(42,34,34,0) 100%); /* IE10+ */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#002a2222', endColorstr='#002a2222',GradientType=1 ); /* IE6-9 */
-	background: url('images/bg_border.png') top right no-repeat, url('images/cr_arrow.png') left center no-repeat, linear-gradient(left, rgba(42,34,34,0) 12%,rgba(42,34,34,0.4) 35%,rgba(42,34,34,0.4) 65%,rgba(42,34,34,0) 100%); /* W3C */
+	background: url('img/bg_border.png') top right no-repeat, url('img/cr_arrow.png') left center no-repeat, linear-gradient(left, rgba(42,34,34,0) 12%,rgba(42,34,34,0.4) 35%,rgba(42,34,34,0.4) 65%,rgba(42,34,34,0) 100%); /* W3C */
 	margin-left: -40px; padding-left: 40px; color: }
 .crList li.active a:visited { color: #e7b303; }
 .crList .pages{display: block;}
@@ -383,21 +381,28 @@ th {text-transform: uppercase;}
 #splash_image img{ border: 0;}
 #splash_text em{ color: #e1dddc; font-weight: bold;}
 
-#fullColumn #searchCompare .eachWord li{
+header #searchCompare{
+	margin-top: -19px;
+}
+
+#searchCompare .eachWord li{
 	display: block;
 }
 
-#fullColumn #searchCompare #betweenItem{
-	padding: 8px 30px 0 30px;
-	background: url("images/bg_border_vert.png") center 30px no-repeat;
+#searchCompare #betweenItem{
+	padding: 8px 20px 0 20px;
+	background: url("img/bg_border_vert.png") center 30px no-repeat;
 	font-weight: 700;
 	font-style: italic;
 }
+#fullColumn #searchCompare #betweenItem{
+	padding: 8px 30px 0 30px;
+}
 
-#fullColumn #searchCompare .submit{
+#searchCompare .submit{
 	background: none;
 }
-#fullColumn #searchCompare .submit .fullButton{
+#searchCompare .submit .fullButton{
 	background-color: #87204b;
 }
 
@@ -415,6 +420,16 @@ ul.wordFilter{
 	display: none;
 }
 
+.wordFilter{
+	padding: 0 20px; 
+	margin-top: 20px;
+	height: 62px; 
+	background: url(../img/bg_rightView_2x.png) right top no-repeat, url(../img/bg_leftView_2x.png) top left no-repeat; 
+}
+.wordFilter li{
+	margin-bottom: 20px; 
+}
+
 #fullColumn #searchCompare form > ul > li{
 	height: none;
 }
@@ -423,13 +438,64 @@ ul.wordFilter{
 	font-style: italic;
 	float: right;
 	margin-top: 10px;
-	background: url('images/expand.png') right 7px no-repeat;
+	background: url('../img/expand.png') right 7px no-repeat;
 	padding-right: 20px;
+}
+
+.expanded{
+    background: url('../img/expand.png') right -24px no-repeat
+}
+
+.advanced span {
+    cursor: pointer; text-decoration: underline; color: #b99004;
 }
 
 .thirdColumn .tagValue{
 	text-indent: -9999em;
 }
+
+.partyChoice li { float: left; margin-right: 17px; margin-bottom: 0;}
+
+.key{
+	font-style: italic;
+	margin-bottom: 20px;
+}
+.key a{
+	text-decoration: underline;
+	margin-right: 0;
+	margin-left: 5px;
+}
+
+.moreComparisons{
+	float: right;
+}
+.wordOne, .wordTwo{
+	margin-right: 20px;
+	margin-left: 20px;
+}
+
+.wordOne span.color, .wordTwo span.color{
+	width: 13px;
+	height: 13px;
+	display: inline-block;
+	margin-right: 5px;
+	text-decoration: none;
+	vertical-align: middle;
+}
+
+.wordOne span.color{
+	background: #902b47;
+}
+
+.wordTwo span.color{
+	background: #a85b08;
+}
+
+.filters{
+	font-style: normal;
+	display: inline-block;
+}
+
 
 
 ol#bigrams,

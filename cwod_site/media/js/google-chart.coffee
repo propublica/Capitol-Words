@@ -38,7 +38,8 @@ class window.GoogleChart
     chs: -> [@width, @height].join('x')
     cht: -> @types['line']
     chd: ->
-        @encoding() + (@encode values for values in @data).join(',')
+        maxValue = @max _(@data).flatten()
+        @encoding() + (@encode(values, maxValue) for values in @data).join(',')
 
     url: ->
         pieces = {
@@ -78,14 +79,13 @@ class window.GoogleChart
     encoding: ->
         if @height > 100 then 'e:' else 's:'
 
-    encode: (values) ->
-        if @height > 100 then @extendedEncode(values) else @simpleEncode(values)
+    encode: (values, maxValue) ->
+        if @height > 100 then @extendedEncode(values, maxValue) else @simpleEncode(values, maxValue)
 
     simpleEncoding: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
-    simpleEncode: (values) ->
+    simpleEncode: (values, maxValue) ->
         chartData = []
-        maxValue = @max(values)
         for currentValue in values
             if not isNaN currentValue and currentValue >= 0
                 val = Math.round ((@simpleEncoding.length - 1) * (currentValue / maxValue))
@@ -96,10 +96,9 @@ class window.GoogleChart
 
     extendedMap: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.'
 
-    extendedEncode: (values) ->
+    extendedEncode: (values, maxValue) ->
         chartData = ''
         mapLength = @extendedMap.length
-        maxValue = @max(values)
         for currentValue in values
             numericalVal = new Number currentValue
             scaledVal = Math.floor mapLength * mapLength * numericalVal / maxValue
