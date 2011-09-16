@@ -202,9 +202,9 @@
           'per_page': 10
         },
         success: function(data) {
-          var maxCount, result, results, _i, _len, _results;
+          var maxcount, result, results, _i, _len, _results;
           results = data['results'];
-          maxCount = results[0]['count'];
+          maxcount = results[0]['count'];
           div.html('');
           _results = [];
           for (_i = 0, _len = results.length; _i < _len; _i++) {
@@ -216,8 +216,9 @@
       });
     };
     CapitolWords.prototype.getStatePopularity = function(term, div) {
-      var url;
+      var cw, url;
       url = 'http://capitolwords.org/api/phrases/state.json';
+      cw = this;
       return jQuery.ajax({
         dataType: 'jsonp',
         url: url,
@@ -235,7 +236,7 @@
             var abbrev, html, pct, state;
             abbrev = result['state'];
             state = abbrev;
-            if (this.states.hasOwnProperty(state)) {
+            if (cw.states.hasOwnProperty(state)) {
               state = this.states[state];
             }
             url = "/state/" + abbrev;

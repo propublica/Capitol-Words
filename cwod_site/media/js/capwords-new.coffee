@@ -153,13 +153,14 @@ class window.CapitolWords
             },
             success: (data) ->
                 results = data['results']
-                maxCount = results[0]['count']
+                maxcount = results[0]['count']
                 div.html ''
                 this.addLegislatorToChart result, maxcount, div for result in results
         }
 
     getStatePopularity: (term, div) ->
         url = 'http://capitolwords.org/api/phrases/state.json'
+        cw = this
         jQuery.ajax {
             dataType: 'jsonp',
             url: url,
@@ -175,7 +176,7 @@ class window.CapitolWords
                 _(results).each (result) ->
                     abbrev = result['state']
                     state = abbrev
-                    if this.states.hasOwnProperty state
+                    if cw.states.hasOwnProperty state
                         state = this.states[state]
                     url = "/state/#{abbrev}"
                     pct = (result['count'] / maxcount) * 100
