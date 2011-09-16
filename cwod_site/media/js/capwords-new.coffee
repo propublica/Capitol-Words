@@ -44,18 +44,57 @@ class window.CapitolWords
                 jQuery('#customChart').attr 'src', imgUrl
         }
 
+    dateFromMonth: (month) ->
+        datePieces = month.match(/(\d{4})(\d{2})/).slice(1,3)
+        datePieces.push '01'
+        datePieces.join '-'
+
+    getGraphData: (term) ->
+        data = {
+            'phrase': term,
+            'granularity': 'month',
+            'percentages': 'true',
+            'mincount': 0,
+            'legend': false,
+        }
+
+        url = 'http://capitolwords.org/api/dates.json'
+        cw = this
+
+        jQuery.ajax {
+            dataType: 'jsonp',
+            url: url,
+            data: data,
+            success: (data) ->
+                results = data['results']
+                cw.results = results
+                counts = _(results).pluck 'count'
+                percentages = _(results).pluck 'percentage'
+                labelPositions = cw.buildXLabels results
+
+                imgUrl = cw.showChart [percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300',]
+
+                overallImgTag = "<img id=\"termChart\" src=\"#{imgUrl}\" alt=\"Timeline of occurrences of #{term}\"/>"
+                customImgTag = "<img id=\"customChart\" src=\"#{imgUrl}\" alt=\"Custom timeline of occurrences of \"#{term}\"/>"
+                jQuery('#overallTimeline').html overallImgTag
+                jQuery('#customTimeline').append customImgTag
+        }
+
+
     getGraph: (term) ->
+        data = {
+            'phrase': term,
+            'granularity': 'month',
+            'percentages': 'true',
+            'mincount': 0,
+            'legend': false,
+        }
+
         url = 'http://capitolwords.org/api/chart/timeline.json'
         jQuery.ajax {
             dataType: 'jsonp',
             url: url,
-            data: {
-                'phrase': term,
-                'granularity': 'month',
-                'percentages': 'true',
-                'mincount': 0,
-                'legend': false,
-            },
+            data: data,
             success: (data) ->
                 results = data['results']
                 imgUrl = results['url']
@@ -67,6 +106,7 @@ class window.CapitolWords
 
     getPartyGraph: (term) ->
         url = 'http://capitolwords.org/api/chart/timeline.json'
+        cw = this
         jQuery.ajax {
             dataType: 'jsonp',
             url: url,
@@ -77,6 +117,8 @@ class window.CapitolWords
                 'mincount': 0,
                 'legend': true,
                 'split_by_party': true,
+                'start_date': cw.start_date,
+                'end_date': cw.end_date,
             },
             success: (data) ->
                 results = data['results']
@@ -85,10 +127,75 @@ class window.CapitolWords
                 jQuery('#partyTimeline').html imgTag
         }
 
+    titleCase: (s) ->
+        s.replace(/\w\S*/g, (txt) ->
+            txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+        )
+
+    highlightEntries: (entries, term) ->
+        entry_matches = []
+        regexp = new RegExp(term, "ig")
+        _(entries).each (entry) ->
+            match = null
+            _(entry['speaking']).each (graf) ->
+                graf = graf.replace /\n/, ''
+                versions_of_term = _(graf.match regexp).uniq()
+                if not _(versions_of_term).isEmpty()
+                    matcher = new RegExp '(' + versions_of_term.join('|') + ')'
+                    match = graf.replace(matcher, (a, b) ->
+                        "<em>#{b}</em>"
+                    )
+                    return
+            entry['match'] = match
+            entry_matches.push(entry)
+        entry_matches
+
+
+    getCREntries: (term) ->
+        url = 'http://capitolwords.org/api/text.json'
+        cw = this
+        data = {
+            'phrase': term,
+            'bioguide_id': "['' TO *]",
+            'start_date': cw.start_date,
+            'end_date': cw.end_date,
+            'sort': 'date desc,score desc',
+        }
+        jQuery.ajax {
+            dataType: 'jsonp',
+            url: url,
+            data: data,
+            success: (data) ->
+                results = data['results']
+                entries = []
+                urls = []
+                _(results).each (entry) ->
+                    if entries.length >= 5
+                        return
+                    if entry['origin_url'] not in urls
+                        urls.push entry['origin_url']
+                        entries.push entry
+
+                entries = cw.highlightEntries(entries, term)
+
+                html = ""
+                _(entries).each (entry) ->
+                    html += """
+                        <li>
+                            <h5><a href="">#{cw.titleCase(entry['title'])}</a></h5>
+                            <p>#{entry['speaker_first']} #{entry['speaker_last']}, #{entry['speaker_party']}-#{entry['speaker_state']}</p>
+                            <p>#{entry.date}</p>
+                            <p>#{entry.match}</p>
+                        </li>
+                    """
+                jQuery('#crEntries').html(html)
+        }
+
     getPartyPieChart: (term, div, width, height, callback) ->
-        width = '' if typeof width == 'undefined'
-        height = '' if typeof width == 'undefined'
+        width = '' if _(width).isUndefined()
+        height = '' if _(width).isUndefined()
         url = 'http://capitolwords.org/api/chart/pie.json'
+        cw = this
         jQuery.ajax {
             dataType: 'jsonp',
             url: url,
@@ -97,6 +204,8 @@ class window.CapitolWords
                 'entity_type': 'party',
                 'width': width,
                 'height': height,
+                'start_date': cw.start_date,
+                'end_date': cw.end_date,
             },
             success: (data) ->
                 results = data['results']
@@ -107,15 +216,20 @@ class window.CapitolWords
                         .attr('src', imgUrl)
                         .attr('alt', "Pie chart of occurrences of #{term} by party")
                         .fadeIn('slow', ->
-                            if typeof callback != 'undefined'
+                            if not _(callback).isUndefined()
                                 callback term, div
                         )
         }
 
-    addLegislatorToChart: (result, maxcount, div) ->
+
+    legislatorData: []
+
+
+    addLegislatorToChart: (result, maxcount, div, callback) ->
         url = 'http://capitolwords.org/api/legislators.json'
         bioguide_id = result['legislator']
         pct = (result['count'] / maxcount) * 100
+        cw = this
         jQuery.ajax {
             dataType: 'jsonp',
             url: url,
@@ -125,21 +239,17 @@ class window.CapitolWords
             },
             success: (data) ->
                 url = "/legislator/#{bioguide_id}-#{data['slug']}"
-                html = """
-                    <li>
-                        <span class="tagValue" style="width:#{pct}%">
-                            <span class="tagPercent">#{pct}%</span>
-                            <span class="tagNumber"></span>
-                        </span>
-                        <span class="barChartTitle"><a href="#{url}">
-                            #{data['honorific']} #{data['full_name']}, #{data['party']}-#{data['state']}
-                        </a>
-                        </span>
-                        </li>
-                """
-                div.append html
+                cw.legislatorData.push({
+                    url: url,
+                    data: data,
+                    result: result,
+                    pct: pct,
+                })
+                
+                callback()
                 
         }
+
 
     getLegislatorPopularity: (term, div) ->
         url = 'http://capitolwords.org/api/phrases/legislator.json'
@@ -151,12 +261,43 @@ class window.CapitolWords
                 'phrase': term,
                 'sort': 'relative',
                 'per_page': 10,
+                'start_date': cw.start_date,
+                'end_date': cw.end_date,
             },
             success: (data) ->
                 results = data['results']
                 maxcount = results[0]['count']
-                div.html ''
-                cw.addLegislatorToChart result, maxcount, div for result in results
+                #div.html ''
+                listItems = []
+
+                cw.legislatorData = []
+
+                render = () ->
+                    cw.legislatorData.sort( (a, b) ->
+                        b['pct'] - a['pct']
+                    )
+                    window.console.log cw.legislatorData
+
+                    _(cw.legislatorData).each (legislator) ->
+                        html = """
+                            <li>
+                                <span class="tagValue" style="width:#{legislator['pct']}%">
+                                    <span class="tagPercent">#{legislator['pct']}%</span>
+                                    <span class="tagNumber"></span>
+                                </span>
+                                <span class="barChartTitle"><a href="#{legislator['url']}">
+                                    #{legislator['data']['honorific']} #{legislator['data']['full_name']}, #{legislator['data']['party']}-#{legislator['data']['state']}
+                                </a>
+                                </span>
+                                </li>
+                        """
+                        listItems.push html
+
+                    div.html(listItems.join(''))
+
+                renderWhenDone = _(results.length).after(render)
+
+                cw.addLegislatorToChart result, maxcount, div, renderWhenDone for result in results
         }
 
     getStatePopularity: (term, div) ->
@@ -169,6 +310,8 @@ class window.CapitolWords
                 'phrase': term,
                 'sort': 'relative',
                 'per_page': 10,
+                'start_date': cw.start_date,
+                'end_date': cw.end_date,
             },
             success: (data) ->
                 div.html ''
@@ -194,11 +337,16 @@ class window.CapitolWords
         }
 
     populateTermDetailPage: (term) ->
-        this.getGraph term
+        if _(this.results).isUndefined()
+            this.getGraphData term
+
         this.getStatePopularity term, jQuery('#stateBarChart')
         this.getPartyPieChart term, jQuery('#partyPieChart')
         this.getLegislatorPopularity term, jQuery('#legislatorBarChart')
         this.getPartyGraph term
+
+        if this.start_date and this.end_date
+            this.getCREntries term
 
 
     populateLegislatorList: (legislators) ->
@@ -236,13 +384,21 @@ class window.CapitolWords
             func = ->
                 true
 
-        aVals = _(this.a['all']).select func
-        bVals = _(this.b['all']).select func
+        if typeof termDetailTerm isnt 'undefined'
+            vals = _(this.results).select func
+            percentages = _(vals).pluck 'percentage'
+            labelPositions = this.buildXLabels vals
+            imgUrl = this.showChart [percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300',]
+            jQuery('#termChart').attr('src', imgUrl)
+            jQuery('#customChart').attr('src', imgUrl)
 
-        labelPositions = this.buildXLabels aVals
-        labels = labelPositions[0]
-        positions = labelPositions[1]
-        this.showChart [_(aVals).pluck('percentage'), _(bVals).pluck('percentage')], labels, positions
+        else
+            aVals = _(this.a['all']).select func
+            bVals = _(this.b['all']).select func
+            labelPositions = this.buildXLabels aVals
+            labels = labelPositions[0]
+            positions = labelPositions[1]
+            this.showChart [_(aVals).pluck('percentage'), _(bVals).pluck('percentage')], labels, positions
 
 
     buildXLabels: (values) ->
@@ -335,7 +491,7 @@ class window.CapitolWords
         legend = []
 
         legendA = termA
-        if termA != 'Word or phrase'
+        if termA and termA != 'Word or phrase'
             if partyA and stateA
                 legendA += " [#{partyA}-#{stateA}]"
             else if partyA
@@ -350,7 +506,7 @@ class window.CapitolWords
         stateB = jQuery('#stateB').val()
 
         legendB = termB
-        if termB != 'Word or phrase'
+        if termB and termB != 'Word or phrase'
             if partyB and stateB
                 legendB += " [#{partyB}-#{stateB}]"
             else if partyB
@@ -363,8 +519,12 @@ class window.CapitolWords
         legend
 
 
-    showChart: (data, x_labels, x_label_positions) ->
-        chart = new GoogleChart 860, 340
+    showChart: (data, x_labels, x_label_positions, width, height, colors) ->
+
+        width = width or 860
+        height = height or 340
+
+        chart = new GoogleChart width, height
         values = []
         maxValue = 0
         max = 0
@@ -379,9 +539,10 @@ class window.CapitolWords
 
         chart.set_grid 0, 50, 2, 5
         chart.set_fill 'bg', 's', '00000000'
-        colors = ['8E2844', 'A85B08', 'AF9703']
+        if not colors
+            colors = ['8E2844', 'A85B08', 'AF9703']
         legend = this.build_legend()
-        chart.set_legend legend
+        chart.set_legend legend if not _(legend).isEmpty()
         chart.set_colors(colors.slice(0, legend.length))
 
         chart.set_axis_labels 'y', ['', "#{max}%"]
@@ -392,10 +553,14 @@ class window.CapitolWords
         if x_label_positions
             chart.set_axis_positions 'x', x_label_positions
 
-        jQuery('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url()).fadeIn 100
+        if jQuery('#chart img.realChart, #compareGraphic img.default')
+            jQuery('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url()).fadeIn 100
 
         if spinner
             spinner.stop()
+
+        chart.url()
+
 
     legislatorSearch: ->
         data = {
@@ -455,7 +620,7 @@ jQuery(document).ready ->
 
     cw = new window.CapitolWords
 
-    if typeof termDetailTerm != 'undefined'
+    if typeof termDetailTerm isnt 'undefined'
         cw.populateTermDetailPage termDetailTerm
 
     jQuery('img').error( ->
@@ -515,7 +680,7 @@ jQuery(document).ready ->
         cw.legislatorSearch()
     )
 
-    if jQuery('#slider-range').length != 0
+    if not _(jQuery('#slider-range')).isEmpty()
         d = new Date()
         jQuery('#slider-range').slider {
             range: true,
@@ -527,8 +692,13 @@ jQuery(document).ready ->
             stop: (event, ui) ->
                 cw.minMonth = "#{ui.values[0]}01"
                 cw.maxMonth = "#{ui.values[1]}12"
-                if _(cw.a).keys().length > 0 or _(cw.b).keys().length > 0
+                if not _(_(cw.a).keys()).isEmpty() or not _(_(cw.b).keys()).isEmpty()
                     cw.limit cw.minMonth, cw.maxMonth
+                else if typeof termDetailTerm isnt 'undefined' # For slider on term detail page
+                    cw.limit cw.minMonth, cw.maxMonth
+                    cw.start_date = cw.dateFromMonth(cw.minMonth)
+                    cw.end_date = cw.dateFromMonth(cw.maxMonth)
+                    cw.populateTermDetailPage termDetailTerm
         }
         jQuery('#years').val jQuery('#slider-range').slider('values', 0) + ' - ' + jQuery('#slider-range').slider('values', 1)
 
@@ -538,4 +708,3 @@ jQuery(document).ready ->
             if jQuery(this).is ':visible' then t.addClass 'expanded' else t.removeClass 'expanded'
         )
     )
-

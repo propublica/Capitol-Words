@@ -1,5 +1,11 @@
 (function() {
   var spinner;
+  var __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
+    }
+    return -1;
+  };
   jQuery.noConflict();
   spinner = null;
   window.CapitolWords = (function() {
@@ -91,19 +97,56 @@
         }
       });
     };
+    CapitolWords.prototype.dateFromMonth = function(month) {
+      var datePieces;
+      datePieces = month.match(/(\d{4})(\d{2})/).slice(1, 3);
+      datePieces.push('01');
+      return datePieces.join('-');
+    };
+    CapitolWords.prototype.getGraphData = function(term) {
+      var cw, data, url;
+      data = {
+        'phrase': term,
+        'granularity': 'month',
+        'percentages': 'true',
+        'mincount': 0,
+        'legend': false
+      };
+      url = 'http://capitolwords.org/api/dates.json';
+      cw = this;
+      return jQuery.ajax({
+        dataType: 'jsonp',
+        url: url,
+        data: data,
+        success: function(data) {
+          var counts, customImgTag, imgUrl, labelPositions, overallImgTag, percentages, results;
+          results = data['results'];
+          cw.results = results;
+          counts = _(results).pluck('count');
+          percentages = _(results).pluck('percentage');
+          labelPositions = cw.buildXLabels(results);
+          imgUrl = cw.showChart([percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300']);
+          overallImgTag = "<img id=\"termChart\" src=\"" + imgUrl + "\" alt=\"Timeline of occurrences of " + term + "\"/>";
+          customImgTag = "<img id=\"customChart\" src=\"" + imgUrl + "\" alt=\"Custom timeline of occurrences of \"" + term + "\"/>";
+          jQuery('#overallTimeline').html(overallImgTag);
+          return jQuery('#customTimeline').append(customImgTag);
+        }
+      });
+    };
     CapitolWords.prototype.getGraph = function(term) {
-      var url;
+      var data, url;
+      data = {
+        'phrase': term,
+        'granularity': 'month',
+        'percentages': 'true',
+        'mincount': 0,
+        'legend': false
+      };
       url = 'http://capitolwords.org/api/chart/timeline.json';
       return jQuery.ajax({
         dataType: 'jsonp',
         url: url,
-        data: {
-          'phrase': term,
-          'granularity': 'month',
-          'percentages': 'true',
-          'mincount': 0,
-          'legend': false
-        },
+        data: data,
         success: function(data) {
           var customImgTag, imgUrl, overallImgTag, results;
           results = data['results'];
@@ -116,8 +159,9 @@
       });
     };
     CapitolWords.prototype.getPartyGraph = function(term) {
-      var url;
+      var cw, url;
       url = 'http://capitolwords.org/api/chart/timeline.json';
+      cw = this;
       return jQuery.ajax({
         dataType: 'jsonp',
         url: url,
@@ -127,7 +171,9 @@
           'percentages': 'true',
           'mincount': 0,
           'legend': true,
-          'split_by_party': true
+          'split_by_party': true,
+          'start_date': cw.start_date,
+          'end_date': cw.end_date
         },
         success: function(data) {
           var imgTag, imgUrl, results;
@@ -138,15 +184,84 @@
         }
       });
     };
+    CapitolWords.prototype.titleCase = function(s) {
+      return s.replace(/\w\S*/g, function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      });
+    };
+    CapitolWords.prototype.highlightEntries = function(entries, term) {
+      var entry_matches, regexp;
+      entry_matches = [];
+      regexp = new RegExp(term, "ig");
+      _(entries).each(function(entry) {
+        var match;
+        match = null;
+        _(entry['speaking']).each(function(graf) {
+          var matcher, versions_of_term;
+          graf = graf.replace(/\n/, '');
+          versions_of_term = _(graf.match(regexp)).uniq();
+          if (!_(versions_of_term).isEmpty()) {
+            matcher = new RegExp('(' + versions_of_term.join('|') + ')');
+            match = graf.replace(matcher, function(a, b) {
+              return "<em>" + b + "</em>";
+            });
+            return;
+          }
+        });
+        entry['match'] = match;
+        return entry_matches.push(entry);
+      });
+      return entry_matches;
+    };
+    CapitolWords.prototype.getCREntries = function(term) {
+      var cw, data, url;
+      url = 'http://capitolwords.org/api/text.json';
+      cw = this;
+      data = {
+        'phrase': term,
+        'bioguide_id': "['' TO *]",
+        'start_date': cw.start_date,
+        'end_date': cw.end_date,
+        'sort': 'date desc,score desc'
+      };
+      return jQuery.ajax({
+        dataType: 'jsonp',
+        url: url,
+        data: data,
+        success: function(data) {
+          var entries, html, results, urls;
+          results = data['results'];
+          entries = [];
+          urls = [];
+          _(results).each(function(entry) {
+            var _ref;
+            if (entries.length >= 5) {
+              return;
+            }
+            if (_ref = entry['origin_url'], __indexOf.call(urls, _ref) < 0) {
+              urls.push(entry['origin_url']);
+              return entries.push(entry);
+            }
+          });
+          entries = cw.highlightEntries(entries, term);
+          html = "";
+          _(entries).each(function(entry) {
+            return html += "<li>\n    <h5><a href=\"\">" + (cw.titleCase(entry['title'])) + "</a></h5>\n    <p>" + entry['speaker_first'] + " " + entry['speaker_last'] + ", " + entry['speaker_party'] + "-" + entry['speaker_state'] + "</p>\n    <p>" + entry.date + "</p>\n    <p>" + entry.match + "</p>\n</li>";
+          });
+          return jQuery('#crEntries').html(html);
+        }
+      });
+    };
     CapitolWords.prototype.getPartyPieChart = function(term, div, width, height, callback) {
-      var url;
-      if (typeof width === 'undefined') {
+      var cw, url;
+      if (_(width).isUndefined()) {
         width = '';
       }
-      if (typeof width === 'undefined') {
+      if (_(width).isUndefined()) {
         height = '';
       }
       url = 'http://capitolwords.org/api/chart/pie.json';
+      cw = this;
       return jQuery.ajax({
         dataType: 'jsonp',
         url: url,
@@ -154,7 +269,9 @@
           'phrase': term,
           'entity_type': 'party',
           'width': width,
-          'height': height
+          'height': height,
+          'start_date': cw.start_date,
+          'end_date': cw.end_date
         },
         success: function(data) {
           var imgUrl, results;
@@ -162,7 +279,7 @@
           imgUrl = results['url'];
           return div.find('.default').fadeOut('slow', function() {
             return div.find('.realChart').attr('src', imgUrl).attr('alt', "Pie chart of occurrences of " + term + " by party").fadeIn('slow', function() {
-              if (typeof callback !== 'undefined') {
+              if (!_(callback).isUndefined()) {
                 return callback(term, div);
               }
             });
@@ -170,11 +287,13 @@
         }
       });
     };
-    CapitolWords.prototype.addLegislatorToChart = function(result, maxcount, div) {
-      var bioguide_id, pct, url;
+    CapitolWords.prototype.legislatorData = [];
+    CapitolWords.prototype.addLegislatorToChart = function(result, maxcount, div, callback) {
+      var bioguide_id, cw, pct, url;
       url = 'http://capitolwords.org/api/legislators.json';
       bioguide_id = result['legislator'];
       pct = (result['count'] / maxcount) * 100;
+      cw = this;
       return jQuery.ajax({
         dataType: 'jsonp',
         url: url,
@@ -183,10 +302,14 @@
           'bioguide_id': bioguide_id
         },
         success: function(data) {
-          var html;
           url = "/legislator/" + bioguide_id + "-" + data['slug'];
-          html = "<li>\n    <span class=\"tagValue\" style=\"width:" + pct + "%\">\n        <span class=\"tagPercent\">" + pct + "%</span>\n        <span class=\"tagNumber\"></span>\n    </span>\n    <span class=\"barChartTitle\"><a href=\"" + url + "\">\n        " + data['honorific'] + " " + data['full_name'] + ", " + data['party'] + "-" + data['state'] + "\n    </a>\n    </span>\n    </li>";
-          return div.append(html);
+          cw.legislatorData.push({
+            url: url,
+            data: data,
+            result: result,
+            pct: pct
+          });
+          return callback();
         }
       });
     };
@@ -200,17 +323,33 @@
         data: {
           'phrase': term,
           'sort': 'relative',
-          'per_page': 10
+          'per_page': 10,
+          'start_date': cw.start_date,
+          'end_date': cw.end_date
         },
         success: function(data) {
-          var maxcount, result, results, _i, _len, _results;
+          var listItems, maxcount, render, renderWhenDone, result, results, _i, _len, _results;
           results = data['results'];
           maxcount = results[0]['count'];
-          div.html('');
+          listItems = [];
+          cw.legislatorData = [];
+          render = function() {
+            cw.legislatorData.sort(function(a, b) {
+              return b['pct'] - a['pct'];
+            });
+            window.console.log(cw.legislatorData);
+            _(cw.legislatorData).each(function(legislator) {
+              var html;
+              html = "<li>\n    <span class=\"tagValue\" style=\"width:" + legislator['pct'] + "%\">\n        <span class=\"tagPercent\">" + legislator['pct'] + "%</span>\n        <span class=\"tagNumber\"></span>\n    </span>\n    <span class=\"barChartTitle\"><a href=\"" + legislator['url'] + "\">\n        " + legislator['data']['honorific'] + " " + legislator['data']['full_name'] + ", " + legislator['data']['party'] + "-" + legislator['data']['state'] + "\n    </a>\n    </span>\n    </li>";
+              return listItems.push(html);
+            });
+            return div.html(listItems.join(''));
+          };
+          renderWhenDone = _(results.length).after(render);
           _results = [];
           for (_i = 0, _len = results.length; _i < _len; _i++) {
             result = results[_i];
-            _results.push(cw.addLegislatorToChart(result, maxcount, div));
+            _results.push(cw.addLegislatorToChart(result, maxcount, div, renderWhenDone));
           }
           return _results;
         }
@@ -226,7 +365,9 @@
         data: {
           'phrase': term,
           'sort': 'relative',
-          'per_page': 10
+          'per_page': 10,
+          'start_date': cw.start_date,
+          'end_date': cw.end_date
         },
         success: function(data) {
           var maxcount, results;
@@ -249,11 +390,16 @@
       });
     };
     CapitolWords.prototype.populateTermDetailPage = function(term) {
-      this.getGraph(term);
+      if (_(this.results).isUndefined()) {
+        this.getGraphData(term);
+      }
       this.getStatePopularity(term, jQuery('#stateBarChart'));
       this.getPartyPieChart(term, jQuery('#partyPieChart'));
       this.getLegislatorPopularity(term, jQuery('#legislatorBarChart'));
-      return this.getPartyGraph(term);
+      this.getPartyGraph(term);
+      if (this.start_date && this.end_date) {
+        return this.getCREntries(term);
+      }
     };
     CapitolWords.prototype.populateLegislatorList = function(legislators) {
       var buildTable;
@@ -277,7 +423,7 @@
     CapitolWords.prototype.minMonth = void 0;
     CapitolWords.prototype.maxMonth = void 0;
     CapitolWords.prototype.limit = function(minMonth, maxMonth) {
-      var aVals, bVals, func, labelPositions, labels, positions;
+      var aVals, bVals, func, imgUrl, labelPositions, labels, percentages, positions, vals;
       if (minMonth && maxMonth) {
         func = function(v) {
           return v['month'] >= minMonth && v['month'] <= maxMonth;
@@ -287,12 +433,21 @@
           return true;
         };
       }
-      aVals = _(this.a['all']).select(func);
-      bVals = _(this.b['all']).select(func);
-      labelPositions = this.buildXLabels(aVals);
-      labels = labelPositions[0];
-      positions = labelPositions[1];
-      return this.showChart([_(aVals).pluck('percentage'), _(bVals).pluck('percentage')], labels, positions);
+      if (typeof termDetailTerm !== 'undefined') {
+        vals = _(this.results).select(func);
+        percentages = _(vals).pluck('percentage');
+        labelPositions = this.buildXLabels(vals);
+        imgUrl = this.showChart([percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300']);
+        jQuery('#termChart').attr('src', imgUrl);
+        return jQuery('#customChart').attr('src', imgUrl);
+      } else {
+        aVals = _(this.a['all']).select(func);
+        bVals = _(this.b['all']).select(func);
+        labelPositions = this.buildXLabels(aVals);
+        labels = labelPositions[0];
+        positions = labelPositions[1];
+        return this.showChart([_(aVals).pluck('percentage'), _(bVals).pluck('percentage')], labels, positions);
+      }
     };
     CapitolWords.prototype.buildXLabels = function(values) {
       var labels, positions, year, years;
@@ -393,7 +548,7 @@
       stateA = jQuery('#stateA').val();
       legend = [];
       legendA = termA;
-      if (termA !== 'Word or phrase') {
+      if (termA && termA !== 'Word or phrase') {
         if (partyA && stateA) {
           legendA += " [" + partyA + "-" + stateA + "]";
         } else if (partyA) {
@@ -407,7 +562,7 @@
       partyB = jQuery(jQuery('.partyB input:checked')[0]).val();
       stateB = jQuery('#stateB').val();
       legendB = termB;
-      if (termB !== 'Word or phrase') {
+      if (termB && termB !== 'Word or phrase') {
         if (partyB && stateB) {
           legendB += " [" + partyB + "-" + stateB + "]";
         } else if (partyB) {
@@ -419,9 +574,11 @@
       }
       return legend;
     };
-    CapitolWords.prototype.showChart = function(data, x_labels, x_label_positions) {
-      var chart, colors, cw, legend, max, maxValue, values;
-      chart = new GoogleChart(860, 340);
+    CapitolWords.prototype.showChart = function(data, x_labels, x_label_positions, width, height, colors) {
+      var chart, cw, legend, max, maxValue, values;
+      width = width || 860;
+      height = height || 340;
+      chart = new GoogleChart(width, height);
       values = [];
       maxValue = 0;
       max = 0;
@@ -436,9 +593,13 @@
       });
       chart.set_grid(0, 50, 2, 5);
       chart.set_fill('bg', 's', '00000000');
-      colors = ['8E2844', 'A85B08', 'AF9703'];
+      if (!colors) {
+        colors = ['8E2844', 'A85B08', 'AF9703'];
+      }
       legend = this.build_legend();
-      chart.set_legend(legend);
+      if (!_(legend).isEmpty()) {
+        chart.set_legend(legend);
+      }
       chart.set_colors(colors.slice(0, legend.length));
       chart.set_axis_labels('y', ['', "" + max + "%"]);
       if (x_labels) {
@@ -447,10 +608,13 @@
       if (x_label_positions) {
         chart.set_axis_positions('x', x_label_positions);
       }
-      jQuery('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url()).fadeIn(100);
-      if (spinner) {
-        return spinner.stop();
+      if (jQuery('#chart img.realChart, #compareGraphic img.default')) {
+        jQuery('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url()).fadeIn(100);
       }
+      if (spinner) {
+        spinner.stop();
+      }
+      return chart.url();
     };
     CapitolWords.prototype.legislatorSearch = function() {
       var data;
@@ -585,7 +749,7 @@
     jQuery('#searchFilterButton').bind('click', function() {
       return cw.legislatorSearch();
     });
-    if (jQuery('#slider-range').length !== 0) {
+    if (!_(jQuery('#slider-range')).isEmpty()) {
       d = new Date();
       jQuery('#slider-range').slider({
         range: true,
@@ -598,8 +762,13 @@
         stop: function(event, ui) {
           cw.minMonth = "" + ui.values[0] + "01";
           cw.maxMonth = "" + ui.values[1] + "12";
-          if (_(cw.a).keys().length > 0 || _(cw.b).keys().length > 0) {
+          if (!_(_(cw.a).keys()).isEmpty() || !_(_(cw.b).keys()).isEmpty()) {
             return cw.limit(cw.minMonth, cw.maxMonth);
+          } else if (typeof termDetailTerm !== 'undefined') {
+            cw.limit(cw.minMonth, cw.maxMonth);
+            cw.start_date = cw.dateFromMonth(cw.minMonth);
+            cw.end_date = cw.dateFromMonth(cw.maxMonth);
+            return cw.populateTermDetailPage(termDetailTerm);
           }
         }
       });
