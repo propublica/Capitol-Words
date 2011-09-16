@@ -225,7 +225,7 @@ input { padding: 5px 8px; background: #e6e4e2 url(../img/bg_input.png) left bott
 
 #signUp { padding-top: 5px;}
 #signUp input { margin-right: 10px;}
-#signUp button { padding: 2px 15px; background: url("img/bg_button.png") left top repeat-x #706363;}
+#signUp button { padding: 2px 15px; background: url("../img/bg_button.png") left top repeat-x #706363;}
 
 #navWrapper { background: url(../img/bg_footerNav.jpg) center top repeat-x; height: 48px;}
 #navWrapper li { background-color: #494141; padding: 0 20px; margin-top: 5px; margin-top: 12px;}
@@ -305,11 +305,11 @@ th {text-transform: uppercase;}
 #searchCompare ul>li ul.terms>li {display: inline}
 #searchCompare ul>li.filterBy ul>li {display: block; padding: 0 0;}
 
-#searchCompare .filterBy{ background: url('img/bg_border_vert.png') top left no-repeat; padding: 0 30px 0 30px;}
+#searchCompare .filterBy{ background: url('../img/bg_border_vert.png') top left no-repeat; padding: 0 30px 0 30px;}
 #searchCompare .filterBy label{ width: 28px; display: inline-block}
 #searchCompare .filterBy li{margin-bottom: 15px}
 #searchCompare select{ margin-left: 10px; width: 233px;}
-#searchCompare .submit{background: url('img/bg_border_vert.png') top left no-repeat; padding: 0 0 0 30px;}
+#searchCompare .submit{background: url('../img/bg_border_vert.png') top left no-repeat; padding: 0 0 0 30px;}
 
 #fullColumn #searchCompare, #fullColumn #compareGraphic{ margin-left: -30px; width: 890px; margin-bottom: 50px}
 
@@ -391,7 +391,7 @@ header #searchCompare{
 
 #searchCompare #betweenItem{
 	padding: 8px 20px 0 20px;
-	background: url("img/bg_border_vert.png") center 30px no-repeat;
+	background: url("../img/bg_border_vert.png") center 30px no-repeat;
 	font-weight: 700;
 	font-style: italic;
 }
