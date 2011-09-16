@@ -148,7 +148,7 @@ class window.CapitolWords
             url: url,
             data: {
                 'phrase': term,
-                'sort': relative,
+                'sort': 'relative',
                 'per_page': 10,
             },
             success: (data) ->
@@ -165,7 +165,7 @@ class window.CapitolWords
             url: url,
             data: {
                 'phrase': term,
-                'sort': relative,
+                'sort': 'relative',
                 'per_page': 10,
             },
             success: (data) ->

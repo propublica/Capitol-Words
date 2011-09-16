@@ -198,7 +198,7 @@
         url: url,
         data: {
           'phrase': term,
-          'sort': relative,
+          'sort': 'relative',
           'per_page': 10
         },
         success: function(data) {
@@ -223,7 +223,7 @@
         url: url,
         data: {
           'phrase': term,
-          'sort': relative,
+          'sort': 'relative',
           'per_page': 10
         },
         success: function(data) {
