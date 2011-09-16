@@ -70,6 +70,7 @@
                                 {% endif %}
                             </div>
                         </div>
+                        <div id="slider-range"></div>
                     </div> 
                     <div class="module">
                         <div class="rightHeader">
@@ -95,7 +96,7 @@
                         <div class="rightHeader">
                             <h3>Occurrences in the Congressional Record</h3>
                         </div>
-                        <ul>
+                        <ul id="crEntries">
                             {% for entry in entries|slice:"5" %}
                             <li>
                             <h5><a href="{% entry_detail_url entry.origin_url entry.title %}">{{ entry.title|smart_title|typogrify }}</a></h5>
