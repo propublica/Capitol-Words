@@ -22,7 +22,7 @@ from capitolwords import capitolwords, ApiError
 from ngrams.models import *
 
 
-capitolwords = capitolwords(api_key=settings.SUNLIGHT_API_KEY, domain='localhost:8000/api')
+capitolwords = capitolwords(api_key=settings.SUNLIGHT_API_KEY, domain=settings.API_ROOT)
 
 # These are used in a regular expression so must be escaped.
 # From NLTK
