@@ -544,21 +544,20 @@
     jQuery('#timelineToggle input').bind('click', function() {
       var selected, selectedId, timelines;
       selectedId = jQuery('input[name=toggle]:checked', '#timelineToggle').attr('id');
-      timelines = {
-        party: jQuery('#partyTimeline'),
-        custom: jQuery('#customTimeline'),
-        overall: jQuery('#overallTimeline')
-      };
+      timelines = [['party', jQuery('#partyTimeline')], ['custom', jQuery('#customTimeline')], ['overall', jQuery('#overallTimeline')]];
       selected = {
-        overallTimelineSelect: 'overall',
-        partyTimelineSelect: 'party',
-        customTimelineSelect: 'custom'
+        'overallTimelineSelect': 'overall',
+        'partyTimelineSelect': 'party',
+        'customTimelineSelect': 'custom'
       }[selectedId];
-      return _(timelines).each(function(k, v) {
-        if (k === selected) {
-          return v.show();
+      return _(timelines).each(function(timeline) {
+        var name, obj;
+        name = timeline[0];
+        obj = timeline[1];
+        if (name === selected) {
+          return obj.show();
         } else {
-          return v.hide();
+          return obj.hide();
         }
       });
     });

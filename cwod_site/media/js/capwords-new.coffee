@@ -471,22 +471,24 @@ jQuery(document).ready ->
 
     jQuery('#timelineToggle input').bind('click', ->
         selectedId = jQuery('input[name=toggle]:checked', '#timelineToggle').attr 'id'
-        timelines = {
-            party: jQuery('#partyTimeline'),
-            custom: jQuery('#customTimeline'),
-            overall: jQuery('#overallTimeline'),
-        }
+        timelines = [
+            ['party', jQuery('#partyTimeline')],
+            ['custom', jQuery('#customTimeline')],
+            ['overall', jQuery('#overallTimeline')],
+        ]
         selected = {
-            overallTimelineSelect: 'overall',
-            partyTimelineSelect: 'party',
-            customTimelineSelect: 'custom',
+            'overallTimelineSelect': 'overall',
+            'partyTimelineSelect': 'party',
+            'customTimelineSelect': 'custom',
         }[selectedId]
 
-        _(timelines).each (k, v) ->
-            if k == selected
-                v.show()
+        _(timelines).each (timeline) ->
+            name = timeline[0]
+            obj = timeline[1]
+            if name == selected
+                obj.show()
             else
-                v.hide()
+                obj.hide()
     )
 
     jQuery('#partySelect, #stateSelect').change( ->
