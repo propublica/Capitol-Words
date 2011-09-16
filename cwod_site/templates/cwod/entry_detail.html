@@ -31,6 +31,7 @@
                         </div>
 						</header>
                         <div class="crContent">
+
                         {% for chunk in chunks %}
 							<div class="crSpeaker">
                             {% if chunk.bioguide_id %}
@@ -48,7 +49,7 @@
                                 {% endwith %}
                             {% endif %}
                             {% for graf in chunk.speaking %}
-                            <p {% if not chunk.bioguide_id %}class="nobioguide"{% endif %}>{{ graf|typogrify }}</p>
+                            <p {% if not chunk.bioguide_id %}class="nobioguide"{% endif %}>{{ graf }}</p>
                             {% endfor %}
                             <div class="clear"></div>
                         </div>
