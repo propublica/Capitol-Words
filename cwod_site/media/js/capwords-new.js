@@ -191,8 +191,9 @@
       });
     };
     CapitolWords.prototype.getLegislatorPopularity = function(term, div) {
-      var url;
+      var cw, url;
       url = 'http://capitolwords.org/api/phrases/legislator.json';
+      cw = this;
       return jQuery.ajax({
         dataType: 'jsonp',
         url: url,
@@ -209,7 +210,7 @@
           _results = [];
           for (_i = 0, _len = results.length; _i < _len; _i++) {
             result = results[_i];
-            _results.push(this.addLegislatorToChart(result, maxcount, div));
+            _results.push(cw.addLegislatorToChart(result, maxcount, div));
           }
           return _results;
         }
@@ -237,7 +238,7 @@
             abbrev = result['state'];
             state = abbrev;
             if (cw.states.hasOwnProperty(state)) {
-              state = this.states[state];
+              state = cw.states[state];
             }
             url = "/state/" + abbrev;
             pct = (result['count'] / maxcount) * 100;
