@@ -490,7 +490,7 @@ class window.CapitolWords
         )
         [labels, positions]
 
-    submitHomepageCompareForm: ->
+    submitHomepageCompareForm: (skipState) ->
         cw = this
         opts = {
             lines: 12,
@@ -506,17 +506,17 @@ class window.CapitolWords
         spinner = new Spinner(opts).spin target
 
         url = 'http://capitolwords.org/api/dates.json'
-        phraseA = jQuery('#terma').val()
-        phraseA = if phraseA == 'Word or phrase' then '' else phraseA
+        #phraseA = jQuery('#terma').val()
+        #phraseA = if phraseA == 'Word or phrase' then '' else phraseA
 
-        phraseB = jQuery('#termb').val()
-        phraseB = if phraseB == 'Word or phrase' then '' else phraseB
+        #phraseB = jQuery('#termb').val()
+        #phraseB = if phraseB == 'Word or phrase' then '' else phraseB
 
         jQuery.ajax {
             dataType: 'jsonp',
             url: url,
             data: {
-                phrase: phraseA,
+                phrase: cw.phraseA(),
                 state: jQuery('#stateA').val() or '',
                 party: jQuery(jQuery('.partyA input:checked')[0]).val(),
                 granularity: 'month',
@@ -533,7 +533,7 @@ class window.CapitolWords
                     dataType: 'jsonp',
                     url : url,
                     data: {
-                        phrase: phraseB,
+                        phrase: cw.phraseB(),
                         state: jQuery('#stateB').val() or '',
                         party: jQuery(jQuery('.partyB input:checked')[0]).val(),
                         granularity: 'month',
@@ -560,7 +560,22 @@ class window.CapitolWords
                 }
         }
 
+        if not skipState
+            this.makeHomepageHistoryState()
+
+
+    phraseA: ->
+        phraseA = jQuery('#terma').val()
+        if phraseA == 'Word or phrase' then '' else phraseA
+
+
+    phraseB: ->
+        phraseB = jQuery('#termb').val()
+        if phraseB == 'Word or phrase' then '' else phraseB
+
+
     smoothing: 0
+
 
     build_legend: ->
         termA = jQuery('#terma').val()
@@ -658,6 +673,74 @@ class window.CapitolWords
                 cw.populateLegislatorList data['results']
         }
 
+
+    readHomepageHistory: ->
+        mapping = {'terma': '#terma', 'termb': '#termb', 'statea': '#stateA', 'stateb': '#stateB', }
+        hash = History.getState().hash.split('?')[1]
+        data = {}
+        showAdvanced = false
+        cw = this
+
+        if hash
+            pieces = hash.split '&'
+            _(pieces).each (piece) ->
+                [k, v] = piece.split '='
+                id = mapping[k]
+                jQuery("#{id}").val(v)
+
+                if k in ['partya', 'partyb', 'statea', 'stateb']
+                    showAdvanced = true
+
+                if k == 'partya' and v
+                    jQuery("#partyA#{v}").attr('checked', true)
+
+                else if k == 'partyb' and v
+                    jQuery("#partyB#{v}").attr('checked', true)
+
+                else if k == 'start' and v
+                    cw.minMonth = v
+
+                else if k == 'end' and v
+                    cw.maxMonth = v
+
+            if showAdvanced
+                jQuery('ul.wordFilter').show()
+                jQuery('.advanced').addClass 'expanded'
+
+            if this.minMonth or this.maxMonth
+                startYear = this.minMonth.slice(0, 4)
+                endYear = this.maxMonth.slice(0, 4)
+                jQuery("#slider-range").slider("option", "values", [startYear, endYear])
+                this.limit this.minMonth, this.maxMonth
+
+            this.submitHomepageCompareForm(true)
+
+
+    makeHomepageHistoryState: (slid) ->
+        stateA = jQuery('#stateA').val() or ''
+        stateB = jQuery('#stateB').val() or ''
+        partyA = jQuery(jQuery('.partyA input:checked')[0]).val()
+        partyB = jQuery(jQuery('.partyB input:checked')[0]).val()
+
+        pieces = [
+            ["terma", this.phraseA(),]
+            ["termb", this.phraseB(),]
+            ["statea", stateA,]
+            ["stateb", stateB,]
+            ["partya", partyA,]
+            ["partyb", partyB,]
+            ["start", this.minMonth,],
+            ["end", this.maxMonth,],
+        ]
+        pieces = _(pieces).select( (item) ->
+            return item[1]
+        ).map( (item) ->
+            return "#{item[0]}=#{item[1]}"
+        )
+
+        hash = pieces.join '&'
+        History.pushState {'slid': slid}, '', "?#{hash}"
+
     readLegislatorHistory: ->
         hash = History.getState().hash.split('?')[1]
         data = {}
@@ -665,7 +748,7 @@ class window.CapitolWords
             pieces = hash.split '&'
             chamber = party = congress = state = undefined
             _(pieces).each (piece) ->
-                [k, v] = piece.split('=')
+                [k, v] = piece.split '='
                 jQuery("##{k}").val(v)
                 data[k] = v
 
@@ -787,14 +870,29 @@ jQuery(document).ready ->
             cw.readLegislatorHistory()
         )
 
+    if window.location.pathname.match /^\/?$/
+        cw.readHomepageHistory()
+        History.Adapter.bind(window, 'statechange', ->
+            if History.getState()['data']['slid'] isnt true
+                cw.readHomepageHistory()
+        )
+
 
     if not _(jQuery('#slider-range')).isEmpty()
         d = new Date()
+
+        if cw.minMonth and cw.maxMonth
+            startYear = cw.minMonth.slice(0, 4)
+            endYear = cw.maxMonth.slice(0, 4)
+        else
+            startYear = 1996
+            endYear = d.getFullYear()
+
         jQuery('#slider-range').slider {
             range: true,
             min: 1996,
             max: d.getFullYear(),
-            values: [1996, d.getFullYear()],
+            values: [startYear, endYear],
             slide: (event, ui) ->
                 jQuery('#years').val "#{ui.values[0]}-#{ui.values[1]}"
             stop: (event, ui) ->
@@ -808,8 +906,9 @@ jQuery(document).ready ->
                     cw.start_date = cw.dateFromMonth(cw.minMonth)
                     cw.end_date = cw.dateFromMonth(cw.maxMonth)
                     cw.populateTermDetailPage termDetailTerm
+                cw.makeHomepageHistoryState(true)
         }
-        jQuery('#years').val jQuery('#slider-range').slider('values', 0) + ' - ' + jQuery('#slider-range').slider('values', 1)
+        #jQuery('#years').val jQuery('#slider-range').slider('values', 0) + ' - ' + jQuery('#slider-range').slider('values', 1)
 
     jQuery('.advanced').bind('click', ->
         t = jQuery(this)

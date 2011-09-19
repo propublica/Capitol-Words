@@ -565,8 +565,8 @@
       });
       return [labels, positions];
     };
-    CapitolWords.prototype.submitHomepageCompareForm = function() {
-      var cw, opts, phraseA, phraseB, target, url;
+    CapitolWords.prototype.submitHomepageCompareForm = function(skipState) {
+      var cw, opts, target, url;
       cw = this;
       opts = {
         lines: 12,
@@ -581,15 +581,11 @@
       target = document.getElementById('compareGraphic');
       spinner = new Spinner(opts).spin(target);
       url = 'http://capitolwords.org/api/dates.json';
-      phraseA = jQuery('#terma').val();
-      phraseA = phraseA === 'Word or phrase' ? '' : phraseA;
-      phraseB = jQuery('#termb').val();
-      phraseB = phraseB === 'Word or phrase' ? '' : phraseB;
-      return jQuery.ajax({
+      jQuery.ajax({
         dataType: 'jsonp',
         url: url,
         data: {
-          phrase: phraseA,
+          phrase: cw.phraseA(),
           state: jQuery('#stateA').val() || '',
           party: jQuery(jQuery('.partyA input:checked')[0]).val(),
           granularity: 'month',
@@ -606,7 +602,7 @@
             dataType: 'jsonp',
             url: url,
             data: {
-              phrase: phraseB,
+              phrase: cw.phraseB(),
               state: jQuery('#stateB').val() || '',
               party: jQuery(jQuery('.partyB input:checked')[0]).val(),
               granularity: 'month',
@@ -634,6 +630,27 @@
           });
         }
       });
+      if (!skipState) {
+        return this.makeHomepageHistoryState();
+      }
+    };
+    CapitolWords.prototype.phraseA = function() {
+      var phraseA;
+      phraseA = jQuery('#terma').val();
+      if (phraseA === 'Word or phrase') {
+        return '';
+      } else {
+        return phraseA;
+      }
+    };
+    CapitolWords.prototype.phraseB = function() {
+      var phraseB;
+      phraseB = jQuery('#termb').val();
+      if (phraseB === 'Word or phrase') {
+        return '';
+      } else {
+        return phraseB;
+      }
     };
     CapitolWords.prototype.smoothing = 0;
     CapitolWords.prototype.build_legend = function() {
@@ -731,6 +748,68 @@
         }
       });
     };
+    CapitolWords.prototype.readHomepageHistory = function() {
+      var cw, data, endYear, hash, mapping, pieces, showAdvanced, startYear;
+      mapping = {
+        'terma': '#terma',
+        'termb': '#termb',
+        'statea': '#stateA',
+        'stateb': '#stateB'
+      };
+      hash = History.getState().hash.split('?')[1];
+      data = {};
+      showAdvanced = false;
+      cw = this;
+      if (hash) {
+        pieces = hash.split('&');
+        _(pieces).each(function(piece) {
+          var id, k, v, _ref;
+          _ref = piece.split('='), k = _ref[0], v = _ref[1];
+          id = mapping[k];
+          jQuery("" + id).val(v);
+          if (k === 'partya' || k === 'partyb' || k === 'statea' || k === 'stateb') {
+            showAdvanced = true;
+          }
+          if (k === 'partya' && v) {
+            return jQuery("#partyA" + v).attr('checked', true);
+          } else if (k === 'partyb' && v) {
+            return jQuery("#partyB" + v).attr('checked', true);
+          } else if (k === 'start' && v) {
+            return cw.minMonth = v;
+          } else if (k === 'end' && v) {
+            return cw.maxMonth = v;
+          }
+        });
+        if (showAdvanced) {
+          jQuery('ul.wordFilter').show();
+          jQuery('.advanced').addClass('expanded');
+        }
+        if (this.minMonth || this.maxMonth) {
+          startYear = this.minMonth.slice(0, 4);
+          endYear = this.maxMonth.slice(0, 4);
+          jQuery("#slider-range").slider("option", "values", [startYear, endYear]);
+          this.limit(this.minMonth, this.maxMonth);
+        }
+        return this.submitHomepageCompareForm(true);
+      }
+    };
+    CapitolWords.prototype.makeHomepageHistoryState = function(slid) {
+      var hash, partyA, partyB, pieces, stateA, stateB;
+      stateA = jQuery('#stateA').val() || '';
+      stateB = jQuery('#stateB').val() || '';
+      partyA = jQuery(jQuery('.partyA input:checked')[0]).val();
+      partyB = jQuery(jQuery('.partyB input:checked')[0]).val();
+      pieces = [["terma", this.phraseA()], ["termb", this.phraseB()], ["statea", stateA], ["stateb", stateB], ["partya", partyA], ["partyb", partyB], ["start", this.minMonth], ["end", this.maxMonth]];
+      pieces = _(pieces).select(function(item) {
+        return item[1];
+      }).map(function(item) {
+        return "" + item[0] + "=" + item[1];
+      });
+      hash = pieces.join('&');
+      return History.pushState({
+        'slid': slid
+      }, '', "?" + hash);
+    };
     CapitolWords.prototype.readLegislatorHistory = function() {
       var chamber, congress, data, hash, party, pieces, state;
       hash = History.getState().hash.split('?')[1];
@@ -804,7 +883,7 @@
     return CapitolWords;
   })();
   jQuery(document).ready(function() {
-    var cw, d;
+    var cw, d, endYear, startYear;
     cw = new window.CapitolWords;
     if (typeof termDetailTerm !== 'undefined') {
       cw.populateTermDetailPage(termDetailTerm);
@@ -878,13 +957,28 @@
         return cw.readLegislatorHistory();
       });
     }
+    if (window.location.pathname.match(/^\/?$/)) {
+      cw.readHomepageHistory();
+      History.Adapter.bind(window, 'statechange', function() {
+        if (History.getState()['data']['slid'] !== true) {
+          return cw.readHomepageHistory();
+        }
+      });
+    }
     if (!_(jQuery('#slider-range')).isEmpty()) {
       d = new Date();
+      if (cw.minMonth && cw.maxMonth) {
+        startYear = cw.minMonth.slice(0, 4);
+        endYear = cw.maxMonth.slice(0, 4);
+      } else {
+        startYear = 1996;
+        endYear = d.getFullYear();
+      }
       jQuery('#slider-range').slider({
         range: true,
         min: 1996,
         max: d.getFullYear(),
-        values: [1996, d.getFullYear()],
+        values: [startYear, endYear],
         slide: function(event, ui) {
           return jQuery('#years').val("" + ui.values[0] + "-" + ui.values[1]);
         },
@@ -892,17 +986,17 @@
           cw.minMonth = "" + ui.values[0] + "01";
           cw.maxMonth = "" + ui.values[1] + "12";
           if (!_(_(cw.a).keys()).isEmpty() || !_(_(cw.b).keys()).isEmpty()) {
-            return cw.limit(cw.minMonth, cw.maxMonth);
+            cw.limit(cw.minMonth, cw.maxMonth);
           } else if (typeof termDetailTerm !== 'undefined') {
             cw.limit(cw.minMonth, cw.maxMonth);
             cw.buildPartyGraph(cw.minMonth, cw.maxMonth);
             cw.start_date = cw.dateFromMonth(cw.minMonth);
             cw.end_date = cw.dateFromMonth(cw.maxMonth);
-            return cw.populateTermDetailPage(termDetailTerm);
+            cw.populateTermDetailPage(termDetailTerm);
           }
+          return cw.makeHomepageHistoryState(true);
         }
       });
-      jQuery('#years').val(jQuery('#slider-range').slider('values', 0) + ' - ' + jQuery('#slider-range').slider('values', 1));
     }
     return jQuery('.advanced').bind('click', function() {
       var t;
