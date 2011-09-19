@@ -55,7 +55,6 @@ class window.CapitolWords
             'granularity': 'month',
             'percentages': 'true',
             'mincount': 0,
-            'legend': false,
         }
 
         url = 'http://capitolwords.org/api/dates.json'
@@ -103,6 +102,73 @@ class window.CapitolWords
                 jQuery('#overallTimeline').html overallImgTag
                 #jQuery('#customTimeline').append customImgTag
         }
+
+
+    buildPartyGraph: (minMonth, maxMonth) ->
+        if minMonth and maxMonth
+            func = (v) ->
+                v['month'] >= minMonth and v['month'] <= maxMonth
+        else
+            func = ->
+                true
+
+        vals = [_(x[1]).select(func) for x in this.partyResults][0]
+        labelPositions = this.buildXLabels vals[0]
+        partyAPercentages = _(vals[0]).pluck 'percentage'
+        partyBPercentages = _(vals[1]).pluck 'percentage'
+        percentages = [partyAPercentages, partyBPercentages, ]
+        parties = [x[0] for x in this.partyResults]
+
+        colors = {'R': 'bb3110', 'D': '295e72', }
+
+        imgUrl = this.showChart [partyAPercentages, partyBPercentages,], labelPositions[0], labelPositions[1], 575, 300, [colors[this.partyResults[0][0]], colors[this.partyResults[1][0]],], [this.partyResults[0][0], this.partyResults[1][0],]
+        imgTag = "<img id=\"partyTermChart\" src=\"#{imgUrl}\"/>"
+        jQuery('#partyTimeline').html imgTag
+
+
+    getPartyGraphData: (term) ->
+        data = {
+            'phrase': term,
+            'granularity': 'month',
+            'percentages': true,
+            'mincount': 0,
+        }
+
+        url = 'http://capitolwords.org/api/dates.json'
+        cw = this
+
+        partyData = []
+
+        render = () ->
+            chartData = []
+            legendItems = []
+            cw.partyResults = []
+            _(partyData).each (partyResult) ->
+                cw.partyResults.push partyResult
+
+            cw.buildPartyGraph()
+
+        parties = ['R', 'D', ]
+        renderWhenDone = _(parties.length).after(render)
+
+        _(parties).each (party) ->
+            data = {
+                'party': party,
+                'phrase': term,
+                'granularity': 'month',
+                'percentages': true,
+                'mincount': 0,
+            }
+            jQuery.ajax {
+                dataType: 'jsonp',
+                url: url,
+                data: data,
+                success: (data) ->
+                    results = data['results']
+                    partyData.push [party, results]
+                    renderWhenDone()
+            }
+
 
     getPartyGraph: (term) ->
         url = 'http://capitolwords.org/api/chart/timeline.json'
@@ -267,7 +333,6 @@ class window.CapitolWords
             success: (data) ->
                 results = data['results']
                 maxcount = results[0]['count']
-                #div.html ''
                 listItems = []
 
                 cw.legislatorData = []
@@ -342,7 +407,9 @@ class window.CapitolWords
         this.getStatePopularity term, jQuery('#stateBarChart')
         this.getPartyPieChart term, jQuery('#partyPieChart')
         this.getLegislatorPopularity term, jQuery('#legislatorBarChart')
-        this.getPartyGraph term
+
+        if _(this.partyResults).isUndefined()
+            this.getPartyGraphData term
 
         if this.start_date and this.end_date
             this.getCREntries term
@@ -518,7 +585,7 @@ class window.CapitolWords
         legend
 
 
-    showChart: (data, x_labels, x_label_positions, width, height, colors) ->
+    showChart: (data, x_labels, x_label_positions, width, height, colors, legend) ->
 
         width = width or 860
         height = height or 340
@@ -540,7 +607,8 @@ class window.CapitolWords
         chart.set_fill 'bg', 's', '00000000'
         if not colors
             colors = ['8E2844', 'A85B08', 'AF9703']
-        legend = this.build_legend()
+        if not legend
+            legend = this.build_legend()
         chart.set_legend legend if not _(legend).isEmpty()
         chart.set_colors(colors.slice(0, legend.length))
 
@@ -695,6 +763,7 @@ jQuery(document).ready ->
                     cw.limit cw.minMonth, cw.maxMonth
                 else if typeof termDetailTerm isnt 'undefined' # For slider on term detail page
                     cw.limit cw.minMonth, cw.maxMonth
+                    cw.buildPartyGraph cw.minMonth, cw.maxMonth
                     cw.start_date = cw.dateFromMonth(cw.minMonth)
                     cw.end_date = cw.dateFromMonth(cw.maxMonth)
                     cw.populateTermDetailPage termDetailTerm
