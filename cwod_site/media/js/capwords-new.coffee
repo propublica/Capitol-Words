@@ -418,22 +418,29 @@ class window.CapitolWords
     populateLegislatorList: (legislators) ->
         buildTable = ->
             jQuery('table#legislatorList tbody').empty()
+            bioguides = []
+            n=0
             _(legislators).each (legislator) ->
-                klass = if legislators.indexOf(legislator) % 2 == 0 then 'even' else 'odd'
-                tr = """
-                    <tr class="#{klass}">
-                        <td>
-                            <a href="/legislator/#{legislator['bioguide_id']}-#{legislator['slug']}">
-                            <img class="legislatorImage" alt="legislator photo" src="http://assets.sunlightfoundation.com/moc/40x50/#{legislator['bioguide_id']}.jpg"/>
-                            </a>
-                        </td>
-                        <td><a href="/legislator/#{legislator['bioguide_id']}-#{legislator['slug']}">#{legislator['name']}</a></td>
-                        <td>#{legislator['state']}</td>
-                        <td>#{legislator['party']}</td>
-                        <td>#{legislator['chamber']}</td>
-                    </tr>
-                """
-                jQuery('table#legislatorList tbody').append tr
+                if not _(bioguides).include legislator['bioguide_id']
+                    bioguides.push legislator['bioguide_id']
+                    #klass = if legislators.indexOf(legislator) % 2 == 0 then 'even' else 'odd'
+                    klass = if n % 2 == 0 then 'even' else 'odd'
+                    n++
+                    tr = """
+                        <tr class="#{klass}">
+                            <td>
+                                <a href="/legislator/#{legislator['bioguide_id']}-#{legislator['slug']}">
+                                <img class="legislatorImage" alt="legislator photo" src="http://assets.sunlightfoundation.com/moc/40x50/#{legislator['bioguide_id']}.jpg"/>
+                                </a>
+                            </td>
+                            <td><a href="/legislator/#{legislator['bioguide_id']}-#{legislator['slug']}">#{legislator['name']}</a></td>
+                            <td>#{legislator['state']}</td>
+                            <td>#{legislator['party']}</td>
+                            <td>#{legislator['chamber']}</td>
+                        </tr>
+                    """
+                    jQuery('table#legislatorList tbody').append tr
+
             jQuery('table#legislatorList tbody').fadeIn('fast', ->
                 jQuery('img').error( ->
                     jQuery(this).hide()
