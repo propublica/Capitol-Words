@@ -712,7 +712,7 @@
       data = {
         chamber: jQuery('#chamber').val(),
         party: jQuery('#party').val(),
-        congress: jQuery('#congress').val() || 112,
+        congress: jQuery('#congress').val(),
         state: jQuery('#state').val()
       };
       return jQuery.ajax({

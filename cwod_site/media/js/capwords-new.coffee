@@ -640,7 +640,7 @@ class window.CapitolWords
         data = {
             chamber: jQuery('#chamber').val(),
             party: jQuery('#party').val(),
-            congress: jQuery('#congress').val() or 112,
+            congress: jQuery('#congress').val(),
             state: jQuery('#state').val(),
         }
         jQuery.ajax {
