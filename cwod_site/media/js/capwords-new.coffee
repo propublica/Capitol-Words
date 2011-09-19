@@ -642,13 +642,13 @@ class window.CapitolWords
         chart.url()
 
 
-    legislatorSearch: ->
+    legislatorSearch: (data) ->
         cw = this
         data = {
-            chamber: jQuery('#chamber').val(),
-            party: jQuery('#party').val(),
-            congress: jQuery('#congress').val(),
-            state: jQuery('#state').val(),
+            chamber: data['chamber'] or jQuery('#chamber').val(),
+            party: data['party'] or jQuery('#party').val(),
+            congress: data['congress'] or jQuery('#congress').val(),
+            state: data['state'] or jQuery('#state').val(),
         }
         jQuery.ajax {
             dataType: 'jsonp',
@@ -657,6 +657,19 @@ class window.CapitolWords
             success: (data) ->
                 cw.populateLegislatorList data['results']
         }
+
+    readLegislatorHistory: ->
+        hash = History.getState().hash.split('?')[1]
+        data = {}
+        if hash
+            pieces = hash.split '&'
+            chamber = party = congress = state = undefined
+            _(pieces).each (piece) ->
+                [k, v] = piece.split('=')
+                jQuery("##{k}").val(v)
+                data[k] = v
+
+        this.legislatorSearch(data)
 
     year_values: []
 
@@ -758,11 +771,22 @@ jQuery(document).ready ->
     )
 
     jQuery('#searchFilterButton').bind('click', ->
-        cw.legislatorSearch()
+        pieces = []
+        jQuery('#searchFilter select').each (select) ->
+            id = jQuery(this).attr 'id'
+            val = jQuery(this).val()
+            pieces.push "#{id}=#{val}"
+        hash = pieces.join '&'
+        History.pushState {}, '', "/legislator?#{hash}"
+        cw.legislatorSearch({})
     )
 
     if window.location.pathname.match /^\/legislator\/?$/
-        cw.legislatorSearch()
+        cw.readLegislatorHistory()
+        History.Adapter.bind(window, 'statechange', ->
+            cw.readLegislatorHistory()
+        )
+
 
     if not _(jQuery('#slider-range')).isEmpty()
         d = new Date()
@@ -793,3 +817,5 @@ jQuery(document).ready ->
             if jQuery(this).is ':visible' then t.addClass 'expanded' else t.removeClass 'expanded'
         )
     )
+
+

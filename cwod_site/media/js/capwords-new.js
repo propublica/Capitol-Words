@@ -713,14 +713,14 @@
       }
       return chart.url();
     };
-    CapitolWords.prototype.legislatorSearch = function() {
-      var cw, data;
+    CapitolWords.prototype.legislatorSearch = function(data) {
+      var cw;
       cw = this;
       data = {
-        chamber: jQuery('#chamber').val(),
-        party: jQuery('#party').val(),
-        congress: jQuery('#congress').val(),
-        state: jQuery('#state').val()
+        chamber: data['chamber'] || jQuery('#chamber').val(),
+        party: data['party'] || jQuery('#party').val(),
+        congress: data['congress'] || jQuery('#congress').val(),
+        state: data['state'] || jQuery('#state').val()
       };
       return jQuery.ajax({
         dataType: 'jsonp',
@@ -730,6 +730,22 @@
           return cw.populateLegislatorList(data['results']);
         }
       });
+    };
+    CapitolWords.prototype.readLegislatorHistory = function() {
+      var chamber, congress, data, hash, party, pieces, state;
+      hash = History.getState().hash.split('?')[1];
+      data = {};
+      if (hash) {
+        pieces = hash.split('&');
+        chamber = party = congress = state = void 0;
+        _(pieces).each(function(piece) {
+          var k, v, _ref;
+          _ref = piece.split('='), k = _ref[0], v = _ref[1];
+          jQuery("#" + k).val(v);
+          return data[k] = v;
+        });
+      }
+      return this.legislatorSearch(data);
     };
     CapitolWords.prototype.year_values = [];
     CapitolWords.prototype.startDate = function() {
@@ -844,10 +860,23 @@
       }
     });
     jQuery('#searchFilterButton').bind('click', function() {
-      return cw.legislatorSearch();
+      var hash, pieces;
+      pieces = [];
+      jQuery('#searchFilter select').each(function(select) {
+        var id, val;
+        id = jQuery(this).attr('id');
+        val = jQuery(this).val();
+        return pieces.push("" + id + "=" + val);
+      });
+      hash = pieces.join('&');
+      History.pushState({}, '', "/legislator?" + hash);
+      return cw.legislatorSearch({});
     });
     if (window.location.pathname.match(/^\/legislator\/?$/)) {
-      cw.legislatorSearch();
+      cw.readLegislatorHistory();
+      History.Adapter.bind(window, 'statechange', function() {
+        return cw.readLegislatorHistory();
+      });
     }
     if (!_(jQuery('#slider-range')).isEmpty()) {
       d = new Date();
