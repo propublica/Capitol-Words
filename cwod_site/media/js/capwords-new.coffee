@@ -75,9 +75,9 @@ class window.CapitolWords
                 imgUrl = cw.showChart [percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300',]
 
                 overallImgTag = "<img id=\"termChart\" src=\"#{imgUrl}\" alt=\"Timeline of occurrences of #{term}\"/>"
-                customImgTag = "<img id=\"customChart\" src=\"#{imgUrl}\" alt=\"Custom timeline of occurrences of \"#{term}\"/>"
+                #customImgTag = "<img id=\"customChart\" src=\"#{imgUrl}\" alt=\"Custom timeline of occurrences of \"#{term}\"/>"
                 jQuery('#overallTimeline').html overallImgTag
-                jQuery('#customTimeline').append customImgTag
+                #jQuery('#customTimeline').append customImgTag
         }
 
 
@@ -99,9 +99,9 @@ class window.CapitolWords
                 results = data['results']
                 imgUrl = results['url']
                 overallImgTag = "<img src=\"#{imgUrl}\" alt=\"Timeline of occurrences of #{term}\"/>"
-                customImgTag = "<img id=\"customChart\" src=\"#{imgUrl}\" alt=\"Custom timeline of occurrences of \"#{term}\"/>"
+                #customImgTag = "<img id=\"customChart\" src=\"#{imgUrl}\" alt=\"Custom timeline of occurrences of \"#{term}\"/>"
                 jQuery('#overallTimeline').html overallImgTag
-                jQuery('#customTimeline').append customImgTag
+                #jQuery('#customTimeline').append customImgTag
         }
 
     getPartyGraph: (term) ->
@@ -276,7 +276,6 @@ class window.CapitolWords
                     cw.legislatorData.sort( (a, b) ->
                         b['pct'] - a['pct']
                     )
-                    window.console.log cw.legislatorData
 
                     _(cw.legislatorData).each (legislator) ->
                         html = """
@@ -390,7 +389,7 @@ class window.CapitolWords
             labelPositions = this.buildXLabels vals
             imgUrl = this.showChart [percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300',]
             jQuery('#termChart').attr('src', imgUrl)
-            jQuery('#customChart').attr('src', imgUrl)
+            #jQuery('#customChart').attr('src', imgUrl)
 
         else
             aVals = _(this.a['all']).select func
@@ -638,13 +637,13 @@ jQuery(document).ready ->
         selectedId = jQuery('input[name=toggle]:checked', '#timelineToggle').attr 'id'
         timelines = [
             ['party', jQuery('#partyTimeline')],
-            ['custom', jQuery('#customTimeline')],
             ['overall', jQuery('#overallTimeline')],
+            #['custom', jQuery('#customTimeline')],
         ]
         selected = {
             'overallTimelineSelect': 'overall',
             'partyTimelineSelect': 'party',
-            'customTimelineSelect': 'custom',
+            #'customTimelineSelect': 'custom',
         }[selectedId]
 
         _(timelines).each (timeline) ->
