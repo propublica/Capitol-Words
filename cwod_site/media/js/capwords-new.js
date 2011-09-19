@@ -492,14 +492,15 @@
       var buildTable;
       buildTable = function() {
         jQuery('table#legislatorList tbody').empty();
-        return _(legislators).each(function(legislator) {
+        _(legislators).each(function(legislator) {
           var klass, tr;
           klass = legislators.indexOf(legislator) % 2 === 0 ? 'even' : 'odd';
-          tr = "<tr class=\"" + klass + "\">\n    <td>\n        <img class=\"legislatorImage\" alt=\"legislator photo\" src=\"http://assets.sunlightfoundation.com/moc/40x50/" + legislator['bioguide_id'] + ".jpg\"/>\n    </td>\n    <td>" + legislator['state'] + "</td>\n    <td>" + legislator['party'] + "</td>\n    <td>" + legislator['chamber'] + "</td>\n</tr>";
-          return jQuery('table#legislatorList tbody').fadeIn('fast', function() {
-            return jQuery('img').error(function() {
-              return jQuery(this).hide();
-            });
+          tr = "<tr class=\"" + klass + "\">\n    <td>\n        <a href=\"/legislator/" + legislator['bioguide_id'] + "-" + legislator['slug'] + "\">\n        <img class=\"legislatorImage\" alt=\"legislator photo\" src=\"http://assets.sunlightfoundation.com/moc/40x50/" + legislator['bioguide_id'] + ".jpg\"/>\n        </a>\n    </td>\n    <td><a href=\"/legislator/" + legislator['bioguide_id'] + "-" + legislator['slug'] + "\">" + legislator['name'] + "</a></td>\n    <td>" + legislator['state'] + "</td>\n    <td>" + legislator['party'] + "</td>\n    <td>" + legislator['chamber'] + "</td>\n</tr>";
+          return jQuery('table#legislatorList tbody').append(tr);
+        });
+        return jQuery('table#legislatorList tbody').fadeIn('fast', function() {
+          return jQuery('img').error(function() {
+            return jQuery(this).hide();
           });
         });
       };
@@ -711,7 +712,7 @@
       data = {
         chamber: jQuery('#chamber').val(),
         party: jQuery('#party').val(),
-        congress: jQuery('#congress').val(),
+        congress: jQuery('#congress').val() || 112,
         state: jQuery('#state').val()
       };
       return jQuery.ajax({

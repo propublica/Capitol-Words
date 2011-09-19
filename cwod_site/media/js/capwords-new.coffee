@@ -423,18 +423,22 @@ class window.CapitolWords
                 tr = """
                     <tr class="#{klass}">
                         <td>
+                            <a href="/legislator/#{legislator['bioguide_id']}-#{legislator['slug']}">
                             <img class="legislatorImage" alt="legislator photo" src="http://assets.sunlightfoundation.com/moc/40x50/#{legislator['bioguide_id']}.jpg"/>
+                            </a>
                         </td>
+                        <td><a href="/legislator/#{legislator['bioguide_id']}-#{legislator['slug']}">#{legislator['name']}</a></td>
                         <td>#{legislator['state']}</td>
                         <td>#{legislator['party']}</td>
                         <td>#{legislator['chamber']}</td>
                     </tr>
                 """
-                jQuery('table#legislatorList tbody').fadeIn('fast', ->
-                    jQuery('img').error( ->
-                        jQuery(this).hide()
-                    )
+                jQuery('table#legislatorList tbody').append tr
+            jQuery('table#legislatorList tbody').fadeIn('fast', ->
+                jQuery('img').error( ->
+                    jQuery(this).hide()
                 )
+            )
 
         jQuery('table#legislatorList tbody').fadeOut 'fast', buildTable
 
@@ -636,7 +640,7 @@ class window.CapitolWords
         data = {
             chamber: jQuery('#chamber').val(),
             party: jQuery('#party').val(),
-            congress: jQuery('#congress').val(),
+            congress: jQuery('#congress').val() or 112,
             state: jQuery('#state').val(),
         }
         jQuery.ajax {
