@@ -490,7 +490,7 @@
     };
     CapitolWords.prototype.populateLegislatorList = function(legislators) {
       var buildTable;
-      return buildTable = function() {
+      buildTable = function() {
         jQuery('table#legislatorList tbody').empty();
         return _(legislators).each(function(legislator) {
           var klass, tr;
@@ -503,6 +503,7 @@
           });
         });
       };
+      return jQuery('table#legislatorList tbody').fadeOut('fast', buildTable);
     };
     CapitolWords.prototype.itemsToCompare = [];
     CapitolWords.prototype.a = {};
@@ -705,7 +706,8 @@
       return chart.url();
     };
     CapitolWords.prototype.legislatorSearch = function() {
-      var data;
+      var cw, data;
+      cw = this;
       data = {
         chamber: jQuery('#chamber').val(),
         party: jQuery('#party').val(),
@@ -717,7 +719,7 @@
         url: 'http://capitolwords.org/api/legislators.json',
         data: data,
         success: function(data) {
-          return window.CapitolWords.populateLegislatorList(data['results']);
+          return cw.populateLegislatorList(data['results']);
         }
       });
     };
@@ -836,6 +838,9 @@
     jQuery('#searchFilterButton').bind('click', function() {
       return cw.legislatorSearch();
     });
+    if (window.location.pathname.match(/^\/legislator\/?$/)) {
+      cw.legislatorSearch();
+    }
     if (!_(jQuery('#slider-range')).isEmpty()) {
       d = new Date();
       jQuery('#slider-range').slider({

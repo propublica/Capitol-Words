@@ -436,6 +436,8 @@ class window.CapitolWords
                     )
                 )
 
+        jQuery('table#legislatorList tbody').fadeOut 'fast', buildTable
+
     itemsToCompare: []
     a: {}
     b: {}
@@ -630,6 +632,7 @@ class window.CapitolWords
 
 
     legislatorSearch: ->
+        cw = this
         data = {
             chamber: jQuery('#chamber').val(),
             party: jQuery('#party').val(),
@@ -641,7 +644,7 @@ class window.CapitolWords
             url: 'http://capitolwords.org/api/legislators.json',
             data: data,
             success: (data) ->
-                window.CapitolWords.populateLegislatorList data['results']
+                cw.populateLegislatorList data['results']
         }
 
     year_values: []
@@ -746,6 +749,9 @@ jQuery(document).ready ->
     jQuery('#searchFilterButton').bind('click', ->
         cw.legislatorSearch()
     )
+
+    if window.location.pathname.match /^\/legislator\/?$/
+        cw.legislatorSearch()
 
     if not _(jQuery('#slider-range')).isEmpty()
         d = new Date()
