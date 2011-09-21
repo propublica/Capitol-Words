@@ -260,14 +260,14 @@ def legislator_detail(request, bioguide_id, slug):
                               }, context_instance=RequestContext(request))
 
 
+def chunks(l, n):
+    """ Yield successive n-sized chunks from l.
+    """
+    for i in xrange(0, len(l), n):
+        yield l[i:i+n]
+
+
 def state_list(request):
-
-    def chunks(l, n):
-        """ Yield successive n-sized chunks from l.
-        """
-        for i in xrange(0, len(l), n):
-            yield l[i:i+n]
-
     states = []
     state_choices = dict(STATE_CHOICES)
     for state in NgramsByState.objects.values_list('state', flat=True).order_by('state').distinct():
@@ -402,10 +402,6 @@ def date_detail(request, year, month, day):
                                'similar_dates': similar_dates,
                               }, context_instance=RequestContext(request))
 
-@login_required
-def month_detail(request, year, month):
-    return HttpResponse('month_detail')
-
 
 def get_similar_dates(date):
     cursor = connections['ngrams'].cursor()
@@ -500,12 +496,35 @@ def term_compare(request):
                               {},
                               context_instance=RequestContext(request))
 
+MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',]
+
 @login_required
 def calendar(request):
     months = Date.objects.extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month', flat=True).distinct()
-    month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',]
-    years = [(x, [(str(x)[4:], month_names[int(str(x)[4:])-1]) for x in y]) for x, y in itertools.groupby(months, lambda x: str(x)[:4])]
+    years = [(x, [(str(x)[4:], MONTH_NAMES[int(str(x)[4:])-1]) for x in y]) for x, y in itertools.groupby(months, lambda x: str(x)[:4])]
+    #year_chunks = chunks(years, (len(years)+1)/3)
 
     return render_to_response('cwod/calendar.html',
                               {'years': years,},
+                              context_instance=RequestContext(request))
+
+@login_required
+def month_detail(request, year, month):
+    year_month = '%s%s' % (year, month)
+    month_name = MONTH_NAMES[int(month)-1]
+
+    ngrams = {}
+    for n in range(1, 6):
+        ngrams[GRAM_NAMES[n-1]] = NgramsByMonth.objects.filter(month=year_month, n=n)[:30]
+    ngrams = ngrams.iteritems()
+
+    dates = Date.objects.filter(date__year=year, date__month=month).order_by('date')
+    dates_by_week = [(weeknum, list(dates)) for weeknum, dates in itertools.groupby(dates, lambda x: x.date.strftime('%U'))]
+
+    return render_to_response('cwod/month_detail.html',
+                              {'month_name': month_name, 
+                               'year': year,
+                               'ngrams': ngrams,
+                               'dates_by_week': dates_by_week,
+                              },
                               context_instance=RequestContext(request))
