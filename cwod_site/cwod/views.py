@@ -504,8 +504,8 @@ def term_compare(request):
 def calendar(request):
     months = Date.objects.extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month', flat=True).distinct()
     month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',]
-    months = [(x, [(str(x)[4:], month_names[int(str(x)[4:])-1]) for x in y]) for x, y in itertools.groupby(months, lambda x: str(x)[:4])]
+    years = [(x, [(str(x)[4:], month_names[int(str(x)[4:])-1]) for x in y]) for x, y in itertools.groupby(months, lambda x: str(x)[:4])]
 
     return render_to_response('cwod/calendar.html',
-                              {},
+                              {'years': years,},
                               context_instance=RequestContext(request))
