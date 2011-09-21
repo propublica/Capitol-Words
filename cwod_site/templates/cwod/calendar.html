@@ -1,0 +1,30 @@
+{% extends "cwod/base.html" %}
+{% load capwords %}
+{% load typogrify_tags %}
+
+{% block title %}Calendar | {{ block.super }}{% endblock title %}
+
+{% block content %}
+
+            <div id="main">
+                <div id="internalHead">
+                    <h2>Calendar</h2>
+                    <div class="clear"></div>
+                </div>
+                <div id="ltColumn" style="width: 100%;">
+                    <div class="module">
+                        <ul class="normalList">
+                            {% for year, months in years reversed %}
+                            <li><h4>{{ year }}</h4>
+                                {% for monthnum, monthname in months %}
+                                <a href="{% url cwod_month_detail year=year month=monthnum %}">{{ monthname }}</a>{% if not forloop.last %}&nbsp;&nbsp;&nbsp;{% endif %}
+                                {% endfor %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+
+{% endblock content %}
