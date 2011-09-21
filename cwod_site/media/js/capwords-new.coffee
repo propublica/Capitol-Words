@@ -567,13 +567,16 @@ class window.CapitolWords
                             positions = labelPositions[1]
                             cw.showChart [cw.a['percentages'], cw.b['percentages']], labels, positions
 
-                        if spinner
-                            spinner.stop()
                 }
+                if spinner
+                    spinner.stop()
         }
 
         if not skipState
             this.makeHomepageHistoryState()
+
+        if spinner
+            spinner.stop()
 
 
     phraseA: ->
