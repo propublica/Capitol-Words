@@ -77,6 +77,9 @@ class window.CapitolWords
                 #customImgTag = "<img id=\"customChart\" src=\"#{imgUrl}\" alt=\"Custom timeline of occurrences of \"#{term}\"/>"
                 jQuery('#overallTimeline').html overallImgTag
                 #jQuery('#customTimeline').append customImgTag
+
+                if cw.minMonth and cw.maxMonth
+                    cw.limit cw.minMonth, cw.maxMonth
         }
 
 
@@ -146,7 +149,7 @@ class window.CapitolWords
             _(partyData).each (partyResult) ->
                 cw.partyResults.push partyResult
 
-            cw.buildPartyGraph()
+            cw.buildPartyGraph cw.minMonth, cw.maxMonth
 
         parties = ['R', 'D', ]
         renderWhenDone = _(parties.length).after(render)
@@ -338,11 +341,18 @@ class window.CapitolWords
                 cw.legislatorData = []
 
                 render = () ->
+                    listItems = []
                     cw.legislatorData.sort( (a, b) ->
                         b['pct'] - a['pct']
                     )
+                    done = []
 
                     _(cw.legislatorData).each (legislator) ->
+                        if legislator.data.bioguide_id in done
+                            return
+
+                        done.push legislator.data.bioguide_id
+
                         html = """
                             <li>
                                 <span class="tagValue" style="width:#{legislator['pct']}%">
@@ -401,6 +411,7 @@ class window.CapitolWords
         }
 
     populateTermDetailPage: (term) ->
+
         if _(this.results).isUndefined()
             this.getGraphData term
 
@@ -413,6 +424,7 @@ class window.CapitolWords
 
         if this.start_date and this.end_date
             this.getCREntries term
+
 
 
     populateLegislatorList: (legislators) ->
@@ -674,6 +686,34 @@ class window.CapitolWords
         }
 
 
+    readTermDetailPageHistory: ->
+        hash = History.getState().hash.split('?')[1]
+        pieces = [x.split '=' for x in hash.split '&'][0]
+        for piece in pieces
+            [k, v] = piece
+            if k == 'start'
+                this.minMonth = v
+                this.start_date = this.dateFromMonth(this.minMonth)
+
+            else if k == 'end'
+                this.maxMonth = v
+                this.end_date = this.dateFromMonth(this.maxMonth)
+
+#            else if k == 'pt' and v == 'true'
+#                jQuery('#overallTimeline').hide(->
+#                    jQuery('#partyTimelineSelect').attr('checked', true)
+#                    jQuery('#partyTimeline').show()
+#                )
+
+
+        if this.minMonth or this.maxMonth
+            startYear = this.minMonth.slice(0, 4)
+            endYear = this.maxMonth.slice(0, 4)
+            jQuery("#slider-range").slider("option", "values", [startYear, endYear])
+
+            this.limit this.minMonth, this.maxMonth
+
+
     readHomepageHistory: ->
         mapping = {'terma': '#terma', 'termb': '#termb', 'statea': '#stateA', 'stateb': '#stateB', }
         hash = History.getState().hash.split('?')[1]
@@ -731,6 +771,7 @@ class window.CapitolWords
             ["partyb", partyB,]
             ["start", this.minMonth,],
             ["end", this.maxMonth,],
+            #["pt", jQuery('#partyTimeline:visible').length == 0,],
         ]
         pieces = _(pieces).select( (item) ->
             return item[1]
@@ -798,7 +839,16 @@ jQuery(document).ready ->
     cw = new window.CapitolWords
 
     if typeof termDetailTerm isnt 'undefined'
+        cw.readTermDetailPageHistory()
         cw.populateTermDetailPage termDetailTerm
+        #jQuery('#partyTimelineSelect, #overallTimelineSelect').bind('change', (x) ->
+        #    cw.makeHomepageHistoryState()
+        #)
+        History.Adapter.bind(window, 'statechange', ->
+            cw.readTermDetailPageHistory()
+            cw.populateTermDetailPage termDetailTerm
+        )
+
 
     jQuery('img').error( ->
         jQuery(this).hide()
