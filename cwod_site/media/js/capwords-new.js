@@ -760,7 +760,13 @@
     };
     CapitolWords.prototype.readTermDetailPageHistory = function() {
       var endYear, hash, k, piece, pieces, startYear, v, x, _i, _len;
+      if (typeof History.getState().hash === 'undefined') {
+        return;
+      }
       hash = History.getState().hash.split('?')[1];
+      if (!hash) {
+        return;
+      }
       pieces = [
         (function() {
           var _i, _len, _ref, _results;
