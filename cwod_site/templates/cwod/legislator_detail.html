@@ -24,6 +24,7 @@
                 </div>
                 <div id="ltColumn">
                     {% if legislator.current %}
+                    {% comment %}
 					<div id="timeFilterWrapper">
                         <form id="timeFilter" class="actionItem" action="" method="">
                             <label>Time frame</label>
@@ -33,11 +34,12 @@
                             </select>
                         </form>    
                     </div>
+                    {% endcomment %}
                     {% endif %}
                     <div class="module">
                         <div class="rightHeader">
                             <h3>Top Words & Phrases</h3>
-                            <span class="tip">Current session</span>
+                            {#<span class="tip">Current session</span>#}
                         </div>
                         {% include "cwod/detail_page_ngram_list.html" %}
                     </div>
