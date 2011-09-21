@@ -515,7 +515,9 @@ class window.CapitolWords
             shadow: true,
         }
         target = document.getElementById 'compareGraphic'
-        spinner = new Spinner(opts).spin target
+        if not spinner
+            spinner = new Spinner(opts)
+            spinner.spin target
 
         url = 'http://capitolwords.org/api/dates.json'
         #phraseA = jQuery('#terma').val()
@@ -540,6 +542,7 @@ class window.CapitolWords
                 cw.a['all'] = aResults
                 cw.a['counts'] = _(aResults).pluck 'count'
                 cw.a['percentages'] = _(aResults).pluck 'percentage'
+
 
                 jQuery.ajax {
                     dataType: 'jsonp',
@@ -570,13 +573,11 @@ class window.CapitolWords
                 }
                 if spinner
                     spinner.stop()
+                    delete spinner
         }
 
         if not skipState
             this.makeHomepageHistoryState()
-
-        if spinner
-            spinner.stop()
 
 
     phraseA: ->
@@ -668,6 +669,7 @@ class window.CapitolWords
 
         if spinner
             spinner.stop()
+            delete spinner
 
         chart.url()
 
