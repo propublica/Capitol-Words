@@ -28,7 +28,7 @@
                 <nav>
                     <ul>
                         <li class="last"><a href="{% url cwod_state_list %}">States</a></li>
-                        <li><a href="#">Parties</a></li>
+                        {#<li><a href="#">Parties</a></li>#}
                         <li><a href="{% url cwod_legislator_list %}">Legislators</a></li>
                         <li><a href="{% url cwod_calendar %}">Calendar</a></li>
                     </ul>  
@@ -71,17 +71,27 @@
             <div id="footerContentWrapper">
                 <div id="footerContent">
                     <div id="popularPages">
-                        <h5>Most Popular Pages</h5>
+                        <h5>Suggested Pages</h5>
                         <ol>
+                            <li><a href="/term/obama">obama</a></li>
+                            <li><a href="/term/health_care">health care</a></li>
+                            <li><a href="/term/debt_ceiling">debt ceiling</a></li>
+                            <li><a href="/state/TX">Texas</a></li>
+                            <li><a href="/state/IA">Iowa</a></li>
+                            <li><a href="/legislator/B001256-michele-bachmann">Michele Bachmann</a></li>
+                            <li><a href="/legislator/K000148-john-kerry">John Kerry</a></li>
+                            <li><a href="/legislator/P000583-ron-paul">Ron Paul</a></li>
+                            {% comment %}
                             <li><a href="#">Page Name</a></li>
                             <li><a href="#">Page Name</a></li>
                             <li><a href="#">Page Name</a></li>
                             <li><a href="#">Page Name</a></li>
                             <li><a href="#">Page Name</a></li>
+                            {% endcomment %}
                         </ol>    
                     </div>    
                     <div id="popularWords">
-                        <h5>Most Popular Word per Congressional Day</h5>
+                        <h5>Recent popular words</h5>
                         <table>
                             <tbody>
                                 <tr class="odd">
