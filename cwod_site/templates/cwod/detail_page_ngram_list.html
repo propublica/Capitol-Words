@@ -1,12 +1,24 @@
 <div class="ngramMenu">
     Phrase size:
+    &nbsp;&nbsp;
+    <span id="selected" class="unigrams">One</span>
+    &nbsp;&nbsp;
+    <span class="bigrams">Two</span>
+    &nbsp;&nbsp;
+    <span class="trigrams">Three</span>
+    &nbsp;&nbsp;
+    <span class="quadgrams">Four</span>
+    &nbsp;&nbsp;
+    <span class="pentagrams">Five</span>
+    {% comment %}
     <ol>
-        <li class="unigrams">One word</li>
-        <li class="bigrams">Two words</li>
-        <li class="trigrams">Three words</li>
-        <li class="quadgrams">Four words</li>
-        <li class="pentagrams">Five words</li>
+        <li class="unigrams">1</li>
+        <li class="bigrams">2</li>
+        <li class="trigrams">3</li>
+        <li class="quadgrams">4</li>
+        <li class="pentagrams">5</li>
     </ol>
+    {% endcomment %}
 </div>
 {% for gram_type, ngram_list in ngrams %}
 <ol class="barChart" id="{{ gram_type }}">

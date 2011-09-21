@@ -18,14 +18,13 @@
                         <div class="rightHeader">
                             <h3>Top Words & Phrases</h3>
                         </div>
-                    </div>
                     {% include "cwod/detail_page_ngram_list.html" %}
+                    </div>
                 </div>
 
                 <div id="rtColumn">
                     <div class="leftModule">
                         <div class="leftHeader">
-                            <h4>Dates</h4>
                         </div>
                         {% for week, dates in dates_by_week %}
                         <ol style="margin-bottom: 20px;">

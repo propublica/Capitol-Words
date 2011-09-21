@@ -20,13 +20,6 @@
         <dd><a href="{% url cwod_state_detail state=legislator.state %}">{{ legislator.verbose_state }}</a>{% ifequal legislator.honorific "Rep." %}, District {{ legislator.district }}{% endifequal %}</dd>
     </dl>
 					</div>
-                    {% comment %}
-                    <ul id="legislatorMedia">
-                        <li id="youtubeButton"><a title="YouTube" href="#">YouTube</a></li>
-						<li id="twitterButton"><a title="Twitter" href="#">Twitter</a></li>
-						<li id="webButton"><a title="Website" href="#">Website</a></li>
-                    </ul>    
-                    {% endcomment %}
                     <div class="clear"></div>
                 </div>
                 <div id="ltColumn">
