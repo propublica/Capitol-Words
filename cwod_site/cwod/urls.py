@@ -26,6 +26,11 @@ urlpatterns = patterns('',
             {},
             name='cwod_month_detail'),
 
+        url(r'^date\/?$',
+            calendar,
+            {},
+            name='cwod_calendar'),
+
         url(r'^term\/(?P<term>.*?)\/?$',
             faster_term_detail,
             {},
