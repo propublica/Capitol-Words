@@ -687,7 +687,11 @@ class window.CapitolWords
 
 
     readTermDetailPageHistory: ->
+        if typeof History.getState().hash is 'undefined'
+            return
         hash = History.getState().hash.split('?')[1]
+        if not hash
+            return
         pieces = [x.split '=' for x in hash.split '&'][0]
         for piece in pieces
             [k, v] = piece
