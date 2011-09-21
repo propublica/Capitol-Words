@@ -260,14 +260,14 @@ def legislator_detail(request, bioguide_id, slug):
                               }, context_instance=RequestContext(request))
 
 
+def chunks(l, n):
+    """ Yield successive n-sized chunks from l.
+    """
+    for i in xrange(0, len(l), n):
+        yield l[i:i+n]
+
+
 def state_list(request):
-
-    def chunks(l, n):
-        """ Yield successive n-sized chunks from l.
-        """
-        for i in xrange(0, len(l), n):
-            yield l[i:i+n]
-
     states = []
     state_choices = dict(STATE_CHOICES)
     for state in NgramsByState.objects.values_list('state', flat=True).order_by('state').distinct():
@@ -505,6 +505,7 @@ def calendar(request):
     months = Date.objects.extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month', flat=True).distinct()
     month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',]
     years = [(x, [(str(x)[4:], month_names[int(str(x)[4:])-1]) for x in y]) for x, y in itertools.groupby(months, lambda x: str(x)[:4])]
+    #year_chunks = chunks(years, (len(years)+1)/3)
 
     return render_to_response('cwod/calendar.html',
                               {'years': years,},
