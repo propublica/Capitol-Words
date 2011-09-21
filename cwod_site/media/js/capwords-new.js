@@ -589,7 +589,10 @@
         shadow: true
       };
       target = document.getElementById('compareGraphic');
-      spinner = new Spinner(opts).spin(target);
+      if (!spinner) {
+        spinner = new Spinner(opts);
+        spinner.spin(target);
+      }
       url = 'http://capitolwords.org/api/dates.json';
       jQuery.ajax({
         dataType: 'jsonp',
@@ -636,15 +639,13 @@
             }
           });
           if (spinner) {
-            return spinner.stop();
+            spinner.stop();
+            return delete spinner;
           }
         }
       });
       if (!skipState) {
-        this.makeHomepageHistoryState();
-      }
-      if (spinner) {
-        return spinner.stop();
+        return this.makeHomepageHistoryState();
       }
     };
     CapitolWords.prototype.phraseA = function() {
@@ -740,6 +741,7 @@
       }
       if (spinner) {
         spinner.stop();
+        delete spinner;
       }
       return chart.url();
     };
