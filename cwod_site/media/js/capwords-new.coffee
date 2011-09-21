@@ -804,8 +804,10 @@ jQuery(document).ready ->
         jQuery(this).hide()
     )
 
-    jQuery('.ngramMenu li').bind('click', (x) ->
+    jQuery('.ngramMenu span').bind('click', (x) ->
         classToShow = jQuery(this).attr 'class'
+        jQuery('ngramMenu span').removeAttr('id')
+        jQuery(this).attr('id', 'selected')
         jQuery(jQuery('.barChart:visible')[0]).hide(0, ->
             jQuery("ol##{classToShow}").show(0)
         )

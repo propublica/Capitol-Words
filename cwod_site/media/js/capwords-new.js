@@ -891,9 +891,11 @@
     jQuery('img').error(function() {
       return jQuery(this).hide();
     });
-    jQuery('.ngramMenu li').bind('click', function(x) {
+    jQuery('.ngramMenu span').bind('click', function(x) {
       var classToShow;
       classToShow = jQuery(this).attr('class');
+      jQuery('ngramMenu span').removeAttr('id');
+      jQuery(this).attr('id', 'selected');
       return jQuery(jQuery('.barChart:visible')[0]).hide(0, function() {
         return jQuery("ol#" + classToShow).show(0);
       });
