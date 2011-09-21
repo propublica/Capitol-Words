@@ -608,7 +608,7 @@
           cw.a['all'] = aResults;
           cw.a['counts'] = _(aResults).pluck('count');
           cw.a['percentages'] = _(aResults).pluck('percentage');
-          return jQuery.ajax({
+          jQuery.ajax({
             dataType: 'jsonp',
             url: url,
             data: {
@@ -626,22 +626,25 @@
               cw.b['counts'] = _(bResults).pluck('count');
               cw.b['percentages'] = _(bResults).pluck('percentage');
               if (cw.minMonth || cw.maxMonth) {
-                cw.limit(cw.minMonth, cw.maxMonth);
+                return cw.limit(cw.minMonth, cw.maxMonth);
               } else {
                 labelPositions = cw.buildXLabels(cw.a['all']);
                 labels = labelPositions[0];
                 positions = labelPositions[1];
-                cw.showChart([cw.a['percentages'], cw.b['percentages']], labels, positions);
-              }
-              if (spinner) {
-                return spinner.stop();
+                return cw.showChart([cw.a['percentages'], cw.b['percentages']], labels, positions);
               }
             }
           });
+          if (spinner) {
+            return spinner.stop();
+          }
         }
       });
       if (!skipState) {
-        return this.makeHomepageHistoryState();
+        this.makeHomepageHistoryState();
+      }
+      if (spinner) {
+        return spinner.stop();
       }
     };
     CapitolWords.prototype.phraseA = function() {
