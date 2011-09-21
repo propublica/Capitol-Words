@@ -126,7 +126,10 @@
           labelPositions = cw.buildXLabels(results);
           imgUrl = cw.showChart([percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300']);
           overallImgTag = "<img id=\"termChart\" src=\"" + imgUrl + "\" alt=\"Timeline of occurrences of " + term + "\"/>";
-          return jQuery('#overallTimeline').html(overallImgTag);
+          jQuery('#overallTimeline').html(overallImgTag);
+          if (cw.minMonth && cw.maxMonth) {
+            return cw.limit(cw.minMonth, cw.maxMonth);
+          }
         }
       });
     };
@@ -219,7 +222,7 @@
         _(partyData).each(function(partyResult) {
           return cw.partyResults.push(partyResult);
         });
-        return cw.buildPartyGraph();
+        return cw.buildPartyGraph(cw.minMonth, cw.maxMonth);
       };
       parties = ['R', 'D'];
       renderWhenDone = _(parties.length).after(render);
@@ -420,11 +423,18 @@
           listItems = [];
           cw.legislatorData = [];
           render = function() {
+            var done;
+            listItems = [];
             cw.legislatorData.sort(function(a, b) {
               return b['pct'] - a['pct'];
             });
+            done = [];
             _(cw.legislatorData).each(function(legislator) {
-              var html;
+              var html, _ref;
+              if (_ref = legislator.data.bioguide_id, __indexOf.call(done, _ref) >= 0) {
+                return;
+              }
+              done.push(legislator.data.bioguide_id);
               html = "<li>\n    <span class=\"tagValue\" style=\"width:" + legislator['pct'] + "%\">\n        <span class=\"tagPercent\">" + legislator['pct'] + "%</span>\n        <span class=\"tagNumber\"></span>\n    </span>\n    <span class=\"barChartTitle\"><a href=\"" + legislator['url'] + "\">\n        " + legislator['data']['honorific'] + " " + legislator['data']['full_name'] + ", " + legislator['data']['party'] + "-" + legislator['data']['state'] + "\n    </a>\n    </span>\n    </li>";
               return listItems.push(html);
             });
@@ -748,6 +758,39 @@
         }
       });
     };
+    CapitolWords.prototype.readTermDetailPageHistory = function() {
+      var endYear, hash, k, piece, pieces, startYear, v, x, _i, _len;
+      hash = History.getState().hash.split('?')[1];
+      pieces = [
+        (function() {
+          var _i, _len, _ref, _results;
+          _ref = hash.split('&');
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            x = _ref[_i];
+            _results.push(x.split('='));
+          }
+          return _results;
+        })()
+      ][0];
+      for (_i = 0, _len = pieces.length; _i < _len; _i++) {
+        piece = pieces[_i];
+        k = piece[0], v = piece[1];
+        if (k === 'start') {
+          this.minMonth = v;
+          this.start_date = this.dateFromMonth(this.minMonth);
+        } else if (k === 'end') {
+          this.maxMonth = v;
+          this.end_date = this.dateFromMonth(this.maxMonth);
+        }
+      }
+      if (this.minMonth || this.maxMonth) {
+        startYear = this.minMonth.slice(0, 4);
+        endYear = this.maxMonth.slice(0, 4);
+        jQuery("#slider-range").slider("option", "values", [startYear, endYear]);
+        return this.limit(this.minMonth, this.maxMonth);
+      }
+    };
     CapitolWords.prototype.readHomepageHistory = function() {
       var cw, data, endYear, hash, mapping, pieces, showAdvanced, startYear;
       mapping = {
@@ -886,7 +929,12 @@
     var cw, d, endYear, startYear;
     cw = new window.CapitolWords;
     if (typeof termDetailTerm !== 'undefined') {
+      cw.readTermDetailPageHistory();
       cw.populateTermDetailPage(termDetailTerm);
+      History.Adapter.bind(window, 'statechange', function() {
+        cw.readTermDetailPageHistory();
+        return cw.populateTermDetailPage(termDetailTerm);
+      });
     }
     jQuery('img').error(function() {
       return jQuery(this).hide();
