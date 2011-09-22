@@ -13,7 +13,7 @@ var Emphasis = {
         this.addCSS();
         this.readHash();
 
-		$(document).keydown(function(ev) {
+		jQuery(document).keydown(function(ev) {
 		  Emphasis.keydown(ev);
 		});
     },
@@ -25,7 +25,7 @@ var Emphasis = {
         We use PrototypeJS for its css selector awesomeness, but your needs might be simpler (getElementsByTagName('p') etc.)
     */	
 		this.running           = true;
-        this.paraSelctors      = $("p");
+        this.paraSelctors      = jQuery("p");
 
     //  Class names
         this.classReady        = "emReady";
@@ -37,12 +37,12 @@ var Emphasis = {
     },
 
 	goOverlay: function(keys, h) {
-		$("p.emReady").addClass("emPop");
-		$(document.body).append("<div id='emOverlay'></div>");
+		jQuery("p.emReady").addClass("emPop");
+		jQuery(document.body).append("<div id='emOverlay'></div>");
 		
-		$('#emOverlay').click(function() {
-		  $('#emOverlay').fadeOut("fast",function() {
-			    $(this).remove();
+		jQuery('#emOverlay').click(function() {
+		  jQuery('#emOverlay').fadeOut("fast",function() {
+			    jQuery(this).remove();
           });
 		});
 	},
@@ -161,7 +161,7 @@ var Emphasis = {
                 pr.setAttribute("data-key", k); // Unique Key
                 pr.setAttribute("data-num", c); // Order
 
-				$(pr).click(function(e) {
+				jQuery(pr).click(function(e) {
 					instance.paragraphClick(e);
 				});
 
@@ -185,7 +185,7 @@ var Emphasis = {
 
         if (an) {
         /*  Click an Anchor link */
-            if (!$(an).hasClass(this.classActiveAnchor)) {
+            if (!jQuery(an).hasClass(this.classActiveAnchor)) {
                 this.updateAnchor(an);
                 hasChanged = true;
                 e.preventDefault();
@@ -197,19 +197,19 @@ var Emphasis = {
             return;
         }
 
-        if ($(pr).hasClass(this.classReady)) {
-            if (!$(pr).hasClass(this.classActive) && (sp && !$(sp).hasClass(this.classHighlight))) {
+        if (jQuery(pr).hasClass(this.classReady)) {
+            if (!jQuery(pr).hasClass(this.classActive) && (sp && !jQuery(sp).hasClass(this.classHighlight))) {
             //  If not current Active p tag, clear any others out there and make this the Active p tag
                 this.removeAllClasses("p", this.classActive);
-                $(pr).addClass(this.classActive); // Mark as Active
+                jQuery(pr).addClass(this.classActive); // Mark as Active
             } else {
-                if (!$(pr).hasClass(this.classActive)) {
+                if (!jQuery(pr).hasClass(this.classActive)) {
                     this.removeAllClasses("p", this.classActive);
-                    $(pr).addClass(this.classActive); // Mark as Active
+                    jQuery(pr).addClass(this.classActive); // Mark as Active
                 }
 
                 if (sp) {
-                    $(sp).toggleClass(this.classHighlight);
+                    jQuery(sp).toggleClass(this.classHighlight);
                     hasChanged = true;
                 }
             }
@@ -230,8 +230,8 @@ var Emphasis = {
             pr.setAttribute('data-sentences', jLen);
 
             this.removeAllClasses("p", this.classActive);
-            $(pr).addClass(this.classActive); // Mark as Active
-            $(pr).addClass(this.classReady);  // Mark as Ready
+            jQuery(pr).addClass(this.classActive); // Mark as Active
+            jQuery(pr).addClass(this.classReady);  // Mark as Ready
             hasChanged = true;
         }
 
@@ -244,7 +244,7 @@ var Emphasis = {
     /*  Toggle anchor links next to Paragraphs */
 
         if (mode) {
-            var hasSpan = ($('span.' + this.classInfo)[0]) ? true : false;
+            var hasSpan = (jQuery('span.' + this.classInfo)[0]) ? true : false;
 
             if (!hasSpan) {
                 var pl  = this.paragraphList();
@@ -259,10 +259,10 @@ var Emphasis = {
                 }
             }
         } else {
-            var spans = $('span.' + this.classInfo);
+            var spans = jQuery('span.' + this.classInfo);
             var len = spans.length;
             for (var i=0; i<len; i++) {
-                $(spans[i]).remove();
+                jQuery(spans[i]).remove();
             }
             this.removeAllClasses(this.classActive);
         }
@@ -270,31 +270,31 @@ var Emphasis = {
 
     updateAnchor: function(an) {
     /*  Make this A tag the one and only Anchor */
-        this.p = $(an).attr("data-key");
+        this.p = jQuery(an).attr("data-key");
         this.removeAllClasses("a", this.classActiveAnchor);
-        $(an).addClass(this.classActiveAnchor);
+        jQuery(an).addClass(this.classActiveAnchor);
     },
 
     updateURLHash: function() {
     /*  Scan the Paragraphs, note selections, highlights and update the URL with the new Hash */
         var h     = "h[";
-        var paras = $('p.emReady');
+        var paras = jQuery('p.emReady');
         var pLen  = paras.length;
 
         for (var p=0; p<pLen; p++) {
-            var key = $(paras[p]).attr("data-key");
-            if ($(paras[p]).hasClass(this.classHighlight)) {
+            var key = jQuery(paras[p]).attr("data-key");
+            if (jQuery(paras[p]).hasClass(this.classHighlight)) {
                 h += "," + key; // Highlight full paragraph
             } else {
-                var spans = $(paras[p]).find('span.' + this.classHighlight);
+                var spans = jQuery(paras[p]).find('span.' + this.classHighlight);
                 var sLen  = spans.length;
-                var nSent = $(paras[p]).attr("data-sentences");
+                var nSent = jQuery(paras[p]).attr("data-sentences");
 
                 if (sLen>0) { h += "," + key; }
 
                 if (nSent!=sLen) {
                     for (var s=0; s<sLen; s++) {
-                        h += "," + $(spans[s]).attr("data-num");
+                        h += "," + jQuery(spans[s]).attr("data-num");
                     }
                 }
             }
@@ -360,7 +360,7 @@ var Emphasis = {
             setTimeout(function(){
 
                 //pg.scrollTo();
-				$(pg).animate({scrollTop:0}, 'slow');
+				jQuery(pg).animate({scrollTop:0}, 'slow');
 
             }, 500);
         }
@@ -396,7 +396,7 @@ var Emphasis = {
 
                 para.setAttribute("data-sentences", jLen);
                 para.innerHTML = lines.join('. ').replace(/__DOT__/g, ".").replace(/<\/span>\./g, ".<\/span>");
-                $(para).addClass('emReady'); /* Mark the paragraph as having SPANs */
+                jQuery(para).addClass('emReady'); /* Mark the paragraph as having SPANs */
             }
         }
     },
@@ -480,15 +480,9 @@ var Emphasis = {
     removeAllClasses: function(tag, klass) {
     /*  Remove classes */
         if (!klass || !tag) return;
-        var els = $((tag + "." + klass));
+        var els = jQuery((tag + "." + klass));
         for (var i=0; i<els.length; i++){
-            $(els[i]).removeClass(klass);
+            jQuery(els[i]).removeClass(klass);
         }
     }
 };
-
-// $(document).ready(function() {
- 	Emphasis.init();
-// });
-
-
