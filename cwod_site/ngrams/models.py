@@ -9,7 +9,18 @@ from django.db import models
 # Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'
 # into your database.
 
-from django.db import models
+from django.core.urlresolvers import reverse
+
+
+class Date(models.Model):
+    date = models.DateField()
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('cwod_date_detail', [self.date.strftime('%Y'),
+                                     self.date.strftime('%m'),
+                                     self.date.strftime('%d'), ])
+
 
 class NgramsByState(models.Model):
     n = models.IntegerField()
@@ -73,6 +84,35 @@ class NgramsByDate(models.Model):
 
     def ngram_pct(self):
         top = NgramsByDate.objects.filter(date=self.date, n=self.n).values_list('tfidf', flat=True)[0]
+        return (self.tfidf / top) * 100
+
+    @models.permalink
+    def date_url(self):
+        return ('cwod_date_detail', [self.date.strftime('%Y'),
+                                     self.date.strftime('%m'),
+                                     self.date.strftime('%d'), ])
+
+
+
+class NgramsByMonth(models.Model):
+    n = models.IntegerField()
+    month = models.CharField(max_length=6)
+    ngram = models.CharField(max_length=255)
+    tfidf = models.FloatField()
+    count = models.IntegerField()
+
+    class Meta:
+        ordering = ['-tfidf', '-count', ]
+
+    def __unicode__(self):
+        return self.ngram
+
+    def pct(self):
+        top = NgramsByMonth.objects.filter(month=self.month).values_list('tfidf', flat=True)[0]
+        return (self.tfidf / top) * 100
+
+    def ngram_pct(self):
+        top = NgramsByMonth.objects.filter(month=self.month, n=self.n).values_list('tfidf', flat=True)[0]
         return (self.tfidf / top) * 100
 
 

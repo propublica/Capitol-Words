@@ -258,7 +258,7 @@ class SolrDoc(object):
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_party', match['party'])
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_state', match['state'])
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_firstname', match['firstname'])
-        xml += '''<field name="%s">%s</field>\n''' % ('speaker_middlename', match['middlename'])
+        xml += '''<field name="%s">%s</field>\n''' % ('speaker_middlename', match.get('middlename', ''))
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_lastname', match['lastname'])
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_title', match['title'])
         xml += '''<field name="%s">%s</field>\n''' % ('speaker_district', match['district'])

@@ -566,6 +566,7 @@ class CRParser(object):
         
         # get to the first line 
         theline = self.get_line()
+
         while not theline.strip():
             self.currentline += 1
             theline = self.get_line()
@@ -1123,7 +1124,12 @@ if __name__ == '__main__':
             abspath = os.path.join(CWOD_HOME, 'raw', '%s/%s/%s/%s' % (year, month, day, file))
             print 'processing file %s' % abspath
         parser = CRParser(abspath)
-        parser.parse()
+
+        try:
+            parser.parse()
+        except AttributeError:
+            sys.exit()
+
         if not parser.error_flag:
             parser.validate()
             parser.save()
