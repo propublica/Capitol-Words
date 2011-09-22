@@ -1,4 +1,3 @@
-jQuery.noConflict()
 spinner = null
 
 class window.CapitolWords
@@ -975,4 +974,4 @@ jQuery(document).ready ->
         )
     )
 
-
+    Emphasis.init()

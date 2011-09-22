@@ -6,7 +6,6 @@
     }
     return -1;
   };
-  jQuery.noConflict();
   spinner = null;
   window.CapitolWords = (function() {
     function CapitolWords() {}
@@ -1056,7 +1055,7 @@
         }
       });
     }
-    return jQuery('.advanced').bind('click', function() {
+    jQuery('.advanced').bind('click', function() {
       var t;
       t = jQuery(this);
       return jQuery('ul.wordFilter').slideToggle('', function() {
@@ -1067,5 +1066,6 @@
         }
       });
     });
+    return Emphasis.init();
   });
 }).call(this);
