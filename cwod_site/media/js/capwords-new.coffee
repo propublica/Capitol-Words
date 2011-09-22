@@ -515,9 +515,7 @@ class window.CapitolWords
             shadow: true,
         }
         target = document.getElementById 'compareGraphic'
-        if not spinner
-            spinner = new Spinner(opts)
-            spinner.spin target
+        spinner = new Spinner(opts).spin target
 
         url = 'http://capitolwords.org/api/dates.json'
         #phraseA = jQuery('#terma').val()
@@ -573,11 +571,10 @@ class window.CapitolWords
                 }
                 if spinner
                     spinner.stop()
-                    delete spinner
         }
 
         if not skipState
-            this.makeHomepageHistoryState()
+            this.makeHomepageHistoryState(true)
 
 
     phraseA: ->
@@ -669,7 +666,6 @@ class window.CapitolWords
 
         if spinner
             spinner.stop()
-            delete spinner
 
         chart.url()
 
@@ -723,7 +719,7 @@ class window.CapitolWords
             this.limit this.minMonth, this.maxMonth
 
 
-    readHomepageHistory: ->
+    readHomepageHistory: (nosubmit) ->
         mapping = {'terma': '#terma', 'termb': '#termb', 'statea': '#stateA', 'stateb': '#stateB', }
         hash = History.getState().hash.split('?')[1]
         data = {}
@@ -762,7 +758,8 @@ class window.CapitolWords
                 jQuery("#slider-range").slider("option", "values", [startYear, endYear])
                 this.limit this.minMonth, this.maxMonth
 
-            this.submitHomepageCompareForm(true)
+            if not nosubmit
+                this.submitHomepageCompareForm(true)
 
 
     makeHomepageHistoryState: (slid) ->

@@ -589,10 +589,7 @@
         shadow: true
       };
       target = document.getElementById('compareGraphic');
-      if (!spinner) {
-        spinner = new Spinner(opts);
-        spinner.spin(target);
-      }
+      spinner = new Spinner(opts).spin(target);
       url = 'http://capitolwords.org/api/dates.json';
       jQuery.ajax({
         dataType: 'jsonp',
@@ -639,13 +636,12 @@
             }
           });
           if (spinner) {
-            spinner.stop();
-            return delete spinner;
+            return spinner.stop();
           }
         }
       });
       if (!skipState) {
-        return this.makeHomepageHistoryState();
+        return this.makeHomepageHistoryState(true);
       }
     };
     CapitolWords.prototype.phraseA = function() {
@@ -741,7 +737,6 @@
       }
       if (spinner) {
         spinner.stop();
-        delete spinner;
       }
       return chart.url();
     };
@@ -802,7 +797,7 @@
         return this.limit(this.minMonth, this.maxMonth);
       }
     };
-    CapitolWords.prototype.readHomepageHistory = function() {
+    CapitolWords.prototype.readHomepageHistory = function(nosubmit) {
       var cw, data, endYear, hash, mapping, pieces, showAdvanced, startYear;
       mapping = {
         'terma': '#terma',
@@ -844,7 +839,9 @@
           jQuery("#slider-range").slider("option", "values", [startYear, endYear]);
           this.limit(this.minMonth, this.maxMonth);
         }
-        return this.submitHomepageCompareForm(true);
+        if (!nosubmit) {
+          return this.submitHomepageCompareForm(true);
+        }
       }
     };
     CapitolWords.prototype.makeHomepageHistoryState = function(slid) {
