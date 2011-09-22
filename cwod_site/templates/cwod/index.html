@@ -88,7 +88,6 @@
                                     <td><a href="{{ entry.get_absolute_url }}">{{ entry.title|typogrify|truncatewords:10 }}</a></td>
                                 </tr>
                                 {% endfor %}
-                                {#<li class="more" style="margin-top: 10px; text-align: right;"><em><a href="{{ entry.date_url }}">see more</a></em></li>#}
                             </table>
 						</div>
 						<div class="three thirdColumn" style="width: 285px;">
@@ -101,7 +100,7 @@
                                 <li>
                                     <span class="tagValue" style="width:{{ ngram.ngram_pct }}%;">{{ ngram.ngram_pct }}</span>
                                     <span class="tagNumber"></span> 
-                                    <span class="barChartTitle"><a href="{% url cwod_term_detail term=unigram.ngram %}">{{ ngram.ngram }}</a></span>
+                                    <span class="barChartTitle"><a href="{% url cwod_term_detail term=ngram.ngram %}">{{ ngram.ngram }}</a></span>
                                 </li>
                                 {% endfor %}
 	                        </ol>
