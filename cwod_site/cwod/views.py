@@ -20,6 +20,7 @@ from django.views.generic.simple import direct_to_template
 from bioguide.models import *
 from capitolwords import capitolwords, ApiError
 from ngrams.models import *
+from cwod.models import *
 
 
 capitolwords = capitolwords(api_key=settings.SUNLIGHT_API_KEY, domain=settings.API_ROOT)
@@ -45,7 +46,11 @@ STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
 
 def index(request):
     if request.user.is_authenticated():
-        return direct_to_template(request, template='cwod/index.html')
+        recent_entries = RecentEntry.objects.all()[:10]
+
+        return render_to_response('cwod/index.html',
+                                  {'recent_entries': recent_entries,
+                                  }, context_instance=RequestContext(request))
 
     return direct_to_template(request, template='index.html')
 

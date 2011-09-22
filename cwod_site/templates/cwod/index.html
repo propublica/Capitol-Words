@@ -75,85 +75,38 @@
                         <img class="default" width="860" height="340" src="http://chart.apis.google.com/chart?cht=lc&chs=860x340&chd=&chg=0,50,2,5&chf=bg,s,00000000&chco=8E2844,A85B08,AF9703&chdlp=t|l" style="border: 0;"/>
                         <div id="slider-range"></div>
 					</div>
-                    {% comment %}
+
 					<div id="todaysStats">
-						<div class="one thirdColumn">
+						<div class="one thirdColumn" style="width:520px;">
 							<div class="leftHeader">
-								<h4>Most Talkative Party</h4>
-								<span class="tip">Today</span>
+								<h4>Recent action</h4>
+                                <span class="tip"><a href="{{ recent_entries.0.date_url }}">{{ recent_entries.0.date|date:"l, N j, Y" }}</a></span>
 							</div>
-							<div class="chart">
-                                <img src="{% media_url 'img/placeholder_pie.png' %}" width="257" height="126" alt="Placeholder Pie">
-							</div>
+                            <table>
+                                {% for entry in recent_entries|slice:"6" %}
+                                <tr class="{% cycle 'even' 'odd' %}">
+                                    <td><a href="{{ entry.get_absolute_url }}">{{ entry.title|typogrify|truncatewords:10 }}</a></td>
+                                </tr>
+                                {% endfor %}
+                            </table>
 						</div>
-						<div class="two thirdColumn">
+						<div class="three thirdColumn" style="width: 285px;">
 							<div class="leftHeader">
 								<h4>Most Frequent Words</h4>
-								<span class="tip">Today</span>
+                                <span class="tip"><a href="{{ entry.date_url }}">{{ recent_entries.0.date|date:"l, N j, Y" }}</a></span>
 							</div>
 	                        <ol class="barChart">
-	                            <li>
-	                                <span class="tagValue" style="width:100%;">100%</span> 
-	                                <span class="tagNumber"><a href="#">30</a></span> 
-	                                <span class="barChartTitle"><a href="#">State Name</a></span>
-	                            </li>
-	                            <li>
-	                                <span class="tagValue" style="width:80%;">80%</span> 
-	                                <span class="tagNumber"><a href="#">30</a></span> 
-	                                <span class="barChartTitle"><a href="#">State Name</a></span>
-	                            </li>
-	                            <li>
-	                                <span class="tagValue" style="width:80%;">80%</span> 
-	                                <span class="tagNumber"><a href="#">30</a></span> 
-	                                <span class="barChartTitle"><a href="#">State Name</a></span>
-	                            </li>
-	                            <li>
-	                                <span class="tagValue" style="width:70%;">70%</span> 
-	                                <span class="tagNumber"><a href="#">30</a></span> 
-	                                <span class="barChartTitle"><a href="#">State Name</a></span>
-	                            </li>
-	                            <li>
-	                                <span class="tagValue" style="width:50%;">50%</span> 
-	                                <span class="tagNumber"><a href="#">30</a></span> 
-	                                <span class="barChartTitle"><a href="#">State Name</a></span>
-	                            </li>
-	                        </ol>
-						</div>
-						<div class="three thirdColumn">
-							<div class="leftHeader">
-								<h4>Chattiest Legislator</h4>
-								<span class="tip">Today</span>
-							</div>
-	                        <ol class="barChart">
-	                            <li>
-	                                <span class="tagValue" style="width:100%;">100%</span> 
-	                                <span class="tagNumber"><a href="#">30</a></span> 
-	                                <span class="barChartTitle"><a href="#">State Name</a></span>
-	                            </li>
-	                            <li>
-	                                <span class="tagValue" style="width:80%;">80%</span> 
-	                                <span class="tagNumber"><a href="#">30</a></span> 
-	                                <span class="barChartTitle"><a href="#">State Name</a></span>
-	                            </li>
-	                            <li>
-	                                <span class="tagValue" style="width:80%;">80%</span> 
-	                                <span class="tagNumber"><a href="#">30</a></span> 
-	                                <span class="barChartTitle"><a href="#">State Name</a></span>
-	                            </li>
-	                            <li>
-	                                <span class="tagValue" style="width:70%;">70%</span> 
-	                                <span class="tagNumber"><a href="#">30</a></span> 
-	                                <span class="barChartTitle"><a href="#">State Name</a></span>
-	                            </li>
-	                            <li>
-	                                <span class="tagValue" style="width:50%;">50%</span> 
-	                                <span class="tagNumber"><a href="#">30</a></span> 
-	                                <span class="barChartTitle"><a href="#">State Name</a></span>
-	                            </li>
+                                {% for ngram in recent_top_unigrams.0.1|slice:"6" %}
+                                <li>
+                                    <span class="tagValue" style="width:{{ ngram.ngram_pct }}%;">{{ ngram.ngram_pct }}</span>
+                                    <span class="tagNumber"></span> 
+                                    <span class="barChartTitle"><a href="{% url cwod_term_detail term=ngram.ngram %}">{{ ngram.ngram }}</a></span>
+                                </li>
+                                {% endfor %}
 	                        </ol>
 						</div>
 					</div>
-                    {% endcomment %}
+
                 </div>      
                 <div class="clear"></div>                
             </div>

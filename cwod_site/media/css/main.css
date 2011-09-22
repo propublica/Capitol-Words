@@ -516,3 +516,9 @@ p.emActive > span > span.caps { background-color: #b99004 !important; color: #2d
 span.emHighlight { background-color: red !important; /*#fff0b3 !important;*/ color: #2d2424 !important; }
 
 .chartModule { height: 430px; }
+
+div.ngramMenu { margin-bottom: 15px; }
+
+div.ngramMenu span { text-decoration: underline; cursor: pointer; color: #e7b303; }
+
+div.ngramMenu span#selected { text-decoration: none; cursor: default; }

@@ -11,10 +11,11 @@
                     </div>
 					<div id="stateDetail">
                         <h2 class="withButton">{{ state_name }}</h2>
-                        <a class="editResults" href="{% url cwod_date_list %}">Select a Different State</a>
+                        <a class="editResults" href="{% url cwod_state_list %}">Select a Different State</a>
 						<div class="clear"></div>
 					</div>
                        <div class="clear"></div>
+                        {% comment %}
 					<div id="timeFilterWrapper">
                         <form id="timeFilter" class="actionItem" action="" method="">
                             <label>Time frame</label>
@@ -24,16 +25,17 @@
                             </select>
                         </form>    
                     </div>
+                        {% endcomment %}
                 </div>
                 <div id="ltColumn">
 
                     <div class="module">
                         <div class="rightHeader">
                             <h3>Top Words & Phrases</h3>
-                            <span class="tip">Current session</span>
+                            {#<span class="tip">Current session</span>#}
                         </div>
+                        {% include "cwod/detail_page_ngram_list.html" %}
                     </div>
-                    {% include "cwod/detail_page_ngram_list.html" %}
                     <div class="module">
                         <div class="rightHeader">
                             <h3>Current {{ state_name }} Legislators</h3>

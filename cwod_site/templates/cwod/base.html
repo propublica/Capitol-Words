@@ -13,7 +13,7 @@
 
         <title>{% block title %}Capitol Words{% endblock title %}</title>
     
-        {% css "css/main.css" %}
+        {% css "css/main.css?v=929234192" %}
         {% css "css/jquery.ui/jquery.ui.all.css" %}
 
         <!--[if IE 7]>{% css "css/buggy_7.css" %}<![endif]-->
@@ -91,9 +91,21 @@
                         </ol>    
                     </div>    
                     <div id="popularWords">
-                        <h5>Recent popular words</h5>
+                        <h5>Recently popular words</h5>
                         <table>
                             <tbody>
+                                {% for date, ngrams in recent_top_unigrams %}
+                                <tr class="{% cycle 'even' 'odd' %}">
+                                    <td span class="date"><a href="{{ ngrams.0.date_url }}">{{ date }}</a></span></td>
+                                    <td>
+                                        {% for ngram in ngrams|slice:"5" %}
+                                        <a href="{% url cwod_term_detail ngram.ngram %}">{{ ngram }}</a>{% if not forloop.last %},{% endif %}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                                {% comment %}
                                 <tr class="odd">
                                     <td><span class="date">January 1, 2010</span></td>
                                     <td><a href="#">Word of the Day</a></td>
@@ -119,6 +131,7 @@
                                     <td><a href="#">Word of the Day</a></td>
                                     <td>Spoken 300 times</td>
                                 </tr>  
+                                {% endcomment %}
                             <tbody>    
                         </table>  
                    </div>
@@ -174,7 +187,7 @@
 
 
         {% js "js/google-chart.js" %}
-        {% js "js/capwords-new.js" %}
+        {% js "js/capwords-new.js?v=99234299" %}
         {% endblock javascript %}
 
     </body>
