@@ -522,3 +522,45 @@ div.ngramMenu { margin-bottom: 15px; }
 div.ngramMenu span { text-decoration: underline; cursor: pointer; color: #e7b303; }
 
 div.ngramMenu span#selected { text-decoration: none; cursor: default; }
+
+#timeline{
+	background: url('../img/chart_timeline_home.png') top left no-repeat;
+	padding-top: 30px;
+}
+
+#slider-range.ui-widget-content{
+	background-color: none;
+	background: url('../img/slider_inactive.png') left center repeat-x;
+	border: none;
+}
+#slider-range .ui-slider-range.ui-widget-header{
+	background-color: none;
+	background: url('../img/slider_active.png') left center repeat-x;
+}
+
+#slider-range .ui-state-default{
+	background-color: none;
+	background: url('../img/slider_handle.png') top center no-repeat;
+	height: 22px;
+	border: none;
+	width: 21px;
+}
+
+#compareGraphic .default{
+	background:url('../img/chart_bg_home.png') center top repeat-x,  url('../img/chart_bg_right_home.png') right center no-repeat, url('../img/chart_bg_left_home.png') left center no-repeat;
+	border: 5px solid #3c3333;
+	padding: 6px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
