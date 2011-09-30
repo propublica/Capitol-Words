@@ -512,13 +512,13 @@ p.nobioguide { font-style: italic; }
 
 #partyTimeline { display: none; }
 #customTimeline { display: none; }
-.chart img { border: 0 !important; }
+#main .chart img { border: 0; } /*!important*/
 
 p.emActive > span,
 p.emActive > span > span.caps { background-color: #b99004 !important; color: #2d2424 !important; }
 span.emHighlight { background-color: red !important; /*#fff0b3 !important;*/ color: #2d2424 !important; }
 
-.chartModule { height: 430px; }
+.chartModule { height: ; }
 
 div.ngramMenu { margin-bottom: 15px; }
 
@@ -559,9 +559,21 @@ div.ngramMenu span#selected { text-decoration: none; cursor: default; }
 	padding: 6px;
 }
 
+#crEntries em{
+	color: #d9d2d0;
+}
 
+.chart img#termChart, .chart img#partyTermChart{
+	border-bottom: 7px solid #3C3333;
+}
 
-
+.chartModule #timeline{
+	background: url('../img/chart_timeline_all.png') center top no-repeat;
+	margin-top: -7px;
+	margin-bottom: 10px;
+	height: 28px;
+	width: 572px;
+}
 
 
 
