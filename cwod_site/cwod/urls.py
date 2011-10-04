@@ -36,11 +36,6 @@ urlpatterns = patterns('',
             {},
             name='cwod_term_detail'),
 
-        url(r'^compare\/',
-            term_compare,
-            {},
-            name='cwod_term_compare'),
-
         url(r'^congress\/?$',
             congress_list,
             {},
