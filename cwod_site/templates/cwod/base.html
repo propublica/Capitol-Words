@@ -172,9 +172,11 @@
 
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 
-        {% js "js/underscore/underscore-min.js" %}
-        {% js "js/spin/spin.min.js" %}
         <script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="/media/js/history/scripts/compressed/json2.js"><\/script>'); }</script>
+
+        {% js "js/joined.js" %}
+
+        {% comment %}
         {% js "js/history/scripts/compressed/amplify.store.js" %}
         {% js "js/history/scripts/compressed/history.adapter.jquery.js" %}
         {% js "js/history/scripts/compressed/history.js" %}
@@ -185,10 +187,18 @@
         {% js "js/jquery.ui/jquery.ui.mouse.js" %}
         {% js "js/jquery.ui/jquery.ui.slider.js" %}
 
+        {% js "js/underscore/underscore-min.js" %}
+        {% js "js/spin/spin.min.js" %}
         {% js "js/emphasis/emphasis.js" %}
 
         {% js "js/google-chart.js" %}
+<<<<<<< HEAD
         {% js "js/capwords-new.js?v=99234299" %}
+        {% endcomment %}
+
+=======
+        {% js "js/capwords-new.js" %}
+>>>>>>> 4bda9d9c3cc48aab8079d8395b551096c8e5c170
         {% endblock javascript %}
 
     </body>

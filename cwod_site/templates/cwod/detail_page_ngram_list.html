@@ -1,3 +1,4 @@
+{% load capwords %}
 <div class="ngramMenu">
     Phrase size:
     &nbsp;&nbsp;
@@ -24,7 +25,7 @@
 <ol class="barChart" id="{{ gram_type }}">
     {% for ngram in ngram_list %}
     <li>
-        <span class="tagValue" style="width:{{ ngram.ngram_pct }}%;">
+        <span class="tagValue" style="width:{{ ngram.tfidf|divided_by:ngram_list.0.tfidf }}%;">
             <span class="tagPercent">{{ ngram.ngram_pct }}</span>
             <span class="tagNumber">{#{{ ngram.count }}#}</span> 
         </span> 

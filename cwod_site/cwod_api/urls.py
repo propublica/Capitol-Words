@@ -53,6 +53,8 @@ urlpatterns = patterns('',
             },
             name='cwod_docs'),
 
+        (r'^locksmith/', include('locksmith.hub.urls')),
+
         url(r'^dates\.(?P<emitter_format>\w+)$', phrase_over_time_handler),
 
         url(r'^chart\/(?P<chart_type>\w+)\.(?P<emitter_format>\w+)$', chart_handler),
