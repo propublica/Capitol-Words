@@ -251,9 +251,13 @@ def legislator_detail(request, bioguide_id, slug):
 
     ngrams = {}
     for n in range(1, 6):
-        ngrams[GRAM_NAMES[n-1]] = NgramsByBioguide.objects.filter(bioguide_id=bioguide_id, n=n)[:30]
+        ngrams[GRAM_NAMES[n-1]] = capitolwords.top_phrases(
+                                        entity_type='legislator',
+                                        entity_value=bioguide_id,
+                                        n=n,
+                                        per_page=30
+                                        )
     ngrams = ngrams.iteritems()
-    #ngrams.sort(lambda x, y: cmp(x.ngram_pct(), y.ngram_pct()), reverse=True)
 
     entries = capitolwords.text(bioguide_id=bioguide_id, sort='date desc', per_page=5)
 
@@ -274,9 +278,13 @@ def chunks(l, n):
 
 def state_list(request):
     states = []
-    state_choices = dict(STATE_CHOICES)
-    for state in NgramsByState.objects.values_list('state', flat=True).order_by('state').distinct():
-        states.append((state, state_choices[state], NgramsByState.objects.filter(state=state, n=1)[:5]))
+    for abbrev, statename in US_STATES:
+        states.append((abbrev, statename, capitolwords.top_phrases(
+                        entity_type='state',
+                        entity_value=abbrev,
+                        n=1,
+                        per_page=5)
+                      ))
 
     state_chunks = chunks(states, (len(states)+1)/3)
 
@@ -332,7 +340,12 @@ def state_detail(request, state):
     entries = capitolwords.text(state=state, sort='date desc,score desc', per_page=5)
     ngrams = {}
     for n in range(1, 6):
-        ngrams[GRAM_NAMES[n-1]] = NgramsByState.objects.filter(state=state, n=n)[:30]
+        ngrams[GRAM_NAMES[n-1]] = capitolwords.top_phrases(
+                                        entity_type='state',
+                                        entity_value=state,
+                                        n=n,
+                                        per_page=30
+                                        )
     ngrams = ngrams.iteritems()
 
     similar_states = get_similar_entities('state', state)
@@ -394,7 +407,12 @@ def date_detail(request, year, month, day):
 
     ngrams = {}
     for n in range(1, 6):
-        ngrams[GRAM_NAMES[n-1]] = NgramsByDate.objects.filter(date=date, n=n)[:30]
+        ngrams[GRAM_NAMES[n-1]] = capitolwords.top_phrases(
+                                        entity_type='date',
+                                        entity_value=date,
+                                        n=n,
+                                        per_page=30
+                                        )
     ngrams = ngrams.iteritems()
 
     by_chamber = {'House': [], 'Senate': [], 'Extensions of Remarks': [], }
@@ -520,7 +538,12 @@ def month_detail(request, year, month):
 
     ngrams = {}
     for n in range(1, 6):
-        ngrams[GRAM_NAMES[n-1]] = NgramsByMonth.objects.filter(month=year_month, n=n)[:30]
+        ngrams[GRAM_NAMES[n-1]] = capitolwords.top_phrases(
+                                        entity_type='month',
+                                        entity_value=year_month,
+                                        n=n,
+                                        per_page=30
+                                        )
     ngrams = ngrams.iteritems()
 
     dates = Date.objects.filter(date__year=year, date__month=month).order_by('date')

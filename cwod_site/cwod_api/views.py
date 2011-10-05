@@ -13,6 +13,7 @@ from django.shortcuts import get_list_or_404, get_object_or_404
 
 from bioguide.models import *
 from cwod_api.models import *
+from ngrams.models import *
 
 from piston.handler import BaseHandler
 from piston.resource import Resource
@@ -229,12 +230,75 @@ class GenericHandler(BaseHandler):
         return self.format_for_return(data, *args, **kwargs)
 
 
-class PopularPhraseHandler(GenericHandler):
+class PopularPhraseHandler(BaseHandler):
     """Most frequent phrases.
     """
+    fields = ('ngram', 'count', 'tfidf', )
+    DEFAULT_PER_PAGE = 50
+
     def read(self, request, *args, **kwargs):
-        kwargs['q'] = ['id:CREC*', ]
-        return super(PopularPhraseHandler, self).read(request, *args, **kwargs)
+        allowed_entities = {
+                'legislator': {
+                    'model': NgramsByBioguide,
+                    'field': 'bioguide_id',
+                    },
+                'state': {
+                    'model': NgramsByState,
+                    'field': 'state',
+                    },
+                'date': {
+                    'model': NgramsByDate,
+                    'field': 'date',
+                    },
+                'month': {
+                    'model': NgramsByMonth,
+                    'field': 'month',
+                    },
+                }
+
+        n = request.GET.get('n', 1)
+        try:
+            n = int(n)
+        except ValueError:
+            return {'error': 'Invalid phrase length.', 'results': []}
+
+        if n > 5:
+            return {'error': 'Invaid phrase length.', 'results': []}
+
+        entity = request.GET.get('entity_type', '')
+        if entity not in allowed_entities.keys():
+            return {'error': 'Invalid entity.', 'results': []}
+
+        entity = allowed_entities[entity]
+        val = request.GET.get('entity_value', '')
+        if not val:
+            return {'error': 'Invalud entity value.', 'results': []}
+
+        per_page, offset = self.get_pagination(request)
+
+        model = entity['model']
+        field = entity['field']
+
+        if field == 'date':
+            try:
+                dateparse(val)
+            except ValueError:
+                return {'error': 'Invalid date.', 'results': []}
+
+        query = {field: val, 'n': n}
+        return model.objects.filter(**query)[offset:offset+per_page]
+
+
+    def get_pagination(self, request):
+        try:
+            per_page = int(request.GET.get('per_page', self.DEFAULT_PER_PAGE))
+        except ValueError:
+            per_page = self.DEFAULT_PER_PAGE
+        if per_page > self.DEFAULT_PER_PAGE:
+            per_page = self.DEFAULT_PER_PAGE
+
+        offset = int(request.GET.get('page', 0)) * per_page
+        return per_page, offset
 
 
 class PhraseByCategoryHandler(GenericHandler):

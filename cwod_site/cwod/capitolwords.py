@@ -72,7 +72,7 @@ class capitolwords(object):
         return result
         
     def top_phrases(self, **params):
-        result = capitolwords._apicall(self, 'phrases', params)['results']
+        result = capitolwords._apicall(self, 'phrases', params)
         return result
         
     def get_legislator(self, **params):

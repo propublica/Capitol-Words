@@ -13,8 +13,8 @@
 
         <title>{% block title %}Capitol Words{% endblock title %}</title>
     
-        {% css "css/main.css?v=929234192" %}
         {% css "css/jquery.ui/jquery.ui.all.css" %}
+        {% css "css/main.css?v=929234192" %}
 
         <!--[if IE 7]>{% css "css/buggy_7.css" %}<![endif]-->
         {% endblock head %} 
@@ -192,9 +192,13 @@
         {% js "js/emphasis/emphasis.js" %}
 
         {% js "js/google-chart.js" %}
+<<<<<<< HEAD
         {% js "js/capwords-new.js?v=99234299" %}
         {% endcomment %}
 
+=======
+        {% js "js/capwords-new.js" %}
+>>>>>>> 4bda9d9c3cc48aab8079d8395b551096c8e5c170
         {% endblock javascript %}
 
     </body>
