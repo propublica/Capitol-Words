@@ -575,6 +575,69 @@ div.ngramMenu span#selected { text-decoration: none; cursor: default; }
 	width: 572px;
 }
 
+#embed{
+	float: right;
+}
+#embed a{
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	color: #B99004;
+	margin-top: 5px;
+	display: block;
+	background: url('../img/embed.png') left 5px no-repeat;
+	padding-left: 35px;
+}
+.withAction h3{
+	float: left;
+}
+
+.embedContainer{
+	background: url(../img/bg_secondTitle.png) top left repeat;
+	position: absolute;
+	width: 294px;
+	z-index: 10;
+	margin-left: -215px;
+	margin-top: 20px;
+	padding: 13px;
+	display: none;
+}
+
+.embedContainer form{
+	margin-bottom: 0;
+}
+
+li.embedDark, li.embedLight{
+	width: 127px;
+}
+
+#customizeEmbed img{
+	border: none;
+	margin-left: 20px;
+	
+}
+
+.embedCode label{
+	display: none;
+}
+
+.embedCode textarea{
+	width: 282px;
+	height: 80px;
+	padding: 5px;
+	color: #FBF4F4;
+	border-radius: 5px;
+	-moz-border-radius: 5px; 
+	-webkit-border-radius: 5px;
+	background: #514949 url(../img/bg_input.png) left bottom repeat-x;
+	border: 1px solid #021017;
+}
+
+
+
+
+
+
+
+
 
 
 
