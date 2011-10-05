@@ -461,7 +461,7 @@ ul.wordFilter{
 
 .key{
 	font-style: italic;
-	margin-bottom: 20px;
+	margin-bottom: 5px;
 }
 .key a{
 	text-decoration: underline;
@@ -631,9 +631,15 @@ li.embedDark, li.embedLight{
 	border: 1px solid #021017;
 }
 
+#compareGraphic #embed a{
+	margin-top: 0;
+	margin-bottom: 5px;
+}
 
-
-
+#compareGraphic .embedContainer{
+	margin-left: -243px;
+	margin-top: 0;
+}
 
 
 
