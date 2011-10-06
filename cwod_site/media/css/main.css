@@ -353,7 +353,6 @@ th {text-transform: uppercase;}
 }
 .abstract{
 	font-weight: 200;
-	font-style: italic;
 }
 .crEntries .entTitle{
 	width: 85%;
@@ -561,6 +560,7 @@ div.ngramMenu span#selected { text-decoration: none; cursor: default; }
 
 #crEntries em{
 	color: #d9d2d0;
+	font-weight: bold;
 }
 
 .chart img#termChart, .chart img#partyTermChart{

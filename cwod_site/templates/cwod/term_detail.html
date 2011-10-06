@@ -136,7 +136,7 @@
 							</thead>
 							<tbody>
 								{% for entry in entries|slice:"5" %}
-								<tr class="odd">
+								<tr class="{% cycle 'even' 'odd' %}">
 									<td colspan="2">
 										<table>
 												<tr>
