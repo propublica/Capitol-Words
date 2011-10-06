@@ -578,13 +578,14 @@ div.ngramMenu span#selected { text-decoration: none; cursor: default; }
 #embed{
 	float: right;
 }
-#embed a{
+#embed a, #embed span{
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	color: #B99004;
 	margin-top: 5px;
 	display: block;
 	background: url('../img/embed.png') left 5px no-repeat;
 	padding-left: 35px;
+    cursor: pointer;
 }
 .withAction h3{
 	float: left;

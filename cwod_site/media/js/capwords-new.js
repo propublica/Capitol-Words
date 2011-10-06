@@ -1066,6 +1066,25 @@
         }
       });
     });
+    jQuery('#embed span').bind('click', function() {
+      var imgSrc, t;
+      t = jQuery('.embedContainer');
+      if (t.is(':visible')) {
+        t.slideUp();
+      } else {
+        t.slideDown();
+      }
+      if (jQuery('#partyTimeline').is(':visible')) {
+        imgSrc = jQuery('#partyTimeline img').attr('src');
+      } else {
+        imgSrc = jQuery('#partyTimeline img').attr('src');
+      }
+      return window.console.log({
+        'cw.start_date': cw.start_date,
+        'cw.end_date': cw.end_date,
+        'src': imgSrc
+      });
+    });
     return Emphasis.init();
   });
 }).call(this);
