@@ -79,6 +79,9 @@ class capitolwords(object):
         result = capitolwords._apicall(self, 'legislators', params)
         return result
 
+    def legislators(self, **params):
+        result = capitolwords._apicall(self, 'legislators', params)['results']
+
     def wordtree(self, **params):
         result = capitolwords._apicall(self, 'tree', params)['results']
         return result

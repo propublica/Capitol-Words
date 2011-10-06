@@ -811,6 +811,7 @@ class LegislatorLookupHandler(BaseHandler):
                                     'state': legislator.state,
                                     'party': legislator.party,
                                     'chamber': legislator.chamber,
+                                    'district': legislator.district,
                                     'bioguide_id': legislator.bioguide_id,
                                     'slug': legislator.slug(),
                                     'congress': legislator.congress, })
