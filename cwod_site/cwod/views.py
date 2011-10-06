@@ -353,11 +353,11 @@ def state_detail(request, state):
 
     def sort_districts(x, y):
         try:
-            x_district = int(x.district)
+            x_district = int(x['district'])
         except ValueError:
             x_district = 0
         try:
-            y_district = int(y.district)
+            y_district = int(y['district'])
         except ValueError:
             y_district = 0
         return cmp(x_district, y_district)
@@ -366,7 +366,7 @@ def state_detail(request, state):
 
     bodies = {'House': [], 'Senate': [], }
     for legislator in legislators:
-        if legislator.chamber == 'Senate':
+        if legislator['chamber'] == 'Senate':
             bodies['Senate'].append(legislator)
         else:
             bodies['House'].append(legislator)
