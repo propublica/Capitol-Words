@@ -97,6 +97,7 @@
 
                     </div>
                     <div class="leftModule">
+                        {% if similar_dates %}
                         <div class="leftHeader">
                             <h4>Similar dates</h4>
                         </div>
@@ -109,6 +110,7 @@
                             </li>
                             {% endfor %}
                         </ol>
+                        {% endif %}
                     </div>
                 </div>    
                 <div class="clear"></div>
