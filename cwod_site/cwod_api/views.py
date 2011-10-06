@@ -841,7 +841,7 @@ class LegislatorLookupHandler(BaseHandler):
                                         'state': legislator.state,
                                         'congress': legislator.congress, })
         """
-        return results
+        return {'results': results}
 
 
 class BillDetailHandler(BaseHandler):

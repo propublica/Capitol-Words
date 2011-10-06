@@ -228,10 +228,11 @@ def legislator_list(request):
 
 
 def legislator_lookup(bioguide_id):
-    legislators = LegislatorRole.objects.filter(bioguide_id=bioguide_id).order_by('-congress')
-    if not legislators:
+    legislator = capitolwords.legislators(bioguide_id=bioguide_id)
+    #legislators = LegislatorRole.objects.filter(bioguide_id=bioguide_id).order_by('-congress')
+    if not legislator:
         return None
-    return legislators[0]
+    return legislator
 
 GRAM_NAMES = ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ]
 
@@ -241,7 +242,7 @@ def legislator_detail(request, bioguide_id, slug):
     if not legislator:
         raise Http404
 
-    if legislator.slug() != slug:
+    if legislator['slug'] != slug:
         raise Http404
 
     similar_legislators = []
