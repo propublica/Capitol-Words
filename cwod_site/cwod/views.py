@@ -326,9 +326,7 @@ def get_popular_ngrams(n, entity_type, entity, limit=50):
 
 
 def get_similar_entities(entity_type, entity):
-    cursor = connections['ngrams'].cursor()
-    cursor.execute("SELECT b, cosine_distance FROM distance_%s WHERE a = %%s AND cosine_distance != 1 ORDER BY cosine_distance DESC" % entity_type, [entity, ])
-    return [dict(zip([entity_type, 'distance', ], x)) for x in cursor.fetchall()]
+    return capitolwords._similar(entity_type=entity_type, entity_value=entity)
 
 
 @login_required
@@ -350,15 +348,16 @@ def state_detail(request, state):
 
     similar_states = get_similar_entities('state', state)
 
-    legislators = LegislatorRole.objects.filter(state=state, end_date__gte=datetime.date.today()).order_by('last')
+    #legislators = LegislatorRole.objects.filter(state=state, end_date__gte=datetime.date.today()).order_by('last')
+    legislators = capitolwords.legislators(state=state, congress=112)
 
     def sort_districts(x, y):
         try:
-            x_district = int(x.district)
+            x_district = int(x['district'])
         except ValueError:
             x_district = 0
         try:
-            y_district = int(y.district)
+            y_district = int(y['district'])
         except ValueError:
             y_district = 0
         return cmp(x_district, y_district)
@@ -367,7 +366,7 @@ def state_detail(request, state):
 
     bodies = {'House': [], 'Senate': [], }
     for legislator in legislators:
-        if legislator.title.startswith('Senator'):
+        if legislator['chamber'] == 'Senate':
             bodies['Senate'].append(legislator)
         else:
             bodies['House'].append(legislator)

@@ -52,7 +52,6 @@ class capitolwords(object):
         except httplib2.HttpLib2Error, e:
             raise ApiError(e.read())
         except ValueError, e:
-            print e
             raise ApiError('Invalid Response')
             
     def phrase_by_date_range(self, **params):
@@ -79,6 +78,10 @@ class capitolwords(object):
         result = capitolwords._apicall(self, 'legislators', params)
         return result
 
+    def legislators(self, **params):
+        result = capitolwords._apicall(self, 'legislators', params)['results']
+        return result
+
     def wordtree(self, **params):
         result = capitolwords._apicall(self, 'tree', params)['results']
         return result
@@ -87,6 +90,6 @@ class capitolwords(object):
         result = capitolwords._apicall(self, 'text', params)['results']
         return result
 
-    def similar(self, **params):
-        result = capitolwords._apicall(self, 'similar', params)['results']
+    def _similar(self, **params):
+        result = capitolwords._apicall(self, '_similar', params)['results']
         return result

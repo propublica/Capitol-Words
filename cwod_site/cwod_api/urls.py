@@ -42,6 +42,7 @@ docdetail_handler = Resource(DocDetailHandler, authentication=authorizer)
 billdetail_handler = Resource(BillDetailHandler, authentication=authorizer)
 bill_list_handler = Resource(BillListHandler, authentication=authorizer)
 similar_document_handler = Resource(SimilarDocumentHandler, authentication=authorizer)
+similar_entity_handler = Resource(SimilarEntityHandler, authentication=authorizer)
 
 
 urlpatterns = patterns('',
@@ -53,7 +54,7 @@ urlpatterns = patterns('',
             },
             name='cwod_docs'),
 
-        (r'^locksmith/', include('locksmith.hub.urls')),
+        (r'^locksmith/', include('locksmith.auth.urls')),
 
         url(r'^dates\.(?P<emitter_format>\w+)$', phrase_over_time_handler),
 
@@ -73,10 +74,12 @@ urlpatterns = patterns('',
 
         url(r'^document\.(?P<emitter_format>\w+)$', docdetail_handler),
 
-        url(r'^bill\.(?P<emitter_format>\w+)$', billdetail_handler),
+        #url(r'^bill\.(?P<emitter_format>\w+)$', billdetail_handler),
 
-        url(r'^bills\.(?P<emitter_format>\w+)$', bill_list_handler),
+        #url(r'^bills\.(?P<emitter_format>\w+)$', bill_list_handler),
 
-        url(r'^similar\.(?P<emitter_format>\w+)$', similar_document_handler),
+        #url(r'^similar\.(?P<emitter_format>\w+)$', similar_document_handler),
+
+        url(r'^_similar\.(?P<emitter_format>\w+)$', similar_entity_handler),
 
 )

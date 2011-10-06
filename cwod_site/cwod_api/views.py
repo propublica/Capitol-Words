@@ -10,6 +10,7 @@ import urllib2
 from django.conf import settings
 from django.db.models import *
 from django.shortcuts import get_list_or_404, get_object_or_404
+from django.db import connections, DatabaseError
 
 from bioguide.models import *
 from cwod_api.models import *
@@ -810,6 +811,7 @@ class LegislatorLookupHandler(BaseHandler):
                                     'state': legislator.state,
                                     'party': legislator.party,
                                     'chamber': legislator.chamber,
+                                    'district': legislator.district,
                                     'bioguide_id': legislator.bioguide_id,
                                     'slug': legislator.slug(),
                                     'congress': legislator.congress, })
@@ -968,6 +970,24 @@ class DocDetailHandler(BaseHandler):
                                  session=session,
                                  page_id=page_id)
 
+
+class SimilarEntityHandler(GenericHandler):
+
+    def read(self, request, *args, **kwargs):
+        entity_type = request.GET.get('entity_type')
+        entity_value = request.GET.get('entity_value')
+        if not entity_type or not entity_value:
+            return {'error': 'Must specify entity_type and entity_value', 'results': []}
+
+        valid_entity_types = ['bioguide',
+                              'date',
+                              'month',
+                              'state',
+                              'year', ]
+
+        cursor = connections['ngrams'].cursor()
+        cursor.execute("SELECT b, cosine_distance FROM distance_%s WHERE a = %%s AND cosine_distance != 1 ORDER BY cosine_distance DESC" % entity_type, [entity_value, ])
+        return {'results': [dict(zip([entity_type, 'distance', ], x)) for x in cursor.fetchall()]}
 
 
 def create_gpo_url(crdoc):
