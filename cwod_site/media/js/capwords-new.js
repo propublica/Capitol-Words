@@ -390,6 +390,7 @@
           'bioguide_id': bioguide_id
         },
         success: function(data) {
+          data = data['results'];
           url = "/legislator/" + bioguide_id + "-" + data['slug'];
           cw.legislatorData.push({
             url: url,

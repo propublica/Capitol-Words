@@ -306,6 +306,7 @@ class window.CapitolWords
                 'bioguide_id': bioguide_id,
             },
             success: (data) ->
+                data = data['results']
                 url = "/legislator/#{bioguide_id}-#{data['slug']}"
                 cw.legislatorData.push({
                     url: url,
