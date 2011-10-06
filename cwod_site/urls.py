@@ -6,6 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 
+
         (r'^api/', include('cwod_api.urls')),
 
         (r'^accounts/login/$', 'django.contrib.auth.views.login'),

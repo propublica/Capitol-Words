@@ -306,6 +306,7 @@ class window.CapitolWords
                 'bioguide_id': bioguide_id,
             },
             success: (data) ->
+                data = data['results']
                 url = "/legislator/#{bioguide_id}-#{data['slug']}"
                 cw.legislatorData.push({
                     url: url,
@@ -965,13 +966,30 @@ jQuery(document).ready ->
                     cw.populateTermDetailPage termDetailTerm
                 cw.makeHomepageHistoryState(true)
         }
-        #jQuery('#years').val jQuery('#slider-range').slider('values', 0) + ' - ' + jQuery('#slider-range').slider('values', 1)
 
     jQuery('.advanced').bind('click', ->
         t = jQuery(this)
         jQuery('ul.wordFilter').slideToggle('', ->
             if jQuery(this).is ':visible' then t.addClass 'expanded' else t.removeClass 'expanded'
         )
+    )
+
+    jQuery('#embed span').bind('click', ->
+        t = jQuery('.embedContainer')
+        if t.is ':visible' then t.slideUp() else t.slideDown()
+        
+        # Determine which graph is being shown.
+        if jQuery('#partyTimeline').is(':visible')
+            imgSrc = jQuery('#partyTimeline img').attr 'src'
+        else
+            imgSrc = jQuery('#partyTimeline img').attr 'src'
+             
+        window.console.log {
+            'cw.start_date': cw.start_date,
+            'cw.end_date': cw.end_date,
+            'src': imgSrc,
+        }
+
     )
 
     Emphasis.init()

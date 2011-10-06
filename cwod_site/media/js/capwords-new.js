@@ -390,6 +390,7 @@
           'bioguide_id': bioguide_id
         },
         success: function(data) {
+          data = data['results'];
           url = "/legislator/" + bioguide_id + "-" + data['slug'];
           cw.legislatorData.push({
             url: url,
@@ -1064,6 +1065,25 @@
         } else {
           return t.removeClass('expanded');
         }
+      });
+    });
+    jQuery('#embed span').bind('click', function() {
+      var imgSrc, t;
+      t = jQuery('.embedContainer');
+      if (t.is(':visible')) {
+        t.slideUp();
+      } else {
+        t.slideDown();
+      }
+      if (jQuery('#partyTimeline').is(':visible')) {
+        imgSrc = jQuery('#partyTimeline img').attr('src');
+      } else {
+        imgSrc = jQuery('#partyTimeline img').attr('src');
+      }
+      return window.console.log({
+        'cw.start_date': cw.start_date,
+        'cw.end_date': cw.end_date,
+        'src': imgSrc
       });
     });
     return Emphasis.init();

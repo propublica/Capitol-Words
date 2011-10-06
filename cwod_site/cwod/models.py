@@ -1,5 +1,8 @@
 from django.db import models
 
+from baseconv import base62
+
+
 class RecentEntry(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=50)
@@ -27,3 +30,11 @@ class RecentEntry(models.Model):
         return ('cwod_date_detail', [self.date.strftime('%Y'),
                                      self.date.strftime('%m'),
                                      self.date.strftime('%d'), ])
+
+
+class Embed(models.Model):
+    img_src = models.TextField()
+    url = models.TextField()
+
+    def from_decimal(self):
+        return base62.from_decimal(self.pk)

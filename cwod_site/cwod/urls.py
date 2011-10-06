@@ -93,6 +93,16 @@ urlpatterns = patterns('',
 
         url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 
+        url(r'^embed\/?$',
+            encode_embed,
+            {},
+            name='cwod_embed'),
+
+        url(r'^embed\/(?P<code>.+)\/?$',
+            decode_embed,
+            {},
+            name='cwod_embed'),
+
         url(r'^$',
             index,
             {},
