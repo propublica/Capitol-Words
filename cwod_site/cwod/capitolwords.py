@@ -93,3 +93,7 @@ class capitolwords(object):
     def _similar(self, **params):
         result = capitolwords._apicall(self, '_similar', params)['results']
         return result
+
+    def similar(self, **params):
+        result = capitolwords._apicall(self, 'similar', params)['results']
+        return result
