@@ -22,6 +22,8 @@ from capitolwords import capitolwords, ApiError
 from ngrams.models import *
 from cwod.models import *
 
+from baseconv import base62
+
 
 capitolwords = capitolwords(api_key=settings.SUNLIGHT_API_KEY, domain=settings.API_ROOT)
 
@@ -44,15 +46,15 @@ STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
              'should', 'now', '\.', '\?', '\!', ]
 
 
+@login_required
 def index(request):
-    if request.user.is_authenticated():
-        recent_entries = RecentEntry.objects.all()[:10]
+    recent_entries = RecentEntry.objects.all()[:10]
 
-        return render_to_response('cwod/index.html',
-                                  {'recent_entries': recent_entries,
-                                  }, context_instance=RequestContext(request))
+    return render_to_response('cwod/index.html',
+                              {'recent_entries': recent_entries,
+                              }, context_instance=RequestContext(request))
 
-    return direct_to_template(request, template='index.html')
+    #return direct_to_template(request, template='index.html')
 
 
 @login_required
@@ -556,3 +558,32 @@ def month_detail(request, year, month):
                                'dates_by_week': dates_by_week,
                               },
                               context_instance=RequestContext(request))
+
+
+def decode_embed(request, code=None):
+    data = {'img_src': '', 'url': ''}
+    if code:
+        pk = base62.to_decimal(code)
+        try:
+            obj = Embed.objects.get(pk=pk)
+        except Embed.DoesNotExist:
+            return HttpResponse(json.dumps(data))
+
+        data['img_src'] = obj.img_src
+        data['url'] = obj.url
+        return HttpResponse(json.dumps(data))
+
+    return HttpResponse(json.dumps(data))
+
+
+def encode_embed(request):
+    if request.method == 'POST':
+        img_src = request.POST.get('img_src')
+        url = request.POST.get('url')
+        if img_src and url:
+            obj = Embed.objects.create(img_src=img_src,
+                                      url=url)
+            return HttpResponse(json.dumps({'code': obj.from_decimal()}))
+        return HttpResponse(json.dumps({}))
+
+    return HttpResponse('')
