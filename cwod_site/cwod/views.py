@@ -418,7 +418,7 @@ def date_detail(request, year, month, day):
     ngrams = ngrams.iteritems()
 
     by_chamber = {'House': [], 'Senate': [], 'Extensions of Remarks': [], }
-    similar_dates = get_similar_dates(date)
+    similar_dates = get_similar_entities('date', date)
 
     return render_to_response('cwod/date_detail.html',
                               {'date': date,
