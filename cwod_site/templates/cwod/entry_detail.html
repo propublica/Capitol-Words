@@ -36,7 +36,7 @@
 							<div class="crSpeaker">
                             {% if chunk.bioguide_id %}
                                 {% with chunk|legislator_lookup as legislator %}
-                                <h4><a href="{% url cwod_legislator_detail bioguide_id=chunk.bioguide_id slug=legislator.slug %}">{{ legislator.honorific }} {{ legislator.name }}</a></h4>
+                                <h4><a href="{% url cwod_legislator_detail bioguide_id=chunk.bioguide_id slug=legislator.slug %}">{{ legislator.honorific }} {{ legislator.full_name }}</a></h4>
 								<div id="legislatorDetail">
                                     <img class="legislatorImage" alt="legislator photo" src="{% legislator_thumbnail chunk.bioguide_id 40x50 %}"/>
                                     <dl class="metaData">
