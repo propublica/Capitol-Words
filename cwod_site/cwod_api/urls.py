@@ -78,7 +78,7 @@ urlpatterns = patterns('',
 
         #url(r'^bills\.(?P<emitter_format>\w+)$', bill_list_handler),
 
-        #url(r'^similar\.(?P<emitter_format>\w+)$', similar_document_handler),
+        url(r'^similar\.(?P<emitter_format>\w+)$', similar_document_handler),
 
         url(r'^_similar\.(?P<emitter_format>\w+)$', similar_entity_handler),
 
