@@ -1,6 +1,7 @@
 import datetime
 import re
 
+from django.conf import settings
 from django.contrib.localflavor.us.us_states import US_STATES
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django import template
@@ -51,6 +52,10 @@ def smart_title(s):
 
 @register.filter(name='legislator_lookup')
 def legislator_lookup(chunk):
+    from cwod.capitolwords import capitolwords, ApiError
+    capitolwords = capitolwords(api_key=settings.SUNLIGHT_API_KEY, domain=settings.API_ROOT)
+    legislator = capitolwords.get_legislator(congress=chunk.get('congress'), bioguide_id=chunk.get('bioguide_id'))
+    return legislator['results']
     if isinstance(chunk['date'], str):
         year, month, day = [int(x) for x in chunk['date'].split('-')]
         date = datetime.date(year, month, day)
