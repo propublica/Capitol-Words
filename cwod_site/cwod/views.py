@@ -9,7 +9,7 @@ import copy
 from dateutil.parser import parse as dateparse
 
 from django.conf import settings
-from django.contrib.localflavor.us.us_states import US_STATES, STATE_CHOICES
+from django.contrib.localflavor.us.us_states import US_STATES, STATE_CHOICES, US_TERRITORIES
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import connections, DatabaseError
@@ -25,6 +25,7 @@ from cwod.models import *
 
 from baseconv import base62
 
+TERRITORY_CHOICES = ('PR', 'GU', 'MP', 'AS')
 
 capitolwords = capitolwords(api_key=settings.SUNLIGHT_API_KEY, domain=settings.API_ROOT)
 
@@ -95,7 +96,7 @@ def faster_term_detail(request, term):
                                'entries': entries,
                                'needs_js': True,
                                'no_js_uri': no_js_uri,
-                               'state_choices': US_STATES,
+                               'state_choices': US_STATES + US_TERRITORIES,
                               }, context_instance=RequestContext(request))
 
 @login_required
@@ -193,7 +194,7 @@ def term_detail(request, term):
                                #'tree': tree,
                                'entries': entries,
                                'search': request.GET.get('search') == '1',
-                               'state_choices': US_STATES,
+                               'state_choices': US_STATES + US_TERRITORIES,
                               }, context_instance=RequestContext(request))
 
 
@@ -225,7 +226,7 @@ def legislator_list(request):
                               {'current_legislators': current_legislators,
                                #'past_legislators': past_legislators,
                                'congresses': congresses,
-                               'state_choices': US_STATES,
+                               'state_choices': US_STATES + US_TERRITORIES,
                               }, context_instance=RequestContext(request))
 
 
@@ -282,13 +283,15 @@ def chunks(l, n):
 
 def state_list(request):
     states = []
-    for abbrev, statename in US_STATES:
+    for abbrev, statename in (US_STATES + US_TERRITORIES):
         states.append((abbrev, statename, capitolwords.top_phrases(
                         entity_type='state',
                         entity_value=abbrev,
                         n=1,
                         per_page=5)
                       ))
+
+
 
     state_chunks = chunks(states, (len(states)+1)/3)
 
@@ -335,7 +338,7 @@ def get_similar_entities(entity_type, entity):
 
 @login_required
 def state_detail(request, state):
-    state_name = dict(STATE_CHOICES).get(state)
+    state_name = dict(STATE_CHOICES + TERRITORY_CHOICES).get(state)
     if not state_name:
         raise Http404
 
