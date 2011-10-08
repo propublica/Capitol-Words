@@ -4,6 +4,7 @@ import itertools
 import json
 import re
 from operator import itemgetter
+import copy
 
 from dateutil.parser import parse as dateparse
 
@@ -525,10 +526,33 @@ MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', '
 
 @login_required
 def calendar(request):
-    months = Date.objects.extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month', flat=True).distinct()
-    years = [(x, [(str(x)[4:], MONTH_NAMES[int(str(x)[4:])-1]) for x in y]) for x, y in itertools.groupby(months, lambda x: str(x)[:4])]
-    #year_chunks = chunks(years, (len(years)+1)/3)
+    raw_months = Date.objects.extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month', flat=True).distinct()
+    max_year = max(raw_months) / 100
+    min_year = min(raw_months) / 100
 
+    # this is embarrassing
+    months = []
+    for m in raw_months: 
+        months.append(str(m))
+    
+    empty_year = []
+    for i, n in enumerate(MONTH_NAMES):
+        empty_year.append(["%02d" % (i+1), n, False])
+                
+    # fill out the months in every year
+    years = {}
+    for y in range(min_year, max_year+1):
+        years[str(y)] = copy.deepcopy(empty_year)
+        
+    # activate the, um, active months
+    for m in months:
+        ky = m[:4]
+        km = int(m[-2:])-1
+        if years.has_key(ky):
+            years[ky][km][2] = True
+        
+    years = sorted(years.items(), key=lambda x: int(x[0]))
+    
     return render_to_response('cwod/calendar.html',
                               {'years': years,},
                               context_instance=RequestContext(request))
