@@ -83,12 +83,21 @@ class GenericHandler(BaseHandler):
         per_page, offset = self.get_pagination(request)
 
         for k, v in self.ENTITIES.iteritems():
-            if k in request.GET:
-                if request.GET[k]: # Make sure value isn't blank
-                    q.append('%s:%s' % (v, request.GET[k]))
-            if k in kwargs:
-                if kwargs[k]:
-                    q.append('%s:%s' % (v, kwargs[k]))
+
+            param_val = None
+            if k in request.GET and request.GET[k]: # Make sure value isn't blank
+                param_val = request.GET[k]
+            if k in kwargs and kwargs[k]: 
+                param_val = kwargs[k]
+
+            # this is hacky, but the right way to do it seems to require changing ENTITIES, which
+            # I'm loathe to do without fully understanding how it's used
+            if k=='state' and param_val in ('OR', 'AND'): # not that it will ever be AND, but add reserved words as nec...
+                param_val = '"%s"' % param_val
+
+            if param_val is not None:
+                q.append('%s:%s' % (v, param_val))
+
 
         if 'date' in request.GET:
             date = dateparse(request.GET['date'])
