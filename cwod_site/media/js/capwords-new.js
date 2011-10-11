@@ -971,8 +971,11 @@
         type: 'POST',
         url: '/embed/',
         data: data,
-        success: function(response) {
-          return window.console.log(response);
+        success: function(url) {
+          var full_url, script;
+          full_url = "http://capitolwords.org" + url;
+          script = "<script type=\"text/javascript\" src=\"" + full_url + "\"></script>";
+          return container.find('textarea').val(script);
         }
       });
       return container.slideDown();
