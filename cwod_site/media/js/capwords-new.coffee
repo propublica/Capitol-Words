@@ -314,9 +314,9 @@ class window.CapitolWords
                     result: result,
                     pct: pct,
                 })
-                
+
                 callback()
-                
+
         }
 
 
@@ -922,6 +922,21 @@ jQuery(document).ready ->
         cw.legislatorSearch({})
     )
 
+    jQuery('#signUp').find('input[type=text]').bind('focus', ->
+        el = jQuery(this)
+        try
+          el.parent().find('label[for=' + el.attr('id') + ']').eq(0).addClass('hidden')
+
+        return
+    ).bind('blur', ->
+        el = jQuery(this)
+        if !el.val()
+          try
+            el.parent().find('label[for=' + el.attr('id') + ']').eq(0).removeClass('hidden')
+
+        return
+    )
+
     if window.location.pathname.match /^\/legislator\/?$/
         cw.readLegislatorHistory()
         History.Adapter.bind(window, 'statechange', ->
@@ -977,13 +992,13 @@ jQuery(document).ready ->
     jQuery('#embed span').bind('click', ->
         t = jQuery('.embedContainer')
         if t.is ':visible' then t.slideUp() else t.slideDown()
-        
+
         # Determine which graph is being shown.
         if jQuery('#partyTimeline').is(':visible')
             imgSrc = jQuery('#partyTimeline img').attr 'src'
         else
             imgSrc = jQuery('#partyTimeline img').attr 'src'
-             
+
         window.console.log {
             'cw.start_date': cw.start_date,
             'cw.end_date': cw.end_date,
