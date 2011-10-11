@@ -95,24 +95,24 @@ menu, nav, section, summary, time, mark, audio, video {
 	width: 572px;
 }
 
-.key{
+#capWordsEmbed  .key{
 	font-style: italic;
 	margin-bottom: 5px;
 }
-.key a{
+#capWordsEmbed  .key a{
 	text-decoration: underline;
 	margin-right: 0;
 	margin-left: 3px;
 }
-.wordOne{
+#capWordsEmbed  .wordOne{
 	margin-right: 20px;
 }
-.wordTwo{
+#capWordsEmbed  .wordTwo{
 	margin-right: 20px;
 	margin-left: 20px;
 }
 
-.wordOne span.color, .wordTwo span.color{
+#capWordsEmbed  .wordOne span.color, #capWordsEmbed  .wordTwo span.color{
 	width: 10px;
 	height: 10px;
 	display: inline-block;
@@ -121,20 +121,23 @@ menu, nav, section, summary, time, mark, audio, video {
 	vertical-align: middle;
 }
 
-.wordOne span.color{
+#capWordsEmbed  .wordOne span.color{
 	background: #902b47;
 }
 
-.wordTwo span.color{
+#capWordsEmbed  .wordTwo span.color{
 	background: #a85b08;
 }
 
-.filters{
+#capWordsEmbed  .filters{
 	font-style: normal;
 	display: inline-block;
 }
 
-
+#capWordsEmbed  h3 a{
+	text-decoration: none;
+	color: #ffffff;
+}
 
 
 

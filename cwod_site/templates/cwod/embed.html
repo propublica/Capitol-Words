@@ -8,7 +8,7 @@
 			<div id="ltColumn">
 				<div class="module chartModule">
 				    <div class="rightHeader withAction">
-				        <h3>War vs Peace</h3>
+				        <h3><a href="{{ url }}">{{ title }}</a></h3>
 						<div class="key">
                             <span class="wordOne"><span class="color"></span><a href"#" class="wordOne">"War"</a> <span class="filters">[Oregon, Democrats]</span></span><span class="wordTwo"><span class="color"></span><a href"#" class="wordTwo">"Peace"</a> <span class="filters">[All States, All Parties]</span></span>
 						</div>
@@ -76,7 +76,119 @@
 			</div>
 		</div>
 	</div>
+	<script type="text/javascript">
+	  var embedder, embedder_host;
+
+	  var matches_embedder_host = location.search.match(/embedder_host=([^&\?]+)/);
+	  if (matches_embedder_host)
+	    embedder_host = unescape(matches_embedder_host[1]);
+
+	  var matches_embedder = location.search.match(/embedder=([^&\?]+)/);
+	  if (matches_embedder)
+	    embedder = unescape(matches_embedder[1]);
+
+	  var overriddenReferrer = null;
+	</script>
+
+	<script type="text/javascript">
+	  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	<script type="text/javascript">
+	  try {
+	    var pageTracker = _gat._getTracker("UA-1265484-18");
+
+	    // if the widget is embedded in an iframe, and on an iframe hosted elsewhere,
+	    // override the referer so we can track this like a regular link
+	    overriddenReferrer = false;
+	    if (embedder && (embedder_host != location.host)) {
+	      pageTracker._setReferrerOverride(embedder);
+	      overriddenReferrer = true; // for debugging purposes
+
+	      pageTracker._setCustomVar(
+	        1, // slot 1
+	        "Embedder Host",
+	        embedder_host,
+	        2 // session-level
+	      );
+
+	      pageTracker._setCustomVar(
+	        2, // slot 2
+	        "Embedder URL",
+	        embedder,
+	        2 // session-level
+	      );
+	    }
+
+	    pageTracker._setDomainName("none");
+	    pageTracker._setAllowLinker(true);
+	    pageTracker._trackPageview();
+	  } catch(err) {}
+	</script>
 </body>
 </html> 
 
 			
+<!--<!doctype html>
+<html>
+    <head>
+    </head>
+
+    <body>
+        <a href="{{ url }}"><h1>{{ title }}</h1></a>
+        <img src="{{ img_src }}"/>
+
+<script type="text/javascript">
+  var embedder, embedder_host;
+
+  var matches_embedder_host = location.search.match(/embedder_host=([^&\?]+)/);
+  if (matches_embedder_host)
+    embedder_host = unescape(matches_embedder_host[1]);
+
+  var matches_embedder = location.search.match(/embedder=([^&\?]+)/);
+  if (matches_embedder)
+    embedder = unescape(matches_embedder[1]);
+
+  var overriddenReferrer = null;
+</script>
+
+<script type="text/javascript">
+  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+  try {
+    var pageTracker = _gat._getTracker("UA-1265484-18");
+
+    // if the widget is embedded in an iframe, and on an iframe hosted elsewhere,
+    // override the referer so we can track this like a regular link
+    overriddenReferrer = false;
+    if (embedder && (embedder_host != location.host)) {
+      pageTracker._setReferrerOverride(embedder);
+      overriddenReferrer = true; // for debugging purposes
+
+      pageTracker._setCustomVar(
+        1, // slot 1
+        "Embedder Host",
+        embedder_host,
+        2 // session-level
+      );
+
+      pageTracker._setCustomVar(
+        2, // slot 2
+        "Embedder URL",
+        embedder,
+        2 // session-level
+      );
+    }
+
+    pageTracker._setDomainName("none");
+    pageTracker._setAllowLinker(true);
+    pageTracker._trackPageview();
+  } catch(err) {}
+</script>
+
+</body>
+
+</html>-->
+
