@@ -596,12 +596,14 @@ class window.CapitolWords
     build_legend_html: ->
         legend = this.build_legend()
         termA = legend[0] and legend[0].split(' [')[0] or "(no term)"
+        termA = jQuery('<div>' + termA + '</div>').text();
         partyA = jQuery('.partyA input:checked').eq(0).parent().text().trim()
         if partyA == 'All'
             partyA = 'All Parties'
         stateA = jQuery('#stateA')
         stateA = stateA.val() and this.states[stateA.val()] or "All states"
         termB = legend[1] and legend[1].split(' [')[0] or "(no term)"
+        termB = jQuery('<div>' + termB + '</div>').text();
         partyB = jQuery('.partyB input:checked').eq(0).parent().text().trim()
         if partyB == 'All'
             partyB = 'All Parties'
