@@ -571,6 +571,9 @@ class window.CapitolWords
                 }
                 if spinner
                     spinner.stop()
+            ,
+            complete: ->
+                jQuery('#compareGraphic div.key').eq(0).replaceWith(cw.build_legend_html())
         }
 
         if not skipState
@@ -590,9 +593,39 @@ class window.CapitolWords
     smoothing: 0
 
 
+    build_legend_html: ->
+        legend = this.build_legend()
+        termA = legend[0] and legend[0].split(' [')[0] or "(no term)"
+        partyA = jQuery('.partyA input:checked').eq(0).parent().text().trim()
+        if partyA == 'All'
+            partyA = 'All Parties'
+        stateA = jQuery('#stateA')
+        stateA = stateA.val() and this.states[stateA.val()] or "All states"
+        termB = legend[1] and legend[1].split(' [')[0] or "(no term)"
+        partyB = jQuery('.partyB input:checked').eq(0).parent().text().trim()
+        if partyB == 'All'
+            partyB = 'All Parties'
+        stateB = jQuery('#stateB')
+        stateB = stateB.val() and this.states[stateB.val()] or "All states"
+        template = """
+        <div class="key">
+            Comparing
+            <span class="wordOne">
+                <span class="color"></span><a href"#"="" class="wordOne">"#{termA}"</a>
+                <span class="filters">[#{stateA}, #{partyA}]</span>
+            </span>
+            and
+            <span class="wordTwo">
+                <span class="color"></span><a href"#"="" class="wordTwo">"#{termB}"</a>
+                <span class="filters">[#{stateB}, #{partyB}]</span>
+            </span>
+        </div>
+        """
+
+
     build_legend: ->
         termA = jQuery('#terma').val()
-        partyA = jQuery(jQuery('.partyA input:checked')[0]).val()
+        partyA = jQuery('.partyA input:checked').eq(0).val()
         stateA = jQuery('#stateA').val()
 
         legend = []
@@ -609,7 +642,7 @@ class window.CapitolWords
             legend.push(legendA)
 
         termB = jQuery('#termb').val()
-        partyB = jQuery(jQuery('.partyB input:checked')[0]).val()
+        partyB = jQuery('.partyB input:checked').eq(0).val()
         stateB = jQuery('#stateB').val()
 
         legendB = termB
@@ -975,15 +1008,11 @@ jQuery(document).ready ->
         el = jQuery(this)
         try
           el.parent().find('label[for=' + el.attr('id') + ']').eq(0).addClass('hidden')
-
-        return
     ).bind('blur', ->
         el = jQuery(this)
         if !el.val()
           try
             el.parent().find('label[for=' + el.attr('id') + ']').eq(0).removeClass('hidden')
-
-        return
     )
 
     if window.location.pathname.match /^\/legislator\/?$/

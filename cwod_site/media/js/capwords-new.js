@@ -293,7 +293,6 @@
             match = graf.replace(matcher, function(a, b) {
               return "<em>" + b + "</em>";
             });
-            return;
           }
         });
         entry['match'] = match;
@@ -638,6 +637,9 @@
           if (spinner) {
             return spinner.stop();
           }
+        },
+        complete: function() {
+          return jQuery('#compareGraphic div.key').eq(0).replaceWith(cw.build_legend_html());
         }
       });
       if (!skipState) {
@@ -663,10 +665,29 @@
       }
     };
     CapitolWords.prototype.smoothing = 0;
+    CapitolWords.prototype.build_legend_html = function() {
+      var legend, partyA, partyB, stateA, stateB, template, termA, termB;
+      legend = this.build_legend();
+      termA = legend[0] && legend[0].split(' [')[0] || "(No term)";
+      partyA = jQuery('.partyA input:checked').eq(0).parent().text().trim();
+      if (partyA === 'All') {
+        partyA = 'All Parties';
+      }
+      stateA = jQuery('#stateA');
+      stateA = stateA.val() && this.states[stateA.val()] || "All states";
+      termB = legend[1] && legend[1].split(' [')[0] || "(No term)";
+      partyB = jQuery('.partyB input:checked').eq(0).parent().text().trim();
+      if (partyB === 'All') {
+        partyB = 'All Parties';
+      }
+      stateB = jQuery('#stateB');
+      stateB = stateB.val() && this.states[stateB.val()] || "All states";
+      return template = "<div class=\"key\">\n    Comparing\n    <span class=\"wordOne\">\n        <span class=\"color\"></span><a href\"#\"=\"\" class=\"wordOne\">\"" + termA + "\"</a>\n        <span class=\"filters\">[" + stateA + ", " + partyA + "]</span>\n    </span>\n    and\n    <span class=\"wordTwo\">\n        <span class=\"color\"></span><a href\"#\"=\"\" class=\"wordTwo\">\"" + termB + "\"</a>\n        <span class=\"filters\">[" + stateB + ", " + partyB + "]</span>\n    </span>\n</div>";
+    };
     CapitolWords.prototype.build_legend = function() {
       var legend, legendA, legendB, partyA, partyB, stateA, stateB, termA, termB;
       termA = jQuery('#terma').val();
-      partyA = jQuery(jQuery('.partyA input:checked')[0]).val();
+      partyA = jQuery('.partyA input:checked').eq(0).val();
       stateA = jQuery('#stateA').val();
       legend = [];
       legendA = termA;
@@ -681,7 +702,7 @@
         legend.push(legendA);
       }
       termB = jQuery('#termb').val();
-      partyB = jQuery(jQuery('.partyB input:checked')[0]).val();
+      partyB = jQuery('.partyB input:checked').eq(0).val();
       stateB = jQuery('#stateB').val();
       legendB = termB;
       if (termB && termB !== 'Word or phrase') {
@@ -1066,18 +1087,16 @@
       var el;
       el = jQuery(this);
       try {
-        el.parent().find('label[for=' + el.attr('id') + ']').eq(0).addClass('hidden');
+        return el.parent().find('label[for=' + el.attr('id') + ']').eq(0).addClass('hidden');
       } catch (_e) {}
-      return;
     }).bind('blur', function() {
       var el;
       el = jQuery(this);
       if (!el.val()) {
         try {
-          el.parent().find('label[for=' + el.attr('id') + ']').eq(0).removeClass('hidden');
+          return el.parent().find('label[for=' + el.attr('id') + ']').eq(0).removeClass('hidden');
         } catch (_e) {}
       }
-      return;
     });
     if (window.location.pathname.match(/^\/legislator\/?$/)) {
       cw.readLegislatorHistory();
