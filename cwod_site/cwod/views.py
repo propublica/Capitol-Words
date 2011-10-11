@@ -596,6 +596,6 @@ def encode_embed(request):
                                                        title=title,
                                                        chart_type=chart_type
                                                        )
-            return HttpResponse(json.dumps({'url': obj.js_url()}))
+            return HttpResponse(obj.js_url())
 
-    return HttpResponse('{}')
+    return HttpResponse('')

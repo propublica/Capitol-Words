@@ -859,8 +859,10 @@ class window.CapitolWords
             type: 'POST',
             url: '/embed/',
             data: data,
-            success: (response) ->
-                window.console.log response
+            success: (url) ->
+                full_url = "http://capitolwords.org#{url}"
+                script = """<script type="text/javascript" src="#{full_url}"></script>"""
+                container.find('textarea').val script
         }
 
         container.slideDown()
