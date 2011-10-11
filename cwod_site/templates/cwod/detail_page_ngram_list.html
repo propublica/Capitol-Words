@@ -23,7 +23,7 @@
 </div>
 {% for gram_type, ngram_list in ngrams %}
 <ol class="barChart" id="{{ gram_type }}">
-    {% for ngram in ngram_list %}
+    {% for ngram in ngram_list|slice:"20" %}
     <li>
         <span class="tagValue" style="width:{{ ngram.tfidf|divided_by:ngram_list.0.tfidf }}%;">
             <span class="tagPercent">{{ ngram.ngram_pct }}</span>

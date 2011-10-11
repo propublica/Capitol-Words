@@ -8,6 +8,7 @@ import urllib
 import urllib2
 
 from django.conf import settings
+from django.core.cache import cache
 from django.db.models import *
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.db import connections, DatabaseError
@@ -799,6 +800,11 @@ class FullTextSearchHandler(GenericHandler):
 class LegislatorLookupHandler(BaseHandler):
 
     def read(self, request, *args, **kwargs):
+        path = request.get_full_path()
+        data = cache.get(path)
+        if data:
+            return data
+
         bioguide_id = request.GET.get('bioguide_id', None)
         if not bioguide_id:
             legislators = []
@@ -815,7 +821,9 @@ class LegislatorLookupHandler(BaseHandler):
                                     'bioguide_id': legislator.bioguide_id,
                                     'slug': legislator.slug(),
                                     'congress': legislator.congress, })
-            return {'results': legislators}
+            r = {'results': legislators}
+            cache.set(path, r)
+            return r
 
         legislators = LegislatorRole.objects.filter(bioguide_id=bioguide_id).order_by('-end_date')
         if not legislators:
@@ -834,14 +842,9 @@ class LegislatorLookupHandler(BaseHandler):
                 'honorific': legislator.honorific(),
                 'party': legislator.party,
                 }
-        """
-        for legislator in legislators:
-            results['sessions'].append({'position': legislator.position,
-                                        'party': legislator.party,
-                                        'state': legislator.state,
-                                        'congress': legislator.congress, })
-        """
-        return {'results': results}
+        r = {'results': results}
+        cache.set(path, r)
+        return r
 
 
 class BillDetailHandler(BaseHandler):
