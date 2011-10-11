@@ -1,6 +1,4 @@
-{% load media %}
-
-<!doctype html>
+{% load media %}<!doctype html>
 <!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
 <!--[if IE 7 ]>        <html lang="en" class="no-js ie7"> <![endif]-->
 <!--[if IE 8 ]>        <html lang="en" class="no-js ie8"> <![endif]-->
@@ -15,6 +13,8 @@
     
         {% css "css/jquery.ui/jquery.ui.all.css" %}
         {% css "css/main.css?v=97" %}
+
+        {% js "js/google-analytics.js" %}
 
         <!--[if IE 7]>{% css "css/buggy_7.css" %}<![endif]-->
         {% endblock head %} 
