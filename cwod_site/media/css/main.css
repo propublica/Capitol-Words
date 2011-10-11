@@ -283,7 +283,7 @@ th {text-transform: uppercase;}
 #rtColumn .chart{margin-bottom: 30px;}
 .legName{width: 33%;}
 .entTitle{width: 50%}
-.sort{padding-left: 23px;background: url('img/sort_double.png') 10px center no-repeat;}
+.sort{padding-left: 11px;background: url('img/sort_double.png') 10px center no-repeat;}
 
 #searchCompare{background: url(../img/bg_secondTitle.png) top left repeat; padding: 30px 30px 30px 30px; margin: 0 25px 30px 0; display: visible;}
 #searchCompare h5 { margin-bottom: 30px}
@@ -369,6 +369,10 @@ th {text-transform: uppercase;}
 }
 .crEntries .entDate{
 	padding-left: 23px;
+	vertical-align: top;
+}
+.crEntries .sort.entDate{
+	padding-left: 19px;
 }
 
 #main .crEntries .entTitle a{
