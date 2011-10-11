@@ -293,6 +293,7 @@
             match = graf.replace(matcher, function(a, b) {
               return "<em>" + b + "</em>";
             });
+            return;
           }
         });
         entry['match'] = match;
@@ -930,8 +931,61 @@
         }).reduce(func, 0) / _(weight).reduce(func, 0);
       });
     };
+    CapitolWords.prototype.getEmbedCode = function(container) {
+      var data, imgSrc;
+      if (jQuery('#partyTimeline').is(':visible')) {
+        imgSrc = jQuery('#partyTimeline img').attr('src');
+      } else {
+        imgSrc = jQuery('#overallTimeline img').attr('src');
+      }
+      data = {
+        img_src: imgSrc,
+        url: window.location.href,
+        title: window.document.title.split(' | ')[0],
+        chart_type: jQuery('#embedDark:checked').length === 1 ? 'dark' : 'light'
+      };
+      jQuery.ajax({
+        type: 'POST',
+        url: '/embed/',
+        data: data,
+        success: function(response) {
+          return window.console.log(response);
+        }
+      });
+      return container.slideDown();
+    };
+    CapitolWords.prototype.getCookie = function(name) {
+      var cookie, cookieContent, cookieName, cookies, _i, _len, _ref;
+      if (document.cookie && (document.cookie !== '')) {
+        cookies = _(document.cookie.split(';')).map((function(x) {
+          return jQuery.trim(x);
+        }));
+        for (_i = 0, _len = cookies.length; _i < _len; _i++) {
+          cookie = cookies[_i];
+          _ref = cookie.split('=', 2), cookieName = _ref[0], cookieContent = _ref[1];
+          if (cookieName === name) {
+            return decodeURIComponent(cookieContent);
+          }
+        }
+      }
+    };
+    CapitolWords.prototype.sameOrigin = function(url) {
+      var host, origin, protocol, sr_origin;
+      host = document.location.host;
+      protocol = document.location.protocol;
+      sr_origin = "//" + host;
+      origin = protocol + sr_origin;
+      return (url === origin || url.slice(0, origin.length + 1) === origin + '/') || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + '/') || !(/^(\/\/|http:|https:).*/.test(url));
+    };
     return CapitolWords;
   })();
+  jQuery(document).ajaxSend(function(event, xhr, settings) {
+    var cw;
+    cw = new window.CapitolWords;
+    if ((settings.type === 'POST') && cw.sameOrigin(settings.url)) {
+      return xhr.setRequestHeader("X-CSRFToken", cw.getCookie('csrftoken'));
+    }
+  });
   jQuery(document).ready(function() {
     var cw, d, endYear, startYear;
     cw = new window.CapitolWords;
@@ -1014,6 +1068,7 @@
       try {
         el.parent().find('label[for=' + el.attr('id') + ']').eq(0).addClass('hidden');
       } catch (_e) {}
+      return;
     }).bind('blur', function() {
       var el;
       el = jQuery(this);
@@ -1022,6 +1077,7 @@
           el.parent().find('label[for=' + el.attr('id') + ']').eq(0).removeClass('hidden');
         } catch (_e) {}
       }
+      return;
     });
     if (window.location.pathname.match(/^\/legislator\/?$/)) {
       cw.readLegislatorHistory();
@@ -1082,23 +1138,16 @@
       });
     });
     jQuery('#embed span').bind('click', function() {
-      var imgSrc, t;
+      var t;
       t = jQuery('.embedContainer');
       if (t.is(':visible')) {
-        t.slideUp();
+        return t.slideUp();
       } else {
-        t.slideDown();
+        return cw.getEmbedCode(t);
       }
-      if (jQuery('#partyTimeline').is(':visible')) {
-        imgSrc = jQuery('#partyTimeline img').attr('src');
-      } else {
-        imgSrc = jQuery('#partyTimeline img').attr('src');
-      }
-      return window.console.log({
-        'cw.start_date': cw.start_date,
-        'cw.end_date': cw.end_date,
-        'src': imgSrc
-      });
+    });
+    jQuery('#customizeEmbed input').change(function() {
+      return cw.getEmbedCode(jQuery('.embedContainer'));
     });
     return Emphasis.init();
   });
