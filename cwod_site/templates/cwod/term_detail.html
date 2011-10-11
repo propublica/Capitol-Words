@@ -23,64 +23,64 @@
 
                     </div>
                     <h2 class="withButton">{{ term }}</h2>
-                    <a id="compareBtn" class="buttonLink fullButton" href="{% url cwod_home %}">Compare <em>{{ term }}</em></a>
+                    <a id="compareBtn" class="buttonLink fullButton" href="{% url cwod_home %}?terma={{ term|urlencode }}">Compare <em>{{ term }}</em></a>
                     <div class="clear"></div>
                 </div>
                 <div id="ltColumn">
                     <div class="module chartModule">
                         <div class="rightHeader withAction">
                             <h3>Occurrences over time</h3>
-							<div id="embed">
+                            <div id="embed">
                                 <form action="." method="post" id="embedForm">{% csrf_token %}</form>
-								<span>embed</span>
-								<div class="embedContainer">
-			                        <form id="customizeEmbed" class="actionItem" action="" method="">
-			                            <ul class="partyBreakdown">
-			                                <li class="embedDark">
-												<input class="radio" type="radio" checked name="toggle" id="embedDark"/>
-												<label for="embedDark">Dark</label>
-												<img src="../../media/img/embed_dark.jpg" width="90" height="38" alt="Embed Dark">
-											</li>
-			                                <li class="embedLight">
-												<input class="radio" type="radio" name="toggle" id="embedLight"/>
-												<label for="embedLight">Light</label>
-												<img src="../../media/img/embed_light.jpg" width="90" height="38" alt="Embed Light">
-											</li>
-											<li class="embedCode">
-												<label for="embedCode">Embed Code</label>
-		                                        <textarea id="embedCode" type="text"></textarea>
-											</li>
-			                            </ul>
-			                            <div class="clear"></div>
-			                        </form>
-								</div>
-							</div>
-							<div class="clear"></div>
+                                <span>embed</span>
+                                <div class="embedContainer">
+                                    <form id="customizeEmbed" class="actionItem" action="" method="">
+                                        <ul class="partyBreakdown">
+                                            <li class="embedDark">
+                                                <input class="radio" type="radio" checked name="toggle" id="embedDark"/>
+                                                <label for="embedDark">Dark</label>
+                                                <img src="../../media/img/embed_dark.jpg" width="90" height="38" alt="Embed Dark">
+                                            </li>
+                                            <li class="embedLight">
+                                                <input class="radio" type="radio" name="toggle" id="embedLight"/>
+                                                <label for="embedLight">Light</label>
+                                                <img src="../../media/img/embed_light.jpg" width="90" height="38" alt="Embed Light">
+                                            </li>
+                                            <li class="embedCode">
+                                                <label for="embedCode">Embed Code</label>
+                                                <textarea id="embedCode" type="text"></textarea>
+                                            </li>
+                                        </ul>
+                                        <div class="clear"></div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
                         </div>
-						<div class="actionItem">
-	                        <form id="timelineToggle" action="" method="">
-	                            <ul class="partyBreakdown">
-	                                <li><input class="radio" type="radio" checked name="toggle" id="overallTimelineSelect"/><label for="overallTimelineSelect">Overall</label></li>
-	                                <li><input class="radio" type="radio" name="toggle" id="partyTimelineSelect"/><label for="partyTimelineSelect">By party</label></li>
-	                                {#<li><input class="radio" type="radio" name="toggle" id="customTimelineSelect"/><label for="customTimelineSelect">Custom</label></li>#}
-	                            </ul>
-	                            <div class="clear"></div>
-	                        </form>
-	                        <form id="countToggle" action="" method="">
-	                            <ul class="relVSraw">
-	                                <li>
-										<input class="radio" type="radio" checked name="toggle" id="relFrequency"/>
-										<label for="relFrequency">rel. freq.</label>
-									</li>
-	                                <li>
-										<input class="radio" type="radio" name="toggle" id="rawCount"/>
-										<label for="rawCount">raw count</label>
-									</li>
-	                            </ul>
-	                            <div class="clear"></div>
-	                        </form>
-							<div class="clear"></div>
-						</div>
+                        <div class="actionItem">
+                            <form id="timelineToggle" action="" method="">
+                                <ul class="partyBreakdown">
+                                    <li><input class="radio" type="radio" checked name="toggle" id="overallTimelineSelect"/><label for="overallTimelineSelect">Overall</label></li>
+                                    <li><input class="radio" type="radio" name="toggle" id="partyTimelineSelect"/><label for="partyTimelineSelect">By party</label></li>
+                                    {#<li><input class="radio" type="radio" name="toggle" id="customTimelineSelect"/><label for="customTimelineSelect">Custom</label></li>#}
+                                </ul>
+                                <div class="clear"></div>
+                            </form>
+                            <form id="countToggle" action="" method="">
+                                <ul class="relVSraw">
+                                    <li>
+                                        <input class="radio" type="radio" checked name="toggle" id="relFrequency"/>
+                                        <label for="relFrequency">rel. freq.</label>
+                                    </li>
+                                    <li>
+                                        <input class="radio" type="radio" name="toggle" id="rawCount"/>
+                                        <label for="rawCount">raw count</label>
+                                    </li>
+                                </ul>
+                                <div class="clear"></div>
+                            </form>
+                            <div class="clear"></div>
+                        </div>
                         <div class="chart">
                             <div id="overallTimeline">
                                 {% if timeline_url %}
@@ -116,7 +116,7 @@
                         </div>
                         <div id="timeline"></div>
                         <div id="slider-range"></div>
-                    </div> 
+                    </div>
                     <div class="module">
                         <div class="rightHeader">
                             <h3>Mentioned most often by</h3>
@@ -135,7 +135,7 @@
                             {% endfor %}
 
                             {% endwith %}
-                        </ol>    
+                        </ol>
                     </div>
                     <div class="module">
                         <div class="rightHeader">
@@ -144,42 +144,42 @@
 
 
 
-						<table id="crEntries" class="crEntries">
-							<thead>
-								<tr>
-									<th class="sort entTitle">Entry Title</th>
-									<th class="sort entDate">Date</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for entry in entries|slice:"5" %}
-								<tr class="{% cycle 'even' 'odd' %}">
-									<td colspan="2">
-										<table>
-												<tr>
-													<td class="entTitle"><a href="{% entry_detail_url entry.origin_url entry.title %}">{{ entry.title|smart_title|typogrify }}</a></td>
-													<td class="entDate">{{ entry.date|date_parse|date:"F j, Y" }}</td>
-												</tr>
-												<tr colspan="2">
-													<td colspan="2" class="legislators">
-													<a href="">{{ entry.speaker_first }} {{ entry.speaker_last }}, {{ entry.speaker_party }}-{{ entry.speaker_state }}</a>
-													</td>
-												</tr>
-												<tr colspan="2">
-													<td colspan="2" class="abstract">
-														"{{ entry.match|safe|typogrify }}"
-													</td>
-												</tr>
-										</table>
-									</td>
-								</tr>
-								{% endfor %}
-							</tbody>
-						</table>
+                        <table id="crEntries" class="crEntries">
+                            <thead>
+                                <tr>
+                                    <th class="sort entTitle">Entry Title</th>
+                                    <th class="sort entDate">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for entry in entries|slice:"5" %}
+                                <tr class="{% cycle 'even' 'odd' %}">
+                                    <td colspan="2">
+                                        <table>
+                                                <tr>
+                                                    <td class="entTitle"><a href="{% entry_detail_url entry.origin_url entry.title %}">{{ entry.title|smart_title|typogrify }}</a></td>
+                                                    <td class="entDate">{{ entry.date|date_parse|date:"F j, Y" }}</td>
+                                                </tr>
+                                                <tr colspan="2">
+                                                    <td colspan="2" class="legislators">
+                                                    <a href="">{{ entry.speaker_first }} {{ entry.speaker_last }}, {{ entry.speaker_party }}-{{ entry.speaker_state }}</a>
+                                                    </td>
+                                                </tr>
+                                                <tr colspan="2">
+                                                    <td colspan="2" class="abstract">
+                                                        "{{ entry.match|safe|typogrify }}"
+                                                    </td>
+                                                </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
 
                     </div>
-                </div>  
+                </div>
                 <div id="rtColumn">
                     <div class="leftModule">
                         <div class="leftHeader">
@@ -199,7 +199,7 @@
                             {% endfor %}
 
                             {% endwith %}
-                        </ol>    
+                        </ol>
                     </div>
                     <div class="leftModule">
                         <h4>Popularity by party</h4>
@@ -226,7 +226,7 @@
                         </ol>
                     </div>
                     {% endif %}
-                </div>    
+                </div>
                 <div class="clear"></div>
             </div>
         </div>
