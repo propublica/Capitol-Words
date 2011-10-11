@@ -293,6 +293,7 @@
             match = graf.replace(matcher, function(a, b) {
               return "<em>" + b + "</em>";
             });
+            return;
           }
         });
         entry['match'] = match;
@@ -668,14 +669,14 @@
     CapitolWords.prototype.build_legend_html = function() {
       var legend, partyA, partyB, stateA, stateB, template, termA, termB;
       legend = this.build_legend();
-      termA = legend[0] && legend[0].split(' [')[0] || "(No term)";
+      termA = legend[0] && legend[0].split(' [')[0] || "(no term)";
       partyA = jQuery('.partyA input:checked').eq(0).parent().text().trim();
       if (partyA === 'All') {
         partyA = 'All Parties';
       }
       stateA = jQuery('#stateA');
       stateA = stateA.val() && this.states[stateA.val()] || "All states";
-      termB = legend[1] && legend[1].split(' [')[0] || "(No term)";
+      termB = legend[1] && legend[1].split(' [')[0] || "(no term)";
       partyB = jQuery('.partyB input:checked').eq(0).parent().text().trim();
       if (partyB === 'All') {
         partyB = 'All Parties';
