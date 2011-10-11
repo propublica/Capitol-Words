@@ -40,3 +40,6 @@ class Embed(models.Model):
 
     def from_decimal(self):
         return base62.from_decimal(self.pk)
+
+    def js_url(self):
+        return '%s?c=%s' % (reverse('cwod_embed_js'), self.from_decimal())

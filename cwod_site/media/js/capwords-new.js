@@ -1062,6 +1062,23 @@
       History.pushState({}, '', "/legislator?" + hash);
       return cw.legislatorSearch({});
     });
+    jQuery('#signUp').find('input[type=text]').bind('focus', function() {
+      var el;
+      el = jQuery(this);
+      try {
+        el.parent().find('label[for=' + el.attr('id') + ']').eq(0).addClass('hidden');
+      } catch (_e) {}
+      return;
+    }).bind('blur', function() {
+      var el;
+      el = jQuery(this);
+      if (!el.val()) {
+        try {
+          el.parent().find('label[for=' + el.attr('id') + ']').eq(0).removeClass('hidden');
+        } catch (_e) {}
+      }
+      return;
+    });
     if (window.location.pathname.match(/^\/legislator\/?$/)) {
       cw.readLegislatorHistory();
       History.Adapter.bind(window, 'statechange', function() {

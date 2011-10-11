@@ -584,7 +584,6 @@ def js_embed(request):
                               )
 
 
-
 def encode_embed(request):
     if request.method == 'POST':
         img_src = request.POST.get('img_src')
@@ -597,7 +596,6 @@ def encode_embed(request):
                                                        title=title,
                                                        chart_type=chart_type
                                                        )
-            return HttpResponse(json.dumps({'code': obj.from_decimal()}))
-        return HttpResponse(json.dumps({}))
+            return HttpResponse(json.dumps({'url': obj.js_url()}))
 
-    return HttpResponse('')
+    return HttpResponse('{}')

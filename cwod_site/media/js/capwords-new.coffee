@@ -971,6 +971,21 @@ jQuery(document).ready ->
         cw.legislatorSearch({})
     )
 
+    jQuery('#signUp').find('input[type=text]').bind('focus', ->
+        el = jQuery(this)
+        try
+          el.parent().find('label[for=' + el.attr('id') + ']').eq(0).addClass('hidden')
+
+        return
+    ).bind('blur', ->
+        el = jQuery(this)
+        if !el.val()
+          try
+            el.parent().find('label[for=' + el.attr('id') + ']').eq(0).removeClass('hidden')
+
+        return
+    )
+
     if window.location.pathname.match /^\/legislator\/?$/
         cw.readLegislatorHistory()
         History.Adapter.bind(window, 'statechange', ->
@@ -1030,6 +1045,7 @@ jQuery(document).ready ->
         else
             cw.getEmbedCode t
     )
+
 
     jQuery('#customizeEmbed input').change( () ->
         cw.getEmbedCode jQuery('.embedContainer')
