@@ -338,7 +338,7 @@ def state_detail(request, state):
     if not state_name:
         raise Http404
 
-    entries = capitolwords.text(state=state, sort='date desc,score desc', per_page=5)
+    entries = capitolwords.text(state='"%s"' % state, sort='date desc,score desc', per_page=5)
     ngrams = {}
     for n in range(1, 6):
         ngrams[GRAM_NAMES[n-1]] = capitolwords.top_phrases(
@@ -418,7 +418,7 @@ def date_detail(request, year, month, day):
     ngrams = ngrams.iteritems()
 
     by_chamber = {'House': [], 'Senate': [], 'Extensions of Remarks': [], }
-    similar_dates = get_similar_dates(date)
+    similar_dates = get_similar_entities('date', date)
 
     return render_to_response('cwod/date_detail.html',
                               {'date': date,
