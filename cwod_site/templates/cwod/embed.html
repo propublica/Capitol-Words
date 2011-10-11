@@ -1,0 +1,82 @@
+<head>
+<link rel="stylesheet" href="../../media/css/embed.css" type="text/css" media="screen" title="no title" charset="utf-8">
+
+</head>
+<body>
+	<div id="capWordsEmbed">
+		<div class="light">
+			<div id="ltColumn">
+				<div class="module chartModule">
+				    <div class="rightHeader withAction">
+				        <h3>War vs Peace</h3>
+						<div class="key">
+                            <span class="wordOne"><span class="color"></span><a href"#" class="wordOne">"War"</a> <span class="filters">[Oregon, Democrats]</span></span><span class="wordTwo"><span class="color"></span><a href"#" class="wordTwo">"Peace"</a> <span class="filters">[All States, All Parties]</span></span>
+						</div>
+					</div>
+					<div class="actionItem">
+				        <form id="timelineToggle" action="" method="">
+				            <ul class="partyBreakdown">
+				                <li><input class="radio" type="radio" checked name="toggle" id="overallTimelineSelect"/><label for="overallTimelineSelect">Overall</label></li>
+				                <li><input class="radio" type="radio" name="toggle" id="partyTimelineSelect"/><label for="partyTimelineSelect">By party</label></li>
+				                <!--{#<li><input class="radio" type="radio" name="toggle" id="customTimelineSelect"/><label for="customTimelineSelect">Custom</label></li>#}-->
+				            </ul>
+				            <div class="clear"></div>
+				        </form>
+				        <form id="countToggle" action="" method="">
+				            <ul class="relVSraw">
+				                <li>
+									<input class="radio" type="radio" checked name="toggle" id="relFrequency"/>
+									<label for="relFrequency">rel. freq.</label>
+								</li>
+				                <li>
+									<input class="radio" type="radio" name="toggle" id="rawCount"/>
+									<label for="rawCount">raw count</label>
+								</li>
+				            </ul>
+				            <div class="clear"></div>
+				        </form>
+						<div class="clear"></div>
+					</div>
+				    <div class="chart">
+				        <div id="overallTimeline">
+				            {% if timeline_url %}
+				            <img src="{{ timeline_url }}" alt="Timeline of occurrences of '{{ term }}'"/>
+				            {% endif %}
+				        </div>
+				        <div id="partyTimeline">
+				            {% if party_timeline_url %}
+				            <img src="{{ party_timeline_url }}" alt="Timeline of occurrences of '{{ term }}' by party"/>
+				            {% endif %}
+				        </div>
+				        {% comment %}
+				        <div id="customTimeline">
+				            <form name="customizeGraph" action="" method="get" id="formtest">
+				                <input type="hidden" name="term" id="term" value="{{ term }}"/>
+				                <select name="party" id="partySelect">
+				                    <option value="">All parties</option>
+				                    <option value="D">Democrats</option>
+				                    <option value="R">Republicans</option>
+				                </select>
+				                <select name="state" id="stateSelect">
+				                    <option value="">All states</option>
+				                    {% for abbrev, fullname in state_choices %}
+				                    <option value="{{ abbrev }}">{{ fullname }}</option>
+				                    {% endfor %}
+				                </select>
+				            </form>
+				            {% if timeline_url %}
+				            <img id="customChart" src="{{ timeline_url }}" alt="Custom timeline of occurrences of '{{ term }}'"/>
+				            {% endif %}
+				        </div>
+				        {% endcomment %}
+				    </div>
+				    <div id="timeline"></div>
+				    <div id="slider-range"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html> 
+
+			
