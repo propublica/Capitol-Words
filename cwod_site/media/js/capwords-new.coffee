@@ -314,9 +314,9 @@ class window.CapitolWords
                     result: result,
                     pct: pct,
                 })
-                
+
                 callback()
-                
+
         }
 
 
@@ -840,6 +840,55 @@ class window.CapitolWords
             ).reduce(func, 0) / _(weight).reduce(func, 0)
 
 
+    getEmbedCode: (container) ->
+        # Determine which graph is being shown.
+        if jQuery('#partyTimeline').is(':visible')
+            imgSrc = jQuery('#partyTimeline img').attr 'src'
+        else
+            imgSrc = jQuery('#overallTimeline img').attr 'src'
+
+
+        data = {
+            img_src: imgSrc,
+            url: window.location.href,
+            title: window.document.title.split(' | ')[0],
+            chart_type: if jQuery('#embedDark:checked').length == 1 then 'dark' else 'light',
+        }
+
+        jQuery.ajax {
+            type: 'POST',
+            url: '/embed/',
+            data: data,
+            success: (response) ->
+                window.console.log response
+        }
+
+        container.slideDown()
+
+    getCookie: (name) ->
+        if document.cookie and (document.cookie isnt '')
+            cookies = _(document.cookie.split ';').map ((x) -> jQuery.trim x)
+            for cookie in cookies
+                [cookieName, cookieContent] = cookie.split('=', 2)
+                if cookieName is name
+                    return decodeURIComponent cookieContent
+
+    sameOrigin: (url) ->
+        host = document.location.host
+        protocol = document.location.protocol
+        sr_origin = "//#{host}"
+        origin = protocol + sr_origin
+        (url == origin || url.slice(0, origin.length + 1) == origin + '/') || (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') || !(/^(\/\/|http:|https:).*/.test(url))
+
+
+jQuery(document).ajaxSend( (event, xhr, settings) ->
+        cw = new window.CapitolWords
+        # Adapted from https://docs.djangoproject.com/en/dev/ref/contrib/csrf/
+        if (settings.type is 'POST') and cw.sameOrigin(settings.url)
+            xhr.setRequestHeader "X-CSRFToken", cw.getCookie('csrftoken')
+)
+
+
 jQuery(document).ready ->
 
     cw = new window.CapitolWords
@@ -976,20 +1025,14 @@ jQuery(document).ready ->
 
     jQuery('#embed span').bind('click', ->
         t = jQuery('.embedContainer')
-        if t.is ':visible' then t.slideUp() else t.slideDown()
-        
-        # Determine which graph is being shown.
-        if jQuery('#partyTimeline').is(':visible')
-            imgSrc = jQuery('#partyTimeline img').attr 'src'
+        if t.is ':visible'
+            t.slideUp()
         else
-            imgSrc = jQuery('#partyTimeline img').attr 'src'
-             
-        window.console.log {
-            'cw.start_date': cw.start_date,
-            'cw.end_date': cw.end_date,
-            'src': imgSrc,
-        }
+            cw.getEmbedCode t
+    )
 
+    jQuery('#customizeEmbed input').change( () ->
+        cw.getEmbedCode jQuery('.embedContainer')
     )
 
     Emphasis.init()
