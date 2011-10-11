@@ -185,7 +185,11 @@ input { padding: 5px 8px; background: #e6e4e2 url(../img/bg_input.png) left bott
 .withAction { margin-bottom: 10px;}
 
 .radio { float: left; margin-right: 10px; width: 15px; margin-top: 4px;}
+#timelineToggle{width: 49%; float: left;}
+#countToggle {width: 49%; float: left; border-left: 1px solid #B99004;}
 .partyBreakdown li { float: left; margin-right: 20px;}
+.relVSraw li { float: left; margin-right: 20px; }
+.relVSraw {padding-left: 62px;}
 
 .module { margin-bottom: 80px;}
 .leftModule { margin-bottom: 50px; padding-bottom: 50px; background: url(../img/bg_border.png) left bottom no-repeat;}
@@ -355,7 +359,7 @@ th {text-transform: uppercase;}
 	font-weight: 200;
 }
 .crEntries .entTitle{
-	width: 85%;
+	width: 73%;
 }
 .crEntries table td{
 	padding-left: 0;
