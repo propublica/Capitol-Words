@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 from django.conf import settings
+from django.views.generic.simple import direct_to_template
 
 from cwod.views import *
 
@@ -93,15 +94,20 @@ urlpatterns = patterns('',
 
         url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 
+        url(r'^embed\/(?P<code>.+)\/?$',
+            decode_embed,
+            {},
+            name='cwod_decode_embed'),
+
         url(r'^embed\/?$',
             encode_embed,
             {},
             name='cwod_embed'),
 
-        url(r'^embed\/(?P<code>.+)\/?$',
-            decode_embed,
+        url(r'^embed.js$',
+            js_embed,
             {},
-            name='cwod_embed'),
+            name='cwod_embed_js'),
 
         url(r'^$',
             index,
