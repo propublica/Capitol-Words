@@ -120,6 +120,7 @@
           var counts, imgUrl, labelPositions, percentages, results;
           results = data['results'];
           cw.results = results;
+          window.cwod_results = results;
           counts = _(results).pluck('count');
           percentages = _(results).pluck('percentage');
           labelPositions = cw.buildXLabels(results);
@@ -146,12 +147,12 @@
                 FUZZ_X = 5;
                 FUZZ_Y = 6;
                 i = 0;
-                while ((window.cwod_line_coords[i] + FUZZ_X) < (window.cwod_pagex - (jQuery('#termChart')).offset().left) && (i < results.length * 2)) {
+                while ((window.cwod_line_coords[i] + FUZZ_X) < (window.cwod_pagex - (jQuery('#termChart')).offset().left) && (i < window.cwod_results.length * 2)) {
                   i += 2;
                 }
                 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                annotation_month = MONTHS[(parseInt(results[i / 2].month.substr(4, 2), 10)) - 1];
-                annotation_year = results[i / 2].month.substr(0, 4);
+                annotation_month = MONTHS[(parseInt(window.cwod_results[i / 2].month.substr(4, 2), 10)) - 1];
+                annotation_year = window.cwod_results[i / 2].month.substr(0, 4);
                 annotation_text = '<span class="annotation-count">' + window.cwod_counts[i / 2] + ' mention' + (window.cwod_counts[i / 2] !== 1 ? 's' : '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>';
                 (jQuery('#inner-annotation')).html(annotation_text);
                 return (jQuery('#annotation')).css({
