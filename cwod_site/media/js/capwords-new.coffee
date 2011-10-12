@@ -966,6 +966,8 @@ jQuery(document).ready ->
 
     cw = new window.CapitolWords
 
+    jQuery.ajaxSetup {always}
+
     if typeof termDetailTerm isnt 'undefined'
         cw.readTermDetailPageHistory()
         cw.populateTermDetailPage termDetailTerm
@@ -1118,7 +1120,7 @@ jQuery(document).ready ->
         cw.getEmbedCode jQuery('.embedContainer')
     )
 
-    jQuery('#rtColumn').imagesLoaded (images) ->
-        # do nothing
+    fixImages = jQuery('#rtColumn').imagesLoaded jQuery.noop
+    jQuery('#rtColumn').ajaxSuccess fixImages
 
     Emphasis.init()

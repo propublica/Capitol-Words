@@ -1061,8 +1061,11 @@
     }
   });
   jQuery(document).ready(function() {
-    var cw, d, endYear, startYear;
+    var cw, d, endYear, fixImages, startYear;
     cw = new window.CapitolWords;
+    jQuery.ajaxSetup({
+      always: always
+    });
     if (typeof termDetailTerm !== 'undefined') {
       cw.readTermDetailPageHistory();
       cw.populateTermDetailPage(termDetailTerm);
@@ -1221,7 +1224,8 @@
     jQuery('#customizeEmbed input').change(function() {
       return cw.getEmbedCode(jQuery('.embedContainer'));
     });
-    jQuery('#rtColumn').imagesLoaded(function(images) {});
+    fixImages = jQuery('#rtColumn').imagesLoaded(jQuery.noop);
+    jQuery('#rtColumn').ajaxSuccess(fixImages);
     return Emphasis.init();
   });
 }).call(this);
