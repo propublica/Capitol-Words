@@ -24,10 +24,10 @@ class window.GoogleChart
         @chxp.push [index, positions]
 
     set_grid: (x_step, y_step, dash_length, space_length, x_offset, y_offset) ->
-        @chg = (value for key, value of arguments).join(',')
+        @chg = x_step+ ',' + y_step + ',' +  dash_length + ',' + space_length + ',' +  x_offset + ',' + y_offset
 
     set_fill: (fill_type, s, color) ->
-        @chf = (value for key, value of arguments).join(',')
+        @chf = fill_type + ',' + s + ',' + color        
 
     set_colors: (colors) ->
         @chco = colors.join(',')

@@ -117,15 +117,62 @@
         url: url,
         data: data,
         success: function(data) {
-          var counts, imgUrl, labelPositions, overallImgTag, percentages, results;
+          var counts, imgUrl, labelPositions, percentages, results;
           results = data['results'];
           cw.results = results;
+          window.cwod_results = results;
           counts = _(results).pluck('count');
           percentages = _(results).pluck('percentage');
           labelPositions = cw.buildXLabels(results);
           imgUrl = cw.showChart([percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300']);
-          overallImgTag = "<img id=\"termChart\" src=\"" + imgUrl + "\" alt=\"Timeline of occurrences of " + term + "\"/>";
-          jQuery('#overallTimeline').html(overallImgTag);
+          window.cwod_counts = jQuery.extend(true, [], counts);
+          jQuery.getJSON(imgUrl + '&chof=json', function(data) {
+            var annotation_callback, copy_coords, csj, overallImgTag, _i, _len, _ref;
+            copy_coords = function(c) {
+              if (c.name === 'line0') {
+                return window.cwod_line_coords = jQuery.extend(true, [], c.coords);
+              }
+            };
+            _ref = data.chartshape;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              csj = _ref[_i];
+              copy_coords(csj);
+            }
+            annotation_callback = function() {
+              var FUZZ_X, FUZZ_Y, MONTHS, annotation_month, annotation_text, annotation_year, i;
+              if (!(window.cwod_inchart && (jQuery('#partyTimelineSelect').attr('checked')) !== 'checked')) {
+                return jQuery('#annotation').hide();
+              } else {
+                jQuery('#annotation').show();
+                FUZZ_X = 5;
+                FUZZ_Y = 6;
+                i = 0;
+                while ((window.cwod_line_coords[i] + FUZZ_X) < (window.cwod_pagex - (jQuery('#termChart')).offset().left) && (i < window.cwod_results.length * 2)) {
+                  i += 2;
+                }
+                MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                annotation_month = MONTHS[(parseInt(window.cwod_results[i / 2].month.substr(4, 2), 10)) - 1];
+                annotation_year = window.cwod_results[i / 2].month.substr(0, 4);
+                annotation_text = '<span class="annotation-count">' + window.cwod_counts[i / 2] + ' mention' + (window.cwod_counts[i / 2] !== 1 ? 's' : '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>';
+                (jQuery('#inner-annotation')).html(annotation_text);
+                return (jQuery('#annotation')).css({
+                  left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X,
+                  top: jQuery('#termChart').offset().top + window.cwod_line_coords[i + 1] + FUZZ_Y
+                });
+              }
+            };
+            window.clearInterval(window.cwod_interval);
+            window.cwod_interval = window.setInterval(annotation_callback, 50);
+            overallImgTag = "<img id=\"termChart\" src=\"" + imgUrl + "\" alt=\"Timeline of occurrences of " + term + "\"/>";
+            jQuery('#overallTimeline').html(overallImgTag);
+            return (((jQuery('#termChart')).mouseenter(function(event) {
+              return window.cwod_inchart = true;
+            })).mouseleave(function(event) {
+              return window.cwod_inchart = false;
+            })).mousemove(function(event) {
+              return window.cwod_pagex = event.pageX;
+            });
+          });
           if (cw.minMonth && cw.maxMonth) {
             return cw.limit(cw.minMonth, cw.maxMonth);
           }
