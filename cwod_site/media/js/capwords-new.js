@@ -150,15 +150,17 @@
                 while ((window.cwod_line_coords[i] + FUZZ_X) < (window.cwod_pagex - (jQuery('#termChart')).offset().left) && (i < window.cwod_results.length * 2)) {
                   i += 2;
                 }
-                MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                annotation_month = MONTHS[(parseInt(window.cwod_results[i / 2].month.substr(4, 2), 10)) - 1];
-                annotation_year = window.cwod_results[i / 2].month.substr(0, 4);
-                annotation_text = '<span class="annotation-count">' + window.cwod_counts[i / 2] + ' mention' + (window.cwod_counts[i / 2] !== 1 ? 's' : '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>';
-                (jQuery('#inner-annotation')).html(annotation_text);
-                return (jQuery('#annotation')).css({
-                  left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X,
-                  top: jQuery('#termChart').offset().top + window.cwod_line_coords[i + 1] + FUZZ_Y
-                });
+                if ((i / 2) < window.cwod_results.length) {
+                  MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                  annotation_month = MONTHS[(parseInt(window.cwod_results[i / 2].month.substr(4, 2), 10)) - 1];
+                  annotation_year = window.cwod_results[i / 2].month.substr(0, 4);
+                  annotation_text = '<span class="annotation-count">' + window.cwod_counts[i / 2] + ' mention' + (window.cwod_counts[i / 2] !== 1 ? 's' : '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>';
+                  (jQuery('#inner-annotation')).html(annotation_text);
+                  return (jQuery('#annotation')).css({
+                    left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X,
+                    top: jQuery('#termChart').offset().top + window.cwod_line_coords[i + 1] + FUZZ_Y
+                  });
+                }
               }
             };
             window.clearInterval(window.cwod_interval);
@@ -1057,9 +1059,6 @@
       return xhr.setRequestHeader("X-CSRFToken", cw.getCookie('csrftoken'));
     }
   });
-  jQuery('img').live('error', function() {
-    return jQuery(this).hide();
-  });
   jQuery(document).ready(function() {
     var cw, d, endYear, startYear;
     cw = new window.CapitolWords;
@@ -1071,6 +1070,9 @@
         return cw.populateTermDetailPage(termDetailTerm);
       });
     }
+    jQuery('img').error(function() {
+      return jQuery(this).hide();
+    });
     jQuery('.ngramMenu span').bind('click', function(x) {
       var classToShow;
       classToShow = jQuery(this).attr('class');
