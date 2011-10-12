@@ -493,9 +493,7 @@ class window.CapitolWords
                     jQuery('table#legislatorList tbody').append tr
 
             jQuery('table#legislatorList tbody').fadeIn('fast', ->
-                jQuery('img').error( ->
-                    jQuery(this).hide()
-                )
+                jQuery('#rtColumn').imagesLoaded ->
             )
 
         jQuery('table#legislatorList tbody').fadeOut 'fast', buildTable
@@ -1120,8 +1118,5 @@ jQuery(document).ready ->
 
     # reset images, bind ajax calls to do the same
     jQuery('#rtColumn').imagesLoaded ->
-    jQuery('#rtColumn').ajaxComplete ->
-        window.console && console.log('ajaxComplete')
-        jQuery('img').imagesLoaded ->
 
     Emphasis.init()
