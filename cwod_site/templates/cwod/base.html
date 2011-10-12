@@ -1,10 +1,7 @@
 {% load media %}<!doctype html>
-<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
-<!--[if IE 7 ]>        <html lang="en" class="no-js ie7"> <![endif]-->
-<!--[if IE 8 ]>        <html lang="en" class="no-js ie8"> <![endif]-->
-<!--[if IE 9 ]>        <html lang="en" class="no-js ie9"> <![endif]-->
-<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+
     <head>
+	
         {% block head %}
         <meta charset="utf-8">
         <meta name="description" content="Capitol Words explores the most popular words and phrases used by legislators in Washington. Search the data from 1996 to today by state, date or politician.">
@@ -15,7 +12,17 @@
         {% css "css/main.css?v=97" %}
 
         {% js "js/google-analytics.js" %}
-
+	  <!--[if IE ]>{% css "styles/ie.css" %}<![endif]-->
+		<!--[if lt IE 9]>
+		<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		
+		
+		<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+		<!--[if IE 7 ]>        <html lang="en" class="no-js ie7"> <![endif]-->
+		<!--[if IE 8 ]>        <html lang="en" class="no-js ie8"> <![endif]-->
+		<!--[if IE 9 ]>        <html lang="en" class="no-js ie9"> <![endif]-->
+		<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
         <!--[if IE 7]>{% css "css/buggy_7.css" %}<![endif]-->
         {% endblock head %}
     </head>
