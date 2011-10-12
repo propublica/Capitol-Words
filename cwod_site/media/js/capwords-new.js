@@ -1057,7 +1057,7 @@
       return xhr.setRequestHeader("X-CSRFToken", cw.getCookie('csrftoken'));
     }
   });
-  jQuery.delegate('img', 'error', function() {
+  jQuery('img').live('error', function() {
     return jQuery(this).hide();
   });
   jQuery(document).ready(function() {
