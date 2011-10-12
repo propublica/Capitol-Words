@@ -1222,8 +1222,8 @@
       return cw.getEmbedCode(jQuery('.embedContainer'));
     });
     jQuery('#rtColumn').imagesLoaded(function() {});
-    jQuery('#rtColumn').ajaxSuccess(function() {
-      return jQuery('#rtColumn').imagesLoaded(function() {});
+    jQuery('#rtColumn').ajaxComplete(function() {
+      return jQuery(this).imagesLoaded(function() {});
     });
     return Emphasis.init();
   });

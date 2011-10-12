@@ -1119,7 +1119,7 @@ jQuery(document).ready ->
     )
 
     jQuery('#rtColumn').imagesLoaded ->
-    jQuery('#rtColumn').ajaxSuccess ->
-        jQuery('#rtColumn').imagesLoaded ->
+    jQuery('#rtColumn').ajaxComplete ->
+        jQuery(this).imagesLoaded ->
 
     Emphasis.init()
