@@ -1223,7 +1223,7 @@
     });
     jQuery('#rtColumn').imagesLoaded(function() {});
     jQuery('#rtColumn').ajaxComplete(function() {
-      return jQuery(this).imagesLoaded(function() {});
+      return jQuery('img').imagesLoaded(function() {});
     });
     return Emphasis.init();
   });

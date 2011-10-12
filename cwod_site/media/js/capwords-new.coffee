@@ -1118,8 +1118,9 @@ jQuery(document).ready ->
         cw.getEmbedCode jQuery('.embedContainer')
     )
 
+    # reset images, bind ajax calls to do the same
     jQuery('#rtColumn').imagesLoaded ->
     jQuery('#rtColumn').ajaxComplete ->
-        jQuery(this).imagesLoaded ->
+        jQuery('img').imagesLoaded ->
 
     Emphasis.init()
