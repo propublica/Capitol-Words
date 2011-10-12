@@ -1119,4 +1119,7 @@ jQuery(document).ready ->
         cw.getEmbedCode jQuery('.embedContainer')
     )
 
+    jQuery.imagesLoaded (images) ->
+        # do nothing
+
     Emphasis.init()

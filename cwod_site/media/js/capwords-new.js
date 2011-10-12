@@ -1221,6 +1221,7 @@
     jQuery('#customizeEmbed input').change(function() {
       return cw.getEmbedCode(jQuery('.embedContainer'));
     });
+    jQuery.imagesLoaded(function(images) {});
     return Emphasis.init();
   });
 }).call(this);
