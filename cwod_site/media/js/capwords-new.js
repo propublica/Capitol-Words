@@ -122,10 +122,38 @@
           cw.results = results;
           counts = _(results).pluck('count');
           percentages = _(results).pluck('percentage');
-          labelPositions = cw.buildXLabels(results);
+
+          labelPositions = cw.buildXLabels(results);                                  
           imgUrl = cw.showChart([percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300']);
-          overallImgTag = "<img id=\"termChart\" src=\"" + imgUrl + "\" alt=\"Timeline of occurrences of " + term + "\"/>";
-          jQuery('#overallTimeline').html(overallImgTag);
+
+          var line_coords = [];
+          jQuery.getJSON((imgUrl + '&chof=json'), function(data) {
+            for(var j=0;j<data.chartshape.length;j++) {
+              if (data.chartshape[j].name=='line0') {
+                  line_coords = jQuery.extend(true, [], data.chartshape[j].coords);
+              }
+            }
+            
+            overallImgTag = "<img id=\"termChart\" src=\"" + imgUrl + "\" alt=\"Timeline of occurrences of " + term + "\"/>";
+            jQuery('#overallTimeline').html(overallImgTag);            
+            
+            // fuzziness will never be perfect -- we're working backward from a containing polygon to an approximation
+            // of its centroid. this could probably be calculated formally but I doubt it's worth the effort.
+            var FUZZ_X = 5;
+            var FUZZ_Y = 6;
+            jQuery('#termChart').mousemove(function(event){
+            window.clearTimeout(window.cwod_timeout);
+            window.cwod_timeout = window.setTimeout(function() {
+                var i=0;
+                while((line_coords[i]+FUZZ_X)<(event.pageX - jQuery('#termChart').offset().left) && (i<results.length*2)) {
+                    i += 2;
+                }                                
+                jQuery('#annotation').text(results[i/2].month + ' - ' + counts[i/2]).css({left: jQuery('#termChart').offset().left + line_coords[i] + FUZZ_X, top: jQuery('#termChart').offset().top + line_coords[i+1] + FUZZ_Y});
+            }, 10);
+            });                          
+            
+          });          
+
           if (cw.minMonth && cw.maxMonth) {
             return cw.limit(cw.minMonth, cw.maxMonth);
           }
@@ -697,6 +725,7 @@
       return legend;
     };
     CapitolWords.prototype.showChart = function(data, x_labels, x_label_positions, width, height, colors, legend) {
+
       var chart, cw, max, maxValue, values;
       width = width || 860;
       height = height || 340;
@@ -732,6 +761,7 @@
       if (x_label_positions) {
         chart.set_axis_positions('x', x_label_positions);
       }
+      
       if (jQuery('#chart img.realChart, #compareGraphic img.default')) {
         jQuery('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url()).fadeIn(100);
       }
