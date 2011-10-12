@@ -564,9 +564,7 @@
             return jQuery('table#legislatorList tbody').append(tr);
           }
         });
-        return jQuery('table#legislatorList tbody').fadeIn('fast', function() {
-          return jQuery('#rtColumn').imagesLoaded(function() {});
-        });
+        return jQuery('table#legislatorList tbody').imagesLoaded(function() {}).fadeIn('fast');
       };
       return jQuery('table#legislatorList tbody').fadeOut('fast', buildTable);
     };

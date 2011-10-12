@@ -492,9 +492,7 @@ class window.CapitolWords
                     """
                     jQuery('table#legislatorList tbody').append tr
 
-            jQuery('table#legislatorList tbody').fadeIn('fast', ->
-                jQuery('#rtColumn').imagesLoaded ->
-            )
+            jQuery('table#legislatorList tbody').imagesLoaded(->).fadeIn 'fast'
 
         jQuery('table#legislatorList tbody').fadeOut 'fast', buildTable
 
