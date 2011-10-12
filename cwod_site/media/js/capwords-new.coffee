@@ -100,14 +100,14 @@ class window.CapitolWords
                                 annotation_text = ('<span class="annotation-count">' + window.cwod_counts[i/2] + ' mention' + (if window.cwod_counts[i/2]!=1 then 's' else '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>')
                                 (jQuery '#inner-annotation').html annotation_text
                                 (jQuery '#annotation').css {
-                                    left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X, 
+                                    left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X,
                                     top: jQuery('#termChart').offset().top + window.cwod_line_coords[i+1] + FUZZ_Y
                                 }
                                 true
 
                     window.clearInterval window.cwod_interval
                     window.cwod_interval = window.setInterval annotation_callback, 50
-                
+
                     overallImgTag = "<img id=\"termChart\" src=\"#{imgUrl}\" alt=\"Timeline of occurrences of #{term}\"/>"
                     jQuery('#overallTimeline').html overallImgTag
 
@@ -962,10 +962,6 @@ jQuery(document).ajaxSend (event, xhr, settings) ->
             xhr.setRequestHeader "X-CSRFToken", cw.getCookie('csrftoken')
 
 
-(jQuery 'img').live 'error', ->
-    (jQuery this).hide()
-
-
 jQuery(document).ready ->
 
     cw = new window.CapitolWords
@@ -980,6 +976,10 @@ jQuery(document).ready ->
             cw.readTermDetailPageHistory()
             cw.populateTermDetailPage termDetailTerm
         )
+
+    jQuery('img').error ->
+        jQuery(this).hide()
+
 
     jQuery('.ngramMenu span').bind('click', (x) ->
         classToShow = jQuery(this).attr 'class'
@@ -1118,5 +1118,8 @@ jQuery(document).ready ->
     jQuery('#customizeEmbed input').change( () ->
         cw.getEmbedCode jQuery('.embedContainer')
     )
+
+    jQuery.imagesLoaded (images) ->
+        # do nothing
 
     Emphasis.init()

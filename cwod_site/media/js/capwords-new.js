@@ -1060,9 +1060,6 @@
       return xhr.setRequestHeader("X-CSRFToken", cw.getCookie('csrftoken'));
     }
   });
-  (jQuery('img')).live('error', function() {
-    return (jQuery(this)).hide();
-  });
   jQuery(document).ready(function() {
     var cw, d, endYear, startYear;
     cw = new window.CapitolWords;
@@ -1074,6 +1071,9 @@
         return cw.populateTermDetailPage(termDetailTerm);
       });
     }
+    jQuery('img').error(function() {
+      return jQuery(this).hide();
+    });
     jQuery('.ngramMenu span').bind('click', function(x) {
       var classToShow;
       classToShow = jQuery(this).attr('class');
@@ -1221,6 +1221,7 @@
     jQuery('#customizeEmbed input').change(function() {
       return cw.getEmbedCode(jQuery('.embedContainer'));
     });
+    jQuery.imagesLoaded(function(images) {});
     return Emphasis.init();
   });
 }).call(this);
