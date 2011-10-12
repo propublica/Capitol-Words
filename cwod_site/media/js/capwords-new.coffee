@@ -103,6 +103,7 @@ class window.CapitolWords
                                     left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X, 
                                     top: jQuery('#termChart').offset().top + window.cwod_line_coords[i+1] + FUZZ_Y
                                 }
+                                true
 
                     window.clearInterval window.cwod_interval
                     window.cwod_interval = window.setInterval annotation_callback, 50
