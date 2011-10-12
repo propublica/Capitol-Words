@@ -10,14 +10,14 @@
         <meta name="description" content="">
 
         <title>{% block title %}Capitol Words{% endblock title %}</title>
-    
+
         {% css "css/jquery.ui/jquery.ui.all.css" %}
         {% css "css/main.css?v=97" %}
 
         {% js "js/google-analytics.js" %}
 
         <!--[if IE 7]>{% css "css/buggy_7.css" %}<![endif]-->
-        {% endblock head %} 
+        {% endblock head %}
     </head>
 
     <body>
@@ -35,6 +35,7 @@
                     <div class="clear"></div>  
                 </nav>    
                 <a href="/"><h1>Capitol Words <small>a project of the Sunlight Foundation</small></h1></a>
+                
                 <ul id="mainActions">
                     <li>
                         <form id="mainSearch" action="/search/" method="get">
@@ -47,7 +48,7 @@
                     </li>
                     <li id="betweenItem">
                         <span>or</span>
-                    </li>    
+                    </li>
                     <li>
                     <a href="{% url cwod_home %}#searchCompare">Compare Congressional Words and/or Phrases</a>
                     </li>
@@ -64,10 +65,10 @@
                     <ul>
                         <li><a href="#">About</a></li>
                         <li><a href="#">Contact</a></li>
-                    </ul> 
-                    <div class="clear"></div>   
-                </nav>  
-            </div>  
+                    </ul>
+                    <div class="clear"></div>
+                </nav>
+            </div>
             <div id="footerContentWrapper">
                 <div id="footerContent">
                     <div id="popularPages">
@@ -88,8 +89,8 @@
                             <li><a href="#">Page Name</a></li>
                             <li><a href="#">Page Name</a></li>
                             {% endcomment %}
-                        </ol>    
-                    </div>    
+                        </ol>
+                    </div>
                     <div id="popularWords">
                         <h5>Recent popular words</h5>
                         <table>
@@ -110,16 +111,6 @@
                                     <td><span class="date">January 1, 2010</span></td>
                                     <td><a href="#">Word of the Day</a></td>
                                     <td>Spoken 300 times</td>
-                                </tr>  
-                                <tr>
-                                    <td><span class="date">January 1, 2010</span></td>
-                                    <td><a href="#">Word of the Day</a></td>
-                                    <td>Spoken 300 times</td>
-                                </tr>
-                                <tr class="odd">
-                                    <td><span class="date">January 1, 2010</span></td>
-                                    <td><a href="#">Word of the Day</a></td>
-                                    <td>Spoken 300 times</td>
                                 </tr>
                                 <tr>
                                     <td><span class="date">January 1, 2010</span></td>
@@ -130,10 +121,20 @@
                                     <td><span class="date">January 1, 2010</span></td>
                                     <td><a href="#">Word of the Day</a></td>
                                     <td>Spoken 300 times</td>
-                                </tr>  
+                                </tr>
+                                <tr>
+                                    <td><span class="date">January 1, 2010</span></td>
+                                    <td><a href="#">Word of the Day</a></td>
+                                    <td>Spoken 300 times</td>
+                                </tr>
+                                <tr class="odd">
+                                    <td><span class="date">January 1, 2010</span></td>
+                                    <td><a href="#">Word of the Day</a></td>
+                                    <td>Spoken 300 times</td>
+                                </tr>
                                 {% endcomment %}
-                            <tbody>    
-                        </table>  
+                            <tbody>
+                        </table>
                    </div>
                   <div class="clear"></div>
                 </div>
@@ -151,23 +152,23 @@
                         <form id="signUp" action="" method="">
                             <ul>
                                 <li>
-                                    <input type="text" name="email"/>
+                                    <label for="signUpEmail" class="placeholder">Email address</label><input id="signUpEmail" type="text" name="email"/>
                                 </li>
                                 <li>
-                                    <input type="text" name="zip"/>
+                                    <label for="signUpZip" class="placeholder">Zip code</label><input id="signUpZip" type="text" name="zip"/>
                                 </li>
                                 <li>
                                     <button class="fullButton" type="submit">
                                         <span>Sign Up</span>
                                     </button>
-                                </li>    
-                            </ul>   
+                                </li>
+                            </ul>
                             <div class="clear"></div>
-                        </form>    
-                    </div>    
-                </div> 
-            </div>   
-        </footer>        
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </footer>
         {% block javascript %}
 
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
@@ -200,6 +201,6 @@
         {% endblock javascript %}
 
     </body>
-</html> 
+</html>
 
         {% endblock body %}

@@ -1,0 +1,194 @@
+<head>
+<link rel="stylesheet" href="../../media/css/embed.css" type="text/css" media="screen" title="no title" charset="utf-8">
+
+</head>
+<body>
+	<div id="capWordsEmbed">
+		<div class="light">
+			<div id="ltColumn">
+				<div class="module chartModule">
+				    <div class="rightHeader withAction">
+				        <h3><a href="{{ url }}">{{ title }}</a></h3>
+						<div class="key">
+                            <span class="wordOne"><span class="color"></span><a href"#" class="wordOne">"War"</a> <span class="filters">[Oregon, Democrats]</span></span><span class="wordTwo"><span class="color"></span><a href"#" class="wordTwo">"Peace"</a> <span class="filters">[All States, All Parties]</span></span>
+						</div>
+					</div>
+					<div class="actionItem">
+				        <form id="timelineToggle" action="" method="">
+				            <ul class="partyBreakdown">
+				                <li><input class="radio" type="radio" checked name="toggle" id="overallTimelineSelect"/><label for="overallTimelineSelect">Overall</label></li>
+				                <li><input class="radio" type="radio" name="toggle" id="partyTimelineSelect"/><label for="partyTimelineSelect">By party</label></li>
+				                <!--{#<li><input class="radio" type="radio" name="toggle" id="customTimelineSelect"/><label for="customTimelineSelect">Custom</label></li>#}-->
+				            </ul>
+				            <div class="clear"></div>
+				        </form>
+				        <form id="countToggle" action="" method="">
+				            <ul class="relVSraw">
+				                <li>
+									<input class="radio" type="radio" checked name="toggle" id="relFrequency"/>
+									<label for="relFrequency">rel. freq.</label>
+								</li>
+				                <li>
+									<input class="radio" type="radio" name="toggle" id="rawCount"/>
+									<label for="rawCount">raw count</label>
+								</li>
+				            </ul>
+				            <div class="clear"></div>
+				        </form>
+						<div class="clear"></div>
+					</div>
+				    <div class="chart">
+				        <div id="overallTimeline">
+				            {% if timeline_url %}
+				            <img src="{{ timeline_url }}" alt="Timeline of occurrences of '{{ term }}'"/>
+				            {% endif %}
+				        </div>
+				        <div id="partyTimeline">
+				            {% if party_timeline_url %}
+				            <img src="{{ party_timeline_url }}" alt="Timeline of occurrences of '{{ term }}' by party"/>
+				            {% endif %}
+				        </div>
+				        {% comment %}
+				        <div id="customTimeline">
+				            <form name="customizeGraph" action="" method="get" id="formtest">
+				                <input type="hidden" name="term" id="term" value="{{ term }}"/>
+				                <select name="party" id="partySelect">
+				                    <option value="">All parties</option>
+				                    <option value="D">Democrats</option>
+				                    <option value="R">Republicans</option>
+				                </select>
+				                <select name="state" id="stateSelect">
+				                    <option value="">All states</option>
+				                    {% for abbrev, fullname in state_choices %}
+				                    <option value="{{ abbrev }}">{{ fullname }}</option>
+				                    {% endfor %}
+				                </select>
+				            </form>
+				            {% if timeline_url %}
+				            <img id="customChart" src="{{ timeline_url }}" alt="Custom timeline of occurrences of '{{ term }}'"/>
+				            {% endif %}
+				        </div>
+				        {% endcomment %}
+				    </div>
+				    <div id="timeline"></div>
+				    <div id="slider-range"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+	  var embedder, embedder_host;
+
+	  var matches_embedder_host = location.search.match(/embedder_host=([^&\?]+)/);
+	  if (matches_embedder_host)
+	    embedder_host = unescape(matches_embedder_host[1]);
+
+	  var matches_embedder = location.search.match(/embedder=([^&\?]+)/);
+	  if (matches_embedder)
+	    embedder = unescape(matches_embedder[1]);
+
+	  var overriddenReferrer = null;
+	</script>
+
+	<script type="text/javascript">
+	  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+	  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	<script type="text/javascript">
+	  try {
+	    var pageTracker = _gat._getTracker("UA-1265484-18");
+
+	    // if the widget is embedded in an iframe, and on an iframe hosted elsewhere,
+	    // override the referer so we can track this like a regular link
+	    overriddenReferrer = false;
+	    if (embedder && (embedder_host != location.host)) {
+	      pageTracker._setReferrerOverride(embedder);
+	      overriddenReferrer = true; // for debugging purposes
+
+	      pageTracker._setCustomVar(
+	        1, // slot 1
+	        "Embedder Host",
+	        embedder_host,
+	        2 // session-level
+	      );
+
+	      pageTracker._setCustomVar(
+	        2, // slot 2
+	        "Embedder URL",
+	        embedder,
+	        2 // session-level
+	      );
+	    }
+
+	    pageTracker._setDomainName("none");
+	    pageTracker._setAllowLinker(true);
+	    pageTracker._trackPageview();
+	  } catch(err) {}
+	</script>
+</body>
+</html> 
+
+			
+<!--<!doctype html>
+<html>
+    <head>
+    </head>
+
+    <body>
+        <a href="{{ url }}"><h1>{{ title }}</h1></a>
+        <img src="{{ img_src }}"/>
+
+<script type="text/javascript">
+  var embedder, embedder_host;
+
+  var matches_embedder_host = location.search.match(/embedder_host=([^&\?]+)/);
+  if (matches_embedder_host)
+    embedder_host = unescape(matches_embedder_host[1]);
+
+  var matches_embedder = location.search.match(/embedder=([^&\?]+)/);
+  if (matches_embedder)
+    embedder = unescape(matches_embedder[1]);
+
+  var overriddenReferrer = null;
+</script>
+
+<script type="text/javascript">
+  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+  try {
+    var pageTracker = _gat._getTracker("UA-1265484-18");
+
+    // if the widget is embedded in an iframe, and on an iframe hosted elsewhere,
+    // override the referer so we can track this like a regular link
+    overriddenReferrer = false;
+    if (embedder && (embedder_host != location.host)) {
+      pageTracker._setReferrerOverride(embedder);
+      overriddenReferrer = true; // for debugging purposes
+
+      pageTracker._setCustomVar(
+        1, // slot 1
+        "Embedder Host",
+        embedder_host,
+        2 // session-level
+      );
+
+      pageTracker._setCustomVar(
+        2, // slot 2
+        "Embedder URL",
+        embedder,
+        2 // session-level
+      );
+    }
+
+    pageTracker._setDomainName("none");
+    pageTracker._setAllowLinker(true);
+    pageTracker._trackPageview();
+  } catch(err) {}
+</script>
+
+</body>
+
+</html>-->
+

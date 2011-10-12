@@ -342,7 +342,7 @@ def state_detail(request, state):
     if not state_name:
         raise Http404
 
-    entries = capitolwords.text(state=state, sort='date desc,score desc', per_page=5)
+    entries = capitolwords.text(state='"%s"' % state, sort='date desc,score desc', per_page=5)
     ngrams = {}
     for n in range(1, 6):
         ngrams[GRAM_NAMES[n-1]] = capitolwords.top_phrases(
