@@ -1118,7 +1118,8 @@ jQuery(document).ready ->
         cw.getEmbedCode jQuery('.embedContainer')
     )
 
-    fixImages = jQuery('#rtColumn').imagesLoaded ->
-    jQuery('#rtColumn').ajaxSuccess fixImages()
+    jQuery('#rtColumn').imagesLoaded ->
+    jQuery('#rtColumn').ajaxSuccess ->
+        jQuery('#rtColumn').imagesLoaded ->
 
     Emphasis.init()
