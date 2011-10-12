@@ -567,7 +567,7 @@
         return jQuery('table#legislatorList tbody').find('img').error(function() {
           window.console && console.log('error callback');
           return jQuery(this).hide();
-        }).end.imagesLoaded(function() {}).fadeIn('fast');
+        }).end().imagesLoaded(function() {}).fadeIn('fast');
       };
       return jQuery('table#legislatorList tbody').fadeOut('fast', buildTable);
     };
