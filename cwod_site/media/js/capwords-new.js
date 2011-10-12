@@ -1071,7 +1071,7 @@
         return cw.populateTermDetailPage(termDetailTerm);
       });
     }
-    jQuery('img').error(function() {
+    jQuery('img').live('error', function() {
       return jQuery(this).hide();
     });
     jQuery('.ngramMenu span').bind('click', function(x) {

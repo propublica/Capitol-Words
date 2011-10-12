@@ -977,7 +977,7 @@ jQuery(document).ready ->
             cw.populateTermDetailPage termDetailTerm
         )
 
-    jQuery('img').error ->
+    jQuery('img').live 'error', ->
         jQuery(this).hide()
 
 
