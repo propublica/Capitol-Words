@@ -293,7 +293,6 @@
             match = graf.replace(matcher, function(a, b) {
               return "<em>" + b + "</em>";
             });
-            return;
           }
         });
         entry['match'] = match;
@@ -1011,6 +1010,9 @@
       return xhr.setRequestHeader("X-CSRFToken", cw.getCookie('csrftoken'));
     }
   });
+  jQuery.delegate('img', 'error', function() {
+    return jQuery(this).hide();
+  });
   jQuery(document).ready(function() {
     var cw, d, endYear, startYear;
     cw = new window.CapitolWords;
@@ -1022,9 +1024,6 @@
         return cw.populateTermDetailPage(termDetailTerm);
       });
     }
-    jQuery('img').error(function() {
-      return jQuery(this).hide();
-    });
     jQuery('.ngramMenu span').bind('click', function(x) {
       var classToShow;
       classToShow = jQuery(this).attr('class');
