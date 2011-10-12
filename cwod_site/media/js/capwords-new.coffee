@@ -1121,6 +1121,7 @@ jQuery(document).ready ->
     # reset images, bind ajax calls to do the same
     jQuery('#rtColumn').imagesLoaded ->
     jQuery('#rtColumn').ajaxComplete ->
+        window.console && console.log('ajaxComplete')
         jQuery('img').imagesLoaded ->
 
     Emphasis.init()
