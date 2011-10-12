@@ -156,10 +156,11 @@
                   annotation_year = window.cwod_results[i / 2].month.substr(0, 4);
                   annotation_text = '<span class="annotation-count">' + window.cwod_counts[i / 2] + ' mention' + (window.cwod_counts[i / 2] !== 1 ? 's' : '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>';
                   (jQuery('#inner-annotation')).html(annotation_text);
-                  return (jQuery('#annotation')).css({
+                  (jQuery('#annotation')).css({
                     left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X,
                     top: jQuery('#termChart').offset().top + window.cwod_line_coords[i + 1] + FUZZ_Y
                   });
+                  return true;
                 }
               }
             };
@@ -613,7 +614,7 @@
           _results = [];
           for (_i = 0, _len = years.length; _i < _len; _i++) {
             year = years[_i];
-            _results.push(Math.round((years.indexOf(year) / years.length) * 100));
+            _results.push(Math.round(((jQuery.inArray(year, years)) / years.length) * 100));
           }
           return _results;
         })()

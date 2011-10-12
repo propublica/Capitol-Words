@@ -103,6 +103,7 @@ class window.CapitolWords
                                     left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X,
                                     top: jQuery('#termChart').offset().top + window.cwod_line_coords[i+1] + FUZZ_Y
                                 }
+                                true
 
                     window.clearInterval window.cwod_interval
                     window.cwod_interval = window.setInterval annotation_callback, 50
@@ -534,7 +535,7 @@ class window.CapitolWords
         years = _(_(values).pluck('month')).select((x) ->
             x.match /01$/)
 
-        positions = [Math.round((years.indexOf(year) / years.length) * 100) for year in years]
+        positions = [Math.round(((jQuery.inArray year, years) / years.length) * 100) for year in years]
         labels = _(years).map( (x) ->
             "1/#{x.slice(2,4)}"
         )

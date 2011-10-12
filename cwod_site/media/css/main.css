@@ -668,7 +668,7 @@ li.embedDark, li.embedLight{
     padding: 0 0 0 8px;
     margin: -16px 0 0 2px;
     position: absolute;
-    visibility: hidden;       
+    display: none;
 }
 #annotation #inner-annotation { 
     background-color: #f2f1ed; 
