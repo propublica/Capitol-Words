@@ -1063,9 +1063,6 @@
   jQuery(document).ready(function() {
     var cw, d, endYear, fixImages, startYear;
     cw = new window.CapitolWords;
-    jQuery.ajaxSetup({
-      always: always
-    });
     if (typeof termDetailTerm !== 'undefined') {
       cw.readTermDetailPageHistory();
       cw.populateTermDetailPage(termDetailTerm);

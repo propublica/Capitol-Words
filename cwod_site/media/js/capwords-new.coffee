@@ -966,8 +966,6 @@ jQuery(document).ready ->
 
     cw = new window.CapitolWords
 
-    jQuery.ajaxSetup {always}
-
     if typeof termDetailTerm isnt 'undefined'
         cw.readTermDetailPageHistory()
         cw.populateTermDetailPage termDetailTerm
