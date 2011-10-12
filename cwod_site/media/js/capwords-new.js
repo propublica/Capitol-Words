@@ -564,7 +564,10 @@
             return jQuery('table#legislatorList tbody').append(tr);
           }
         });
-        return jQuery('table#legislatorList tbody').imagesLoaded(function() {}).fadeIn('fast');
+        return jQuery('table#legislatorList tbody').find('img').error(function() {
+          window.console && console.log('error callback');
+          return jQuery(this).hide();
+        }).end.imagesLoaded(function() {}).fadeIn('fast');
       };
       return jQuery('table#legislatorList tbody').fadeOut('fast', buildTable);
     };
@@ -1067,8 +1070,7 @@
         return cw.populateTermDetailPage(termDetailTerm);
       });
     }
-    jQuery('img').live('error', function() {
-      window.console && console.log('error on ' + jQuery(this));
+    jQuery('img').error(function() {
       return jQuery(this).hide();
     });
     jQuery('.ngramMenu span').bind('click', function(x) {

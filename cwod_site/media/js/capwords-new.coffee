@@ -492,7 +492,12 @@ class window.CapitolWords
                     """
                     jQuery('table#legislatorList tbody').append tr
 
-            jQuery('table#legislatorList tbody').imagesLoaded(->).fadeIn 'fast'
+            jQuery('table#legislatorList tbody')
+                .find('img').error ->
+                    window.console && console.log 'error callback'
+                    jQuery(this).hide()
+                .end
+                .imagesLoaded(->).fadeIn 'fast'
 
         jQuery('table#legislatorList tbody').fadeOut 'fast', buildTable
 
@@ -973,8 +978,7 @@ jQuery(document).ready ->
             cw.populateTermDetailPage termDetailTerm
         )
 
-    jQuery('img').live 'error', ->
-        window.console && console.log 'error on ' + jQuery(this)
+    jQuery('img').error ->
         jQuery(this).hide()
 
 
