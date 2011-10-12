@@ -638,6 +638,9 @@
           if (spinner) {
             return spinner.stop();
           }
+        },
+        complete: function() {
+          return jQuery('#compareGraphic div.key').eq(0).replaceWith(cw.build_legend_html());
         }
       });
       if (!skipState) {
@@ -663,10 +666,29 @@
       }
     };
     CapitolWords.prototype.smoothing = 0;
+    CapitolWords.prototype.build_legend_html = function() {
+      var legend, partyA, partyB, stateA, stateB, template, termA, termB;
+      legend = this.build_legend();
+      termA = legend[0] && legend[0].split(' [')[0] || "(no term)";
+      partyA = jQuery('.partyA input:checked').eq(0).parent().text().trim();
+      if (partyA === 'All') {
+        partyA = 'All Parties';
+      }
+      stateA = jQuery('#stateA');
+      stateA = stateA.val() && this.states[stateA.val()] || "All states";
+      termB = legend[1] && legend[1].split(' [')[0] || "(no term)";
+      partyB = jQuery('.partyB input:checked').eq(0).parent().text().trim();
+      if (partyB === 'All') {
+        partyB = 'All Parties';
+      }
+      stateB = jQuery('#stateB');
+      stateB = stateB.val() && this.states[stateB.val()] || "All states";
+      return template = "<div class=\"key\">\n    Comparing\n    <span class=\"wordOne\">\n        <span class=\"color\"></span><a href\"#\"=\"\" class=\"wordOne\">\"" + termA + "\"</a>\n        <span class=\"filters\">[" + stateA + ", " + partyA + "]</span>\n    </span>\n    and\n    <span class=\"wordTwo\">\n        <span class=\"color\"></span><a href\"#\"=\"\" class=\"wordTwo\">\"" + termB + "\"</a>\n        <span class=\"filters\">[" + stateB + ", " + partyB + "]</span>\n    </span>\n</div>";
+    };
     CapitolWords.prototype.build_legend = function() {
       var legend, legendA, legendB, partyA, partyB, stateA, stateB, termA, termB;
       termA = jQuery('#terma').val();
-      partyA = jQuery(jQuery('.partyA input:checked')[0]).val();
+      partyA = jQuery('.partyA input:checked').eq(0).val();
       stateA = jQuery('#stateA').val();
       legend = [];
       legendA = termA;
@@ -681,7 +703,7 @@
         legend.push(legendA);
       }
       termB = jQuery('#termb').val();
-      partyB = jQuery(jQuery('.partyB input:checked')[0]).val();
+      partyB = jQuery('.partyB input:checked').eq(0).val();
       stateB = jQuery('#stateB').val();
       legendB = termB;
       if (termB && termB !== 'Word or phrase') {
@@ -931,8 +953,64 @@
         }).reduce(func, 0) / _(weight).reduce(func, 0);
       });
     };
+    CapitolWords.prototype.getEmbedCode = function(container) {
+      var data, imgSrc;
+      if (jQuery('#partyTimeline').is(':visible')) {
+        imgSrc = jQuery('#partyTimeline img').attr('src');
+      } else {
+        imgSrc = jQuery('#overallTimeline img').attr('src');
+      }
+      data = {
+        img_src: imgSrc,
+        url: window.location.href,
+        title: window.document.title.split(' | ')[0],
+        chart_type: jQuery('#embedDark:checked').length === 1 ? 'dark' : 'light'
+      };
+      jQuery.ajax({
+        type: 'POST',
+        url: '/embed/',
+        data: data,
+        success: function(url) {
+          var full_url, script;
+          full_url = "http://capitolwords.org" + url;
+          script = "<script type=\"text/javascript\" src=\"" + full_url + "\"></script>";
+          return container.find('textarea').val(script);
+        }
+      });
+      return container.slideDown();
+    };
+    CapitolWords.prototype.getCookie = function(name) {
+      var cookie, cookieContent, cookieName, cookies, _i, _len, _ref;
+      if (document.cookie && (document.cookie !== '')) {
+        cookies = _(document.cookie.split(';')).map((function(x) {
+          return jQuery.trim(x);
+        }));
+        for (_i = 0, _len = cookies.length; _i < _len; _i++) {
+          cookie = cookies[_i];
+          _ref = cookie.split('=', 2), cookieName = _ref[0], cookieContent = _ref[1];
+          if (cookieName === name) {
+            return decodeURIComponent(cookieContent);
+          }
+        }
+      }
+    };
+    CapitolWords.prototype.sameOrigin = function(url) {
+      var host, origin, protocol, sr_origin;
+      host = document.location.host;
+      protocol = document.location.protocol;
+      sr_origin = "//" + host;
+      origin = protocol + sr_origin;
+      return (url === origin || url.slice(0, origin.length + 1) === origin + '/') || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + '/') || !(/^(\/\/|http:|https:).*/.test(url));
+    };
     return CapitolWords;
   })();
+  jQuery(document).ajaxSend(function(event, xhr, settings) {
+    var cw;
+    cw = new window.CapitolWords;
+    if ((settings.type === 'POST') && cw.sameOrigin(settings.url)) {
+      return xhr.setRequestHeader("X-CSRFToken", cw.getCookie('csrftoken'));
+    }
+  });
   jQuery(document).ready(function() {
     var cw, d, endYear, startYear;
     cw = new window.CapitolWords;
@@ -1009,6 +1087,21 @@
       History.pushState({}, '', "/legislator?" + hash);
       return cw.legislatorSearch({});
     });
+    jQuery('#signUp').find('input[type=text]').bind('focus', function() {
+      var el;
+      el = jQuery(this);
+      try {
+        return el.parent().find('label[for=' + el.attr('id') + ']').eq(0).addClass('hidden');
+      } catch (_e) {}
+    }).bind('blur', function() {
+      var el;
+      el = jQuery(this);
+      if (!el.val()) {
+        try {
+          return el.parent().find('label[for=' + el.attr('id') + ']').eq(0).removeClass('hidden');
+        } catch (_e) {}
+      }
+    });
     if (window.location.pathname.match(/^\/legislator\/?$/)) {
       cw.readLegislatorHistory();
       History.Adapter.bind(window, 'statechange', function() {
@@ -1068,23 +1161,16 @@
       });
     });
     jQuery('#embed span').bind('click', function() {
-      var imgSrc, t;
+      var t;
       t = jQuery('.embedContainer');
       if (t.is(':visible')) {
-        t.slideUp();
+        return t.slideUp();
       } else {
-        t.slideDown();
+        return cw.getEmbedCode(t);
       }
-      if (jQuery('#partyTimeline').is(':visible')) {
-        imgSrc = jQuery('#partyTimeline img').attr('src');
-      } else {
-        imgSrc = jQuery('#partyTimeline img').attr('src');
-      }
-      return window.console.log({
-        'cw.start_date': cw.start_date,
-        'cw.end_date': cw.end_date,
-        'src': imgSrc
-      });
+    });
+    jQuery('#customizeEmbed input').change(function() {
+      return cw.getEmbedCode(jQuery('.embedContainer'));
     });
     return Emphasis.init();
   });
