@@ -614,7 +614,7 @@
           _results = [];
           for (_i = 0, _len = years.length; _i < _len; _i++) {
             year = years[_i];
-            _results.push(Math.round((years.indexOf(year) / years.length) * 100));
+            _results.push(Math.round(((jQuery.inArray(year, years)) / years.length) * 100));
           }
           return _results;
         })()
