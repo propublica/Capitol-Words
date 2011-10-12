@@ -117,56 +117,57 @@
         url: url,
         data: data,
         success: function(data) {
-          var counts, imgUrl, labelPositions, overallImgTag, percentages, results;
+          var counts, imgUrl, labelPositions, percentages, results;
           results = data['results'];
           cw.results = results;
           counts = _(results).pluck('count');
           percentages = _(results).pluck('percentage');
-
-          labelPositions = cw.buildXLabels(results);                                  
+          labelPositions = cw.buildXLabels(results);
           imgUrl = cw.showChart([percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300']);
-
-          window.cwod_line_coords = [];
-          jQuery.getJSON((imgUrl + '&chof=json'), function(data) {
-            for(var j=0;j<data.chartshape.length;j++) {
-              if (data.chartshape[j].name=='line0') {
-                  window.cwod_line_coords = jQuery.extend(true, [], data.chartshape[j].coords);
+          window.cwod_counts = jQuery.extend(true, [], counts);
+          jQuery.getJSON(imgUrl + '&chof=json', function(data) {
+            var annotation_callback, copy_coords, csj, overallImgTag, _i, _len, _ref;
+            copy_coords = function(c) {
+              if (c.name === 'line0') {
+                return window.cwod_line_coords = jQuery.extend(true, [], c.coords);
               }
+            };
+            _ref = data.chartshape;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              csj = _ref[_i];
+              copy_coords(csj);
             }
-                        
+            annotation_callback = function() {
+              var FUZZ_X, FUZZ_Y, annotation_text, i;
+              if (!(window.cwod_inchart && (jQuery('#partyTimelineSelect').attr('checked')) !== 'checked')) {
+                return jQuery('#annotation').hide();
+              } else {
+                jQuery('#annotation').show();
+                FUZZ_X = 5;
+                FUZZ_Y = 6;
+                i = 0;
+                while ((window.cwod_line_coords[i] + FUZZ_X) < (window.cwod_pagex - (jQuery('#termChart')).offset().left) && (i < results.length * 2)) {
+                  i += 2;
+                }
+                annotation_text = results[i / 2].month + ' - ' + window.cwod_counts[i / 2];
+                return ((jQuery('#annotation')).text(annotation_text)).css({
+                  left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X,
+                  top: jQuery('#termChart').offset().top + window.cwod_line_coords[i + 1] + FUZZ_Y
+                });
+              }
+            };
             window.clearInterval(window.cwod_interval);
-            window.cwod_interval = window.setInterval(function(){ 
-                if((!window.cwod_inchart)||(jQuery('#partyTimelineSelect').attr('checked')=='checked')) {
-                    $('#annotation').hide();
-                }
-                else {
-                    $('#annotation').show();
-                    // fuzziness will never be perfect -- we're working backward from a containing polygon to an approximation
-                    // of its centroid. this could probably be calculated formally but I doubt it's worth the effort.
-                    var FUZZ_X = 5;
-                    var FUZZ_Y = 6;
-                    var i=0;
-                    while((window.cwod_line_coords[i]+FUZZ_X)<(window.cwod_pagex - jQuery('#termChart').offset().left) && (i<results.length*2)) {
-                        i += 2;
-                    }                                
-                    jQuery('#annotation').text(results[i/2].month + ' - ' + counts[i/2]).css({left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X, top: jQuery('#termChart').offset().top + window.cwod_line_coords[i+1] + FUZZ_Y});
-                }
-            }, 50);
-            
+            window.cwod_interval = window.setInterval(annotation_callback, 50);
             overallImgTag = "<img id=\"termChart\" src=\"" + imgUrl + "\" alt=\"Timeline of occurrences of " + term + "\"/>";
-            jQuery('#overallTimeline').html(overallImgTag);            
-            
-            jQuery('#termChart').mouseenter(function(event) {
-               window.cwod_inchart = true; 
-            }).mouseleave(function(event) {
-                window.cwod_inchart = false;
-            });      
-            jQuery('#termChart').mousemove(function(event) {
-                window.cwod_pagex = event.pageX;
-            });                
-            
-          });          
-
+            jQuery('#overallTimeline').html(overallImgTag);
+            return (((jQuery('#termChart')).mouseenter(function(event) {
+              return window.cwod_inchart = true;
+            })).mouseleave(function(event) {
+              return window.cwod_inchart = false;
+            })).mousemove(function(event) {
+              return window.cwod_pagex = event.pageX;
+            });
+          });
           if (cw.minMonth && cw.maxMonth) {
             return cw.limit(cw.minMonth, cw.maxMonth);
           }
@@ -334,7 +335,6 @@
             match = graf.replace(matcher, function(a, b) {
               return "<em>" + b + "</em>";
             });
-            return;
           }
         });
         entry['match'] = match;
@@ -738,7 +738,6 @@
       return legend;
     };
     CapitolWords.prototype.showChart = function(data, x_labels, x_label_positions, width, height, colors, legend) {
-
       var chart, cw, max, maxValue, values;
       width = width || 860;
       height = height || 340;
@@ -774,7 +773,6 @@
       if (x_label_positions) {
         chart.set_axis_positions('x', x_label_positions);
       }
-      
       if (jQuery('#chart img.realChart, #compareGraphic img.default')) {
         jQuery('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url()).fadeIn(100);
       }
