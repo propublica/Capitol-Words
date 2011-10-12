@@ -954,12 +954,15 @@ class window.CapitolWords
         (url == origin || url.slice(0, origin.length + 1) == origin + '/') || (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') || !(/^(\/\/|http:|https:).*/.test(url))
 
 
-jQuery(document).ajaxSend( (event, xhr, settings) ->
+jQuery(document).ajaxSend (event, xhr, settings) ->
         cw = new window.CapitolWords
         # Adapted from https://docs.djangoproject.com/en/dev/ref/contrib/csrf/
         if (settings.type is 'POST') and cw.sameOrigin(settings.url)
             xhr.setRequestHeader "X-CSRFToken", cw.getCookie('csrftoken')
-)
+
+
+jQuery.delegate 'img', 'error', ->
+    jQuery(this).hide()
 
 
 jQuery(document).ready ->
@@ -976,11 +979,6 @@ jQuery(document).ready ->
             cw.readTermDetailPageHistory()
             cw.populateTermDetailPage termDetailTerm
         )
-
-
-    jQuery('img').error( ->
-        jQuery(this).hide()
-    )
 
     jQuery('.ngramMenu span').bind('click', (x) ->
         classToShow = jQuery(this).attr 'class'
