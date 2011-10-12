@@ -494,7 +494,6 @@ class window.CapitolWords
 
             jQuery('table#legislatorList tbody')
                 .find('img').error ->
-                    window.console && console.log 'error callback'
                     jQuery(this).hide()
                 .end()
                 .imagesLoaded(->).fadeIn 'fast'
