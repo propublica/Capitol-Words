@@ -4,11 +4,12 @@ import itertools
 import json
 import re
 from operator import itemgetter
+import copy
 
 from dateutil.parser import parse as dateparse
 
 from django.conf import settings
-from django.contrib.localflavor.us.us_states import US_STATES, STATE_CHOICES
+from django.contrib.localflavor.us.us_states import US_STATES, STATE_CHOICES, US_TERRITORIES
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import connections, DatabaseError
@@ -24,6 +25,7 @@ from cwod.models import *
 
 from baseconv import base62
 
+TERRITORY_CHOICES = ('PR', 'GU', 'MP', 'AS')
 
 capitolwords = capitolwords(api_key=settings.SUNLIGHT_API_KEY, domain=settings.API_ROOT)
 
@@ -94,7 +96,7 @@ def faster_term_detail(request, term):
                                'entries': entries,
                                'needs_js': True,
                                'no_js_uri': no_js_uri,
-                               'state_choices': US_STATES,
+                               'state_choices': US_STATES + US_TERRITORIES,
                               }, context_instance=RequestContext(request))
 
 @login_required
@@ -192,7 +194,7 @@ def term_detail(request, term):
                                #'tree': tree,
                                'entries': entries,
                                'search': request.GET.get('search') == '1',
-                               'state_choices': US_STATES,
+                               'state_choices': US_STATES + US_TERRITORIES,
                               }, context_instance=RequestContext(request))
 
 
@@ -224,7 +226,7 @@ def legislator_list(request):
                               {'current_legislators': current_legislators,
                                #'past_legislators': past_legislators,
                                'congresses': congresses,
-                               'state_choices': US_STATES,
+                               'state_choices': US_STATES + US_TERRITORIES,
                               }, context_instance=RequestContext(request))
 
 
@@ -281,13 +283,15 @@ def chunks(l, n):
 
 def state_list(request):
     states = []
-    for abbrev, statename in US_STATES:
+    for abbrev, statename in (US_STATES + US_TERRITORIES):
         states.append((abbrev, statename, capitolwords.top_phrases(
                         entity_type='state',
                         entity_value=abbrev,
                         n=1,
                         per_page=5)
                       ))
+
+
 
     state_chunks = chunks(states, (len(states)+1)/3)
 
@@ -334,7 +338,7 @@ def get_similar_entities(entity_type, entity):
 
 @login_required
 def state_detail(request, state):
-    state_name = dict(STATE_CHOICES).get(state)
+    state_name = dict(STATE_CHOICES + TERRITORY_CHOICES).get(state)
     if not state_name:
         raise Http404
 
@@ -525,10 +529,33 @@ MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', '
 
 @login_required
 def calendar(request):
-    months = Date.objects.extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month', flat=True).distinct()
-    years = [(x, [(str(x)[4:], MONTH_NAMES[int(str(x)[4:])-1]) for x in y]) for x, y in itertools.groupby(months, lambda x: str(x)[:4])]
-    #year_chunks = chunks(years, (len(years)+1)/3)
+    raw_months = Date.objects.extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month', flat=True).distinct()
+    max_year = max(raw_months) / 100
+    min_year = min(raw_months) / 100
 
+    # this is embarrassing
+    months = []
+    for m in raw_months: 
+        months.append(str(m))
+    
+    empty_year = []
+    for i, n in enumerate(MONTH_NAMES):
+        empty_year.append(["%02d" % (i+1), n, False])
+                
+    # fill out the months in every year
+    years = {}
+    for y in range(min_year, max_year+1):
+        years[str(y)] = copy.deepcopy(empty_year)
+        
+    # activate the, um, active months
+    for m in months:
+        ky = m[:4]
+        km = int(m[-2:])-1
+        if years.has_key(ky):
+            years[ky][km][2] = True
+        
+    years = sorted(years.items(), key=lambda x: int(x[0]))
+    
     return render_to_response('cwod/calendar.html',
                               {'years': years,},
                               context_instance=RequestContext(request))

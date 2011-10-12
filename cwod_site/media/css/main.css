@@ -659,7 +659,24 @@ li.embedDark, li.embedLight{
 }
 
 
-
+#annotation { 
+    font-size: 11px;
+    height: 32px;    
+    line-height: 13px;
+    color: #2d2525;
+    background: url(../img/annotation_arrow.png) left top no-repeat;
+    padding: 0 0 0 8px;
+    margin: -16px 0 0 2px;
+    position: absolute;   
+}
+#annotation #inner-annotation { 
+    background-color: #f2f1ed; 
+    margin: 0; 
+    padding: 3px 4px 3px 4px; 
+    position: relative;
+}
+#annotation .annotation-count { font-weight: bold; }
+#annotation .annotation-date { font-style: italic; }
 
 
 

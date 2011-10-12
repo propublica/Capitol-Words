@@ -26,28 +26,10 @@
       return this.chxp.push([index, positions]);
     };
     GoogleChart.prototype.set_grid = function(x_step, y_step, dash_length, space_length, x_offset, y_offset) {
-      var key, value;
-      return this.chg = ((function() {
-        var _results;
-        _results = [];
-        for (key in arguments) {
-          value = arguments[key];
-          _results.push(value);
-        }
-        return _results;
-      }).apply(this, arguments)).join(',');
+      return this.chg = x_step + ',' + y_step + ',' + dash_length + ',' + space_length + ',' + x_offset + ',' + y_offset;
     };
     GoogleChart.prototype.set_fill = function(fill_type, s, color) {
-      var key, value;
-      return this.chf = ((function() {
-        var _results;
-        _results = [];
-        for (key in arguments) {
-          value = arguments[key];
-          _results.push(value);
-        }
-        return _results;
-      }).apply(this, arguments)).join(',');
+      return this.chf = fill_type + ',' + s + ',' + color;
     };
     GoogleChart.prototype.set_colors = function(colors) {
       return this.chco = colors.join(',');

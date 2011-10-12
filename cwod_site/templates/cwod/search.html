@@ -1,4 +1,4 @@
-<!doctype html>
+{% load media %}<!doctype html>
 <!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
 <!--[if IE 7 ]>        <html lang="en" class="no-js ie7"> <![endif]-->
 <!--[if IE 8 ]>        <html lang="en" class="no-js ie8"> <![endif]-->
@@ -13,7 +13,7 @@
     
         <link rel="stylesheet" href="main.css" type="text/css" media="screen" />
         <!--[if IE 7]>{% css "styles/buggy_7.css" %}<![endif]-->
-    
+        {% js "js/google-analytics.js" %}    
     </head>
     <body>
         <div id="containerWrapper">

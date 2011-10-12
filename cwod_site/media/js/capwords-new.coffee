@@ -71,11 +71,47 @@ class window.CapitolWords
                 labelPositions = cw.buildXLabels results
 
                 imgUrl = cw.showChart [percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300',]
+                window.cwod_counts = jQuery.extend true, [], counts
 
-                overallImgTag = "<img id=\"termChart\" src=\"#{imgUrl}\" alt=\"Timeline of occurrences of #{term}\"/>"
-                #customImgTag = "<img id=\"customChart\" src=\"#{imgUrl}\" alt=\"Custom timeline of occurrences of \"#{term}\"/>"
-                jQuery('#overallTimeline').html overallImgTag
-                #jQuery('#customTimeline').append customImgTag
+                jQuery.getJSON (imgUrl + '&chof=json'), (data) ->
+
+                    copy_coords = (c) ->
+                        if c.name is 'line0'
+                            window.cwod_line_coords = jQuery.extend true, [], c.coords
+
+                    copy_coords(csj) for csj in data.chartshape
+
+                    annotation_callback = () ->
+                        if not (window.cwod_inchart and (jQuery('#partyTimelineSelect').attr 'checked')!='checked')
+                            jQuery('#annotation').hide()
+                        else
+                            jQuery('#annotation').show()
+                            FUZZ_X = 5
+                            FUZZ_Y = 6
+                            i = 0
+                            while ((window.cwod_line_coords[i]+FUZZ_X)<(window.cwod_pagex - (jQuery '#termChart').offset().left) and (i<results.length*2))
+                                i += 2
+
+                            MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+                            annotation_month = MONTHS[(parseInt (results[i/2].month.substr 4, 2), 10) - 1]
+                            annotation_year = results[i/2].month.substr 0, 4
+                            annotation_text = ('<span class="annotation-count">' + window.cwod_counts[i/2] + ' mention' + (if window.cwod_counts[i/2]!=1 then 's' else '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>')
+                            (jQuery '#inner-annotation').html annotation_text
+                            (jQuery '#annotation').css {
+                                left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X, 
+                                top: jQuery('#termChart').offset().top + window.cwod_line_coords[i+1] + FUZZ_Y
+                            }
+
+                    window.clearInterval window.cwod_interval
+                    window.cwod_interval = window.setInterval annotation_callback, 50
+                
+                    overallImgTag = "<img id=\"termChart\" src=\"#{imgUrl}\" alt=\"Timeline of occurrences of #{term}\"/>"
+                    jQuery('#overallTimeline').html overallImgTag
+
+                    (((jQuery '#termChart').mouseenter (event) ->
+                       window.cwod_inchart = true).mouseleave (event) ->
+                          window.cwod_inchart = false).mousemove (event) ->
+                             window.cwod_pagex = event.pageX
 
                 if cw.minMonth and cw.maxMonth
                     cw.limit cw.minMonth, cw.maxMonth
