@@ -560,30 +560,42 @@ def month_detail(request, year, month):
                               context_instance=RequestContext(request))
 
 
-def decode_embed(request, code=None):
-    data = {'img_src': '', 'url': ''}
-    if code:
-        pk = base62.to_decimal(code)
-        try:
-            obj = Embed.objects.get(pk=pk)
-        except Embed.DoesNotExist:
-            return HttpResponse(json.dumps(data))
+def decode_embed(request, code):
+    pk = base62.to_decimal(code)
+    try:
+        obj = Embed.objects.get(pk=pk)
+    except Embed.DoesNotExist:
+        raise Http404
 
-        data['img_src'] = obj.img_src
-        data['url'] = obj.url
-        return HttpResponse(json.dumps(data))
+    return render_to_response('cwod/embed.html',
+                              {'img_src': obj.img_src,
+                               'url': obj.url,
+                               'title': obj.title,
+                               'chart_type': obj.chart_type,
+                               })
 
-    return HttpResponse(json.dumps(data))
+def js_embed(request):
+    code = request.GET.get('c')
+    if not code:
+        raise Http404
+    return render_to_response('cwod/embed.js',
+                              {'code': code},
+                              mimetype='text/javascript',
+                              )
 
 
 def encode_embed(request):
     if request.method == 'POST':
         img_src = request.POST.get('img_src')
         url = request.POST.get('url')
-        if img_src and url:
-            obj = Embed.objects.create(img_src=img_src,
-                                      url=url)
-            return HttpResponse(json.dumps({'code': obj.from_decimal()}))
-        return HttpResponse(json.dumps({}))
+        title = request.POST.get('title')
+        chart_type = request.POST.get('chart_type')
+        if img_src and url and title and chart_type:
+            obj, created = Embed.objects.get_or_create(img_src=img_src,
+                                                       url=url,
+                                                       title=title,
+                                                       chart_type=chart_type
+                                                       )
+            return HttpResponse(obj.js_url())
 
     return HttpResponse('')
