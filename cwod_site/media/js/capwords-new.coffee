@@ -1121,4 +1121,5 @@ jQuery(document).ready ->
     jQuery('#rtColumn').imagesLoaded (images) ->
         # do nothing
 
-    Emphasis.init()
+    # disabled due to IE8 incompatibilities -- seems to be related to how it inserts into the DOM
+    # Emphasis.init()
