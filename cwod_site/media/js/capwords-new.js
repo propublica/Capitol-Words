@@ -126,31 +126,44 @@
           labelPositions = cw.buildXLabels(results);                                  
           imgUrl = cw.showChart([percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300']);
 
-          var line_coords = [];
+          window.cwod_line_coords = [];
           jQuery.getJSON((imgUrl + '&chof=json'), function(data) {
             for(var j=0;j<data.chartshape.length;j++) {
               if (data.chartshape[j].name=='line0') {
-                  line_coords = jQuery.extend(true, [], data.chartshape[j].coords);
+                  window.cwod_line_coords = jQuery.extend(true, [], data.chartshape[j].coords);
               }
             }
+                        
+            window.clearInterval(window.cwod_interval);
+            window.cwod_interval = window.setInterval(function(){ 
+                if((!window.cwod_inchart)||(jQuery('#partyTimelineSelect').attr('checked')=='checked')) {
+                    $('#annotation').hide();
+                }
+                else {
+                    $('#annotation').show();
+                    // fuzziness will never be perfect -- we're working backward from a containing polygon to an approximation
+                    // of its centroid. this could probably be calculated formally but I doubt it's worth the effort.
+                    var FUZZ_X = 5;
+                    var FUZZ_Y = 6;
+                    var i=0;
+                    while((window.cwod_line_coords[i]+FUZZ_X)<(window.cwod_pagex - jQuery('#termChart').offset().left) && (i<results.length*2)) {
+                        i += 2;
+                    }                                
+                    jQuery('#annotation').text(results[i/2].month + ' - ' + counts[i/2]).css({left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X, top: jQuery('#termChart').offset().top + window.cwod_line_coords[i+1] + FUZZ_Y});
+                }
+            }, 50);
             
             overallImgTag = "<img id=\"termChart\" src=\"" + imgUrl + "\" alt=\"Timeline of occurrences of " + term + "\"/>";
             jQuery('#overallTimeline').html(overallImgTag);            
             
-            // fuzziness will never be perfect -- we're working backward from a containing polygon to an approximation
-            // of its centroid. this could probably be calculated formally but I doubt it's worth the effort.
-            var FUZZ_X = 5;
-            var FUZZ_Y = 6;
-            jQuery('#termChart').mousemove(function(event){
-            window.clearTimeout(window.cwod_timeout);
-            window.cwod_timeout = window.setTimeout(function() {
-                var i=0;
-                while((line_coords[i]+FUZZ_X)<(event.pageX - jQuery('#termChart').offset().left) && (i<results.length*2)) {
-                    i += 2;
-                }                                
-                jQuery('#annotation').text(results[i/2].month + ' - ' + counts[i/2]).css({left: jQuery('#termChart').offset().left + line_coords[i] + FUZZ_X, top: jQuery('#termChart').offset().top + line_coords[i+1] + FUZZ_Y});
-            }, 10);
-            });                          
+            jQuery('#termChart').mouseenter(function(event) {
+               window.cwod_inchart = true; 
+            }).mouseleave(function(event) {
+                window.cwod_inchart = false;
+            });      
+            jQuery('#termChart').mousemove(function(event) {
+                window.cwod_pagex = event.pageX;
+            });                
             
           });          
 
