@@ -50,7 +50,7 @@ var Emphasis = {
     addCSS: function() {
     /*  Inject the minimum styles rules required */
         var st = document.createElement('style');
-        st.innerHTML = 'p.' + this.classActive + ' span { background-color:#f2f4f5; } p span.' + this.classHighlight + ' { background-color:#fff0b3; } span.' + this.classInfo + ' { position:absolute; margin:-1px 0px 0px -8px; padding:0; font-size:10px; background-color: transparent !important} span.' + this.classInfo + ' a { text-decoration: none; } a.' + this.classAnchor + ' { color: darkBlue; font-family: Helvetica, Arial; font-size: 10px; } a.' + this.classActiveAnchor + ' { color: #000; font-size: 11px; }';
+        jQuery(st).html('p.' + this.classActive + ' span { background-color:#f2f4f5; } p span.' + this.classHighlight + ' { background-color:#fff0b3; } span.' + this.classInfo + ' { position:absolute; margin:-1px 0px 0px -8px; padding:0; font-size:10px; background-color: transparent !important} span.' + this.classInfo + ' a { text-decoration: none; } a.' + this.classAnchor + ' { color: darkBlue; font-family: Helvetica, Arial; font-size: 10px; } a.' + this.classActiveAnchor + ' { color: #000; font-size: 11px; }');
         document.getElementsByTagName("head")[0].appendChild(st);
     },
 
@@ -226,7 +226,7 @@ var Emphasis = {
             var chr = txt.substring(txt.length-8).charCodeAt(0);
             if ("|8221|63|46|41|39|37|34|33|".indexOf(chr)==-1) { txt += "."; }
 
-            pr.innerHTML = txt;
+            jQuery(pr).html(txt);
             pr.setAttribute('data-sentences', jLen);
 
             this.removeAllClasses("p", this.classActive);
@@ -254,7 +254,7 @@ var Emphasis = {
                     if (para) {
                         var key        = pl.keys[i];
                         var isActive   = (key==this.p) ? (" " + this.classActiveAnchor) : "";
-                        para.innerHTML = "<span class='" + this.classInfo + "'><a class='"+ this.classAnchor + isActive + "' href='#p[" + key + "]' data-key='" + key + "' title='Link to " + this.ordinal(i+1) + " paragraph'>&para;</a></span>" + para.innerHTML;
+                        jQuery(para).html("<span class='" + this.classInfo + "'><a class='"+ this.classAnchor + isActive + "' href='#p[" + key + "]' data-key='" + key + "' title='Link to " + this.ordinal(i+1) + " paragraph'>&para;</a></span>" + jQuery(para).html());
                     }
                 }
             }
@@ -395,7 +395,7 @@ var Emphasis = {
                 }
 
                 para.setAttribute("data-sentences", jLen);
-                para.innerHTML = lines.join('. ').replace(/__DOT__/g, ".").replace(/<\/span>\./g, ".<\/span>");
+                jQuery(para).html(lines.join('. ').replace(/__DOT__/g, ".").replace(/<\/span>\./g, ".<\/span>"));
                 jQuery(para).addClass('emReady'); /* Mark the paragraph as having SPANs */
             }
         }
