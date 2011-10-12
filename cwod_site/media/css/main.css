@@ -661,6 +661,7 @@ li.embedDark, li.embedLight{
 
 #annotation { 
     font-size: 11px;
+    z-index: 99;
     height: 32px;    
     line-height: 13px;
     color: #2d2525;
