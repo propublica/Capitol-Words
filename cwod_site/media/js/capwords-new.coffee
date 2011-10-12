@@ -974,6 +974,7 @@ jQuery(document).ready ->
         )
 
     jQuery('img').live 'error', ->
+        window.console && console.log 'error on ' + jQuery(this)
         jQuery(this).hide()
 
 

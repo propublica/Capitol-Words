@@ -1068,6 +1068,7 @@
       });
     }
     jQuery('img').live('error', function() {
+      window.console && console.log('error on ' + jQuery(this));
       return jQuery(this).hide();
     });
     jQuery('.ngramMenu span').bind('click', function(x) {
