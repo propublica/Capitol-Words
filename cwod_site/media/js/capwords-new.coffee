@@ -962,8 +962,8 @@ jQuery(document).ajaxSend (event, xhr, settings) ->
             xhr.setRequestHeader "X-CSRFToken", cw.getCookie('csrftoken')
 
 
-jQuery.delegate 'img', 'error', ->
-    jQuery(this).hide()
+(jQuery 'img').live 'error', ->
+    (jQuery this).hide()
 
 
 jQuery(document).ready ->
