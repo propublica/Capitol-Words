@@ -92,8 +92,12 @@ class window.CapitolWords
                             while ((window.cwod_line_coords[i]+FUZZ_X)<(window.cwod_pagex - (jQuery '#termChart').offset().left) and (i<results.length*2))
                                 i += 2
 
-                            annotation_text = (results[i/2].month + ' - ' + window.cwod_counts[i/2])
-                            ((jQuery '#annotation').text annotation_text).css {
+                            MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+                            annotation_month = MONTHS[(parseInt (results[i/2].month.substr 4, 2), 10) - 1]
+                            annotation_year = results[i/2].month.substr 0, 4
+                            annotation_text = ('<span class="annotation-count">' + window.cwod_counts[i/2] + ' mention' + (if window.cwod_counts[i/2]!=1 then 's' else '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>')
+                            (jQuery '#inner-annotation').html annotation_text
+                            (jQuery '#annotation').css {
                                 left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X, 
                                 top: jQuery('#termChart').offset().top + window.cwod_line_coords[i+1] + FUZZ_Y
                             }
