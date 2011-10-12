@@ -1114,12 +1114,11 @@ jQuery(document).ready ->
             cw.getEmbedCode t
     )
 
-
     jQuery('#customizeEmbed input').change( () ->
         cw.getEmbedCode jQuery('.embedContainer')
     )
 
-    jQuery.imagesLoaded (images) ->
+    jQuery('#rtColumn').imagesLoaded (images) ->
         # do nothing
 
     Emphasis.init()
