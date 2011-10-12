@@ -219,6 +219,12 @@ input { padding: 5px 8px; background: #e6e4e2 url(../img/bg_input.png) left bott
 #popularPages { float: left; width: 330px; padding: 0 30px;}
 #popularWords { float: left; width: 520px; padding: 0 0 0 30px; background: url(../img/bg_vertBorder.jpg) left top repeat-y; }
 
+#popularWords .date a {
+    border-bottom: 1px dotted #FDF1F1;
+    color: #FDF1F1;
+    font-style: oblique;
+}
+
 #signUp li { float: left; position: relative; }
 
 #footerContent .odd { background-color: #574d4e;}
@@ -283,7 +289,7 @@ th {text-transform: uppercase;}
 #rtColumn .chart{margin-bottom: 30px;}
 .legName{width: 33%;}
 .entTitle{width: 50%}
-.sort{padding-left: 23px;background: url('img/sort_double.png') 10px center no-repeat;}
+.sort{padding-left: 11px;background: url('img/sort_double.png') 10px center no-repeat;}
 
 #searchCompare{background: url(../img/bg_secondTitle.png) top left repeat; padding: 30px 30px 30px 30px; margin: 0 25px 30px 0; display: visible;}
 #searchCompare h5 { margin-bottom: 30px}
@@ -369,6 +375,10 @@ th {text-transform: uppercase;}
 }
 .crEntries .entDate{
 	padding-left: 23px;
+	vertical-align: top;
+}
+.crEntries .sort.entDate{
+	padding-left: 19px;
 }
 
 #main .crEntries .entTitle a{
