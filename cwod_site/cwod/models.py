@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.urlresolvers import reverse
 
 from baseconv import base62
 
@@ -35,6 +36,11 @@ class RecentEntry(models.Model):
 class Embed(models.Model):
     img_src = models.TextField()
     url = models.TextField()
+    title = models.CharField(max_length=255)
+    chart_type = models.CharField(max_length=255)
 
     def from_decimal(self):
         return base62.from_decimal(self.pk)
+
+    def js_url(self):
+        return '%s?c=%s' % (reverse('cwod_embed_js'), self.from_decimal())
