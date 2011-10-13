@@ -576,7 +576,12 @@ def month_detail(request, year, month):
     ngrams = ngrams.iteritems()
 
     dates = capitolwords._dates_in_month(year=year, month=month)
-    dates_by_week = [(weeknum, list(dates)) for weeknum, dates in itertools.groupby(dates, lambda x: dateparse(x['date']).date().strftime('%U'))]
+
+    def date_str_to_date(date_str):
+        year, month, day = map(int, date_str.split('-'))
+        return datetime.date(year, month, day)
+
+    dates_by_week = [(weeknum, list(dates)) for weeknum, dates in itertools.groupby(dates, lambda x: date_str_to_date(x['date']).strftime('%U'))]
 
     return render_to_response('cwod/month_detail.html',
                               {'month_name': month_name, 
