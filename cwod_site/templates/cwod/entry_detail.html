@@ -41,7 +41,7 @@
                                     <img class="legislatorImage" alt="legislator photo" src="{% legislator_thumbnail chunk.bioguide_id 40x50 %}"/>
                                     <dl class="metaData">
                                         <dt>Party</dt>
-                                        <dd class="withBar">{{ legislator.party|party_initial_to_abbrev }}</dd>
+                                        <dd class="withBar">{{ legislator.party }}</dd>
                                         <dt>State</dt>
                                         <dd>{{ chunk.speaker_state }}</dd>
                                     </dl>

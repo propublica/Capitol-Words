@@ -14,7 +14,7 @@
                 <div class="clear"></div>
                 <dl class="metaData">
                     <dt>Party</dt>
-                    <dd class="withBar">{{ legislator.party|party_initial_to_abbrev }}</dd>
+                    <dd class="withBar">{{ legislator.party }}</dd>
 
                     <dt>State{% ifequal legislator.honorific "Rep." %} and District{% endifequal %}</dt>
                     <dd><a href="{% url cwod_state_detail state=legislator.state %}">{{ legislator.state|state_abbrev_to_full }}</a>{% ifequal legislator.honorific "Rep." %}, District {{ legislator.district }}{% endifequal %}</dd>
@@ -62,7 +62,7 @@
                         <div class="clear"></div>
                         <dl class="metaData clear">
                             <dt>Party</dt>
-                            <dd class="withBar">{{ i.legislator.party|party_initial_to_abbrev }}</dd>
+                            <dd class="withBar">{{ i.legislator.party }}</dd>
 
                             <dt>State{% ifequal i.legislator.honorific "Rep." %} and District{% endifequal %}</dt>
                             <dd>{{ i.legislator.state|state_abbrev_to_full }}{% ifequal i.legislator.honorific "Rep." %}, District {{ i.legislator.district }}{% endifequal %}</dd>
