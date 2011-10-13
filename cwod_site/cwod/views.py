@@ -529,7 +529,7 @@ MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', '
 
 @login_required
 def calendar(request):
-    raw_months = Date.objects.extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month', flat=True).distinct()
+    raw_months = capitolwords._month_list()
     max_year = max(raw_months) / 100
     min_year = min(raw_months) / 100
 
@@ -575,8 +575,13 @@ def month_detail(request, year, month):
                                         )
     ngrams = ngrams.iteritems()
 
-    dates = Date.objects.filter(date__year=year, date__month=month).order_by('date')
-    dates_by_week = [(weeknum, list(dates)) for weeknum, dates in itertools.groupby(dates, lambda x: x.date.strftime('%U'))]
+    dates = capitolwords._dates_in_month(year=year, month=month)
+
+    def date_str_to_date(date_str):
+        year, month, day = map(int, date_str.split('-'))
+        return datetime.date(year, month, day)
+
+    dates_by_week = [(weeknum, list(dates)) for weeknum, dates in itertools.groupby(dates, lambda x: date_str_to_date(x['date']).strftime('%U'))]
 
     return render_to_response('cwod/month_detail.html',
                               {'month_name': month_name, 
