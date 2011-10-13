@@ -104,10 +104,12 @@
                         <ol class="barChart">
                             {% for similar_date in similar_dates|slice:"10" %}
                             <li>
+                            {% with similar_date.date|date_parse as similar_date %}
                                 <span class="tagValue" style="width:0%;"></span> 
                                 <span class="tagNumber"></span>
                                 <span class="barChartTitle"><a href="{% url cwod_date_detail similar_date.year similar_date|date:"m" similar_date|date:"d" %}">{{ similar_date|date:"F j, Y" }}</a></span>
                             </li>
+                            {% endwith %}
                             {% endfor %}
                         </ol>
                         {% endif %}
