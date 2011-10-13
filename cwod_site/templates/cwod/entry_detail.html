@@ -16,32 +16,32 @@
                 <div id="ltColumn">
                     <article class="module">
                         <header>
-						<div class="rightHeader withAction">
+                        <div class="rightHeader withAction">
                             <dl class="metaData tip">
-								<dt>Volume</dt>
+                                <dt>Volume</dt>
                                 <dd class="withBar">Volume {{ metadata.volume }} , Number {{ metadata.number }} </dd>
-								<dt>Pages</dt>
+                                <dt>Pages</dt>
                                 <dd class="withBar">Pages {{ metadata.pages }}</dd>
-								<dt>Legislative Body</dt>
+                                <dt>Legislative Body</dt>
                                 <dd class="withBar">{% ifequal metadata.chamber 'Extensions' %}Extensions of Remarks{% else %}{{ metadata.chamber }}{% endifequal %}</dd>
-								<dt>Date</dt>
-                                <dd><a href="{% url cwod_date_detail metadata.date.year metadata.date|date:"m" metadata.date|date:"d" %}">{{ metadata.date|date:"l, N j, Y" }}</a></dd> 
-							</dl>
-							<div class="clear"></div>
+                                <dt>Date</dt>
+                                <dd><a href="{% url cwod_date_detail metadata.date.year metadata.date|date:"m" metadata.date|date:"d" %}">{{ metadata.date|date:"l, N j, Y" }}</a></dd>
+                            </dl>
+                            <div class="clear"></div>
                         </div>
-						</header>
+                        </header>
                         <div class="crContent">
 
                         {% for chunk in chunks %}
-							<div class="crSpeaker">
+                            <div class="crSpeaker">
                             {% if chunk.bioguide_id %}
                                 {% with chunk|legislator_lookup as legislator %}
                                 <h4><a href="{% url cwod_legislator_detail bioguide_id=chunk.bioguide_id slug=legislator.slug %}">{{ legislator.honorific }} {{ legislator.full_name }}</a></h4>
-								<div id="legislatorDetail">
+                                <div id="legislatorDetail">
                                     <img class="legislatorImage" alt="legislator photo" src="{% legislator_thumbnail chunk.bioguide_id 40x50 %}"/>
                                     <dl class="metaData">
                                         <dt>Party</dt>
-                                        <dd class="withBar">{{ legislator.party }}</dd>
+                                        <dd class="withBar">{{ legislator.party|party_initial_to_abbrev }}</dd>
                                         <dt>State</dt>
                                         <dd>{{ chunk.speaker_state }}</dd>
                                     </dl>
@@ -49,14 +49,14 @@
                                 {% endwith %}
                             {% endif %}
                             {% for graf in chunk.speaking %}
-                            <p {% if not chunk.bioguide_id %}class="nobioguide"{% endif %}>{{ graf }}</p>
+                            <p {% if not chunk.bioguide_id %}class="crInterlude"{% endif %}>{{ graf }}</p>
                             {% endfor %}
                             <div class="clear"></div>
                         </div>
                         {% endfor %}
 
-                    </article> 
-                </div>  
+                    </article>
+                </div>
 
                 <div id="rtColumn">
                     {% if similar_entries %}
@@ -74,7 +74,7 @@
                         </ul>
                     </div>
                     {% endif %}
-                </div>    
+                </div>
                 <div class="clear"></div>
             </div>
         </div>

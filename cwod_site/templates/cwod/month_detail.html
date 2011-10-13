@@ -30,7 +30,9 @@
                         {% for week, dates in dates_by_week %}
                         <ol style="margin-bottom: 20px;">
                             {% for date in dates %}
-                            <li><a href="{{ date.get_absolute_url }}">{{ date.date|date:"l, F j" }}</a></li>
+                            {% with date.date|date_parse as date %}
+                            <li><a href="{% url cwod_date_detail year=date.year month=date|date:"m" day=date|date:"d" %}">{{ date|date:"l, F j" }}</a></li>
+                            {% endwith %}
                             {% endfor %}
                         </ol>
                         {% endfor %}

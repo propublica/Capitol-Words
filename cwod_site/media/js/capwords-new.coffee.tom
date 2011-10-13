@@ -293,25 +293,27 @@ class window.CapitolWords
         container.slideDown()
 
     getGraph: (term) ->
-        data =
-            'phrase': term
-            'granularity': 'month'
-            'percentages': 'true'
-            'mincount': 0
-            'legend': false
+        data = {
+            'phrase': term,
+            'granularity': 'month',
+            'percentages': 'true',
+            'mincount': 0,
+            'legend': false,
+        }
 
         url = 'http://capitolwords.org/api/chart/timeline.json'
-        $.ajax
-            dataType: 'jsonp'
-            url: url
-            data: data
+        jQuery.ajax {
+            dataType: 'jsonp',
+            url: url,
+            data: data,
             success: (data) ->
                 results = data['results']
                 imgUrl = results['url']
-                overallImgTag = """<img src="#{imgUrl}" alt="Timeline of occurrences of #{term}"/>"""
-                #customImgTag = """<img id="customChart" src="#{imgUrl}" alt="Custom timeline of occurrences of "#{term}"/>"""
-                $('#overallTimeline').html overallImgTag
-                #$('#customTimeline').append customImgTag
+                overallImgTag = "<img src=\"#{imgUrl}\" alt=\"Timeline of occurrences of #{term}\"/>"
+                #customImgTag = "<img id=\"customChart\" src=\"#{imgUrl}\" alt=\"Custom timeline of occurrences of \"#{term}\"/>"
+                jQuery('#overallTimeline').html overallImgTag
+                #jQuery('#customTimeline').append customImgTag
+        }
 
     getGraphData: (term) ->
         data = {
@@ -416,23 +418,25 @@ class window.CapitolWords
     getPartyGraph: (term) ->
         url = 'http://capitolwords.org/api/chart/timeline.json'
         cw = this
-        $.ajax
-            dataType: 'jsonp'
-            url: url
-            data:
-                'phrase': term
-                'granularity': 'month'
-                'percentages': 'true'
-                'mincount': 0
-                'legend': true
-                'split_by_party': true
-                'start_date': cw.start_date
-                'end_date': cw.end_date
+        jQuery.ajax {
+            dataType: 'jsonp',
+            url: url,
+            data: {
+                'phrase': term,
+                'granularity': 'month',
+                'percentages': 'true',
+                'mincount': 0,
+                'legend': true,
+                'split_by_party': true,
+                'start_date': cw.start_date,
+                'end_date': cw.end_date,
+            },
             success: (data) ->
                 results = data['results']
                 imgUrl = results['url']
-                imgTag = """<img src="#{imgUrl}" alt="Timeline of occurrences of #{term}"/>"""
-                $('#partyTimeline').html imgTag
+                imgTag = "<img src=\"#{imgUrl}\" alt=\"Timeline of occurrences of #{term}\"/>"
+                jQuery('#partyTimeline').html imgTag                                            
+        }
 
     getPartyGraphData: (term) ->
         data = {
@@ -477,9 +481,9 @@ class window.CapitolWords
                     results = data['results']
                     partyData.push [party, results]
                     renderWhenDone()                                        
-                    
+
                     window.cwod_results['party'].push results
-                    window.cwod_counts['party'].push _(results).pluck 'count'
+                    window.cwod_counts['party'].push (jQuery.extend true, [], _(results).pluck 'count')                    
             }
 
     getPartyPieChart: (term, div, width, height, callback) ->
@@ -669,12 +673,6 @@ class window.CapitolWords
 
     populateTermDetailPage: (term) ->
 
-        # hacky, but necessary: the history stuff fires this twice otherwise, which pollutes the
-        # count objects used for the annotations
-        if window.term_has_been_populated
-            return            
-        window.term_has_been_populated = true
-
         window.cwod_inchart = false
         window.cwod_results = [] if window.cwod_results is undefined
         window.cwod_line_coords = [] if window.cwod_line_coords is undefined
@@ -698,7 +696,7 @@ class window.CapitolWords
 
             if (not window.cwod_inchart) or (not window.cwod_line_coords)
                 jQuery('.annotation').hide()
-                return                        
+                return            
 
             selected = 'term'
             selected_chart = '#termChart'
@@ -716,6 +714,11 @@ class window.CapitolWords
                     datapoint_i += 2
 
                 if (datapoint_i/2) < window.cwod_results[selected][series_i].length    
+
+                    # console.log ('#annotation-'+selected+'-'+series_i+' .inner-annotation')
+                    # console.log selected
+                    # console.log series_i
+                    # console.log datapoint_i
 
                     MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
                     annotation_month = MONTHS[(parseInt (window.cwod_results[selected][series_i][datapoint_i/2].month.substr 4, 2), 10) - 1]
@@ -1000,12 +1003,11 @@ $(document).ajaxSend (event, xhr, settings) ->
 Handle special routes
 ###
 History.Adapter.bind window, 'statechange', ->
-    
     History.log('state changed')
 
     if window.location.pathname.match /^\/legislator\/?$/
         cw.readLegislatorHistory()
-    
+
     else if window.location.pathname.match /^term\/[.+]\/?/
         cw.readTermDetailPageHistory()
         cw.populateTermDetailPage termDetailTerm
@@ -1142,4 +1144,3 @@ $(document).ready ->
 
     # reset images, bind ajax calls to do the same
     (area = $('#rtColumn')) && area.length && area.imagesLoaded ->
-
