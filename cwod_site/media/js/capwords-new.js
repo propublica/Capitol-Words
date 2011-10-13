@@ -1,5 +1,5 @@
 (function() {
-  var $, spinner;
+  var $, History, cw, spinner;
   var __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -27,6 +27,17 @@
     return params;
   };
   /*
+  jQuery.cleanedValue
+  decodes uri components and strips html tags
+  */
+  $.cleanedValue = function(str) {
+    if (!str) {
+      return '';
+    }
+    str = decodeURIComponent(str).replace(/\+/g, ' ');
+    return $("<div>" + str + "</div>").text().trim();
+  };
+  /*
   CapitolWords
   main application class
   */
@@ -34,6 +45,16 @@
     function CapitolWords() {}
     CapitolWords.prototype.a = {};
     CapitolWords.prototype.b = {};
+    CapitolWords.prototype.homepageDefaults = {
+      'terma': 'Word or phrase',
+      'termb': 'Word or phrase',
+      'statea': '',
+      'stateb': '',
+      'partya': 'All',
+      'partyb': 'All',
+      'start': '199601',
+      'end': '201112'
+    };
     CapitolWords.prototype.itemsToCompare = [];
     CapitolWords.prototype.legislatorData = [];
     CapitolWords.prototype.minMonth = void 0;
@@ -728,11 +749,12 @@
       }
     };
     CapitolWords.prototype.makeHomepageHistoryState = function(slid) {
-      var hash, params, partyA, partyB, stateA, stateB;
-      stateA = $('#stateA').val() || '';
-      stateB = $('#stateB').val() || '';
-      partyA = $('.partyA input:checked').eq(0).val();
-      partyB = $('.partyB input:checked').eq(0).val();
+      var cw, hash, hashParams, params, partyA, partyB, stateA, stateB;
+      cw = this;
+      stateA = $('#stateA').val() || cw.homepageDefaults['statea'];
+      stateB = $('#stateB').val() || cw.homepageDefaults['stateb'];
+      partyA = $('.partyA input:checked').eq(0).val() || cw.homepageDefaults['partya'];
+      partyB = $('.partyB input:checked').eq(0).val() || cw.homepageDefaults['partyb'];
       params = {
         "terma": this.phraseA(),
         "termb": this.phraseB(),
@@ -740,10 +762,16 @@
         "stateb": stateB,
         "partya": partyA,
         "partyb": partyB,
-        "start": this.minMonth,
-        "end": this.maxMonth
+        "start": this.minMonth || cw.homepageDefaults['start'],
+        "end": this.maxMonth || cw.homepageDefaults['end']
       };
-      hash = $.param(params);
+      hashParams = {};
+      _.each(params, function(v, k) {
+        if (v !== cw.homepageDefaults[k] && v !== void 0) {
+          return hashParams[k] = v;
+        }
+      });
+      hash = $.param(hashParams);
       return History.pushState({
         'slid': slid
       }, '', "?" + hash);
@@ -804,34 +832,30 @@
       }
     };
     CapitolWords.prototype.readHomepageHistory = function(nosubmit) {
-      var cw, data, endYear, hash, mapping, pieces, showAdvanced, startYear;
-      mapping = {
+      var cw, endYear, hash, param_id_map, params, showAdvanced, startYear, state;
+      cw = this;
+      param_id_map = {
         'terma': '#terma',
         'termb': '#termb',
         'statea': '#stateA',
         'stateb': '#stateB'
       };
-      hash = History.getState().hash.split('?')[1];
-      data = {};
-      showAdvanced = false;
-      cw = this;
+      state = History.getState();
+      hash = state.hash.split('?')[1];
+      params = $.deparam(hash);
+      showAdvanced = _.without(_.intersection(params.keys, cw.homepageDefaults.keys), 'terma', 'termb', 'start', 'end').length;
       if (hash) {
-        pieces = hash.split('&');
-        _(pieces).each(function(piece) {
-          var id, k, v, _ref;
-          _ref = piece.split('='), k = _ref[0], v = _ref[1];
-          id = mapping[k];
-          $("" + id).val(v);
-          if (k === 'partya' || k === 'partyb' || k === 'statea' || k === 'stateb') {
-            showAdvanced = true;
-          }
+        _(_.defaults(params, cw.homepageDefaults)).each(function(v, k) {
+          var id;
+          id = param_id_map[k];
+          $("" + id).val($.cleanedValue(v));
           if (k === 'partya' && v) {
             return $("#partyA" + v).attr('checked', true);
           } else if (k === 'partyb' && v) {
             return $("#partyB" + v).attr('checked', true);
-          } else if (k === 'start' && v) {
+          } else if (k === 'start' && v !== cw.homepageDefaults[k]) {
             return cw.minMonth = v;
-          } else if (k === 'end' && v) {
+          } else if (k === 'end' && v !== cw.homepageDefaults[k]) {
             return cw.maxMonth = v;
           }
         });
@@ -839,14 +863,14 @@
           $('ul.wordFilter').show();
           $('.advanced').addClass('expanded');
         }
-        if (this.minMonth || this.maxMonth) {
-          startYear = this.minMonth.slice(0, 4);
-          endYear = this.maxMonth.slice(0, 4);
-          $("#slider-range").slider("option", "values", [startYear, endYear]);
-          this.limit(this.minMonth, this.maxMonth);
-        }
+        cw.minMonth = cw.minMonth || cw.homepageDefaults['start'];
+        cw.maxMonth = cw.maxMonth || cw.homepageDefaults['end'];
+        startYear = cw.minMonth.slice(0, 4);
+        endYear = cw.maxMonth.slice(0, 4);
+        $("#slider-range").slider("option", "values", [startYear, endYear]);
+        cw.limit(cw.minMonth, cw.maxMonth);
         if (!nosubmit) {
-          return this.submitHomepageCompareForm(true);
+          return cw.submitHomepageCompareForm(true);
         }
       }
     };
@@ -1008,6 +1032,7 @@
         shadow: true
       };
       target = document.getElementById('compareGraphic');
+      spinner && spinner.stop && spinner.stop();
       spinner = new Spinner(opts).spin(target);
       url = 'http://capitolwords.org/api/dates.json';
       querya = $.ajax({
@@ -1083,28 +1108,41 @@
     return CapitolWords;
   })();
   /*
+  Create a global CW instance within this closure
+  */
+  cw = new window.CapitolWords;
+  History = window.History;
+  /*
   Add csrf token to ajax POSTs
   */
   $(document).ajaxSend(function(event, xhr, settings) {
-    var cw;
-    cw = new window.CapitolWords;
     if ((settings.type === 'POST') && cw.sameOrigin(settings.url)) {
       return xhr.setRequestHeader("X-CSRFToken", cw.getCookie('csrftoken'));
     }
   });
   /*
+  Handle special routes
+  */
+  History.Adapter.bind(window, 'statechange', function() {
+    History.log('state changed');
+    if (window.location.pathname.match(/^\/legislator\/?$/)) {
+      return cw.readLegislatorHistory();
+    } else if (window.location.pathname.match(/^term\/[.+]\/?/)) {
+      cw.readTermDetailPageHistory();
+      return cw.populateTermDetailPage(termDetailTerm);
+    } else if (window.location.pathname.match(/^\/?$/)) {
+      return cw.readHomepageHistory();
+    }
+  });
+  $(window).trigger('statechange');
+  /*
   DomReady Handler
   */
   $(document).ready(function() {
-    var area, cw, d, endYear, startYear;
-    cw = new window.CapitolWords;
+    var area, d, endYear, startYear;
     if (typeof termDetailTerm !== 'undefined') {
       cw.readTermDetailPageHistory();
       cw.populateTermDetailPage(termDetailTerm);
-      History.Adapter.bind(window, 'statechange', function() {
-        cw.readTermDetailPageHistory();
-        return cw.populateTermDetailPage(termDetailTerm);
-      });
     }
     $('img').error(function() {
       return $(this).hide();
@@ -1186,20 +1224,6 @@
         } catch (_e) {}
       }
     });
-    if (window.location.pathname.match(/^\/legislator\/?$/)) {
-      cw.readLegislatorHistory();
-      History.Adapter.bind(window, 'statechange', function() {
-        return cw.readLegislatorHistory();
-      });
-    }
-    if (window.location.pathname.match(/^\/?$/)) {
-      cw.readHomepageHistory();
-      History.Adapter.bind(window, 'statechange', function() {
-        if (History.getState()['data']['slid'] !== true) {
-          return cw.readHomepageHistory();
-        }
-      });
-    }
     if (!_($('#slider-range')).isEmpty()) {
       d = new Date();
       if (cw.minMonth && cw.maxMonth) {
