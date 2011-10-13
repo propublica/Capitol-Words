@@ -107,7 +107,7 @@ a:link { -webkit-tap-highlight-color: #CA5703; }
 
 .tip { font-style: oblique; text-transform: lowercase; color: #746f6d;}
 dl.tip { font-style: oblique; text-transform: lowercase; color: #746f6d; margin-top: 5px; margin-bottom: 25px}
-.fullButton { background: #706363 url('../img/bg_button.png') left 3px repeat-x; border: 1px solid #021017; -moz-border-radius: 5px; -webkit-border-radius: 5px; color: #fff; text-decoration: none; font-size: 120%; padding: 5px 30px; font-family: Georgia, "Times New Roman", Times, serif;}
+.fullButton { overflow: visible; background: #706363 url('../img/bg_button.png') left 3px repeat-x; border: 1px solid #021017; -moz-border-radius: 5px; -webkit-border-radius: 5px; color: #fff; text-decoration: none; font-size: 120%; padding: 5px 30px; font-family: Georgia, "Times New Roman", Times, serif;}
 .fullButton:hover { background: #5a5050 url('../img/bg_button.png') left 3px repeat-x; color: #eae5e5;}
 .fullButton:visited { color: #ffffff;}
 
@@ -316,9 +316,9 @@ th {text-transform: uppercase;}
 #subtractTermBtn.fullButton span{display: block; height: 5px; margin-top: -12px}
 
 #searchCompare ul>li {
-	display: inline;
 	display: inline-block;
-	zoom: 1;
+    zoom: 1;
+    *display: inline;
 	}
 #searchCompare form>ul>li {vertical-align: top;}
 #searchCompare ul>li ul.terms>li {display: inline}
@@ -328,7 +328,7 @@ th {text-transform: uppercase;}
 #searchCompare .filterBy label{ width: 28px; display: inline-block}
 #searchCompare .filterBy li{margin-bottom: 15px}
 #searchCompare select{ margin-left: 10px; width: 233px;}
-#searchCompare .submit{background: url('../img/bg_border_vert.png') top left no-repeat; padding: 0 0 0 30px;}
+#searchCompare .submit{background: url('../img/bg_border_vert.png') top left no-repeat; padding: 0 0 0 30px; width:130px; overflow: visible;}
 
 #fullColumn #searchCompare, #fullColumn #compareGraphic{ margin-left: -30px; width: 890px; margin-bottom: 50px}
 
@@ -446,7 +446,7 @@ ul.wordFilter{
 }
 
 .wordFilter{
-	padding: 0 20px;
+	padding: 0 0 0 20px;
 	margin-top: 20px;
 	height: 62px;
 	background: url('../img/bg_rightView_2x.png') right top no-repeat, url('../img/bg_leftView_2x.png') top left no-repeat;
