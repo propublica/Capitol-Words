@@ -91,9 +91,9 @@ def decimal_to_percent(n):
 @register.filter(name='party_initial_to_abbrev')
 def party_initial_to_abbrev(initial):
     initials = {
-        D: 'Dem',
-        R: 'Rep',
-        I: 'Ind',
+        'D': 'Dem',
+        'R': 'Rep',
+        'I': 'Ind',
     }
     try:
         initial = initials[initial]
