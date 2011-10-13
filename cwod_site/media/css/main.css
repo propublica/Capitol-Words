@@ -583,8 +583,7 @@ div.ngramMenu span#selected { text-decoration: none; cursor: default; }
 }
 
 #crEntries em{
-	color: #d9d2d0;
-	font-weight: bold;
+	color: #B13557;
 }
 
 .chart img#termChart, .chart img#partyTermChart{
