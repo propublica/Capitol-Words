@@ -1016,3 +1016,12 @@ def create_gpo_url(crdoc):
     return url
 
 
+class MonthListHandler(GenericHandler):
+    def read(self, request, *args, **kwargs):
+        raw_months = Date.objects.extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month', flat=True).distinct()
+        return raw_months
+
+class DatesInMonthHandler(GenericHandler):
+    def read(self, request, *args, **kwargs):
+        dates = Date.objects.filter(date__year=request.GET.get('year'), date__month=request.GET.get('month')).order_by('date')
+        return dates
