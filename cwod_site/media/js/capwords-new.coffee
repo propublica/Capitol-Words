@@ -15,12 +15,30 @@ $.deparam = (qs) ->
     return params
 
 ###
+jQuery.cleanedValue
+decodes uri components and strips html tags
+###
+$.cleanedValue = (str) ->
+    return '' unless str
+    str = decodeURIComponent(str).replace /\+/g, ' '
+    return $("<div>#{str}</div>").text().trim()
+
+###
 CapitolWords
 main application class
 ###
 class window.CapitolWords
     a: {}
     b: {}
+    homepageDefaults:
+        'terma':'Word or phrase'
+        'termb': 'Word or phrase'
+        'statea':''
+        'stateb':''
+        'partya':'All'
+        'partyb': 'All'
+        'start':'199601'
+        'end':'201112'
     itemsToCompare: []
     legislatorData: []
     minMonth: undefined
@@ -592,10 +610,11 @@ class window.CapitolWords
             this.showChart [_(aVals).pluck('percentage'), _(bVals).pluck('percentage')], labels, positions
 
     makeHomepageHistoryState: (slid) ->
-        stateA = $('#stateA').val() or ''
-        stateB = $('#stateB').val() or ''
-        partyA = $('.partyA input:checked').eq(0).val()
-        partyB = $('.partyB input:checked').eq(0).val()
+        cw = this
+        stateA = $('#stateA').val() or cw.homepageDefaults['statea']
+        stateB = $('#stateB').val() or cw.homepageDefaults['stateb']
+        partyA = $('.partyA input:checked').eq(0).val() or cw.homepageDefaults['partya']
+        partyB = $('.partyB input:checked').eq(0).val() or cw.homepageDefaults['partyb']
 
         params =
             "terma": this.phraseA()
@@ -604,10 +623,15 @@ class window.CapitolWords
             "stateb": stateB
             "partya": partyA
             "partyb": partyB
-            "start": this.minMonth
-            "end": this.maxMonth
+            "start": this.minMonth or cw.homepageDefaults['start']
+            "end": this.maxMonth or cw.homepageDefaults['end']
 
-        hash = $.param(params)
+        hashParams = {}
+        _.each params, (v, k) ->
+            if v isnt cw.homepageDefaults[k] and v isnt undefined
+                hashParams[k] = v
+
+        hash = $.param(hashParams)
         History.pushState {'slid': slid}, '', "?#{hash}"
 
     phraseA: ->
@@ -668,46 +692,41 @@ class window.CapitolWords
             this.getCREntries term
 
     readHomepageHistory: (nosubmit) ->
-        mapping = {'terma': '#terma', 'termb': '#termb', 'statea': '#stateA', 'stateb': '#stateB', }
-        hash = History.getState().hash.split('?')[1]
-        data = {}
-        showAdvanced = false
         cw = this
+        param_id_map = {'terma': '#terma', 'termb': '#termb', 'statea': '#stateA', 'stateb': '#stateB', }
+        state = History.getState()
+        hash = state.hash.split('?')[1]
+        params = $.deparam(hash)
+        showAdvanced = _.without(_.intersection(params.keys, cw.homepageDefaults.keys), 'terma', 'termb', 'start', 'end').length
 
         if hash
-            pieces = hash.split '&'
-            _(pieces).each (piece) ->
-                [k, v] = piece.split '='
-                id = mapping[k]
-                $("#{id}").val(v)
-
-                if k in ['partya', 'partyb', 'statea', 'stateb']
-                    showAdvanced = true
+            _(_.defaults(params, cw.homepageDefaults)).each (v, k) ->
+                id = param_id_map[k]
+                $("#{id}").val $.cleanedValue v
 
                 if k == 'partya' and v
                     $("#partyA#{v}").attr('checked', true)
-
                 else if k == 'partyb' and v
                     $("#partyB#{v}").attr('checked', true)
-
-                else if k == 'start' and v
+                else if k == 'start' and v isnt cw.homepageDefaults[k]
                     cw.minMonth = v
-
-                else if k == 'end' and v
+                else if k == 'end' and v isnt cw.homepageDefaults[k]
                     cw.maxMonth = v
 
             if showAdvanced
                 $('ul.wordFilter').show()
                 $('.advanced').addClass 'expanded'
 
-            if this.minMonth or this.maxMonth
-                startYear = this.minMonth.slice(0, 4)
-                endYear = this.maxMonth.slice(0, 4)
-                $("#slider-range").slider("option", "values", [startYear, endYear])
-                this.limit this.minMonth, this.maxMonth
+            cw.minMonth = cw.minMonth or cw.homepageDefaults['start']
+            cw.maxMonth = cw.maxMonth or cw.homepageDefaults['end']
+
+            startYear = cw.minMonth.slice(0, 4)
+            endYear = cw.maxMonth.slice(0, 4)
+            $("#slider-range").slider("option", "values", [startYear, endYear])
+            cw.limit cw.minMonth, cw.maxMonth
 
             if not nosubmit
-                this.submitHomepageCompareForm(true)
+                cw.submitHomepageCompareForm(true)
 
     readLegislatorHistory: ->
         hash = History.getState().hash.split('?')[1]
@@ -844,6 +863,8 @@ class window.CapitolWords
             shadow: true
 
         target = document.getElementById 'compareGraphic'
+        # stop the spinner first if it's already running
+        spinner && spinner.stop && spinner.stop()
         spinner = new Spinner(opts).spin target
 
         url = 'http://capitolwords.org/api/dates.json'
@@ -912,31 +933,49 @@ class window.CapitolWords
         if this.year_values.length == 2 then true else false
 
 ###
+Create a global CW instance within this closure
+###
+cw = new window.CapitolWords
+History = window.History
+
+###
 Add csrf token to ajax POSTs
 ###
 $(document).ajaxSend (event, xhr, settings) ->
-        cw = new window.CapitolWords
-        # Adapted from https://docs.djangoproject.com/en/dev/ref/contrib/csrf/
-        if (settings.type is 'POST') and cw.sameOrigin(settings.url)
-            xhr.setRequestHeader "X-CSRFToken", cw.getCookie('csrftoken')
+    # Adapted from https://docs.djangoproject.com/en/dev/ref/contrib/csrf/
+    if (settings.type is 'POST') and cw.sameOrigin(settings.url)
+        xhr.setRequestHeader "X-CSRFToken", cw.getCookie('csrftoken')
+
+###
+Handle special routes
+###
+History.Adapter.bind window, 'statechange', ->
+    History.log('state changed')
+
+    if window.location.pathname.match /^\/legislator\/?$/
+        cw.readLegislatorHistory()
+
+    else if window.location.pathname.match /^term\/[.+]\/?/
+        cw.readTermDetailPageHistory()
+        cw.populateTermDetailPage termDetailTerm
+
+    else if window.location.pathname.match /^\/?$/
+        cw.readHomepageHistory()
+
+# force statechange on initial load
+$(window).trigger 'statechange'
 
 ###
 DomReady Handler
 ###
 $(document).ready ->
-
-    cw = new window.CapitolWords
-
     if typeof termDetailTerm isnt 'undefined'
         cw.readTermDetailPageHistory()
         cw.populateTermDetailPage termDetailTerm
         #$('#partyTimelineSelect, #overallTimelineSelect').bind('change', (x) ->
         #    cw.makeHomepageHistoryState()
         #)
-        History.Adapter.bind(window, 'statechange', ->
-            cw.readTermDetailPageHistory()
-            cw.populateTermDetailPage termDetailTerm
-        )
+
 
     $('img').error ->
         $(this).hide()
@@ -1004,17 +1043,6 @@ $(document).ready ->
         if !el.val()
           try
             el.parent().find('label[for=' + el.attr('id') + ']').eq(0).removeClass('hidden')
-
-    if window.location.pathname.match /^\/legislator\/?$/
-        cw.readLegislatorHistory()
-        History.Adapter.bind window, 'statechange', ->
-            cw.readLegislatorHistory()
-
-    if window.location.pathname.match /^\/?$/
-        cw.readHomepageHistory()
-        History.Adapter.bind window, 'statechange', ->
-            if History.getState()['data']['slid'] isnt true
-                cw.readHomepageHistory()
 
     if not _($('#slider-range')).isEmpty()
         d = new Date()

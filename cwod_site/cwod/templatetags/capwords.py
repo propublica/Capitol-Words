@@ -70,7 +70,7 @@ def legislator_lookup(chunk):
     roles = LegislatorRole.objects.filter(bioguide_id=chunk['bioguide_id']).order_by('-end_date')
     if roles:
         return roles[0]
-    
+
     return {}
 
 
@@ -86,6 +86,20 @@ def state_abbrev_to_ap(abbrev):
 @register.filter(name='decimal_to_percent')
 def decimal_to_percent(n):
     return n*100
+
+
+@register.filter(name='party_initial_to_abbrev')
+def party_initial_to_abbrev(initial):
+    initials = {
+        'D': 'Dem',
+        'R': 'Rep',
+        'I': 'Ind',
+    }
+    try:
+        initial = initials[initial]
+    except KeyError:
+        pass
+    return initial
 
 
 @register.tag(name='legislator_thumbnail')
