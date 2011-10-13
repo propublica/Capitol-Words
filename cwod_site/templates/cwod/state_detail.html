@@ -9,21 +9,21 @@
                     <div id="social icons">
 
                     </div>
-					<div id="stateDetail">
+                    <div id="stateDetail">
                         <h2 class="withButton">{{ state_name }}</h2>
                         <a class="editResults" href="{% url cwod_state_list %}">Select a Different State</a>
-						<div class="clear"></div>
-					</div>
+                        <div class="clear"></div>
+                    </div>
                        <div class="clear"></div>
                         {% comment %}
-					<div id="timeFilterWrapper">
+                    <div id="timeFilterWrapper">
                         <form id="timeFilter" class="actionItem" action="" method="">
                             <label>Time frame</label>
                             <select name="time">
                                 <option value="current">Current session</option>
                                 <option value="career">All sessions</option>
                             </select>
-                        </form>    
+                        </form>
                     </div>
                         {% endcomment %}
                 </div>
@@ -41,15 +41,15 @@
                         <div class="rightHeader">
                             <h3>Current {{ state_name }} Legislators</h3>
                         </div>
-						<table>
-							<thead>
-								<tr>
-									<th class="sort legName">Name</th>
-									<th class="sort">District</th>
-									<th class="sort">Party</th>
-								</tr>
-							</thead>
-							<tbody>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="sort legName">Name</th>
+                                    <th class="sort">District</th>
+                                    <th class="sort">Party</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 {% for body, legislators in bodies %}
                                     {% for legislator in legislators %}
                                     <tr class="{% cycle 'odd' 'even' %}">
@@ -63,12 +63,12 @@
                                     </tr>
                                     {% endfor %}
                                 {% endfor %}
-							</tbody>
-						</table>
+                            </tbody>
+                        </table>
                     </div>
 
                     {% include "cwod/detail_congressional_record_list.html" %}
-                </div>  
+                </div>
 
                 <div id="rtColumn">
                     <div class="leftModule">
@@ -89,7 +89,7 @@
                             </ol>
                         </div>
                     </div>
-                </div>    
+                </div>
                 <div class="clear"></div>
             </div>
         </div>
