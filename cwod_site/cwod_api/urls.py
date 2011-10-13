@@ -43,6 +43,8 @@ billdetail_handler = Resource(BillDetailHandler, authentication=authorizer)
 bill_list_handler = Resource(BillListHandler, authentication=authorizer)
 similar_document_handler = Resource(SimilarDocumentHandler, authentication=authorizer)
 similar_entity_handler = Resource(SimilarEntityHandler, authentication=authorizer)
+month_list_handler = Resource(MonthListHandler, authentication=authorizer)
+dates_in_month_handler = Resource(DatesInMonthHandler, authentication=authorizer)
 
 
 urlpatterns = patterns('',
@@ -81,5 +83,9 @@ urlpatterns = patterns('',
         url(r'^similar\.(?P<emitter_format>\w+)$', similar_document_handler),
 
         url(r'^_similar\.(?P<emitter_format>\w+)$', similar_entity_handler),
+
+        url(r'^_month_list\.(?P<emitter_format>\w+)$', month_list_handler),
+
+        url(r'^_dates_in_month\.(?P<emitter_format>\w+)$', dates_in_month_handler),
 
 )

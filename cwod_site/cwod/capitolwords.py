@@ -97,3 +97,9 @@ class capitolwords(object):
     def similar(self, **params):
         result = capitolwords._apicall(self, 'similar', params)['results']
         return result
+
+    def _month_list(self, **params):
+        return capitolwords._apicall(self, '_month_list', params)
+
+    def _dates_in_month(self, **params):
+        return capitolwords._apicall(self, '_dates_in_month', params)
