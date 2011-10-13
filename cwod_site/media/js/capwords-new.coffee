@@ -66,52 +66,28 @@ class window.CapitolWords
             success: (data) ->
                 results = data['results']
                 cw.results = results
-                window.cwod_results = results
                 counts = _(results).pluck 'count'
                 percentages = _(results).pluck 'percentage'
                 labelPositions = cw.buildXLabels results
 
                 imgUrl = cw.showChart [percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300',]
-                window.cwod_counts = jQuery.extend true, [], counts
+
+                window.cwod_counts['term'] = [ (jQuery.extend true, [], counts), ]
+                window.cwod_results['term'] = [ (jQuery.extend true, [], results), ]
+                window.cwod_line_coords['term'] = []
 
                 jQuery.getJSON (imgUrl + '&chof=json'), (data) ->
 
                     copy_coords = (c) ->
                         if c.name is 'line0'
-                            window.cwod_line_coords = jQuery.extend true, [], c.coords
+                            window.cwod_line_coords['term'].push (jQuery.extend true, [], c.coords)
 
                     copy_coords(csj) for csj in data.chartshape
-
-                    annotation_callback = () ->
-                        if not (window.cwod_inchart and (jQuery('#partyTimelineSelect').attr 'checked')!='checked')
-                            jQuery('#annotation').hide()
-                        else
-                            jQuery('#annotation').show()
-                            FUZZ_X = 5
-                            FUZZ_Y = 6
-                            i = 0
-                            while ((window.cwod_line_coords[i]+FUZZ_X)<(window.cwod_pagex - (jQuery '#termChart').offset().left) and (i<window.cwod_results.length*2))
-                                i += 2
-
-                            if (i/2) < window.cwod_results.length
-                                MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-                                annotation_month = MONTHS[(parseInt (window.cwod_results[i/2].month.substr 4, 2), 10) - 1]
-                                annotation_year = window.cwod_results[i/2].month.substr 0, 4
-                                annotation_text = ('<span class="annotation-count">' + window.cwod_counts[i/2] + ' mention' + (if window.cwod_counts[i/2]!=1 then 's' else '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>')
-                                (jQuery '#inner-annotation').html annotation_text
-                                (jQuery '#annotation').css {
-                                    left: jQuery('#termChart').offset().left + window.cwod_line_coords[i] + FUZZ_X,
-                                    top: jQuery('#termChart').offset().top + window.cwod_line_coords[i+1] + FUZZ_Y
-                                }
-                                true
-
-                    window.clearInterval window.cwod_interval
-                    window.cwod_interval = window.setInterval annotation_callback, 50
 
                     overallImgTag = "<img id=\"termChart\" src=\"#{imgUrl}\" alt=\"Timeline of occurrences of #{term}\"/>"
                     jQuery('#overallTimeline').html overallImgTag
 
-                    (((jQuery '#termChart').mouseenter (event) ->
+                    (((jQuery '#termChart, #partyTermChart').mouseenter (event) ->
                        window.cwod_inchart = true).mouseleave (event) ->
                           window.cwod_inchart = false).mousemove (event) ->
                              window.cwod_pagex = event.pageX
@@ -163,6 +139,15 @@ class window.CapitolWords
         colors = {'R': 'bb3110', 'D': '295e72', }
 
         imgUrl = this.showChart [partyAPercentages, partyBPercentages,], labelPositions[0], labelPositions[1], 575, 300, [colors[this.partyResults[0][0]], colors[this.partyResults[1][0]],], [this.partyResults[0][0], this.partyResults[1][0],]
+
+        window.cwod_line_coords['party'] = []
+        jQuery.getJSON (imgUrl + '&chof=json'), (data) ->
+            copy_coords = (c) ->
+                if c.name.match /^line/
+                    window.cwod_line_coords['party'].push (jQuery.extend true, [], c.coords)
+        
+            copy_coords(csj) for csj in data.chartshape
+
         imgTag = "<img id=\"partyTermChart\" src=\"#{imgUrl}\"/>"
         jQuery('#partyTimeline').html imgTag
 
@@ -192,6 +177,8 @@ class window.CapitolWords
         parties = ['R', 'D', ]
         renderWhenDone = _(parties.length).after(render)
 
+        window.cwod_results['party'] = []
+        window.cwod_counts['party'] = []
         _(parties).each (party) ->
             data = {
                 'party': party,
@@ -207,7 +194,10 @@ class window.CapitolWords
                 success: (data) ->
                     results = data['results']
                     partyData.push [party, results]
-                    renderWhenDone()
+                    renderWhenDone()                                        
+
+                    window.cwod_results['party'].push results
+                    window.cwod_counts['party'].push (jQuery.extend true, [], _(results).pluck 'count')                    
             }
 
 
@@ -231,7 +221,7 @@ class window.CapitolWords
                 results = data['results']
                 imgUrl = results['url']
                 imgTag = "<img src=\"#{imgUrl}\" alt=\"Timeline of occurrences of #{term}\"/>"
-                jQuery('#partyTimeline').html imgTag
+                jQuery('#partyTimeline').html imgTag                                            
         }
 
     titleCase: (s) ->
@@ -451,10 +441,16 @@ class window.CapitolWords
 
     populateTermDetailPage: (term) ->
 
+        window.cwod_inchart = false
+        window.cwod_results = [] if window.cwod_results is undefined
+        window.cwod_line_coords = [] if window.cwod_line_coords is undefined
+        window.cwod_counts = [] if window.cwod_counts is undefined
+
         if _(this.results).isUndefined()
             this.getGraphData term
 
         this.getStatePopularity term, jQuery('#stateBarChart')
+        
         this.getPartyPieChart term, jQuery('#partyPieChart')
         this.getLegislatorPopularity term, jQuery('#legislatorBarChart')
 
@@ -463,6 +459,58 @@ class window.CapitolWords
 
         if this.start_date and this.end_date
             this.getCREntries term
+           
+        annotation_callback = () ->
+                                    
+            if (not window.cwod_inchart) or (not window.cwod_line_coords)
+                jQuery('.annotation').hide()
+                return            
+                            
+            selected = 'term'
+            selected_chart = '#termChart'
+            if (jQuery('#overallTimelineSelect').attr 'checked')!='checked'
+                 selected = 'party'    
+                 selected_chart = '#partyTermChart'
+        
+            series_i = 0
+            while series_i<window.cwod_line_coords[selected].length                
+                
+                FUZZ_X = 5
+                FUZZ_Y = 6
+                datapoint_i = 0
+                while ((window.cwod_line_coords[selected][series_i][datapoint_i]+FUZZ_X)<(window.cwod_pagex - (jQuery selected_chart).offset().left) and (datapoint_i<window.cwod_results[selected][series_i].length*2))
+                    datapoint_i += 2
+                    
+                if (datapoint_i/2) < window.cwod_results[selected][series_i].length    
+                    
+                    # console.log ('#annotation-'+selected+'-'+series_i+' .inner-annotation')
+                    # console.log selected
+                    # console.log series_i
+                    # console.log datapoint_i
+                                                        
+                    MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+                    annotation_month = MONTHS[(parseInt (window.cwod_results[selected][series_i][datapoint_i/2].month.substr 4, 2), 10) - 1]
+                    annotation_year = window.cwod_results[selected][series_i][datapoint_i/2].month.substr 0, 4
+                    annotation_text = ('<span class="annotation-count">' + window.cwod_counts[selected][series_i][datapoint_i/2] + ' mention' + (if window.cwod_counts[selected][series_i][datapoint_i/2]!=1 then 's' else '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>')
+                    (jQuery '#annotation-'+selected+'-'+series_i+' .inner-annotation').html annotation_text
+
+                    if not ((jQuery '#annotation-'+selected+'-'+series_i).hasClass 'flipped')
+                        (jQuery '#annotation-'+selected+'-'+series_i).css {
+                            left: jQuery(selected_chart).offset().left + window.cwod_line_coords[selected][series_i][datapoint_i] + FUZZ_X,
+                            top: jQuery(selected_chart).offset().top + window.cwod_line_coords[selected][series_i][datapoint_i+1] + FUZZ_Y
+                        }
+                    else
+                        (jQuery '#annotation-'+selected+'-'+series_i).css {
+                            right: jQuery(window).width() - (jQuery(selected_chart).offset().left + window.cwod_line_coords[selected][series_i][datapoint_i] + FUZZ_X),
+                            top: jQuery(selected_chart).offset().top + window.cwod_line_coords[selected][series_i][datapoint_i+1] + FUZZ_Y
+                        }
+
+                    jQuery('#annotation-'+selected+'-'+series_i).show()
+
+                series_i += 1
+                
+        window.clearInterval window.cwod_interval
+        window.cwod_interval = window.setInterval annotation_callback, 50
 
 
 

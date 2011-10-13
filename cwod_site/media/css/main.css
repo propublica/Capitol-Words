@@ -659,32 +659,31 @@ li.embedDark, li.embedLight{
 }
 
 
-#annotation { 
+.annotation { 
     font-size: 11px;
     z-index: 99;
     height: 32px;    
     line-height: 13px;
     color: #2d2525;
-    background: url(../img/annotation_arrow.png) left top no-repeat;
-    padding: 0 0 0 8px;
     margin: -16px 0 0 2px;
     position: absolute;
     display: none;
+
+    background: url(../img/annotation_arrow.png) left top no-repeat;
+    padding: 0 0 0 8px;
+
 }
-#annotation #inner-annotation { 
+.annotation.flipped {
+    background: url(../img/annotation_arrow_flipped.png) right top no-repeat;
+    padding: 0 8px 0 0;
+    
+}
+.annotation .inner-annotation { 
     background-color: #f2f1ed; 
     margin: 0; 
     padding: 3px 4px 3px 4px; 
     position: relative;
 }
-#annotation .annotation-count { font-weight: bold; }
-#annotation .annotation-date { font-style: italic; }
-
-
-
-
-
-
-
-
-
+.annotation .annotation-count { font-weight: bold; }
+.annotation .annotation-date { font-style: italic; }
+#overallTimeline { cursor: pointer; }
