@@ -1048,7 +1048,7 @@
           return cw.b['percentages'] = _(bResults).pluck('percentage');
         }
       });
-      $.when(a, b).done(function() {
+      $.when(querya, queryb).done(function() {
         var labelPositions, labels, positions;
         if (cw.minMonth || cw.maxMonth) {
           return cw.limit(cw.minMonth, cw.maxMonth);

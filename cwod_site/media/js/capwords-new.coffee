@@ -885,7 +885,7 @@ class window.CapitolWords
                 cw.b['counts'] = _(bResults).pluck 'count'
                 cw.b['percentages'] = _(bResults).pluck 'percentage'
 
-        $.when(a,b)
+        $.when(querya, queryb)
             .done ->
                 if cw.minMonth or cw.maxMonth
                     cw.limit cw.minMonth, cw.maxMonth
