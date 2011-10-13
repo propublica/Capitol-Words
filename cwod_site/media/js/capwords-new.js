@@ -262,7 +262,14 @@
         return _results;
       });
       imgTag = "<img id=\"partyTermChart\" src=\"" + imgUrl + "\"/>";
-      return jQuery('#partyTimeline').html(imgTag);
+      jQuery('#partyTimeline').html(imgTag);
+      return (((jQuery('#partyTermChart')).mouseenter(function(event) {
+        return window.cwod_inchart = true;
+      })).mouseleave(function(event) {
+        return window.cwod_inchart = false;
+      })).mousemove(function(event) {
+        return window.cwod_pagex = event.pageX;
+      });
     };
     CapitolWords.prototype.buildXLabels = function(values) {
       var labels, positions, year, years;
@@ -468,7 +475,7 @@
             }
             overallImgTag = "<img id=\"termChart\" src=\"" + imgUrl + "\" alt=\"Timeline of occurrences of " + term + "\"/>";
             jQuery('#overallTimeline').html(overallImgTag);
-            return (((jQuery('#termChart, #partyTermChart')).mouseenter(function(event) {
+            return (((jQuery('#termChart')).mouseenter(function(event) {
               return window.cwod_inchart = true;
             })).mouseleave(function(event) {
               return window.cwod_inchart = false;

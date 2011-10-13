@@ -180,6 +180,12 @@ class window.CapitolWords
 
         imgTag = "<img id=\"partyTermChart\" src=\"#{imgUrl}\"/>"
         jQuery('#partyTimeline').html imgTag
+                
+        (((jQuery '#partyTermChart').mouseenter (event) ->
+           window.cwod_inchart = true).mouseleave (event) ->
+              window.cwod_inchart = false).mousemove (event) ->
+                 window.cwod_pagex = event.pageX
+        
 
     buildXLabels: (values) ->
         years = _(_(values).pluck('month')).select((x) ->
@@ -352,7 +358,7 @@ class window.CapitolWords
                     overallImgTag = "<img id=\"termChart\" src=\"#{imgUrl}\" alt=\"Timeline of occurrences of #{term}\"/>"
                     jQuery('#overallTimeline').html overallImgTag
 
-                    (((jQuery '#termChart, #partyTermChart').mouseenter (event) ->
+                    (((jQuery '#termChart').mouseenter (event) ->
                        window.cwod_inchart = true).mouseleave (event) ->
                           window.cwod_inchart = false).mousemove (event) ->
                              window.cwod_pagex = event.pageX
@@ -433,6 +439,7 @@ class window.CapitolWords
                 imgUrl = results['url']
                 imgTag = """<img src="#{imgUrl}" alt="Timeline of occurrences of #{term}"/>"""
                 $('#partyTimeline').html imgTag
+                
 
     getPartyGraphData: (term) ->
         data = {
