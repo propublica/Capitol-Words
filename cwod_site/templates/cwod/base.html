@@ -53,17 +53,15 @@
                         <span>or</span>
                     </li>
                     <li>
-                    <a href="{% url cwod_home %}#searchCompare">Compare Congressional Words and/or Phrases</a>
+                    <a id="toggleSearchCompare" href="{% url cwod_home %}#searchCompare">Compare Congressional Words and/or Phrases</a>
                     </li>
                 </ul>
                 <div class="clear"></div>
-                {% comment %}
                 {% block search_compare %}
                     <div class="toggleSearchCompare">
                     {% include "cwod/partials/search_compare_form.html" %}
                     </div>
                 {% endblock search_compare %}
-                {% endcomment %}
             </header>
             {% block content %}
             {% endblock content %}
