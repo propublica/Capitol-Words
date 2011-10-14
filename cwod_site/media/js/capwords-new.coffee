@@ -950,7 +950,6 @@ $(document).ajaxSend (event, xhr, settings) ->
 Handle special routes
 ###
 History.Adapter.bind window, 'statechange', ->
-    History.log('state changed')
 
     if window.location.pathname.match /^\/legislator\/?$/
         cw.readLegislatorHistory()
