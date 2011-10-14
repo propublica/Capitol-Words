@@ -294,7 +294,7 @@ th {text-transform: uppercase;}
 .entTitle{width: 50%}
 .sort{padding-left: 11px;background: url('img/sort_double.png') 10px center no-repeat;}
 
-#searchCompare{background: url('../img/bg_secondTitle.png') top left repeat; padding: 30px 30px 30px 30px; margin: 0 25px 30px 0; display: visible;}
+#searchCompare{background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 30px 30px 30px 30px; margin: 0 25px 30px 0; display: visible;}
 #searchCompare h5 { margin-bottom: 30px}
 
 #searchCompare h5 tip{ font-style: italic; font-size: 80%}
@@ -332,9 +332,9 @@ th {text-transform: uppercase;}
 
 #fullColumn #searchCompare, #fullColumn #compareGraphic{ margin-left: -30px; width: 890px; margin-bottom: 50px}
 
-#compareGraphic {background: url('../img/bg_secondTitle.png') top left repeat; padding: 20px 30px 30px 30px; margin: -19px 25px 30px 0; display: visible;}
+#compareGraphic {background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 20px 30px 30px 30px; margin: -19px 25px 30px 0; display: visible;}
 
-.thirdColumn {float: left; background: url('../img/bg_secondTitle.png') top left repeat; padding: 30px 30px 30px 30px; margin: -19px 25px 30px 0; display: visible; width: 240px;}
+.thirdColumn {float: left; background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 30px 30px 30px 30px; margin: -19px 25px 30px 0; display: visible; width: 240px;}
 .three.thirdColumn {margin-right: 0;}
 
 #todaysStats {margin-left: -30px}
