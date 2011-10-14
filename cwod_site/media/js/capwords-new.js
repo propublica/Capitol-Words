@@ -1126,10 +1126,8 @@
       spinner = new Spinner(opts).spin(target);
       url = 'http://capitolwords.org/api/dates.json';
       _ref = cw.phrases(), phraseA = _ref[0], phraseB = _ref[1];
-      if ((phraseA === '') && (phraseB === '')) {
-        phraseA = 'money';
-        phraseB = 'power';
-      }
+      window.cwod_results['homepage'] = [[], []];
+      window.cwod_line_coords['homepage'] = [];
       querya = $.ajax({
         dataType: 'jsonp',
         url: url,
@@ -1146,7 +1144,8 @@
           aResults = data['results'];
           cw.a['all'] = aResults;
           cw.a['counts'] = _(aResults).pluck('count');
-          return cw.a['percentages'] = _(aResults).pluck('percentage');
+          cw.a['percentages'] = _(aResults).pluck('percentage');
+          return window.cwod_results[0] = jQuery.extend(true, [], aResults);
         }
       });
       queryb = $.ajax({
@@ -1165,7 +1164,8 @@
           bResults = data['results'];
           cw.b['all'] = bResults;
           cw.b['counts'] = _(bResults).pluck('count');
-          return cw.b['percentages'] = _(bResults).pluck('percentage');
+          cw.b['percentages'] = _(bResults).pluck('percentage');
+          return window.cwod_results[1] = jQuery.extend(true, [], bResults);
         }
       });
       $.when(querya, queryb).done(function() {

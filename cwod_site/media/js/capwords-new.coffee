@@ -966,17 +966,11 @@ class window.CapitolWords
         spinner = new Spinner(opts).spin target
 
         url = 'http://capitolwords.org/api/dates.json'
-        #phraseA = $('#terma').val()
-        #phraseA = if phraseA == 'Word or phrase' then '' else phraseA
-
-        #phraseB = $('#termb').val()
-        #phraseB = if phraseB == 'Word or phrase' then '' else phraseB
 
         [phraseA, phraseB] = cw.phrases()
 
-        if (phraseA is '') and (phraseB is '')
-            phraseA = 'money'
-            phraseB = 'power'
+        window.cwod_results['homepage'] = [[], []]
+        window.cwod_line_coords['homepage'] = []
 
         querya = $.ajax
             dataType: 'jsonp'
@@ -993,6 +987,7 @@ class window.CapitolWords
                 cw.a['all'] = aResults
                 cw.a['counts'] = _(aResults).pluck 'count'
                 cw.a['percentages'] = _(aResults).pluck 'percentage'
+                window.cwod_results[0] = (jQuery.extend true, [], aResults)
 
         queryb = $.ajax
             dataType: 'jsonp'
@@ -1009,6 +1004,7 @@ class window.CapitolWords
                 cw.b['all'] = bResults
                 cw.b['counts'] = _(bResults).pluck 'count'
                 cw.b['percentages'] = _(bResults).pluck 'percentage'
+                window.cwod_results[1] = (jQuery.extend true, [], bResults)
 
         $.when(querya, queryb)
             .done ->
