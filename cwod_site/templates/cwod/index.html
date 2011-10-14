@@ -8,108 +8,108 @@
             <div id="main">
                 <div id="splash_image">
                     <img src="{% media_url 'img/bubble.jpg' %}" width="180" height="179" alt="Bubble">
-					
+
                 </div>
                 <div id="splash_text">
-					Dig up some data on the <em>words</em> our <em>legislators</em> use every day.
+                    Dig up some data on the <em>words</em> our <em>legislators</em> use every day.
                 </div>
-				<div class="clear">
-				</div>
+                <div class="clear">
+                </div>
                 <div id="fullColumn">
-					<div id="searchCompare">
-						<form action="/search/" method="get" id="termSelect">
-								<ul class="wordCompare">
-									<li class="eachWord">
-										<label>Pick a word or phrase</label>
+                    <div id="searchCompare">
+                        <form action="/search/" method="get" id="termSelect">
+                                <ul class="wordCompare">
+                                    <li class="eachWord">
+                                        <label>Pick a word or phrase</label>
                                         <input id="terma" class="id_addTerm" type="text" value="Word or phrase"/>
-										<ul class="wordFilter">
-											<li>
+                                        <ul class="wordFilter">
+                                            <li>
                                                 <label> State</label>
-					                            <select name="state" id="stateA">
-                                                    {% include "cwod/state_select.html" %}
-					                            </select>
-											</li>
-											<li class="partyA partyChoice clear">
+                                                <select name="state" id="stateA">
+                                                    {% include "cwod/partials/state_select.html" %}
+                                                </select>
+                                            </li>
+                                            <li class="partyA partyChoice clear">
                                                 <ul>
                                                     <li><label><input id="partyAAll" class="radio" type="radio" name="partyA" value="" CHECKED/>All</label></li>
                                                     <li><label><input id="partyAD" class="radio" type="radio" name="partyA" value="D"/>Democrats</label></li>
                                                     <li><label><input id="partyAR" class="radio" type="radio" name="partyA" value="R"/>Republicans</label></li>
                                                 </ul>
-											</li>
-										</ul>
-									</li>
-									<li id="betweenItem">
-										<span>and</span>
-									</li>
-									<li class="eachWord">
-										<label>Pick a word or phrase</label>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li id="betweenItem">
+                                        <span>and</span>
+                                    </li>
+                                    <li class="eachWord">
+                                        <label>Pick a word or phrase</label>
                                         <input id="termb" class="id_addTerm" type="text" value="Word or phrase"/>
-										<ul class="wordFilter">
-											<li>
+                                        <ul class="wordFilter">
+                                            <li>
                                                 <label>State</label>
-					                            <select name="state" id="stateB">
-                                                    {% include "cwod/state_select.html" %}
-					                            </select>
-											</li>
-											<li class="partyB partyChoice clear">
+                                                <select name="state" id="stateB">
+                                                    {% include "cwod/partials/state_select.html" %}
+                                                </select>
+                                            </li>
+                                            <li class="partyB partyChoice clear">
                                                 <ul>
                                                     <li><label><input id="partyBAll" class="radio" type="radio" name="partyB" value="" CHECKED/>All</label>
                                                     <li><label><input id="partyBD" class="radio" type="radio" name="partyB" value="D"/>Democrats</label>
                                                     <li><label><input id="partyBR" class="radio" type="radio" name="partyB" value="R"/>Republicans</label>
                                                 </ul>
-											</li>
-										</ul>
-									</li>
-									<li class="submit">
-										 <button id="compareBtn" class="compareSubmit buttonLink fullButton" type="button">
-									         <span>Compare</span>
-									     </button>
-										<div class="clear advanced">
-											 <span>advanced</span>
-										</div>
-									</li>
-								</ul>
-							</form>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="submit">
+                                         <button id="compareBtn" class="compareSubmit buttonLink fullButton" type="button">
+                                             <span>Compare</span>
+                                         </button>
+                                        <div class="clear advanced">
+                                             <span>advanced</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </form>
                         </div>
-					<div id="compareGraphic">
-						<div class="key">
+                    <div id="compareGraphic">
+                        <div class="key">
                             Comparing <span class="wordOne"><span class="color"></span><a href"#" class="wordOne">"War"</a> <span class="filters">[Oregon, Democrats]</span></span> and <span class="wordTwo"><span class="color"></span><a href"#" class="wordTwo">"Peace"</a> <span class="filters">[All States, All Parties]</span></span> {#<a class="moreComparisons">More Comparisons</a>#}
-						</div>
-						<div id="embed">
-							<a href="#">embed</a>
-							<div class="embedContainer">
-		                        <form id="customizeEmbed" class="actionItem" action="" method="">
-		                            <ul class="partyBreakdown">
-		                                <li class="embedDark">
-											<input class="radio" type="radio" checked name="toggle" id="embedDark"/>
-											<label for="embedDark">Dark</label>
-											<img src="../../media/img/embed_dark.jpg" width="90" height="38" alt="Embed Dark">
-										</li>
-		                                <li class="embedLight">
-											<input class="radio" type="radio" name="toggle" id="embedLight"/>
-											<label for="embedLight">Light</label>
-											<img src="../../media/img/embed_light.jpg" width="90" height="38" alt="Embed Light">
-										</li>
-										<li class="embedCode">
-											<label for="embedCode">Embed Code</label>
-	                                        <textarea id="embedCode" type="text"></textarea>
-										</li>
-		                            </ul>
-		                            <div class="clear"></div>
-		                        </form>
-							</div>
-						</div>
+                        </div>
+                        <div id="embed">
+                            <a href="#">embed</a>
+                            <div class="embedContainer">
+                                <form id="customizeEmbed" class="actionItem" action="" method="">
+                                    <ul class="partyBreakdown">
+                                        <li class="embedDark">
+                                            <input class="radio" type="radio" checked name="toggle" id="embedDark"/>
+                                            <label for="embedDark">Dark</label>
+                                            <img src="../../media/img/embed_dark.jpg" width="90" height="38" alt="Embed Dark">
+                                        </li>
+                                        <li class="embedLight">
+                                            <input class="radio" type="radio" name="toggle" id="embedLight"/>
+                                            <label for="embedLight">Light</label>
+                                            <img src="../../media/img/embed_light.jpg" width="90" height="38" alt="Embed Light">
+                                        </li>
+                                        <li class="embedCode">
+                                            <label for="embedCode">Embed Code</label>
+                                            <textarea id="embedCode" type="text"></textarea>
+                                        </li>
+                                    </ul>
+                                    <div class="clear"></div>
+                                </form>
+                            </div>
+                        </div>
                         <img class="default" width="870" height="340" src="http://chart.apis.google.com/chart?cht=lc&chs=860x340&chd=&chg=0,50,2,5&chf=bg,s,00000000&chco=8E2844,A85B08,AF9703&chdlp=t|l"/>
                         <div id="timeline"></div>
-						<div id="slider-range"></div>
-					</div>
+                        <div id="slider-range"></div>
+                    </div>
 
-					<div id="todaysStats">
-						<div class="one thirdColumn" style="width:520px;">
-							<div class="leftHeader">
-								<h4>Recent action</h4>
+                    <div id="todaysStats">
+                        <div class="one thirdColumn" style="width:520px;">
+                            <div class="leftHeader">
+                                <h4>Recent action</h4>
                                 <span class="tip"><a href="{{ recent_entries.0.date_url }}">{{ recent_entries.0.date|date:"l, N j, Y" }}</a></span>
-							</div>
+                            </div>
                             <table>
                                 {% for entry in recent_entries|slice:"6" %}
                                 <tr class="{% cycle 'even' 'odd' %}">
@@ -117,26 +117,26 @@
                                 </tr>
                                 {% endfor %}
                             </table>
-						</div>
-						<div class="three thirdColumn" style="width: 285px;">
-							<div class="leftHeader">
-								<h4>Most Frequent Words</h4>
+                        </div>
+                        <div class="three thirdColumn" style="width: 285px;">
+                            <div class="leftHeader">
+                                <h4>Most Frequent Words</h4>
                                 <span class="tip"><a href="{{ entry.date_url }}">{{ recent_entries.0.date|date:"l, N j, Y" }}</a></span>
-							</div>
-	                        <ol class="barChart">
+                            </div>
+                            <ol class="barChart">
                                 {% for ngram in recent_top_unigrams.0.1|slice:"6" %}
                                 <li>
                                     <span class="tagValue" style="width:{{ ngram.ngram_pct }}%;">{{ ngram.ngram_pct }}</span>
-                                    <span class="tagNumber"></span> 
+                                    <span class="tagNumber"></span>
                                     <span class="barChartTitle"><a href="{% url cwod_term_detail term=ngram.ngram %}">{{ ngram.ngram }}</a></span>
                                 </li>
                                 {% endfor %}
-	                        </ol>
-						</div>
-					</div>
+                            </ol>
+                        </div>
+                    </div>
 
-                </div>      
-                <div class="clear"></div>                
+                </div>
+                <div class="clear"></div>
             </div>
         </div>
 
