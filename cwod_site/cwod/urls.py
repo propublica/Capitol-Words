@@ -61,10 +61,14 @@ urlpatterns = patterns('',
             {},
             name='cwod_legislator_list'),
 
-        url(r'legislator\/(?P<bioguide_id>[A-Z][0-9]+)-(?P<slug>[-\w]+)\/?$',
+        url(r'legislator\/(?P<bioguide_id>[A-Z][0-9]+)-(?P<slug>[-\w]+)?\/?$',
             legislator_detail,
             {},
             name='cwod_legislator_detail'),
+
+        url(r'legislator\/(?P<bioguide_id>[A-Z][0-9]+)\/?$',
+            legislator_detail,
+            {}),
 
         url(r'^state\/?$',
             state_list,

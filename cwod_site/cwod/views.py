@@ -31,20 +31,20 @@ capitolwords = capitolwords(api_key=settings.SUNLIGHT_API_KEY, domain=settings.A
 
 # These are used in a regular expression so must be escaped.
 # From NLTK
-STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 
-             'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 
-             'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 
-             'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 
-             'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 
-             'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 
-             'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 
-             'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 
-             'with', 'about', 'against', 'between', 'into', 'through', 'during', 
-             'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 
-             'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 
-             'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 
-             'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 
-             'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 
+STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
+             'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his',
+             'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself',
+             'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which',
+             'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are',
+             'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having',
+             'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if',
+             'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for',
+             'with', 'about', 'against', 'between', 'into', 'through', 'during',
+             'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in',
+             'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once',
+             'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each',
+             'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own',
+             'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don',
              'should', 'now', '\.', '\?', '\!', ]
 
 
@@ -143,8 +143,8 @@ def term_detail(request, term):
             custom_timeline_url = 'error'
 
     """
-    popular_dates = sorted(capitolwords.phrase_by_date_range(phrase=term, per_page=15, sort='count', percentages='true'), 
-                           key=itemgetter('percentage'), 
+    popular_dates = sorted(capitolwords.phrase_by_date_range(phrase=term, per_page=15, sort='count', percentages='true'),
+                           key=itemgetter('percentage'),
                            reverse=True)[:10]
     popular_dates = [dateparse(x['day']).date() for x in popular_dates]
     """
@@ -240,14 +240,15 @@ def legislator_lookup(bioguide_id):
 
 GRAM_NAMES = ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ]
 
+
 @login_required
-def legislator_detail(request, bioguide_id, slug):
+def legislator_detail(request, bioguide_id, slug=None):
     legislator = legislator_lookup(bioguide_id)
     if not legislator:
         raise Http404
 
     if legislator['slug'] != slug:
-        raise Http404
+        return HttpResponsePermanentRedirect(reverse('cwod_legislator_detail', kwargs={'bioguide_id':bioguide_id, 'slug':legislator['slug']}))
 
     similar_legislators = []
     for i in get_similar_entities('bioguide', bioguide_id)[:10]:
@@ -307,7 +308,7 @@ def _highlight_entries(entries, term):
             graf = graf.replace('\n', '')
             versions_of_term = re.findall(term, graf, re.I)
             if versions_of_term:
-                match = re.sub('(%s)' % '|'.join([x for x in set(versions_of_term)]), 
+                match = re.sub('(%s)' % '|'.join([x for x in set(versions_of_term)]),
                                r'<em>\1</em>', graf)
                 break
         entry['match'] = match
@@ -383,7 +384,7 @@ def state_detail(request, state):
 
     return render_to_response('cwod/state_detail.html',
             {'state': state,
-             'state_name': state_name, 
+             'state_name': state_name,
              'entries': entries,
              'ngrams': ngrams,
              #'other_states': other_states,
@@ -535,27 +536,27 @@ def calendar(request):
 
     # this is embarrassing
     months = []
-    for m in raw_months: 
+    for m in raw_months:
         months.append(str(m))
-    
+
     empty_year = []
     for i, n in enumerate(MONTH_NAMES):
         empty_year.append(["%02d" % (i+1), n, False])
-                
+
     # fill out the months in every year
     years = {}
     for y in range(min_year, max_year+1):
         years[str(y)] = copy.deepcopy(empty_year)
-        
+
     # activate the, um, active months
     for m in months:
         ky = m[:4]
         km = int(m[-2:])-1
         if years.has_key(ky):
             years[ky][km][2] = True
-        
+
     years = sorted(years.items(), key=lambda x: int(x[0]))
-    
+
     return render_to_response('cwod/calendar.html',
                               {'years': years,},
                               context_instance=RequestContext(request))
@@ -584,7 +585,7 @@ def month_detail(request, year, month):
     dates_by_week = [(weeknum, list(dates)) for weeknum, dates in itertools.groupby(dates, lambda x: date_str_to_date(x['date']).strftime('%U'))]
 
     return render_to_response('cwod/month_detail.html',
-                              {'month_name': month_name, 
+                              {'month_name': month_name,
                                'year': year,
                                'ngrams': ngrams,
                                'dates_by_week': dates_by_week,
