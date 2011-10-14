@@ -240,14 +240,15 @@ def legislator_lookup(bioguide_id):
 
 GRAM_NAMES = ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ]
 
+
 @login_required
-def legislator_detail(request, bioguide_id, slug):
+def legislator_detail(request, bioguide_id, slug=None):
     legislator = legislator_lookup(bioguide_id)
     if not legislator:
         raise Http404
 
     if legislator['slug'] != slug:
-        raise Http404
+        return HttpResponsePermanentRedirect(reverse('cwod_legislator_detail', kwargs={'bioguide_id':bioguide_id, 'slug':legislator['slug']}))
 
     similar_legislators = []
     for i in get_similar_entities('bioguide', bioguide_id)[:10]:
