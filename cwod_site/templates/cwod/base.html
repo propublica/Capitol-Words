@@ -1,7 +1,10 @@
 {% load media %}<!doctype html>
-
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>        <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>        <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>        <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
     <head>
-	<script type="text/javascript" src="https://getfirebug.com/firebug-lite.js"></script>
         {% block head %}
 
         <meta charset="utf-8">
@@ -13,17 +16,7 @@
         {% css "css/main.css?v=97" %}
 
         {% js "js/google-analytics.js" %}
-	  <!--[if IE ]>{% css "styles/ie.css" %}<![endif]-->
-		<!--[if lt IE 9]>
-		<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
-		
-		
-		<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
-		<!--[if IE 7 ]>        <html lang="en" class="no-js ie7"> <![endif]-->
-		<!--[if IE 8 ]>        <html lang="en" class="no-js ie8"> <![endif]-->
-		<!--[if IE 9 ]>        <html lang="en" class="no-js ie9"> <![endif]-->
-		<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+
         <!--[if IE 7]>{% css "css/buggy_7.css" %}<![endif]-->
         {% endblock head %}
     </head>
@@ -195,10 +188,10 @@
         {% js "js/jquery.ui/jquery.ui.widget.js" %}
         {% js "js/jquery.ui/jquery.ui.mouse.js" %}
         {% js "js/jquery.ui/jquery.ui.slider.js" %}
+        P% js "js/jquery.imagesloaded.js" %}
 
         {% js "js/underscore/underscore-min.js" %}
         {% js "js/spin/spin.min.js" %}
-        {% js "js/emphasis/emphasis.js" %}
 
         {% js "js/google-chart.js" %}
         {% js "js/capwords-new.js?v=99234299" %}

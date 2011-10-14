@@ -12,40 +12,40 @@
                     <div id="social icons">
 
                     </div>
-                    <div id="searchDetail">
-                        <h2>Legislators</h2>
-                        <div class="clear"></div>
-                    </div>
+					<div id="searchDetail">
+                    	<h2>Legislators</h2>
+						<div class="clear"></div>
+					</div>
                        <div class="clear"></div>
                 </div>
 
-                <div id="ltColumn" class="search">
+				<div id="ltColumn" class="search">
                     <div class="leftModule">
                         <div class="rightHeader">
                             <h4>Filter Legislators</h4>
 
                         </div>
-                        <div id="searchFilterWrapper">
+	                    <div id="searchFilterWrapper">
 
                             <form id="searchFilter" class="actionItem" action="" method="">
-                                <ul>
-                                    <li>
-                                        <label>Chamber</label>
-                                        <select id="chamber" name="chamber">
-                                            <option value=""></option>
+	                            <ul>
+									<li>
+			                            <label>Chamber</label>
+			                            <select id="chamber" name="chamber">
+			                                <option value=""></option>
                                             <option value="House">House</option>
                                             <option value="Senate">Senate</option>
-                                        </select>
-                                    </li>
-                                    <li>
-                                        <label>Party</label>
-                                        <select id="party" name="party">
-                                            <option value=""></option>
+			                            </select>
+									</li>
+									<li>
+			                            <label>Party</label>
+			                            <select id="party" name="party">
+			                                <option value=""></option>
                                             <option value="D">Democratic</option>
                                             <option value="R">Republican</option>
                                             <option value="3">Other</option>
-                                        </select>
-                                    </li>
+			                            </select>
+									</li>
                                     <li>
                                         <label>State</label>
                                         <select id="state" name="state">
@@ -55,39 +55,39 @@
                                             {% endfor %}
                                         </select>
                                     </li>
-                                    <li>
-                                        <label>Congress</label>
-                                        <select id="congress" name="congress">
-                                            {#<option value=""></option>#}
+									<li>
+										<label>Congress</label>
+			                            <select id="congress" name="congress">
+                                            <option value=""></option>
                                             {% for congress in congresses %}
-                                            <option value="{{ congress }}" {% if forloop.first %}selected{% endif %}>{{ congress }}</option>
+                                            <option value="{{ congress }}" {% if forloop.first %}SELECTED{% endif %}>{{ congress }}</option>
                                             {% endfor %}
-                                        </select>
-                                    </li>
-                                    <li class="submit">
-                                        <button id="searchFilterButton" class="buttonLink fullButton">Filter</button>
-                                    </li>
-                                </ul>
+			                            </select>
+									</li>
+									<li class="submit">
+										<span id="searchFilterButton" class="buttonLink fullButton">Filter</button>
+									</li>
+								</ul>
                             </form>
-                        </div>
+						</div>
 
                     </div>
                 </div>
 
                 <div id="rtColumn" class="search">
                     <div class="module">
-                        <table id="legislatorList">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th class="sort legName">Name</th>
-                                    <th class="sort">State</th>
-                                    <th class="sort">Party</th>
-                                    <th class="sort">Chamber</th>
-
-                                </tr>
-                            </thead>
-                            <tbody>
+						<table id="legislatorList">
+							<thead>
+								<tr>
+									<th></th>
+									<th class="sort legName">Name</th>
+									<th class="sort">State</th>
+									<th class="sort">Party</th>
+									<th class="sort">Chamber</th>
+									
+								</tr>
+							</thead>
+							<tbody>
                                 {% comment %}
                                 {% for legislator in current_legislators %}
                                 <tr class="{% cycle 'even' 'odd' %}">
@@ -99,11 +99,11 @@
                                 </tr>
                                 {% endfor %}
                                 {% endcomment %}
-                            </tbody>
-                        </table>
+							</tbody>
+						</table>
                     </div>
-                </div>
-
+                </div>  
+    
                 <div class="clear"></div>
             </div>
         </div>
