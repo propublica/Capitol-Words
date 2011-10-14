@@ -6,3 +6,9 @@ def recent_top_unigrams(request):
     for date in dates:
         popular_unigrams.append((date, NgramsByDate.objects.filter(date=date, n=1)[:10]))
     return {'recent_top_unigrams': popular_unigrams}
+
+def search_terms(request):
+    return {
+        'termA': request.GET.get('terma'),
+        'termB': request.GET.get('termb'),
+        }
