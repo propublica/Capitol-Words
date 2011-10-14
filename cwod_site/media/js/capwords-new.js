@@ -149,8 +149,8 @@
       });
     };
     CapitolWords.prototype.build_legend = function() {
-      var legend, legendA, legendB, partyA, partyB, stateA, stateB, termA, termB;
-      termA = $('#terma').val();
+      var legend, legendA, legendB, partyA, partyB, stateA, stateB, termA, termB, _ref;
+      _ref = window.cw.phrases(), termA = _ref[0], termB = _ref[1];
       partyA = $('.partyA input:checked').eq(0).val();
       stateA = $('#stateA').val();
       legend = [];
@@ -165,7 +165,6 @@
         }
         legend.push(legendA);
       }
-      termB = $('#termb').val();
       partyB = $('.partyB input:checked').eq(0).val();
       stateB = $('#stateB').val();
       legendB = termB;
@@ -783,15 +782,16 @@
       }
     };
     CapitolWords.prototype.makeHomepageHistoryState = function(slid) {
-      var cw, hash, hashParams, params, partyA, partyB, stateA, stateB;
+      var cw, hash, hashParams, params, partyA, partyB, phraseA, phraseB, stateA, stateB, _ref;
       cw = this;
       stateA = $('#stateA').val() || cw.homepageDefaults['statea'];
       stateB = $('#stateB').val() || cw.homepageDefaults['stateb'];
       partyA = $('.partyA input:checked').eq(0).val() || cw.homepageDefaults['partya'];
       partyB = $('.partyB input:checked').eq(0).val() || cw.homepageDefaults['partyb'];
+      _ref = this.phrases(), phraseA = _ref[0], phraseB = _ref[1];
       params = {
-        "terma": this.phraseA(),
-        "termb": this.phraseB(),
+        "terma": phraseA,
+        "termb": phraseB,
         "statea": stateA,
         "stateb": stateB,
         "partya": partyA,
@@ -810,23 +810,24 @@
         'slid': slid
       }, '', "?" + hash);
     };
-    CapitolWords.prototype.phraseA = function() {
-      var phraseA;
+    CapitolWords.prototype.phrases = function() {
+      var SAMPLE_PHRASES, phraseA, phraseB;
       phraseA = $('#terma').val();
       if (phraseA === 'Word or phrase') {
-        return '';
-      } else {
-        return phraseA;
+        phraseA = '';
       }
-    };
-    CapitolWords.prototype.phraseB = function() {
-      var phraseB;
       phraseB = $('#termb').val();
       if (phraseB === 'Word or phrase') {
-        return '';
-      } else {
-        return phraseB;
+        phraseB = '';
       }
+      if ((window.cwod_random_phrase_i !== void 0) || (phraseA === '') && (phraseB === '') && (window.location.pathname.match(/(^\/?$|homepage\.html)/)) && (!(window.location.href.match(/[\?#]/)))) {
+        SAMPLE_PHRASES = [['global warming', 'climate change'], ['iraq', 'afghanistan'], ['war', 'peace'], ['ozone', 'carbon dioxide'], ['bailout', 'big banks']];
+        if (window.cwod_random_phrase_i === void 0) {
+          window.cwod_random_phrase_i = Math.floor(Math.random() * SAMPLE_PHRASES.length);
+        }
+        return SAMPLE_PHRASES[window.cwod_random_phrase_i];
+      }
+      return [phraseA, phraseB];
     };
     CapitolWords.prototype.populateLegislatorList = function(legislators) {
       var buildTable;
@@ -1108,7 +1109,7 @@
       }
     };
     CapitolWords.prototype.submitHomepageCompareForm = function(skipState) {
-      var cw, opts, querya, queryb, target, url;
+      var cw, opts, phraseA, phraseB, querya, queryb, target, url, _ref;
       cw = this;
       opts = {
         lines: 12,
@@ -1124,11 +1125,16 @@
       spinner && spinner.stop && spinner.stop();
       spinner = new Spinner(opts).spin(target);
       url = 'http://capitolwords.org/api/dates.json';
+      _ref = cw.phrases(), phraseA = _ref[0], phraseB = _ref[1];
+      if ((phraseA === '') && (phraseB === '')) {
+        phraseA = 'money';
+        phraseB = 'power';
+      }
       querya = $.ajax({
         dataType: 'jsonp',
         url: url,
         data: {
-          phrase: cw.phraseA(),
+          phrase: phraseA,
           state: $('#stateA').val() || '',
           party: $('.partyA input:checked').eq(0).val(),
           granularity: 'month',
@@ -1147,7 +1153,7 @@
         dataType: 'jsonp',
         url: url,
         data: {
-          phrase: cw.phraseB(),
+          phrase: phraseB,
           state: $('#stateB').val() || '',
           party: $('.partyB input:checked').eq(0).val(),
           granularity: 'month',
@@ -1176,7 +1182,8 @@
         if (spinner) {
           spinner.stop();
         }
-        return $('#compareGraphic div.key').eq(0).replaceWith(cw.build_legend_html());
+        $('#compareGraphic div.key').eq(0).replaceWith(cw.build_legend_html());
+        return window.cwod_random_phrase_i = void 0;
       });
       if (!skipState) {
         return this.makeHomepageHistoryState(true);
@@ -1369,6 +1376,9 @@
     $('#customizeEmbed input').change(function() {
       return cw.getEmbedCode($('.embedContainer'));
     });
-    return (area = $('#rtColumn')) && area.length && area.imagesLoaded(function() {});
+    (area = $('#rtColumn')) && area.length && area.imagesLoaded(function() {});
+    if ((window.location.pathname.match(/(^\/?$|homepage\.html)/)) && (!(window.location.href.match(/[\?#]/)))) {
+      return cw.submitHomepageCompareForm();
+    }
   });
 }).call(this);

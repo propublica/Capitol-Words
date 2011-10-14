@@ -88,7 +88,8 @@ class window.CapitolWords
                 callback()
 
     build_legend: ->
-        termA = $('#terma').val()
+        [termA, termB] = window.cw.phrases()
+        
         partyA = $('.partyA input:checked').eq(0).val()
         stateA = $('#stateA').val()
 
@@ -105,7 +106,6 @@ class window.CapitolWords
 
             legend.push(legendA)
 
-        termB = $('#termb').val()
         partyB = $('.partyB input:checked').eq(0).val()
         stateB = $('#stateB').val()
 
@@ -646,9 +646,11 @@ class window.CapitolWords
         partyA = $('.partyA input:checked').eq(0).val() or cw.homepageDefaults['partya']
         partyB = $('.partyB input:checked').eq(0).val() or cw.homepageDefaults['partyb']
 
+        [phraseA, phraseB] = this.phrases()
+
         params =
-            "terma": this.phraseA()
-            "termb": this.phraseB()
+            "terma": phraseA
+            "termb": phraseB
             "statea": stateA
             "stateb": stateB
             "partya": partyA
@@ -663,14 +665,28 @@ class window.CapitolWords
 
         hash = $.param(hashParams)
         History.pushState {'slid': slid}, '', "?#{hash}"
-
-    phraseA: ->
+        
+    phrases: ->
         phraseA = $('#terma').val()
-        if phraseA == 'Word or phrase' then '' else phraseA
-
-    phraseB: ->
-        phraseB = $('#termb').val()
-        if phraseB == 'Word or phrase' then '' else phraseB
+        if phraseA == 'Word or phrase'
+            phraseA = ''
+        phraseB = $('#termb').val()            
+        if phraseB == 'Word or phrase'
+            phraseB = ''
+            
+        if (window.cwod_random_phrase_i isnt undefined) or (phraseA=='') and (phraseB=='') and (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))
+            SAMPLE_PHRASES = [
+                ['global warming', 'climate change'],
+                ['iraq', 'afghanistan'],
+                ['war', 'peace'],
+                ['ozone', 'carbon dioxide'],
+                ['bailout', 'big banks']
+            ]
+            if window.cwod_random_phrase_i is undefined
+                window.cwod_random_phrase_i = Math.floor(Math.random() * SAMPLE_PHRASES.length)
+            return SAMPLE_PHRASES[window.cwod_random_phrase_i]
+            
+        return [phraseA, phraseB]
 
     populateLegislatorList: (legislators) ->
         buildTable = ->
@@ -956,11 +972,17 @@ class window.CapitolWords
         #phraseB = $('#termb').val()
         #phraseB = if phraseB == 'Word or phrase' then '' else phraseB
 
+        [phraseA, phraseB] = cw.phrases()
+
+        if (phraseA is '') and (phraseB is '')
+            phraseA = 'money'
+            phraseB = 'power'
+
         querya = $.ajax
             dataType: 'jsonp'
             url: url
             data:
-                phrase: cw.phraseA()
+                phrase: phraseA
                 state: $('#stateA').val() or ''
                 party: $('.partyA input:checked').eq(0).val()
                 granularity: 'month'
@@ -976,7 +998,7 @@ class window.CapitolWords
             dataType: 'jsonp'
             url : url
             data:
-                phrase: cw.phraseB()
+                phrase: phraseB
                 state: $('#stateB').val() or ''
                 party: $('.partyB input:checked').eq(0).val()
                 granularity: 'month'
@@ -1002,6 +1024,8 @@ class window.CapitolWords
                     spinner.stop()
 
                 $('#compareGraphic div.key').eq(0).replaceWith(cw.build_legend_html())
+
+                window.cwod_random_phrase_i = undefined
 
         if not skipState
             this.makeHomepageHistoryState(true)
@@ -1173,3 +1197,6 @@ $(document).ready ->
     # reset images, bind ajax calls to do the same
     (area = $('#rtColumn')) && area.length && area.imagesLoaded ->
 
+    # fire sample search if arriving fresh on the homepage
+    if (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))        
+        cw.submitHomepageCompareForm()
