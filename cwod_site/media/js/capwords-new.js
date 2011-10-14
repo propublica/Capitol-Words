@@ -263,12 +263,14 @@
       });
       imgTag = "<img id=\"partyTermChart\" src=\"" + imgUrl + "\"/>";
       jQuery('#partyTimeline').html(imgTag);
-      return (((jQuery('#partyTermChart')).mouseenter(function(event) {
+      return ((((jQuery('#partyTermChart')).mouseenter(function(event) {
         return window.cwod_inchart = true;
       })).mouseleave(function(event) {
         return window.cwod_inchart = false;
       })).mousemove(function(event) {
         return window.cwod_pagex = event.pageX;
+      })).click(function(event) {
+        return window.cw.handleChartClick(event);
       });
     };
     CapitolWords.prototype.buildXLabels = function(values) {
@@ -332,6 +334,34 @@
       } else {
         return "" + (d.getFullYear()) + "-12-31";
       }
+    };
+    CapitolWords.prototype.findActiveDataPoints = function() {
+      var DETECTION_FUZZ_X, datapoint_i, return_vals, selected, selected_chart, series_i, _ref;
+      DETECTION_FUZZ_X = 6;
+      return_vals = [];
+      _ref = window.cw.findSelectedChart(), selected = _ref[0], selected_chart = _ref[1];
+      series_i = 0;
+      while (series_i < window.cwod_line_coords[selected].length) {
+        datapoint_i = 0;
+        while ((window.cwod_line_coords[selected][series_i][datapoint_i] + DETECTION_FUZZ_X) < (window.cwod_pagex - (jQuery(selected_chart)).offset().left) && (datapoint_i < window.cwod_results[selected][series_i].length * 2)) {
+          datapoint_i += 2;
+        }
+        if ((datapoint_i / 2) < window.cwod_results[selected][series_i].length) {
+          return_vals.push([series_i, window.cwod_results[selected][series_i][datapoint_i / 2], window.cwod_line_coords[selected][series_i][datapoint_i], window.cwod_line_coords[selected][series_i][datapoint_i + 1]]);
+        }
+        series_i += 1;
+      }
+      return return_vals;
+    };
+    CapitolWords.prototype.findSelectedChart = function() {
+      var selected, selected_chart;
+      selected = 'term';
+      selected_chart = '#termChart';
+      if ((jQuery('#overallTimelineSelect').attr('checked')) !== 'checked') {
+        selected = 'party';
+        selected_chart = '#partyTermChart';
+      }
+      return [selected, selected_chart];
     };
     CapitolWords.prototype.getCookie = function(name) {
       var cookie, cookieContent, cookieName, cookies, _i, _len, _ref;
@@ -458,7 +488,6 @@
           percentages = _(results).pluck('percentage');
           labelPositions = cw.buildXLabels(results);
           imgUrl = cw.showChart([percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300']);
-          window.cwod_counts['term'] = [jQuery.extend(true, [], counts)];
           window.cwod_results['term'] = [jQuery.extend(true, [], results)];
           window.cwod_line_coords['term'] = [];
           jQuery.getJSON(imgUrl + '&chof=json', function(data) {
@@ -475,12 +504,14 @@
             }
             overallImgTag = "<img id=\"termChart\" src=\"" + imgUrl + "\" alt=\"Timeline of occurrences of " + term + "\"/>";
             jQuery('#overallTimeline').html(overallImgTag);
-            return (((jQuery('#termChart')).mouseenter(function(event) {
+            return ((((jQuery('#termChart')).mouseenter(function(event) {
               return window.cwod_inchart = true;
             })).mouseleave(function(event) {
               return window.cwod_inchart = false;
             })).mousemove(function(event) {
               return window.cwod_pagex = event.pageX;
+            })).click(function(event) {
+              return window.cw.handleChartClick(event);
             });
           });
           if (cw.minMonth && cw.maxMonth) {
@@ -587,7 +618,6 @@
       parties = ['R', 'D'];
       renderWhenDone = _(parties.length).after(render);
       window.cwod_results['party'] = [];
-      window.cwod_counts['party'] = [];
       return _(parties).each(function(party) {
         data = {
           'party': party,
@@ -605,8 +635,7 @@
             results = data['results'];
             partyData.push([party, results]);
             renderWhenDone();
-            window.cwod_results['party'].push(results);
-            return window.cwod_counts['party'].push(_(results).pluck('count'));
+            return window.cwod_results['party'].push(results);
           }
         });
       });
@@ -679,6 +708,12 @@
           });
         }
       });
+    };
+    CapitolWords.prototype.handleChartClick = function(event) {
+      var active_data_point_result, url;
+      active_data_point_result = window.cw.findActiveDataPoints()[0][1];
+      url = '/date/' + active_data_point_result.month.substr(0, 4) + '/' + active_data_point_result.month.substr(4, 2);
+      return window.location.href = url;
     };
     CapitolWords.prototype.highlightEntries = function(entries, term) {
       var entry_matches, regexp;
@@ -829,9 +864,6 @@
       if (window.cwod_line_coords === void 0) {
         window.cwod_line_coords = [];
       }
-      if (window.cwod_counts === void 0) {
-        window.cwod_counts = [];
-      }
       if (_(this.results).isUndefined()) {
         this.getGraphData(term);
       }
@@ -845,46 +877,43 @@
         this.getCREntries(term);
       }
       annotation_callback = function() {
-        var FUZZ_X, FUZZ_Y, MONTHS, annotation_month, annotation_text, annotation_year, datapoint_i, selected, selected_chart, series_i, _results;
+        var dp, selected, selected_chart, show_annotation, _i, _len, _ref, _ref2, _results;
         if ((!window.cwod_inchart) || (!window.cwod_line_coords)) {
           jQuery('.annotation').hide();
           return;
         }
-        selected = 'term';
-        selected_chart = '#termChart';
-        if ((jQuery('#overallTimelineSelect').attr('checked')) !== 'checked') {
-          selected = 'party';
-          selected_chart = '#partyTermChart';
-        }
-        series_i = 0;
-        _results = [];
-        while (series_i < window.cwod_line_coords[selected].length) {
+        _ref = window.cw.findSelectedChart(), selected = _ref[0], selected_chart = _ref[1];
+        show_annotation = function(dp) {
+          var FUZZ_X, FUZZ_Y, MONTHS, annotation_month, annotation_text, annotation_year, dp_result, dp_series_i, dp_x, dp_y;
           FUZZ_X = 5;
           FUZZ_Y = 6;
-          datapoint_i = 0;
-          while ((window.cwod_line_coords[selected][series_i][datapoint_i] + FUZZ_X) < (window.cwod_pagex - (jQuery(selected_chart)).offset().left) && (datapoint_i < window.cwod_results[selected][series_i].length * 2)) {
-            datapoint_i += 2;
+          dp_series_i = dp[0];
+          dp_result = dp[1];
+          dp_x = dp[2];
+          dp_y = dp[3];
+          MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+          annotation_month = MONTHS[(parseInt(dp_result.month.substr(4, 2), 10)) - 1];
+          annotation_year = dp_result.month.substr(0, 4);
+          annotation_text = '<span class="annotation-count">' + dp_result.count + ' mention' + (dp_result.count !== 1 ? 's' : '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>';
+          (jQuery('#annotation-' + selected + '-' + dp_series_i + ' .inner-annotation')).html(annotation_text);
+          if (!((jQuery('#annotation-' + selected + '-' + dp_series_i)).hasClass('flipped'))) {
+            (jQuery('#annotation-' + selected + '-' + dp_series_i)).css({
+              left: jQuery(selected_chart).offset().left + dp_x + FUZZ_X,
+              top: jQuery(selected_chart).offset().top + dp_y + FUZZ_Y
+            });
+          } else {
+            (jQuery('#annotation-' + selected + '-' + dp_series_i)).css({
+              right: jQuery(window).width() - (jQuery(selected_chart).offset().left + dp_x + FUZZ_X),
+              top: jQuery(selected_chart).offset().top + dp_y + FUZZ_Y
+            });
           }
-          if ((datapoint_i / 2) < window.cwod_results[selected][series_i].length) {
-            MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            annotation_month = MONTHS[(parseInt(window.cwod_results[selected][series_i][datapoint_i / 2].month.substr(4, 2), 10)) - 1];
-            annotation_year = window.cwod_results[selected][series_i][datapoint_i / 2].month.substr(0, 4);
-            annotation_text = '<span class="annotation-count">' + window.cwod_counts[selected][series_i][datapoint_i / 2] + ' mention' + (window.cwod_counts[selected][series_i][datapoint_i / 2] !== 1 ? 's' : '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>';
-            (jQuery('#annotation-' + selected + '-' + series_i + ' .inner-annotation')).html(annotation_text);
-            if (!((jQuery('#annotation-' + selected + '-' + series_i)).hasClass('flipped'))) {
-              (jQuery('#annotation-' + selected + '-' + series_i)).css({
-                left: jQuery(selected_chart).offset().left + window.cwod_line_coords[selected][series_i][datapoint_i] + FUZZ_X,
-                top: jQuery(selected_chart).offset().top + window.cwod_line_coords[selected][series_i][datapoint_i + 1] + FUZZ_Y
-              });
-            } else {
-              (jQuery('#annotation-' + selected + '-' + series_i)).css({
-                right: jQuery(window).width() - (jQuery(selected_chart).offset().left + window.cwod_line_coords[selected][series_i][datapoint_i] + FUZZ_X),
-                top: jQuery(selected_chart).offset().top + window.cwod_line_coords[selected][series_i][datapoint_i + 1] + FUZZ_Y
-              });
-            }
-            jQuery('#annotation-' + selected + '-' + series_i).show();
-          }
-          _results.push(series_i += 1);
+          return jQuery('#annotation-' + selected + '-' + dp_series_i).show();
+        };
+        _ref2 = window.cw.findActiveDataPoints();
+        _results = [];
+        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+          dp = _ref2[_i];
+          _results.push(show_annotation(dp));
         }
         return _results;
       };
@@ -1171,6 +1200,7 @@
   Create a global CW instance within this closure
   */
   cw = new window.CapitolWords;
+  window.cw = cw;
   History = window.History;
   /*
   Add csrf token to ajax POSTs
