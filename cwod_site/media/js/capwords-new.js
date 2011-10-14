@@ -198,7 +198,7 @@
       }
       stateB = $('#stateB');
       stateB = stateB.val() && this.states[stateB.val()] || "All states";
-      template = "<div class=\"key\">\n    Comparing\n    <span class=\"wordOne\">\n        <span class=\"color\"></span><a href=\"/term/" + termA + "\" class=\"wordOne\">\"" + termA + "\"</a>\n        <span class=\"filters\">[" + stateA + ", " + partyA + "]</span>\n    </span>\n    and\n    <span class=\"wordTwo\">\n        <span class=\"color\"></span><a href=\"/term/" + termB + "\" class=\"wordTwo\">\"" + termB + "\"</a>\n        <span class=\"filters\">[" + stateB + ", " + partyB + "]</span>\n    </span>\n</div>";
+      template = "<div class=\"key\">\n    Comparing\n    <span class=\"wordOne\">\n        <span class=\"color\"></span><a href=\"/term/" + termA + "\" class=\"wordOne\">" + termA + "</a>\n        <span class=\"filters\">[" + stateA + ", " + partyA + "]</span>\n    </span>\n    and\n    <span class=\"wordTwo\">\n        <span class=\"color\"></span><a href=\"/term/" + termB + "\" class=\"wordTwo\">" + termB + "</a>\n        <span class=\"filters\">[" + stateB + ", " + partyB + "]</span>\n    </span>\n</div>";
       return template;
     };
     CapitolWords.prototype.buildPartyGraph = function(minMonth, maxMonth) {
