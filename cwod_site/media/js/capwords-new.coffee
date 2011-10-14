@@ -139,12 +139,12 @@ class window.CapitolWords
         <div class="key">
             Comparing
             <span class="wordOne">
-                <span class="color"></span><a href"#"="" class="wordOne">"#{termA}"</a>
+                <span class="color"></span><a href="/term/#{termA}" class="wordOne">"#{termA}"</a>
                 <span class="filters">[#{stateA}, #{partyA}]</span>
             </span>
             and
             <span class="wordTwo">
-                <span class="color"></span><a href"#"="" class="wordTwo">"#{termB}"</a>
+                <span class="color"></span><a href="/term/#{termB}" class="wordTwo">"#{termB}"</a>
                 <span class="filters">[#{stateB}, #{partyB}]</span>
             </span>
         </div>
