@@ -139,12 +139,12 @@ class window.CapitolWords
         <div class="key">
             Comparing
             <span class="wordOne">
-                <span class="color"></span><a href"#"="" class="wordOne">"#{termA}"</a>
+                <span class="color"></span><a href="/term/#{termA}" class="wordOne">"#{termA}"</a>
                 <span class="filters">[#{stateA}, #{partyA}]</span>
             </span>
             and
             <span class="wordTwo">
-                <span class="color"></span><a href"#"="" class="wordTwo">"#{termB}"</a>
+                <span class="color"></span><a href="/term/#{termB}" class="wordTwo">"#{termB}"</a>
                 <span class="filters">[#{stateB}, #{partyB}]</span>
             </span>
         </div>
@@ -181,10 +181,11 @@ class window.CapitolWords
         imgTag = "<img id=\"partyTermChart\" src=\"#{imgUrl}\"/>"
         jQuery('#partyTimeline').html imgTag
 
-        (((jQuery '#partyTermChart').mouseenter (event) ->
+        ((((jQuery '#partyTermChart').mouseenter (event) ->
            window.cwod_inchart = true).mouseleave (event) ->
               window.cwod_inchart = false).mousemove (event) ->
-                 window.cwod_pagex = event.pageX
+                 window.cwod_pagex = event.pageX).click (event) ->
+                     window.cw.handleChartClick event
 
 
     buildXLabels: (values) ->
@@ -226,6 +227,34 @@ class window.CapitolWords
     endDate: ->
         d = new Date()
         if this.year_values[1] then "#{this.year_values[1]}-12-31" else "#{d.getFullYear()}-12-31"
+
+    findActiveDataPoints: ->
+        DETECTION_FUZZ_X = 6
+
+        return_vals = []
+        
+        [selected, selected_chart] = window.cw.findSelectedChart()
+
+        series_i = 0
+        while series_i<window.cwod_line_coords[selected].length                
+            datapoint_i = 0
+            while ((window.cwod_line_coords[selected][series_i][datapoint_i]+DETECTION_FUZZ_X)<(window.cwod_pagex - (jQuery selected_chart).offset().left) and (datapoint_i<window.cwod_results[selected][series_i].length*2))
+                datapoint_i += 2
+
+            if (datapoint_i/2) < window.cwod_results[selected][series_i].length    
+                return_vals.push [ series_i, window.cwod_results[selected][series_i][datapoint_i/2], window.cwod_line_coords[selected][series_i][datapoint_i], window.cwod_line_coords[selected][series_i][datapoint_i+1] ]
+
+            series_i += 1
+            
+        return return_vals
+        
+    findSelectedChart: ->
+        selected = 'term'
+        selected_chart = '#termChart'
+        if (jQuery('#overallTimelineSelect').attr 'checked')!='checked'
+             selected = 'party'    
+             selected_chart = '#partyTermChart'             
+        return [selected, selected_chart]
 
     getCookie: (name) ->
         if document.cookie and (document.cookie isnt '')
@@ -343,7 +372,6 @@ class window.CapitolWords
 
                 imgUrl = cw.showChart [percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300',]
 
-                window.cwod_counts['term'] = [ (jQuery.extend true, [], counts), ]
                 window.cwod_results['term'] = [ (jQuery.extend true, [], results), ]
                 window.cwod_line_coords['term'] = []
 
@@ -358,10 +386,11 @@ class window.CapitolWords
                     overallImgTag = "<img id=\"termChart\" src=\"#{imgUrl}\" alt=\"Timeline of occurrences of #{term}\"/>"
                     jQuery('#overallTimeline').html overallImgTag
 
-                    (((jQuery '#termChart').mouseenter (event) ->
+                    ((((jQuery '#termChart').mouseenter (event) ->
                        window.cwod_inchart = true).mouseleave (event) ->
                           window.cwod_inchart = false).mousemove (event) ->
-                             window.cwod_pagex = event.pageX
+                             window.cwod_pagex = event.pageX).click (event) ->
+                                 window.cw.handleChartClick event
 
                 if cw.minMonth and cw.maxMonth
                     cw.limit cw.minMonth, cw.maxMonth
@@ -467,7 +496,6 @@ class window.CapitolWords
         renderWhenDone = _(parties.length).after(render)
 
         window.cwod_results['party'] = []
-        window.cwod_counts['party'] = []
         _(parties).each (party) ->
             data = {
                 'party': party,
@@ -486,7 +514,6 @@ class window.CapitolWords
                     renderWhenDone()
 
                     window.cwod_results['party'].push results
-                    window.cwod_counts['party'].push _(results).pluck 'count'
             }
 
     getPartyPieChart: (term, div, width, height, callback) ->
@@ -550,6 +577,11 @@ class window.CapitolWords
                         </li>
                     """
                     div.append html
+
+    handleChartClick: (event) ->
+        active_data_point_result = window.cw.findActiveDataPoints()[0][1]
+        url = '/date/'+active_data_point_result.month.substr(0,4)+'/'+active_data_point_result.month.substr(4,2)
+        window.location.href = url        
 
     highlightEntries: (entries, term) ->
         entry_matches = []
@@ -685,7 +717,6 @@ class window.CapitolWords
         window.cwod_inchart = false
         window.cwod_results = [] if window.cwod_results is undefined
         window.cwod_line_coords = [] if window.cwod_line_coords is undefined
-        window.cwod_counts = [] if window.cwod_counts is undefined
 
         if _(this.results).isUndefined()
             this.getGraphData term
@@ -707,43 +738,37 @@ class window.CapitolWords
                 jQuery('.annotation').hide()
                 return
 
-            selected = 'term'
-            selected_chart = '#termChart'
-            if (jQuery('#overallTimelineSelect').attr 'checked')!='checked'
-                 selected = 'party'
-                 selected_chart = '#partyTermChart'
+            [selected, selected_chart] = window.cw.findSelectedChart()
 
-            series_i = 0
-            while series_i<window.cwod_line_coords[selected].length
-
+            show_annotation = (dp) ->
                 FUZZ_X = 5
                 FUZZ_Y = 6
-                datapoint_i = 0
-                while ((window.cwod_line_coords[selected][series_i][datapoint_i]+FUZZ_X)<(window.cwod_pagex - (jQuery selected_chart).offset().left) and (datapoint_i<window.cwod_results[selected][series_i].length*2))
-                    datapoint_i += 2
 
-                if (datapoint_i/2) < window.cwod_results[selected][series_i].length
+                dp_series_i = dp[0]
+                dp_result = dp[1]
+                dp_x = dp[2]
+                dp_y = dp[3]
 
-                    MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-                    annotation_month = MONTHS[(parseInt (window.cwod_results[selected][series_i][datapoint_i/2].month.substr 4, 2), 10) - 1]
-                    annotation_year = window.cwod_results[selected][series_i][datapoint_i/2].month.substr 0, 4
-                    annotation_text = ('<span class="annotation-count">' + window.cwod_counts[selected][series_i][datapoint_i/2] + ' mention' + (if window.cwod_counts[selected][series_i][datapoint_i/2]!=1 then 's' else '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>')
-                    (jQuery '#annotation-'+selected+'-'+series_i+' .inner-annotation').html annotation_text
+                MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+                annotation_month = MONTHS[(parseInt (dp_result.month.substr 4, 2), 10) - 1]
+                annotation_year = dp_result.month.substr 0, 4
+                annotation_text = ('<span class="annotation-count">' + dp_result.count + ' mention' + (if dp_result.count!=1 then 's' else '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>')
+                (jQuery '#annotation-'+selected+'-'+dp_series_i+' .inner-annotation').html annotation_text
 
-                    if not ((jQuery '#annotation-'+selected+'-'+series_i).hasClass 'flipped')
-                        (jQuery '#annotation-'+selected+'-'+series_i).css {
-                            left: jQuery(selected_chart).offset().left + window.cwod_line_coords[selected][series_i][datapoint_i] + FUZZ_X,
-                            top: jQuery(selected_chart).offset().top + window.cwod_line_coords[selected][series_i][datapoint_i+1] + FUZZ_Y
-                        }
-                    else
-                        (jQuery '#annotation-'+selected+'-'+series_i).css {
-                            right: jQuery(window).width() - (jQuery(selected_chart).offset().left + window.cwod_line_coords[selected][series_i][datapoint_i] + FUZZ_X),
-                            top: jQuery(selected_chart).offset().top + window.cwod_line_coords[selected][series_i][datapoint_i+1] + FUZZ_Y
-                        }
+                if not ((jQuery '#annotation-'+selected+'-'+dp_series_i).hasClass 'flipped')
+                    (jQuery '#annotation-'+selected+'-'+dp_series_i).css {
+                        left: jQuery(selected_chart).offset().left + dp_x + FUZZ_X,
+                        top: jQuery(selected_chart).offset().top + dp_y + FUZZ_Y
+                    }
+                else
+                    (jQuery '#annotation-'+selected+'-'+dp_series_i).css {
+                        right: jQuery(window).width() - (jQuery(selected_chart).offset().left + dp_x + FUZZ_X),
+                        top: jQuery(selected_chart).offset().top + dp_y + FUZZ_Y
+                    }
 
-                    jQuery('#annotation-'+selected+'-'+series_i).show()
+                jQuery('#annotation-'+selected+'-'+dp_series_i).show()
 
-                series_i += 1
+            show_annotation dp for dp in window.cw.findActiveDataPoints()         
 
         window.clearInterval window.cwod_interval
         window.cwod_interval = window.setInterval annotation_callback, 50
@@ -993,6 +1018,7 @@ class window.CapitolWords
 Create a global CW instance within this closure
 ###
 cw = new window.CapitolWords
+window.cw = cw
 History = window.History
 
 ###
