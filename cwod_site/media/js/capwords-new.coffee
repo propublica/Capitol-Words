@@ -89,7 +89,7 @@ class window.CapitolWords
 
     build_legend: ->
         [termA, termB] = window.cw.phrases()
-        
+
         partyA = $('.partyA input:checked').eq(0).val()
         stateA = $('#stateA').val()
 
@@ -232,28 +232,28 @@ class window.CapitolWords
         DETECTION_FUZZ_X = 6
 
         return_vals = []
-        
+
         [selected, selected_chart] = window.cw.findSelectedChart()
 
         series_i = 0
-        while series_i<window.cwod_line_coords[selected].length                
+        while series_i<window.cwod_line_coords[selected].length
             datapoint_i = 0
             while ((window.cwod_line_coords[selected][series_i][datapoint_i]+DETECTION_FUZZ_X)<(window.cwod_pagex - (jQuery selected_chart).offset().left) and (datapoint_i<window.cwod_results[selected][series_i].length*2))
                 datapoint_i += 2
 
-            if (datapoint_i/2) < window.cwod_results[selected][series_i].length    
+            if (datapoint_i/2) < window.cwod_results[selected][series_i].length
                 return_vals.push [ series_i, window.cwod_results[selected][series_i][datapoint_i/2], window.cwod_line_coords[selected][series_i][datapoint_i], window.cwod_line_coords[selected][series_i][datapoint_i+1] ]
 
             series_i += 1
-            
+
         return return_vals
-        
+
     findSelectedChart: ->
         selected = 'term'
         selected_chart = '#termChart'
         if (jQuery('#overallTimelineSelect').attr 'checked')!='checked'
-             selected = 'party'    
-             selected_chart = '#partyTermChart'             
+             selected = 'party'
+             selected_chart = '#partyTermChart'
         return [selected, selected_chart]
 
     getCookie: (name) ->
@@ -581,7 +581,7 @@ class window.CapitolWords
     handleChartClick: (event) ->
         active_data_point_result = window.cw.findActiveDataPoints()[0][1]
         url = '/date/'+active_data_point_result.month.substr(0,4)+'/'+active_data_point_result.month.substr(4,2)
-        window.location.href = url        
+        window.location.href = url
 
     highlightEntries: (entries, term) ->
         entry_matches = []
@@ -665,15 +665,15 @@ class window.CapitolWords
 
         hash = $.param(hashParams)
         History.pushState {'slid': slid}, '', "?#{hash}"
-        
+
     phrases: ->
         phraseA = $('#terma').val()
         if phraseA == 'Word or phrase'
             phraseA = ''
-        phraseB = $('#termb').val()            
+        phraseB = $('#termb').val()
         if phraseB == 'Word or phrase'
             phraseB = ''
-            
+
         if (window.cwod_random_phrase_i isnt undefined) or (phraseA=='') and (phraseB=='') and (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))
             SAMPLE_PHRASES = [
                 ['global warming', 'climate change'],
@@ -685,7 +685,7 @@ class window.CapitolWords
             if window.cwod_random_phrase_i is undefined
                 window.cwod_random_phrase_i = Math.floor(Math.random() * SAMPLE_PHRASES.length)
             return SAMPLE_PHRASES[window.cwod_random_phrase_i]
-            
+
         return [phraseA, phraseB]
 
     populateLegislatorList: (legislators) ->
@@ -784,7 +784,7 @@ class window.CapitolWords
 
                 jQuery('#annotation-'+selected+'-'+dp_series_i).show()
 
-            show_annotation dp for dp in window.cw.findActiveDataPoints()         
+            show_annotation dp for dp in window.cw.findActiveDataPoints()
 
         window.clearInterval window.cwod_interval
         window.cwod_interval = window.setInterval annotation_callback, 50
@@ -1085,6 +1085,9 @@ $(document).ready ->
     $('img').error ->
         $(this).hide()
 
+    $('#toggleSearchCompare').click ->
+        $('.toggleSearchCompare').slideToggle()
+        false
 
     $('.ngramMenu span').bind 'click', (x) ->
         classToShow = $(this).attr 'class'
@@ -1198,5 +1201,5 @@ $(document).ready ->
     (area = $('#rtColumn')) && area.length && area.imagesLoaded ->
 
     # fire sample search if arriving fresh on the homepage
-    if (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))        
+    if (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))
         cw.submitHomepageCompareForm()

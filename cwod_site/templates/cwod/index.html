@@ -4,19 +4,20 @@
 {% load typogrify_tags %}
 {% load media %}
 
+{% block splash %}
+<div id="splash_image">
+    <img src="{% media_url 'img/bubble.jpg' %}" width="180" height="179" alt="Bubble">
+
+</div>
+<div id="splash_text">
+    Dig up some data on the <em>words</em> our <em>legislators</em> use every day.
+</div>
+<div class="clear"></div>
+{% endblock splash %}
+
 {% block content %}
 <div id="main">
-    <div id="splash_image">
-        <img src="{% media_url 'img/bubble.jpg' %}" width="180" height="179" alt="Bubble">
-
-    </div>
-    <div id="splash_text">
-        Dig up some data on the <em>words</em> our <em>legislators</em> use every day.
-    </div>
-    <div class="clear">
-    </div>
     <div id="fullColumn">
-        {% include "cwod/partials/search_compare_form.html" %}
         <div id="compareGraphic">
 
             <div class="key">
