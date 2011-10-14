@@ -180,12 +180,12 @@ class window.CapitolWords
 
         imgTag = "<img id=\"partyTermChart\" src=\"#{imgUrl}\"/>"
         jQuery('#partyTimeline').html imgTag
-                
+
         (((jQuery '#partyTermChart').mouseenter (event) ->
            window.cwod_inchart = true).mouseleave (event) ->
               window.cwod_inchart = false).mousemove (event) ->
                  window.cwod_pagex = event.pageX
-        
+
 
     buildXLabels: (values) ->
         years = _(_(values).pluck('month')).select((x) ->
@@ -439,7 +439,7 @@ class window.CapitolWords
                 imgUrl = results['url']
                 imgTag = """<img src="#{imgUrl}" alt="Timeline of occurrences of #{term}"/>"""
                 $('#partyTimeline').html imgTag
-                
+
 
     getPartyGraphData: (term) ->
         data = {
@@ -483,8 +483,8 @@ class window.CapitolWords
                 success: (data) ->
                     results = data['results']
                     partyData.push [party, results]
-                    renderWhenDone()                                        
-                    
+                    renderWhenDone()
+
                     window.cwod_results['party'].push results
                     window.cwod_counts['party'].push _(results).pluck 'count'
             }
@@ -679,7 +679,7 @@ class window.CapitolWords
         # hacky, but necessary: the history stuff fires this twice otherwise, which pollutes the
         # count objects used for the annotations
         if window.term_has_been_populated
-            return            
+            return
         window.term_has_been_populated = true
 
         window.cwod_inchart = false
@@ -705,16 +705,16 @@ class window.CapitolWords
 
             if (not window.cwod_inchart) or (not window.cwod_line_coords)
                 jQuery('.annotation').hide()
-                return                        
+                return
 
             selected = 'term'
             selected_chart = '#termChart'
             if (jQuery('#overallTimelineSelect').attr 'checked')!='checked'
-                 selected = 'party'    
+                 selected = 'party'
                  selected_chart = '#partyTermChart'
 
             series_i = 0
-            while series_i<window.cwod_line_coords[selected].length                
+            while series_i<window.cwod_line_coords[selected].length
 
                 FUZZ_X = 5
                 FUZZ_Y = 6
@@ -722,7 +722,7 @@ class window.CapitolWords
                 while ((window.cwod_line_coords[selected][series_i][datapoint_i]+FUZZ_X)<(window.cwod_pagex - (jQuery selected_chart).offset().left) and (datapoint_i<window.cwod_results[selected][series_i].length*2))
                     datapoint_i += 2
 
-                if (datapoint_i/2) < window.cwod_results[selected][series_i].length    
+                if (datapoint_i/2) < window.cwod_results[selected][series_i].length
 
                     MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
                     annotation_month = MONTHS[(parseInt (window.cwod_results[selected][series_i][datapoint_i/2].month.substr 4, 2), 10) - 1]
@@ -1007,12 +1007,9 @@ $(document).ajaxSend (event, xhr, settings) ->
 Handle special routes
 ###
 History.Adapter.bind window, 'statechange', ->
-    
-    History.log('state changed')
-
     if window.location.pathname.match /^\/legislator\/?$/
         cw.readLegislatorHistory()
-    
+
     else if window.location.pathname.match /^term\/[.+]\/?/
         cw.readTermDetailPageHistory()
         cw.populateTermDetailPage termDetailTerm
