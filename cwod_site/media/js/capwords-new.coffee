@@ -180,13 +180,13 @@ class window.CapitolWords
 
         imgTag = "<img id=\"partyTermChart\" src=\"#{imgUrl}\"/>"
         jQuery('#partyTimeline').html imgTag
-                
+
         ((((jQuery '#partyTermChart').mouseenter (event) ->
            window.cwod_inchart = true).mouseleave (event) ->
               window.cwod_inchart = false).mousemove (event) ->
                  window.cwod_pagex = event.pageX).click (event) ->
                      window.cw.handleChartClick event
-        
+
 
     buildXLabels: (values) ->
         years = _(_(values).pluck('month')).select((x) ->
@@ -468,7 +468,7 @@ class window.CapitolWords
                 imgUrl = results['url']
                 imgTag = """<img src="#{imgUrl}" alt="Timeline of occurrences of #{term}"/>"""
                 $('#partyTimeline').html imgTag
-                
+
 
     getPartyGraphData: (term) ->
         data = {
@@ -511,8 +511,8 @@ class window.CapitolWords
                 success: (data) ->
                     results = data['results']
                     partyData.push [party, results]
-                    renderWhenDone()                                        
-                    
+                    renderWhenDone()
+
                     window.cwod_results['party'].push results
             }
 
@@ -711,7 +711,7 @@ class window.CapitolWords
         # hacky, but necessary: the history stuff fires this twice otherwise, which pollutes the
         # count objects used for the annotations
         if window.term_has_been_populated
-            return            
+            return
         window.term_has_been_populated = true
 
         window.cwod_inchart = false
@@ -736,7 +736,7 @@ class window.CapitolWords
 
             if (not window.cwod_inchart) or (not window.cwod_line_coords)
                 jQuery('.annotation').hide()
-                return                        
+                return
 
             [selected, selected_chart] = window.cw.findSelectedChart()
 
@@ -1033,12 +1033,9 @@ $(document).ajaxSend (event, xhr, settings) ->
 Handle special routes
 ###
 History.Adapter.bind window, 'statechange', ->
-    
-    History.log('state changed')
-
     if window.location.pathname.match /^\/legislator\/?$/
         cw.readLegislatorHistory()
-    
+
     else if window.location.pathname.match /^term\/[.+]\/?/
         cw.readTermDetailPageHistory()
         cw.populateTermDetailPage termDetailTerm

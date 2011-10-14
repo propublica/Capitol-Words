@@ -1214,7 +1214,6 @@
   Handle special routes
   */
   History.Adapter.bind(window, 'statechange', function() {
-    History.log('state changed');
     if (window.location.pathname.match(/^\/legislator\/?$/)) {
       return cw.readLegislatorHistory();
     } else if (window.location.pathname.match(/^term\/[.+]\/?/)) {
