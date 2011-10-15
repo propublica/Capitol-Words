@@ -693,4 +693,4 @@ li.embedDark, li.embedLight{
 }
 .annotation .annotation-count { font-weight: bold; }
 .annotation .annotation-date { font-style: italic; }
-#overallTimeline, #partyTimeline { cursor: pointer; }
+#overallTimeline, #partyTimeline, img.default { cursor: pointer; }

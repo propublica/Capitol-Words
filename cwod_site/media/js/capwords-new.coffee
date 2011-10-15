@@ -43,6 +43,7 @@ class window.CapitolWords
     legislatorData: []
     minMonth: undefined
     maxMonth: undefined
+    random_phrase_i: undefined
     smoothing: 0
     year_values: []
     states :
@@ -63,6 +64,14 @@ class window.CapitolWords
         "AP": "Armed Forces Pacific",                       "AS": "American Samoa",
         "GU": "Guam",                                       "MP": "Northern Mariana Islands",
         "PR": "Puerto Rico",                                "VI": "Virgin Islands",
+
+    # annotation properties
+    annotation_interval: null
+    annotation_interval_frequency: 50
+    annotation_line_coords: []
+    annotation_results: []
+    inchart: false
+
 
     addLegislatorToChart: (result, maxcount, div, callback) ->
         url = 'http://capitolwords.org/api/legislators.json'
@@ -86,6 +95,45 @@ class window.CapitolWords
                 })
 
                 callback()
+                
+    annotation_callback: () ->
+        if (not window.cw.inchart) or (not window.cw.annotation_line_coords)
+            jQuery('.annotation').hide()
+            return
+
+        window.cw.annotation_show dp for dp in window.cw.findActiveDataPoints()                
+
+    annotation_show: (dp) ->
+        [selected, selected_chart] = window.cw.findSelectedChart()
+        
+        FUZZ_X = 5
+        FUZZ_Y = 6
+        if selected is 'homepage'
+            FUZZ_Y = 13
+
+        dp_series_i = dp[0]
+        dp_result = dp[1]
+        dp_x = dp[2]
+        dp_y = dp[3]
+
+        MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        annotation_month = MONTHS[(parseInt (dp_result.month.substr 4, 2), 10) - 1]
+        annotation_year = dp_result.month.substr 0, 4
+        annotation_text = ('<span class="annotation-count">' + dp_result.count + ' mention' + (if dp_result.count!=1 then 's' else '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>')
+        (jQuery '#annotation-'+selected+'-'+dp_series_i+' .inner-annotation').html annotation_text
+
+        if not ((jQuery '#annotation-'+selected+'-'+dp_series_i).hasClass 'flipped')
+            (jQuery '#annotation-'+selected+'-'+dp_series_i).css {
+                left: jQuery(selected_chart).offset().left + dp_x + FUZZ_X,
+                top: jQuery(selected_chart).offset().top + dp_y + FUZZ_Y
+            }
+        else
+            (jQuery '#annotation-'+selected+'-'+dp_series_i).css {
+                right: jQuery(window).width() - (jQuery(selected_chart).offset().left + dp_x + FUZZ_X),
+                top: jQuery(selected_chart).offset().top + dp_y + FUZZ_Y
+            }
+
+        jQuery('#annotation-'+selected+'-'+dp_series_i).show()
 
     build_legend: ->
         [termA, termB] = window.cw.phrases()
@@ -170,11 +218,11 @@ class window.CapitolWords
 
         imgUrl = this.showChart [partyAPercentages, partyBPercentages,], labelPositions[0], labelPositions[1], 575, 300, [colors[this.partyResults[0][0]], colors[this.partyResults[1][0]],], [this.partyResults[0][0], this.partyResults[1][0],]
 
-        window.cwod_line_coords['party'] = []
+        window.cw.annotation_line_coords['party'] = []
         jQuery.getJSON (imgUrl + '&chof=json'), (data) ->
             copy_coords = (c) ->
                 if c.name.match /^line/
-                    window.cwod_line_coords['party'].push (jQuery.extend true, [], c.coords)
+                    window.cw.annotation_line_coords['party'].push (jQuery.extend true, [], c.coords)
 
             copy_coords(csj) for csj in data.chartshape
 
@@ -182,9 +230,9 @@ class window.CapitolWords
         jQuery('#partyTimeline').html imgTag
 
         ((((jQuery '#partyTermChart').mouseenter (event) ->
-           window.cwod_inchart = true).mouseleave (event) ->
-              window.cwod_inchart = false).mousemove (event) ->
-                 window.cwod_pagex = event.pageX).click (event) ->
+           window.cw.inchart = true).mouseleave (event) ->
+              window.cw.inchart = false).mousemove (event) ->
+                 window.cw.pagex = event.pageX).click (event) ->
                      window.cw.handleChartClick event
 
 
@@ -229,32 +277,35 @@ class window.CapitolWords
         if this.year_values[1] then "#{this.year_values[1]}-12-31" else "#{d.getFullYear()}-12-31"
 
     findActiveDataPoints: ->
-        DETECTION_FUZZ_X = 6
-
         return_vals = []
 
         [selected, selected_chart] = window.cw.findSelectedChart()
 
+        DETECTION_FUZZ_X = 6
+        if selected is 'homepage'
+            DETECTION_FUZZ_X = 21
+        
         series_i = 0
-        while series_i<window.cwod_line_coords[selected].length
+
+        while series_i<window.cw.annotation_line_coords[selected].length                
             datapoint_i = 0
-            while ((window.cwod_line_coords[selected][series_i][datapoint_i]+DETECTION_FUZZ_X)<(window.cwod_pagex - (jQuery selected_chart).offset().left) and (datapoint_i<window.cwod_results[selected][series_i].length*2))
+            while ((window.cw.annotation_line_coords[selected][series_i][datapoint_i]+DETECTION_FUZZ_X)<(window.cw.pagex - (jQuery selected_chart).offset().left) and (datapoint_i<window.cw.annotation_results[selected][series_i].length*2))
                 datapoint_i += 2
 
-            if (datapoint_i/2) < window.cwod_results[selected][series_i].length
-                return_vals.push [ series_i, window.cwod_results[selected][series_i][datapoint_i/2], window.cwod_line_coords[selected][series_i][datapoint_i], window.cwod_line_coords[selected][series_i][datapoint_i+1] ]
+            if (datapoint_i/2) < window.cw.annotation_results[selected][series_i].length    
+                return_vals.push [ series_i, window.cw.annotation_results[selected][series_i][datapoint_i/2], window.cw.annotation_line_coords[selected][series_i][datapoint_i], window.cw.annotation_line_coords[selected][series_i][datapoint_i+1] ]
 
             series_i += 1
 
         return return_vals
 
     findSelectedChart: ->
-        selected = 'term'
-        selected_chart = '#termChart'
-        if (jQuery('#overallTimelineSelect').attr 'checked')!='checked'
-             selected = 'party'
-             selected_chart = '#partyTermChart'
-        return [selected, selected_chart]
+        if (jQuery '#annotation-homepage-0').length>0
+            return ['homepage', 'img.default']
+        else if (jQuery('#overallTimelineSelect').attr 'checked')!='checked'
+            return ['party', '#partyTermChart']
+        else
+            return ['term', '#termChart']
 
     getCookie: (name) ->
         if document.cookie and (document.cookie isnt '')
@@ -372,14 +423,14 @@ class window.CapitolWords
 
                 imgUrl = cw.showChart [percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300',]
 
-                window.cwod_results['term'] = [ (jQuery.extend true, [], results), ]
-                window.cwod_line_coords['term'] = []
+                window.cw.annotation_results['term'] = [ (jQuery.extend true, [], results), ]
+                window.cw.annotation_line_coords['term'] = []
 
                 jQuery.getJSON (imgUrl + '&chof=json'), (data) ->
 
                     copy_coords = (c) ->
                         if c.name is 'line0'
-                            window.cwod_line_coords['term'].push (jQuery.extend true, [], c.coords)
+                            window.cw.annotation_line_coords['term'].push (jQuery.extend true, [], c.coords)
 
                     copy_coords(csj) for csj in data.chartshape
 
@@ -387,9 +438,9 @@ class window.CapitolWords
                     jQuery('#overallTimeline').html overallImgTag
 
                     ((((jQuery '#termChart').mouseenter (event) ->
-                       window.cwod_inchart = true).mouseleave (event) ->
-                          window.cwod_inchart = false).mousemove (event) ->
-                             window.cwod_pagex = event.pageX).click (event) ->
+                       window.cw.inchart = true).mouseleave (event) ->
+                          window.cw.inchart = false).mousemove (event) ->
+                             window.cw.pagex = event.pageX).click (event) ->
                                  window.cw.handleChartClick event
 
                 if cw.minMonth and cw.maxMonth
@@ -495,7 +546,7 @@ class window.CapitolWords
         parties = ['R', 'D', ]
         renderWhenDone = _(parties.length).after(render)
 
-        window.cwod_results['party'] = []
+        window.cw.annotation_results['party'] = []
         _(parties).each (party) ->
             data = {
                 'party': party,
@@ -513,7 +564,7 @@ class window.CapitolWords
                     partyData.push [party, results]
                     renderWhenDone()
 
-                    window.cwod_results['party'].push results
+                    window.cw.annotation_results['party'].push results
             }
 
     getPartyPieChart: (term, div, width, height, callback) ->
@@ -673,8 +724,8 @@ class window.CapitolWords
         phraseB = $('#termb').val()
         if phraseB == 'Word or phrase'
             phraseB = ''
-
-        if (window.cwod_random_phrase_i isnt undefined) or (phraseA=='') and (phraseB=='') and (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))
+         
+        if (window.cw.random_phrase_i isnt undefined) or (phraseA=='') and (phraseB=='') and (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))
             SAMPLE_PHRASES = [
                 ['global warming', 'climate change'],
                 ['iraq', 'afghanistan'],
@@ -682,10 +733,10 @@ class window.CapitolWords
                 ['ozone', 'carbon dioxide'],
                 ['bailout', 'big banks']
             ]
-            if window.cwod_random_phrase_i is undefined
-                window.cwod_random_phrase_i = Math.floor(Math.random() * SAMPLE_PHRASES.length)
-            return SAMPLE_PHRASES[window.cwod_random_phrase_i]
-
+            if window.cw.random_phrase_i is undefined
+                window.cw.random_phrase_i = Math.floor(Math.random() * SAMPLE_PHRASES.length)
+            return SAMPLE_PHRASES[window.cw.random_phrase_i]
+            
         return [phraseA, phraseB]
 
     populateLegislatorList: (legislators) ->
@@ -730,10 +781,6 @@ class window.CapitolWords
             return
         window.term_has_been_populated = true
 
-        window.cwod_inchart = false
-        window.cwod_results = [] if window.cwod_results is undefined
-        window.cwod_line_coords = [] if window.cwod_line_coords is undefined
-
         if _(this.results).isUndefined()
             this.getGraphData term
 
@@ -747,47 +794,9 @@ class window.CapitolWords
 
         if this.start_date and this.end_date
             this.getCREntries term
-
-        annotation_callback = () ->
-
-            if (not window.cwod_inchart) or (not window.cwod_line_coords)
-                jQuery('.annotation').hide()
-                return
-
-            [selected, selected_chart] = window.cw.findSelectedChart()
-
-            show_annotation = (dp) ->
-                FUZZ_X = 5
-                FUZZ_Y = 6
-
-                dp_series_i = dp[0]
-                dp_result = dp[1]
-                dp_x = dp[2]
-                dp_y = dp[3]
-
-                MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-                annotation_month = MONTHS[(parseInt (dp_result.month.substr 4, 2), 10) - 1]
-                annotation_year = dp_result.month.substr 0, 4
-                annotation_text = ('<span class="annotation-count">' + dp_result.count + ' mention' + (if dp_result.count!=1 then 's' else '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>')
-                (jQuery '#annotation-'+selected+'-'+dp_series_i+' .inner-annotation').html annotation_text
-
-                if not ((jQuery '#annotation-'+selected+'-'+dp_series_i).hasClass 'flipped')
-                    (jQuery '#annotation-'+selected+'-'+dp_series_i).css {
-                        left: jQuery(selected_chart).offset().left + dp_x + FUZZ_X,
-                        top: jQuery(selected_chart).offset().top + dp_y + FUZZ_Y
-                    }
-                else
-                    (jQuery '#annotation-'+selected+'-'+dp_series_i).css {
-                        right: jQuery(window).width() - (jQuery(selected_chart).offset().left + dp_x + FUZZ_X),
-                        top: jQuery(selected_chart).offset().top + dp_y + FUZZ_Y
-                    }
-
-                jQuery('#annotation-'+selected+'-'+dp_series_i).show()
-
-            show_annotation dp for dp in window.cw.findActiveDataPoints()
-
-        window.clearInterval window.cwod_interval
-        window.cwod_interval = window.setInterval annotation_callback, 50
+     
+        window.clearInterval window.cw.annotation_interval
+        window.cw.annotation_interval = window.setInterval window.cw.annotation_callback, window.cw.annotation_interval_frequency
 
     readHomepageHistory: (nosubmit) ->
         cw = this
@@ -912,8 +921,25 @@ class window.CapitolWords
         if x_label_positions
             chart.set_axis_positions 'x', x_label_positions
 
-        if $('#chart img.realChart, #compareGraphic img.default')
+        if $('#annotation-homepage-0').length>0
+            window.cw.annotation_line_coords['homepage'] = []
+            jQuery.getJSON (chart.url() + '&chof=json'), (data) ->
+                copy_coords = (c) ->
+                    if c.name.match /^line/
+                        window.cw.annotation_line_coords['homepage'].push (jQuery.extend true, [], c.coords)
+
+                copy_coords(csj) for csj in data.chartshape            
+            
             $('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url()).fadeIn 100
+
+            ((((jQuery '#chart img.realChart, #compareGraphic img.default').mouseenter (event) ->
+               window.cw.inchart = true).mouseleave (event) ->
+                  window.cw.inchart = false).mousemove (event) ->
+                     window.cw.pagex = event.pageX).click (event) ->
+                         window.cw.handleChartClick event
+
+            window.clearInterval window.cw.annotation_interval
+            window.cw.annotation_interval = window.setInterval window.cw.annotation_callback, window.cw.annotation_interval_frequency
 
         if spinner
             spinner.stop()
@@ -966,17 +992,11 @@ class window.CapitolWords
         spinner = new Spinner(opts).spin target
 
         url = 'http://capitolwords.org/api/dates.json'
-        #phraseA = $('#terma').val()
-        #phraseA = if phraseA == 'Word or phrase' then '' else phraseA
-
-        #phraseB = $('#termb').val()
-        #phraseB = if phraseB == 'Word or phrase' then '' else phraseB
 
         [phraseA, phraseB] = cw.phrases()
 
-        if (phraseA is '') and (phraseB is '')
-            phraseA = 'money'
-            phraseB = 'power'
+        window.cw.annotation_results['homepage'] = [[], []]
+        window.cw.annotation_line_coords['homepage'] = []
 
         querya = $.ajax
             dataType: 'jsonp'
@@ -993,6 +1013,7 @@ class window.CapitolWords
                 cw.a['all'] = aResults
                 cw.a['counts'] = _(aResults).pluck 'count'
                 cw.a['percentages'] = _(aResults).pluck 'percentage'
+                window.cw.annotation_results['homepage'][0] = (jQuery.extend true, [], aResults)
 
         queryb = $.ajax
             dataType: 'jsonp'
@@ -1009,6 +1030,7 @@ class window.CapitolWords
                 cw.b['all'] = bResults
                 cw.b['counts'] = _(bResults).pluck 'count'
                 cw.b['percentages'] = _(bResults).pluck 'percentage'
+                window.cw.annotation_results['homepage'][1] = (jQuery.extend true, [], bResults)
 
         $.when(querya, queryb)
             .done ->
@@ -1025,7 +1047,7 @@ class window.CapitolWords
 
                 $('#compareGraphic div.key').eq(0).replaceWith(cw.build_legend_html())
 
-                window.cwod_random_phrase_i = undefined
+                window.cw.random_phrase_i = undefined
 
         if not skipState
             this.makeHomepageHistoryState(true)
