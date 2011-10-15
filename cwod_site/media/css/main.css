@@ -239,8 +239,8 @@ input { padding: 5px 8px; background: #e6e4e2 url('../img/bg_input.png') left bo
 #signUp label.placeholder { position: absolute; color:#999; font-style: italic; left:8px; top:2px; }
 #signUp label.hidden { left: -9999px; }
 
-#navWrapper { 
-	background: url('../img/bg_footerNav.jpg') center top repeat-x; 
+#navWrapper {
+	background: url('../img/bg_footerNav.jpg') center top repeat-x;
 	height: 48px;
 	}
 #navWrapper li { background-color: #494141; padding: 0 20px; margin-top: 5px; margin-top: 12px;}
@@ -293,8 +293,8 @@ th {text-transform: uppercase;}
 .legName{width: 33%;}
 .entTitle{width: 50%}
 .sort{padding-left: 11px;background: url('img/sort_double.png') 10px center no-repeat;}
-
-#searchCompare{background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 30px 30px 30px 30px; margin: 0 25px 30px 0; display: visible;}
+.toggleSearchCompare{display:none;}
+#searchCompare{background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 30px 30px 30px 30px; margin: 0 0 30px 0;/* rt margin was 25 */ display: block;}
 #searchCompare h5 { margin-bottom: 30px}
 
 #searchCompare h5 tip{ font-style: italic; font-size: 80%}
@@ -666,10 +666,10 @@ li.embedDark, li.embedLight{
 }
 
 
-.annotation { 
+.annotation {
     font-size: 11px;
     z-index: 99;
-    height: 32px;    
+    height: 32px;
     line-height: 13px;
     color: #2d2525;
     margin: -16px 0 0 2px;
@@ -683,12 +683,12 @@ li.embedDark, li.embedLight{
 .annotation.flipped {
     background: url(../img/annotation_arrow_flipped.png) right top no-repeat;
     padding: 0 8px 0 0;
-    
+
 }
-.annotation .inner-annotation { 
-    background-color: #f2f1ed; 
-    margin: 0; 
-    padding: 3px 4px 3px 4px; 
+.annotation .inner-annotation {
+    background-color: #f2f1ed;
+    margin: 0;
+    padding: 3px 4px 3px 4px;
     position: relative;
 }
 .annotation .annotation-count { font-weight: bold; }

@@ -32,11 +32,13 @@
                         {#<li><a href="#">Parties</a></li>#}
                         <li><a href="{% url cwod_legislator_list %}">Legislators</a></li>
                         <li><a href="{% url cwod_calendar %}">Calendar</a></li>
-                    </ul>  
-                    <div class="clear"></div>  
-                </nav>    
+                    </ul>
+                    <div class="clear"></div>
+                </nav>
                 <a href="/"><h1>Capitol Words <small>a project of the Sunlight Foundation</small></h1></a>
-                
+
+                {% block splash %}{% endblock %}
+
                 <ul id="mainActions">
                     <li>
                         <form id="mainSearch" action="/search/" method="get">
@@ -51,10 +53,15 @@
                         <span>or</span>
                     </li>
                     <li>
-                    <a href="{% url cwod_home %}#searchCompare">Compare Congressional Words and/or Phrases</a>
+                    <a id="toggleSearchCompare" href="{% url cwod_home %}#searchCompare">Compare Congressional Words and/or Phrases</a>
                     </li>
                 </ul>
                 <div class="clear"></div>
+                {% block search_compare %}
+                    <div class="toggleSearchCompare">
+                    {% include "cwod/partials/search_compare_form.html" %}
+                    </div>
+                {% endblock search_compare %}
             </header>
             {% block content %}
             {% endblock content %}

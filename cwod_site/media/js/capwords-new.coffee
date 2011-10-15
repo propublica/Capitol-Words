@@ -137,7 +137,7 @@ class window.CapitolWords
 
     build_legend: ->
         [termA, termB] = window.cw.phrases()
-        
+
         partyA = $('.partyA input:checked').eq(0).val()
         stateA = $('#stateA').val()
 
@@ -278,7 +278,7 @@ class window.CapitolWords
 
     findActiveDataPoints: ->
         return_vals = []
-        
+
         [selected, selected_chart] = window.cw.findSelectedChart()
 
         DETECTION_FUZZ_X = 6
@@ -286,6 +286,7 @@ class window.CapitolWords
             DETECTION_FUZZ_X = 21
         
         series_i = 0
+
         while series_i<window.cw.annotation_line_coords[selected].length                
             datapoint_i = 0
             while ((window.cw.annotation_line_coords[selected][series_i][datapoint_i]+DETECTION_FUZZ_X)<(window.cw.pagex - (jQuery selected_chart).offset().left) and (datapoint_i<window.cw.annotation_results[selected][series_i].length*2))
@@ -295,9 +296,9 @@ class window.CapitolWords
                 return_vals.push [ series_i, window.cw.annotation_results[selected][series_i][datapoint_i/2], window.cw.annotation_line_coords[selected][series_i][datapoint_i], window.cw.annotation_line_coords[selected][series_i][datapoint_i+1] ]
 
             series_i += 1
-            
+
         return return_vals
-        
+
     findSelectedChart: ->
         if (jQuery '#annotation-homepage-0').length>0
             return ['homepage', 'img.default']
@@ -631,7 +632,7 @@ class window.CapitolWords
     handleChartClick: (event) ->
         active_data_point_result = window.cw.findActiveDataPoints()[0][1]
         url = '/date/'+active_data_point_result.month.substr(0,4)+'/'+active_data_point_result.month.substr(4,2)
-        window.location.href = url        
+        window.location.href = url
 
     highlightEntries: (entries, term) ->
         entry_matches = []
@@ -715,15 +716,15 @@ class window.CapitolWords
 
         hash = $.param(hashParams)
         History.pushState {'slid': slid}, '', "?#{hash}"
-        
+
     phrases: ->
         phraseA = $('#terma').val()
         if phraseA == 'Word or phrase'
             phraseA = ''
-        phraseB = $('#termb').val()            
+        phraseB = $('#termb').val()
         if phraseB == 'Word or phrase'
             phraseB = ''
-            
+         
         if (window.cw.random_phrase_i isnt undefined) or (phraseA=='') and (phraseB=='') and (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))
             SAMPLE_PHRASES = [
                 ['global warming', 'climate change'],
@@ -793,7 +794,7 @@ class window.CapitolWords
 
         if this.start_date and this.end_date
             this.getCREntries term
-        
+     
         window.clearInterval window.cw.annotation_interval
         window.cw.annotation_interval = window.setInterval window.cw.annotation_callback, window.cw.annotation_interval_frequency
 
@@ -1106,6 +1107,9 @@ $(document).ready ->
     $('img').error ->
         $(this).hide()
 
+    $('#toggleSearchCompare').click ->
+        $('.toggleSearchCompare').slideToggle()
+        false
 
     $('.ngramMenu span').bind 'click', (x) ->
         classToShow = $(this).attr 'class'
@@ -1219,5 +1223,5 @@ $(document).ready ->
     (area = $('#rtColumn')) && area.length && area.imagesLoaded ->
 
     # fire sample search if arriving fresh on the homepage
-    if (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))        
+    if (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))
         cw.submitHomepageCompareForm()

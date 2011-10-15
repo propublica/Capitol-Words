@@ -1273,6 +1273,10 @@
     $('img').error(function() {
       return $(this).hide();
     });
+    $('#toggleSearchCompare').click(function() {
+      $('.toggleSearchCompare').slideToggle();
+      return false;
+    });
     $('.ngramMenu span').bind('click', function(x) {
       var classToShow;
       classToShow = $(this).attr('class');
