@@ -75,7 +75,7 @@ sup { vertical-align: super; font-size: smaller; }
 pre {  padding: 15px;  white-space: pre;  white-space: pre-wrap;  white-space: pre-line;  word-wrap: break-word; }
 textarea { overflow: auto; }
 .ie6 legend, .ie7 legend { margin-left: -7px; }
-input[type="radio"] { vertical-align: text-bottom; background: none; border: none; padding-left: 0; padding-right: 0; }
+input[type="radio"] { vertical-align: text-bottom; background: none; border: none; padding-left: 0; padding-right: 0; margin-right: 8px;}
 input[type="checkbox"] { vertical-align: bottom; }
 .ie7 input[type="checkbox"] { vertical-align: baseline; }
 .ie6 input { vertical-align: text-bottom; }
@@ -446,7 +446,8 @@ ul.wordFilter{
 }
 
 .wordFilter{
-	padding: 0 0 0 20px;
+    width: 286px;
+	padding: 0 15px 0 15px;
 	margin-top: 20px;
 	height: 62px;
 	background: url('../img/bg_rightView_2x.png') right top no-repeat, url('../img/bg_leftView_2x.png') top left no-repeat;
