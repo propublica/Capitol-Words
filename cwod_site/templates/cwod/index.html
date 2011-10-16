@@ -1,3 +1,4 @@
+
 {% extends "cwod/base.html" %}
 
 {% load capwords %}
@@ -5,12 +6,13 @@
 {% load media %}
 
 {% block splash %}
+<body class="home">
+<div id="splash_text">
+    Dig up some data on the <em>words</em> our <em>legislators</em> use every day.
+</div>
 <div id="splash_image">
     <img src="{% media_url 'img/bubble.jpg' %}" width="180" height="179" alt="Bubble">
 
-</div>
-<div id="splash_text">
-    Dig up some data on the <em>words</em> our <em>legislators</em> use every day.
 </div>
 <div class="clear"></div>
 {% endblock splash %}
@@ -102,5 +104,6 @@
     <div class="clear"></div>
 </div>
 </div>
-
+</body>
 {% endblock content %}
+
