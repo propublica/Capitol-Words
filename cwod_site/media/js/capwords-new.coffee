@@ -454,7 +454,8 @@ class window.CapitolWords
 
                 imgUrl = cw.showChart [percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300',]
 
-                window.cw.annotation_results['term'] = [ (jQuery.extend true, [], results), ]
+                window.cw.annotation_results['term'] = []
+                window.cw.annotation_results['term'].push results
                 window.cw.annotation_line_coords['term'] = []
 
                 jQuery.getJSON (imgUrl + '&chof=json'), (data) ->
@@ -713,7 +714,10 @@ class window.CapitolWords
             $('#termChart').attr('src', imgUrl)
             #$('#customChart').attr('src', imgUrl)
 
-        else
+        else # homepage
+            window.cw.annotation_results['homepage'][0] = _(this.a['all']).select func
+            window.cw.annotation_results['homepage'][1] = _(this.b['all']).select func
+            
             aVals = _(this.a['all']).select func
             bVals = _(this.b['all']).select func
             labelPositions = this.buildXLabels aVals
@@ -805,15 +809,7 @@ class window.CapitolWords
         $('table#legislatorList tbody').fadeOut 'fast', buildTable
 
     populateTermDetailPage: (term) ->
-
-        # hacky, but necessary: the history stuff fires this twice otherwise, which pollutes the
-        # count objects used for the annotations
-        if window.term_has_been_populated
-            return
-        window.term_has_been_populated = true
-
-        if _(this.results).isUndefined()
-            this.getGraphData term
+        this.getGraphData term
 
         this.getStatePopularity term, jQuery('#stateBarChart')
 
@@ -918,7 +914,6 @@ class window.CapitolWords
         (url == origin || url.slice(0, origin.length + 1) == origin + '/') || (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') || !(/^(\/\/|http:|https:).*/.test(url))
 
     showChart: (data, x_labels, x_label_positions, width, height, colors, legend) ->
-
         width = width or 860
         height = height or 340
 
