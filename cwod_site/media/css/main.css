@@ -123,8 +123,8 @@ header nav a, footer nav a { text-decoration: none; color: #fbf4f4; font-family:
 
 h1 { text-indent: -9999em; display: block; width: 300px; height: 73px; background: url('../img/logo.png') 0 0 no-repeat; margin-bottom: 23px;}
 
-#mainActions { text-transform: lowercase; color: #f4f3f1; text-align: center; font-size: 115%; margin-left: 25px; margin-bottom:-19px; /*float:left;*/ }
-#mainActions li { background: url('../img/bg_mainActions.png') 0 0 no-repeat; width: 411px; height: 50px; padding-top: 11px; display:inline-block; zoom:1; *display:inline;}
+#mainActions { text-transform: lowercase; color: #f4f3f1; text-align: left; font-size: 115%; margin-left: 25px; margin-bottom:-19px; /*float:left;*/ }
+#mainActions li { background: url('../img/bg_mainActions.png') 0 0 no-repeat; width: 411px; height: 50px; padding-top: 11px; display:inline-block; zoom:1; *display:inline; text-align: center;}
 #mainActions li#betweenItem { background: none; width: auto; margin: 0 15px; font-style: oblique;}
 #mainActions a { color: #f4f3f1;}
 #mainSearch{ position:relative; }
