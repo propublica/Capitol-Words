@@ -1306,7 +1306,7 @@
     });
     $('#toggleSearchCompare').click(function(e) {
       e.preventDefault();
-      return $('.toggleSearchCompare').slideToggle();
+      return $('.toggleSearchCompare').slideToggle('fast', 'swing');
     });
     $('#compareBtn').live('click', function(e) {
       var word;
@@ -1428,7 +1428,7 @@
     $('.advanced').bind('click', function() {
       var t;
       t = $(this);
-      return $('ul.wordFilter').slideToggle('', function() {
+      return $('ul.wordFilter').slideToggle('fast', 'swing', function() {
         if ($(this).is(':visible')) {
           return t.addClass('expanded');
         } else {

@@ -1146,7 +1146,7 @@ $(document).ready ->
 
     $('#toggleSearchCompare').click (e) ->
         e.preventDefault()
-        $('.toggleSearchCompare').slideToggle()
+        $('.toggleSearchCompare').slideToggle 'fast', 'swing'
 
     $('#compareBtn').live 'click', (e) ->
         e.preventDefault()
@@ -1249,7 +1249,7 @@ $(document).ready ->
 
     $('.advanced').bind 'click', ->
         t = $(this)
-        $('ul.wordFilter').slideToggle '', ->
+        $('ul.wordFilter').slideToggle 'fast', 'swing', ->
             if $(this).is ':visible' then t.addClass 'expanded' else t.removeClass 'expanded'
 
     $('#embed span').bind 'click', ->
