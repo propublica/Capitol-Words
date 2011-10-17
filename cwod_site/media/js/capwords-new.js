@@ -45,6 +45,7 @@
     function CapitolWords() {}
     CapitolWords.prototype.a = {};
     CapitolWords.prototype.b = {};
+    CapitolWords.prototype.debug_progress = 0;
     CapitolWords.prototype.homepageDefaults = {
       'terma': 'Word or phrase',
       'termb': 'Word or phrase',
@@ -168,12 +169,41 @@
       }
       return _results;
     };
+    CapitolWords.prototype.debug_draw_outlines = function() {
+      var COLORS, draw_point, selected, selected_chart, series, _i, _len, _ref, _ref2;
+      COLORS = ['blue', 'green', 'red', 'orange', 'pink'];
+      _ref = window.cw.findSelectedChart(), selected = _ref[0], selected_chart = _ref[1];
+      draw_point = function(series) {
+        var FUZZ_X, FUZZ_Y;
+        if (window.cw.debug_progress > (series.length / 2)) {
+          return;
+        }
+        FUZZ_X = 5;
+        FUZZ_Y = 6;
+        if (selected === 'homepage') {
+          FUZZ_X = 12;
+          FUZZ_Y = 13;
+        }
+        return jQuery('<div class="dot" style="position:absolute; background-color:' + COLORS[1] + '; width:2px; height:2px"></div>').css({
+          left: jQuery(selected_chart).offset().left + series[window.cw.debug_progress] + FUZZ_X,
+          top: jQuery(selected_chart).offset().top + series[window.cw.debug_progress + 1] + FUZZ_Y
+        }).appendTo(jQuery(selected_chart).parent());
+      };
+      _ref2 = window.cw.annotation_line_coords[selected];
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        series = _ref2[_i];
+        draw_point(series);
+      }
+      window.cw.debug_progress += 2;
+      return window.setTimeout(window.cw.debug_draw_outlines, 50);
+    };
     CapitolWords.prototype.annotation_show = function(dp) {
       var FUZZ_X, FUZZ_Y, MONTHS, annotation_month, annotation_text, annotation_year, dp_result, dp_series_i, dp_x, dp_y, selected, selected_chart, _ref;
       _ref = window.cw.findSelectedChart(), selected = _ref[0], selected_chart = _ref[1];
       FUZZ_X = 5;
       FUZZ_Y = 6;
       if (selected === 'homepage') {
+        FUZZ_X = 12;
         FUZZ_Y = 13;
       }
       dp_series_i = dp[0];
