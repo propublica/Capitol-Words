@@ -1,10 +1,16 @@
 from django.conf.urls.defaults import *
 from django.conf import settings
+from django.views.generic.simple import direct_to_template
 
 from cwod.views import *
 
 
 urlpatterns = patterns('',
+
+        url(r'^about\/?$',
+            direct_to_template,
+            {'template': 'cwod/about.html', },
+            name='cwod_about'),
 
         url(r'^search\/?$',
             search,

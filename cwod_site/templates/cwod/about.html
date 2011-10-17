@@ -1,0 +1,180 @@
+{% extends "cwod/base.html" %}
+
+{% block content %}
+
+<h2>Methodology</h2>
+
+<p>The contents of the Congressional Record are downloaded daily from the <a href="http://www.gpo.gov/fdsys/browse/collection.action?collectionCode=CREC">website of the Government Printing Office</a>. The GPO distributes the Congressional Record in ZIP files containing the contents of the record in plain-text format.</p>
+
+<p>Each text file is parsed and turned into an XML document, with things like the title and speaker marked up. The contents of each file are then split up into words and phrases -- from one word to five.</p>
+
+<p>The resulting data is saved to a search engine.</p>
+
+<p>Capitol Words has data from 1996 to the present.</p>
+
+<h2>Words/phrases over time</h2>
+
+<p>Graphs on the Capitol Words site that show the occurrences of words and phrases over time do so using the relative frequency of the word or phrase. That is, the number of times the given word or phrase occurred divided by the total number of words or phrases of that size for that time period, multiplied by 100. This gives a better idea of how popular a term really was because it takes into account how much action there was in Congress in that time period.</p>
+
+<h2>Popular words/phrases</h2>
+
+<p>To calculate the top words and phrases for each entity, Capitol Words uses a weighting formula similar to <a href="http://en.wikipedia.org/wiki/Tf-idf">term frequency–inverse document frequency</a>. This formula gives a higher weight to words and phrases used more frequently by the given entity than by others.</p>
+
+<h2>API</h2>
+
+<p>The Capitol Words site runs on a built-in API, which is available to developers. To begin using the API, register for an API key at <a href="http://services.sunlightlabs.com/accounts/register/">Sunlight Data Services</a>.</p>
+
+<p>The following methods are provided:</p>
+
+<h3>dates.json</h3>
+<p>Show the popularity of a phrase over a period of time.</p>
+
+<h4>Required arguments</h4>
+<ul>
+    <li>apikey</li>
+    <li>phrase
+    <p>The phrase to search for.</p>
+    </li>
+</ul>
+
+<h4>Optional arguments</h4>
+<ul>
+    <li>state
+    <p>Limit results to members of Congress from the given state.</p>
+    </li>
+
+    <li>party
+    <p>Limit results to members of Congress from the given party.</p>
+    </li>
+
+    <li>bioguide
+    <p>Limit results to the member of Congress with the given Bioguide ID.</p>
+    </li>
+
+    <li>chamber
+        <p>The chamber to search. Default is House, Senate and extensions of remarks.</p>
+        <p>Valid values:
+        <ul>
+            <li>house</li>
+            <li>senate</li>
+            <li>extensions</li>
+        </ul>
+        </p>
+    </li>
+
+    <li>date
+    <p>Show results for only the given date.</p>
+
+    <li>start_date
+        <p>Limit results to those on or after the given date.</p>
+    </li>
+    <li>end_date
+        <p>Limit results to those on or before the given date.</p>
+    </li>
+    <li>granularity
+        <p>The length of time covered by each result</p>
+        <p>Valid values:</p>
+        <ul>
+            <li>year</li>
+            <li>month</li>
+            <li>day (default) </li>
+        </ul>
+    </li>
+
+</ul>
+
+<h3>phrases.json</h3>
+<p>List top phrases.</p>
+
+<h4>Required arguments</h4>
+<ul>
+    <li>apikey</li>
+</ul>
+
+<h4>Optional arguments</h4>
+<ul>
+    <li>n
+        <p>The size of phrase, in words, to search for (up to 5).
+    </li>
+    <li>start_date
+        <p>Limit results to those starting at the given date.</p>
+        <p>If this argument is supplied, end_date is required.</p>
+    </li>
+    <li>end_date
+        <p>Limit results to those ending at the given date.</p>
+        <p>If this argument is supplied, start_date is required.</p>
+    </li>
+    <li>entity_type
+        <p>The entity type.</p>
+        <p>Valid values:</p>
+        <ul>
+            <li>state</li>
+            <li>party</li>
+            <li>legislator</li>
+            <li>bioguide</li>
+        </ul>
+        <p>If this argument is supplied, entity_value is required.</p>
+    </li>
+    <li>entity_value
+        <p>The value of the entity given in entity_type.</p>
+        <p>If this argument is supplied, entity_type is required.</p>
+    </li>
+    <li>page
+        <p>The page of results to show.</p>
+        <p>100 results are shown at a time. To get more than 100 results, use the page parameter.</p>
+    </li>
+    <li>stemmed
+        <p>Set as 'true' to use stemming in top-word list.</p>
+        <p>Note that this works only if n=1</p>
+    </li>
+    <li>chamber
+        <p>The chamber to search. Default is House, Senate and extensions of remarks.</p>
+        <p>Valid values:</p>
+        <ul>
+            <li>house</li>
+            <li>senate</li>
+            <li>extensions</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>text.json</h3>
+<p>Full-text search by phrase.</p>
+
+<h4>Optional arguments</h4>
+<ul>
+    <li>phrase
+    <p>The text to search for.</p>
+    <li>start_date
+        <p>Limit results to those starting at the given date.</p>
+        <p>If this argument is supplied, end_date is required.</p>
+    </li>
+    <li>end_date
+        <p>Limit results to those ending at the given date.</p>
+        <p>If this argument is supplied, start_date is required.</p>
+    </li>
+    <li>entity_type
+        <p>The entity type.</p>
+        <p>Valid values:</p>
+        <ul>
+            <li>state</li>
+            <li>party</li>
+            <li>legislator</li>
+            <li>bioguide</li>
+        </ul>
+        <p>If this argument is supplied, entity_value is required.</p>
+    </li>
+    <li>entity_value
+        <p>The value of the entity given in entity_type.</p>
+        <p>If this argument is supplied, entity_type is required.</p>
+    </li>
+    <li>cr_pages
+        <p>The pages in the Congressional Record to search.</p>
+    </li>
+    <li>page
+        <p>The page of results to show.</p>
+        <p>100 results are shown at a time. To get more than 100 results, use the page parameter.</p>
+    </li>
+</ul>
+
+{% endblock %}
