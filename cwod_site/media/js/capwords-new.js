@@ -569,7 +569,8 @@
           percentages = _(results).pluck('percentage');
           labelPositions = cw.buildXLabels(results);
           imgUrl = cw.showChart([percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300']);
-          window.cw.annotation_results['term'] = [jQuery.extend(true, [], results)];
+          window.cw.annotation_results['term'] = [];
+          window.cw.annotation_results['term'].push(results);
           window.cw.annotation_line_coords['term'] = [];
           jQuery.getJSON(imgUrl + '&chof=json', function(data) {
             var copy_coords, csj, overallImgTag, _i, _len, _ref;
@@ -855,6 +856,8 @@
         imgUrl = this.showChart([percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300']);
         return $('#termChart').attr('src', imgUrl);
       } else {
+        window.cw.annotation_results['homepage'][0] = _(this.a['all']).select(func);
+        window.cw.annotation_results['homepage'][1] = _(this.b['all']).select(func);
         aVals = _(this.a['all']).select(func);
         bVals = _(this.b['all']).select(func);
         labelPositions = this.buildXLabels(aVals);
@@ -935,13 +938,7 @@
       return $('table#legislatorList tbody').fadeOut('fast', buildTable);
     };
     CapitolWords.prototype.populateTermDetailPage = function(term) {
-      if (window.term_has_been_populated) {
-        return;
-      }
-      window.term_has_been_populated = true;
-      if (_(this.results).isUndefined()) {
-        this.getGraphData(term);
-      }
+      this.getGraphData(term);
       this.getStatePopularity(term, jQuery('#stateBarChart'));
       this.getPartyPieChart(term, jQuery('#partyPieChart'));
       this.getLegislatorPopularity(term, jQuery('#legislatorBarChart'));
