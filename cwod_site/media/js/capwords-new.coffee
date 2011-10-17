@@ -70,7 +70,11 @@ class window.CapitolWords
     annotation_interval: null
     annotation_interval_frequency: 50
     annotation_line_coords: []
-    annotation_results: []
+    annotation_results: {
+        term: [],
+        homepage: [[], []],
+        party: []
+    }
     inchart: false
 
 
