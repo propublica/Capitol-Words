@@ -58,7 +58,6 @@ def index(request):
 
     #return direct_to_template(request, template='index.html')
 
-
 @login_required
 def faster_term_detail(request, term):
     # For better URLs, replace spaces with underscores

@@ -127,7 +127,11 @@
     CapitolWords.prototype.annotation_interval = null;
     CapitolWords.prototype.annotation_interval_frequency = 50;
     CapitolWords.prototype.annotation_line_coords = [];
-    CapitolWords.prototype.annotation_results = [];
+    CapitolWords.prototype.annotation_results = {
+      term: [],
+      homepage: [[], []],
+      party: []
+    };
     CapitolWords.prototype.inchart = false;
     CapitolWords.prototype.addLegislatorToChart = function(result, maxcount, div, callback) {
       var bioguide_id, cw, pct, url;
