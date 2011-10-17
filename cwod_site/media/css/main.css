@@ -1,4 +1,4 @@
-/*  HTML5 ✰ Boilerplate  */
+/*	HTML5 ✰ Boilerplate	 */
 
 html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp,
@@ -20,8 +20,8 @@ blockquote, q {
 	background:url('../img/quotes.png') 12px top no-repeat ;
 	quotes: '»' '«' ;
 	margin-left:30px;
-    padding-left:35px;
-    border-left: 1px solid #E5E4DB;
+	padding-left:35px;
+	border-left: 1px solid #E5E4DB;
 	color: #726B68;
 	margin-bottom: 1em;
 	}
@@ -99,7 +99,7 @@ a:link { -webkit-tap-highlight-color: #CA5703; }
 .hidden { display: none; visibility: hidden; }
 .visuallyhidden { position: absolute !important; clip: rect(1px 1px 1px 1px);  clip: rect(1px, 1px, 1px, 1px); }
 .invisible { visibility: hidden; }
-.clearfix:before, .clearfix:after {  content: "\0020"; display: block; height: 0; visibility: hidden; }
+.clearfix:before, .clearfix:after {	 content: "\0020"; display: block; height: 0; visibility: hidden; }
 .clearfix:after { clear: both; }
 .clearfix { zoom: 1; }
 .clear { clear: both;}
@@ -123,7 +123,7 @@ header nav a, footer nav a { text-decoration: none; color: #fbf4f4; font-family:
 
 h1 { text-indent: -9999em; display: block; width: 300px; height: 73px; background: url('../img/logo.png') top left no-repeat; margin-bottom: 23px;}
 
-#mainActions { text-transform: lowercase; color: #f4f3f1; text-align: center; font-size: 115%; margin-left: 25px;}
+#mainActions { text-transform: lowercase; color: #f4f3f1; text-align: center; font-size: 115%; margin-left: 25px; margin-bottom:-19px}
 #mainActions li { float: left; background: url('../img/bg_mainActions.png') top left no-repeat; width: 411px; height: 50px; padding-top: 11px;}
 #mainActions li#betweenItem { background: none; width: auto; margin: 0 15px; font-style: oblique;}
 #mainActions a { color: #f4f3f1;}
@@ -141,7 +141,7 @@ h5 { font-weight: normal; font-size: 140%; margin-bottom: 15px; }
 .rightHeader { background: url('../img/bg_secondTitle.png') top left repeat-x; padding: 3px 30px; margin-left: -30px; margin-bottom: 30px; }
 .leftHeader { margin-bottom: 20px;}
 
-#internalHead {  border-bottom: 1px dotted #4a4342; padding-bottom: 10px; background: url('../img/bg_headerLine.png') left 15px no-repeat; padding-left: 30px; }
+#internalHead {	 border-bottom: 1px dotted #4a4342; padding-bottom: 10px; background: url('../img/bg_headerLine.png') left 15px no-repeat; padding-left: 30px; }
 #compareBtn { float: right; }
 
 input { padding: 5px 8px; background: #e6e4e2 url('../img/bg_input.png') left bottom repeat-x; -moz-border-radius: 5px; -webkit-border-radius: 5px; border: 1px solid #021017; }
@@ -157,7 +157,7 @@ input { padding: 5px 8px; background: #e6e4e2 url('../img/bg_input.png') left bo
 
 
 #timeFilterWrapper { background: url('../img/bg_rightView.png') right top no-repeat; padding-right: 20px; width: 250px; padding-bottom: 3px; margin-top: 25px;}
-#ltColumn #timeFilterWrapper { margin-top: 0; margin-bottom: 40px;  }
+#ltColumn #timeFilterWrapper { margin-top: 0; margin-bottom: 40px;	}
 #timeFilter { background: url('../img/bg_leftView.png') top left no-repeat; padding-left: 20px; text-align: center; padding-bottom: 3px; margin-bottom: 0;}
 #timeFilter label { margin-right: 10px;}
 
@@ -202,7 +202,7 @@ input { padding: 5px 8px; background: #e6e4e2 url('../img/bg_input.png') left bo
 .barChart a, #main table a { color: #fdf1f1; border-bottom: 1px dotted #A79E9C; text-decoration: none;}
 #main table { color: #fdf1f1;}
 
-.tagValue { background: url('../img/bg_barTexture.jpg') top left repeat-x;  position: absolute; height: 100%;}
+.tagValue { background: url('../img/bg_barTexture.jpg') top left repeat-x;	position: absolute; height: 100%;}
 .tagPercent { text-indent: -9999em; display: block; float: left;}
 .leftModule .tagValue { text-indent: -9999em; }
 .barChart li { position: relative; margin-bottom: 3px; height: 26px;}
@@ -220,9 +220,9 @@ input { padding: 5px 8px; background: #e6e4e2 url('../img/bg_input.png') left bo
 #popularWords { float: left; width: 520px; padding: 0 0 0 30px; background: url('../img/bg_vertBorder.jpg') left top repeat-y; }
 
 #popularWords .date a {
-    border-bottom: 1px dotted #FDF1F1;
-    color: #FDF1F1;
-    font-style: oblique;
+	border-bottom: 1px dotted #FDF1F1;
+	color: #FDF1F1;
+	font-style: oblique;
 }
 
 #signUp li { float: left; position: relative; }
@@ -294,7 +294,7 @@ th {text-transform: uppercase;}
 .entTitle{width: 50%}
 .sort{padding-left: 11px;background: url('img/sort_double.png') 10px center no-repeat;}
 .toggleSearchCompare{display:none;}
-#searchCompare{width: 890px; background: url('../img/bg_secondTitle_alt.png') top left repeat, url('../img/compare_arrow.png') 530px 6px no-repeat; background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 43px 30px 30px 30px; margin: 0 0 30px 0;/* rt margin was 25 */ display: block;}
+#searchCompare{/*width: 890px;*/ background: url('../img/bg_secondTitle_alt.png') top left repeat, url('../img/compare_arrow.png') 530px 6px no-repeat; background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 43px 30px 30px 30px; display: block;}
 #searchCompare h5 { margin-bottom: 30px}
 
 #searchCompare h5 tip{ font-style: italic; font-size: 80%}
@@ -317,8 +317,8 @@ th {text-transform: uppercase;}
 
 #searchCompare ul>li {
 	display: inline-block;
-    zoom: 1;
-    *display: inline;
+	zoom: 1;
+	*display: inline;
 	}
 #searchCompare form>ul>li {vertical-align: top;}
 #searchCompare ul>li ul.terms>li {display: inline}
@@ -332,7 +332,7 @@ th {text-transform: uppercase;}
 
 #fullColumn #searchCompare, #fullColumn #compareGraphic{ margin-left: -30px; width: 890px; margin-bottom: 50px}
 
-#compareGraphic {background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 20px 30px 30px 30px; margin: -19px 0 30px 0; display: visible;}
+#compareGraphic {background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 20px 30px 30px 30px; margin: 0 25px 30px 0; display: visible;}
 
 .thirdColumn {float: left; background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 30px 30px 30px 30px; margin: -19px 25px 30px 0; display: visible; width: 240px;}
 .three.thirdColumn {margin-right: 0;}
@@ -403,9 +403,9 @@ th {text-transform: uppercase;}
 #splash_image img{ border: 0;}
 #splash_text em{ color: #e1dddc; font-weight: bold;}
 
-header #searchCompare{
+/*header #searchCompare{
 	margin-top: -19px;
-}
+}*/
 
 #searchCompare .eachWord li{
 	display: block;
@@ -442,11 +442,11 @@ header #searchCompare{
 }
 
 ul.wordFilter{
-	display: none;
+/*  display: none;*/
 }
 
 .wordFilter{
-    width: 286px;
+	width: 286px;
 	padding: 0 15px 0 15px;
 	margin-top: 20px;
 	height: 62px;
@@ -469,12 +469,12 @@ ul.wordFilter{
 }
 
 .expanded{
-    background: url('../img/expand.png') right -24px no-repeat;
+	background: url('../img/expand.png') right -24px no-repeat;
 	float: right;
 }
 
 .advanced span {
-    cursor: pointer; text-decoration: underline; color: #b99004;
+	cursor: pointer; text-decoration: underline; color: #b99004;
 }
 
 .thirdColumn .tagValue{
@@ -578,8 +578,8 @@ div.ngramMenu span#selected { text-decoration: none; cursor: default; }
 }
 
 #compareGraphic .default{
-	background:url('../img/chart_bg_home.png') center top repeat-x,  url('../img/chart_bg_right_home.png') right center no-repeat, url('../img/chart_bg_left_home.png') left center no-repeat;
-	
+	background:url('../img/chart_bg_home.png') center top repeat-x,	 url('../img/chart_bg_right_home.png') right center no-repeat, url('../img/chart_bg_left_home.png') left center no-repeat;
+
 	border: 5px solid #3c3333;
 	padding: 6px 10px 6px 10px;
 }
@@ -610,7 +610,7 @@ div.ngramMenu span#selected { text-decoration: none; cursor: default; }
 	display: block;
 	background: url('../img/embed.png') left 5px no-repeat;
 	padding-left: 35px;
-    cursor: pointer;
+	cursor: pointer;
 }
 .withAction h3{
 	float: left;
@@ -669,49 +669,51 @@ li.embedDark, li.embedLight{
 
 
 .annotation {
-    font-size: 11px;
-    z-index: 99;
-    height: 32px;
-    line-height: 13px;
-    color: #2d2525;
-    margin: -16px 0 0 2px;
-    position: absolute;
-    display: none;
+	font-size: 11px;
+	z-index: 99;
+	height: 32px;
+	line-height: 13px;
+	color: #2d2525;
+	margin: -16px 0 0 2px;
+	position: absolute;
+	display: none;
 
-    background: url(../img/annotation_arrow.png) left top no-repeat;
-    padding: 0 0 0 8px;
+	background: url(../img/annotation_arrow.png) left top no-repeat;
+	padding: 0 0 0 8px;
 
 }
 .annotation.flipped {
-    background: url(../img/annotation_arrow_flipped.png) right top no-repeat;
-    padding: 0 8px 0 0;
+	background: url(../img/annotation_arrow_flipped.png) right top no-repeat;
+	padding: 0 8px 0 0;
 
 }
 .annotation .inner-annotation {
-    background-color: #f2f1ed;
-    margin: 0;
-    padding: 3px 4px 3px 4px;
-    position: relative;
+	background-color: #f2f1ed;
+	margin: 0;
+	padding: 3px 4px 3px 4px;
+	position: relative;
 }
 .annotation .annotation-count { font-weight: bold; }
 .annotation .annotation-date { font-style: italic; }
+
 #overallTimeline, #partyTimeline, img.default { cursor: pointer; }
 body.home #containerWrapper{
-    background: url('../img/bg_home.jpg') center top repeat-x;
+	background: url('../img/bg_home.jpg') center top repeat-x;
 }
 
 .home #main{
-    background: url('../img/bg_headerLine_home.png') left 3px no-repeat; 
-    padding-top: 55px;
+	background: url('../img/bg_headerLine_home.png') left 3px no-repeat;
+	padding-top: 55px;
 }
 
 .home header{
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
+<<<<<<< Updated upstream
 .home #container{
-    padding-right: 0;
-    width: 950px;
+	padding-right: 0;
+	width: 950px;
 }
 
 
@@ -726,3 +728,15 @@ body.home #containerWrapper{
 
 
 
+=======
+#overallTimeline, #partyTimeline { cursor: pointer; }
+
+.clearfix:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+	zoom:1;
+}
+>>>>>>> Stashed changes
