@@ -30,6 +30,7 @@ main application class
 class window.CapitolWords
     a: {}
     b: {}
+    debug_progress: 0
     homepageDefaults:
         'terma':'Word or phrase'
         'termb': 'Word or phrase'
@@ -103,12 +104,42 @@ class window.CapitolWords
 
         window.cw.annotation_show dp for dp in window.cw.findActiveDataPoints()                
 
+    debug_draw_outlines: () ->        
+
+        COLORS = ['blue', 'green', 'red', 'orange', 'pink']
+        [selected, selected_chart] = window.cw.findSelectedChart()
+        
+        draw_point = (series) ->
+            if window.cw.debug_progress > (series.length/2)
+                return
+                
+            FUZZ_X = 5
+            FUZZ_Y = 6
+            if selected is 'homepage'
+                FUZZ_X = 12
+                FUZZ_Y = 13
+
+            jQuery('<div class="dot" style="position:absolute; background-color:' + COLORS[1] + '; width:2px; height:2px"></div>').css({
+                left: jQuery(selected_chart).offset().left + series[window.cw.debug_progress] + FUZZ_X,
+                top: jQuery(selected_chart).offset().top + series[window.cw.debug_progress + 1] + FUZZ_Y,
+            }).appendTo(jQuery(selected_chart).parent())
+
+        draw_point series for series in window.cw.annotation_line_coords[selected]
+
+        window.cw.debug_progress += 2
+
+        window.setTimeout window.cw.debug_draw_outlines, 50
+            
+
+
+
     annotation_show: (dp) ->
         [selected, selected_chart] = window.cw.findSelectedChart()
         
         FUZZ_X = 5
         FUZZ_Y = 6
         if selected is 'homepage'
+            FUZZ_X = 12
             FUZZ_Y = 13
 
         dp_series_i = dp[0]
