@@ -21,7 +21,7 @@ decodes uri components and strips html tags
 $.cleanedValue = (str) ->
     return '' unless str
     str = decodeURIComponent(str).replace /\+/g, ' '
-    return $("<div>#{str}</div>").text().trim()
+    return $.trim($("<div>#{str}</div>").text())
 
 ###
 CapitolWords
@@ -100,23 +100,23 @@ class window.CapitolWords
                 })
 
                 callback()
-                
+
     annotation_callback: () ->
         if (not window.cw.inchart) or (not window.cw.annotation_line_coords)
             jQuery('.annotation').hide()
             return
 
-        window.cw.annotation_show dp for dp in window.cw.findActiveDataPoints()                
+        window.cw.annotation_show dp for dp in window.cw.findActiveDataPoints()
 
-    debug_draw_outlines: () ->        
+    debug_draw_outlines: () ->
 
         COLORS = ['blue', 'green', 'red', 'orange', 'pink']
         [selected, selected_chart] = window.cw.findSelectedChart()
-        
+
         draw_point = (series) ->
             if window.cw.debug_progress > (series.length/2)
                 return
-                
+
             FUZZ_X = 5
             FUZZ_Y = 6
             if selected is 'homepage'
@@ -133,13 +133,13 @@ class window.CapitolWords
         window.cw.debug_progress += 2
 
         window.setTimeout window.cw.debug_draw_outlines, 50
-            
+
 
 
 
     annotation_show: (dp) ->
         [selected, selected_chart] = window.cw.findSelectedChart()
-        
+
         FUZZ_X = 5
         FUZZ_Y = 6
         if selected is 'homepage'
@@ -319,15 +319,15 @@ class window.CapitolWords
         DETECTION_FUZZ_X = 6
         if selected is 'homepage'
             DETECTION_FUZZ_X = 21
-        
+
         series_i = 0
 
-        while series_i<window.cw.annotation_line_coords[selected].length                
+        while series_i<window.cw.annotation_line_coords[selected].length
             datapoint_i = 0
             while ((window.cw.annotation_line_coords[selected][series_i][datapoint_i]+DETECTION_FUZZ_X)<(window.cw.pagex - (jQuery selected_chart).offset().left) and (datapoint_i<window.cw.annotation_results[selected][series_i].length*2))
                 datapoint_i += 2
 
-            if (datapoint_i/2) < window.cw.annotation_results[selected][series_i].length    
+            if (datapoint_i/2) < window.cw.annotation_results[selected][series_i].length
                 return_vals.push [ series_i, window.cw.annotation_results[selected][series_i][datapoint_i/2], window.cw.annotation_line_coords[selected][series_i][datapoint_i], window.cw.annotation_line_coords[selected][series_i][datapoint_i+1] ]
 
             series_i += 1
@@ -721,7 +721,7 @@ class window.CapitolWords
         else # homepage
             window.cw.annotation_results['homepage'][0] = _(this.a['all']).select func
             window.cw.annotation_results['homepage'][1] = _(this.b['all']).select func
-            
+
             aVals = _(this.a['all']).select func
             bVals = _(this.b['all']).select func
             labelPositions = this.buildXLabels aVals
@@ -763,7 +763,7 @@ class window.CapitolWords
         phraseB = $('#termb').val()
         if phraseB == 'Word or phrase'
             phraseB = ''
-         
+
         if (window.cw.random_phrase_i isnt undefined) or (phraseA=='') and (phraseB=='') and (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))
             SAMPLE_PHRASES = [
                 ['global warming', 'climate change'],
@@ -775,7 +775,7 @@ class window.CapitolWords
             if window.cw.random_phrase_i is undefined
                 window.cw.random_phrase_i = Math.floor(Math.random() * SAMPLE_PHRASES.length)
             return SAMPLE_PHRASES[window.cw.random_phrase_i]
-            
+
         return [phraseA, phraseB]
 
     populateLegislatorList: (legislators) ->
@@ -825,7 +825,7 @@ class window.CapitolWords
 
         if this.start_date and this.end_date
             this.getCREntries term
-     
+
         window.clearInterval window.cw.annotation_interval
         window.cw.annotation_interval = window.setInterval window.cw.annotation_callback, window.cw.annotation_interval_frequency
 
@@ -958,8 +958,8 @@ class window.CapitolWords
                     if c.name.match /^line/
                         window.cw.annotation_line_coords['homepage'].push (jQuery.extend true, [], c.coords)
 
-                copy_coords(csj) for csj in data.chartshape            
-            
+                copy_coords(csj) for csj in data.chartshape
+
             $('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url()).fadeIn 100
 
             ((((jQuery '#chart img.realChart, #compareGraphic img.default').mouseenter (event) ->

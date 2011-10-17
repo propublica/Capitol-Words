@@ -1,6 +1,6 @@
 <div id="searchCompare">
     <form action="/search/" method="get" id="termSelect">
-        <ul class="wordCompare">
+        <ul class="wordCompare clearfix">
             <li class="eachWord">
                 <label>Pick a word or phrase</label>
                 <input id="terma" class="id_addTerm" type="text" value="{{ termA|default:'Word or phrase' }}"/>
@@ -12,7 +12,7 @@
                         </select>
                     </li>
                     <li class="partyA partyChoice clear">
-                        <ul>
+                        <ul class="clearfix">
                             <li><label><input id="partyAAll" class="radio" type="radio" name="partyA" value="" CHECKED/>All</label></li>
                             <li><label><input id="partyAD" class="radio" type="radio" name="partyA" value="D"/>Democrats</label></li>
                             <li><label><input id="partyAR" class="radio" type="radio" name="partyA" value="R"/>Republicans</label></li>
