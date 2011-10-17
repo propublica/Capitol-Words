@@ -75,7 +75,7 @@ sup { vertical-align: super; font-size: smaller; }
 pre {  padding: 15px;  white-space: pre;  white-space: pre-wrap;  white-space: pre-line;  word-wrap: break-word; }
 textarea { overflow: auto; }
 .ie6 legend, .ie7 legend { margin-left: -7px; }
-input[type="radio"] { vertical-align: text-bottom; background: none; border: none; padding-left: 0; padding-right: 0; }
+input[type="radio"] { vertical-align: text-bottom; background: none; border: none; padding-left: 0; padding-right: 0; margin-right: 8px;}
 input[type="checkbox"] { vertical-align: bottom; }
 .ie7 input[type="checkbox"] { vertical-align: baseline; }
 .ie6 input { vertical-align: text-bottom; }
@@ -124,7 +124,7 @@ header nav a, footer nav a { text-decoration: none; color: #fbf4f4; font-family:
 h1 { text-indent: -9999em; display: block; width: 300px; height: 73px; background: url('../img/logo.png') top left no-repeat; margin-bottom: 23px;}
 
 #mainActions { text-transform: lowercase; color: #f4f3f1; text-align: center; font-size: 115%; margin-left: 25px;}
-#mainActions li { float: left; background: url('../img/bg_mainActions.jpg') top left no-repeat; width: 411px; height: 50px; padding-top: 11px;}
+#mainActions li { float: left; background: url('../img/bg_mainActions.png') top left no-repeat; width: 411px; height: 50px; padding-top: 11px;}
 #mainActions li#betweenItem { background: none; width: auto; margin: 0 15px; font-style: oblique;}
 #mainActions a { color: #f4f3f1;}
 
@@ -294,7 +294,7 @@ th {text-transform: uppercase;}
 .entTitle{width: 50%}
 .sort{padding-left: 11px;background: url('img/sort_double.png') 10px center no-repeat;}
 .toggleSearchCompare{display:none;}
-#searchCompare{background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 30px 30px 30px 30px; margin: 0 0 30px 0;/* rt margin was 25 */ display: block;}
+#searchCompare{width: 890px; background: url('../img/bg_secondTitle_alt.png') top left repeat, url('../img/compare_arrow.png') 530px 6px no-repeat; background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 43px 30px 30px 30px; margin: 0 0 30px 0;/* rt margin was 25 */ display: block;}
 #searchCompare h5 { margin-bottom: 30px}
 
 #searchCompare h5 tip{ font-style: italic; font-size: 80%}
@@ -397,7 +397,7 @@ th {text-transform: uppercase;}
 	padding-bottom: 10px;
 }
 
-#splash_image { padding-bottom: 10px; background: url('../img/bg_headerLine.png') left 15px no-repeat; padding-left: 60px; float: left; height: 180px;}
+#splash_image { padding-bottom: 10px; padding-left: 60px; float: left; height: 180px;}
 #splash_text { border-bottom: 1px dotted #4a4342; padding-top: 29px; padding-bottom: 10px; margin-left: 30px; float: left; height: 103px; font-size: 300%; font-style: italic; width: 600px; line-height: 1.3; color: #d5d0ce;}
 
 #splash_image img{ border: 0;}
@@ -446,7 +446,8 @@ ul.wordFilter{
 }
 
 .wordFilter{
-	padding: 0 0 0 20px;
+    width: 286px;
+	padding: 0 15px 0 15px;
 	margin-top: 20px;
 	height: 62px;
 	background: url('../img/bg_rightView_2x.png') right top no-repeat, url('../img/bg_leftView_2x.png') top left no-repeat;
@@ -694,3 +695,30 @@ li.embedDark, li.embedLight{
 .annotation .annotation-count { font-weight: bold; }
 .annotation .annotation-date { font-style: italic; }
 #overallTimeline, #partyTimeline, img.default { cursor: pointer; }
+body.home #containerWrapper{
+    background: url('../img/bg_home.jpg') center top repeat-x;
+}
+
+.home #main{
+    background: url('../img/bg_headerLine_home.png') left 3px no-repeat; 
+    padding-top: 55px;
+}
+
+.home header{
+    margin-bottom: 20px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
