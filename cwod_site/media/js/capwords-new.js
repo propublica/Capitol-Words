@@ -35,7 +35,7 @@
       return '';
     }
     str = decodeURIComponent(str).replace(/\+/g, ' ');
-    return $("<div>" + str + "</div>").text().trim();
+    return $.trim($("<div>" + str + "</div>").text());
   };
   /*
   CapitolWords
@@ -1304,9 +1304,16 @@
     $('img').error(function() {
       return $(this).hide();
     });
-    $('#toggleSearchCompare').click(function() {
-      $('.toggleSearchCompare').slideToggle();
-      return false;
+    $('#toggleSearchCompare').click(function(e) {
+      e.preventDefault();
+      return $('.toggleSearchCompare').slideToggle();
+    });
+    $('#compareBtn').live('click', function(e) {
+      var word;
+      e.preventDefault();
+      word = $(this).find('em').text();
+      $('#terma').val(word);
+      return $('#toggleSearchCompare').trigger('click');
     });
     $('.ngramMenu span').bind('click', function(x) {
       var classToShow;
