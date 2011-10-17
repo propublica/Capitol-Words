@@ -710,33 +710,8 @@ body.home #containerWrapper{
 	margin-bottom: 20px;
 }
 
-<<<<<<< Updated upstream
 .home #container{
 	padding-right: 0;
 	width: 950px;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-=======
-#overallTimeline, #partyTimeline { cursor: pointer; }
-
-.clearfix:after {
-	content: ".";
-	display: block;
-	height: 0;
-	clear: both;
-	visibility: hidden;
-	zoom:1;
-}
->>>>>>> Stashed changes
