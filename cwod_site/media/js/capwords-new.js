@@ -268,14 +268,14 @@
       var legend, partyA, partyB, stateA, stateB, template, termA, termB;
       legend = this.build_legend();
       termA = legend[0] && legend[0].split(' [')[0] || "(no term)";
-      partyA = $.trim($('.partyA input:checked').eq(0).parent().text());
+      partyA = $('.partyA input:checked').eq(0).parent().text().trim();
       if (partyA === 'All') {
         partyA = 'All Parties';
       }
       stateA = $('#stateA');
       stateA = stateA.val() && this.states[stateA.val()] || "All states";
       termB = legend[1] && legend[1].split(' [')[0] || "(no term)";
-      partyB = $.trim($('.partyB input:checked').eq(0).parent().text());
+      partyB = $('.partyB input:checked').eq(0).parent().text().trim();
       if (partyB === 'All') {
         partyB = 'All Parties';
       }
@@ -1304,9 +1304,16 @@
     $('img').error(function() {
       return $(this).hide();
     });
-    $('#toggleSearchCompare').click(function() {
-      $('.toggleSearchCompare').slideToggle();
-      return false;
+    $('#toggleSearchCompare').click(function(e) {
+      e.preventDefault();
+      return $('.toggleSearchCompare').slideToggle();
+    });
+    $('#compareBtn').live('click', function(e) {
+      var word;
+      e.preventDefault();
+      word = $(this).find('em').text();
+      $('#terma').val(word);
+      return $('#toggleSearchCompare').trigger('click');
     });
     $('.ngramMenu span').bind('click', function(x) {
       var classToShow;

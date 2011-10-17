@@ -1137,9 +1137,15 @@ $(document).ready ->
     $('img').error ->
         $(this).hide()
 
-    $('#toggleSearchCompare').click ->
+    $('#toggleSearchCompare').click (e) ->
+        e.preventDefault()
         $('.toggleSearchCompare').slideToggle()
-        false
+
+    $('#compareBtn').live 'click', (e) ->
+        e.preventDefault()
+        word = $(this).find('em').text()
+        $('#terma').val word
+        $('#toggleSearchCompare').trigger 'click'
 
     $('.ngramMenu span').bind 'click', (x) ->
         classToShow = $(this).attr 'class'
