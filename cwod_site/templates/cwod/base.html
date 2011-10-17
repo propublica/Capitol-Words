@@ -11,10 +11,10 @@
         <meta name="description" content="Capitol Words explores the most popular words and phrases used by legislators in Washington. Search the data from 1996 to today by state, date or politician.">
 
         <title>{% block title %}Capitol Words{% endblock title %}</title>
-		<!--[if IE ]>{% css "styles/ie.css" %}<![endif]-->
-		<!--[if lt IE 9]>
-		<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
+        <!--[if IE ]>{% css "styles/ie.css" %}<![endif]-->
+        <!--[if lt IE 9]>
+        <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
         {% css "css/jquery.ui/jquery.ui.all.css" %}
         {% css "css/main.css?v=97" %}
 
@@ -24,8 +24,7 @@
         {% endblock head %}
     </head>
 
-    <body>
-        {% block body %}
+    <body class="{% block bodyclass %}{% endblock %}">
         <div id="containerWrapper">
         <div id="container">
             <header>
@@ -41,7 +40,6 @@
                 <a href="/"><h1>Capitol Words <small>a project of the Sunlight Foundation</small></h1></a>
 
                 {% block splash %}{% endblock %}
-
                 <ul id="mainActions" class="clearfix">
                     <li>
                         <form id="mainSearch" action="/search/" method="get">
@@ -59,12 +57,12 @@
                     <a id="toggleSearchCompare" href="{% url cwod_home %}#searchCompare">Compare Congressional Words and/or Phrases</a>
                     </li>
                 </ul>
-                <div class="clear"></div>
                 {% block search_compare %}
-                    <div class="toggleSearchCompare">
+                    <div class="toggleSearchCompare clearfix">
                     {% include "cwod/partials/search_compare_form.html" %}
                     </div>
                 {% endblock search_compare %}
+                <div class="clear"></div>
             </header>
             {% block content %}
             {% endblock content %}
@@ -213,5 +211,3 @@
 
     </body>
 </html>
-
-        {% endblock body %}
