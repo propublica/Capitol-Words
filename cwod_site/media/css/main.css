@@ -152,7 +152,7 @@ input { padding: 5px 8px; background: #e6e4e2 url('../img/bg_input.png') left bo
 #ltColumn.search, #ltColumn.index{width: 275px;}
 #rtColumn.search, #rtColumn.index{width: 575px;}
 
-#fullColumn { float: left; width: 920px; margin-right: 30px; background: url('../img/bg_mainLine.png') left top repeat-y; padding-left: 30px;}
+#fullColumn { float: left; width: 920px; margin-right: 0; background: url('../img/bg_mainLine.png') left top repeat-y; padding-left: 30px;}
 
 
 
@@ -332,7 +332,7 @@ th {text-transform: uppercase;}
 
 #fullColumn #searchCompare, #fullColumn #compareGraphic{ margin-left: -30px; width: 890px; margin-bottom: 50px}
 
-#compareGraphic {background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 20px 30px 30px 30px; margin: -19px 25px 30px 0; display: visible;}
+#compareGraphic {background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 20px 30px 30px 30px; margin: -19px 0 30px 0; display: visible;}
 
 .thirdColumn {float: left; background: url('../img/bg_secondTitle_alt.png') top left repeat; padding: 30px 30px 30px 30px; margin: -19px 25px 30px 0; display: visible; width: 240px;}
 .three.thirdColumn {margin-right: 0;}
@@ -579,8 +579,9 @@ div.ngramMenu span#selected { text-decoration: none; cursor: default; }
 
 #compareGraphic .default{
 	background:url('../img/chart_bg_home.png') center top repeat-x,  url('../img/chart_bg_right_home.png') right center no-repeat, url('../img/chart_bg_left_home.png') left center no-repeat;
+	
 	border: 5px solid #3c3333;
-	padding: 6px;
+	padding: 6px 10px 6px 10px;
 }
 
 #crEntries em{
@@ -708,7 +709,10 @@ body.home #containerWrapper{
     margin-bottom: 20px;
 }
 
-
+.home #container{
+    padding-right: 0;
+    width: 950px;
+}
 
 
 
