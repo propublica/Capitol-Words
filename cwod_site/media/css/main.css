@@ -222,6 +222,7 @@ input { padding: 5px 8px; background: #e6e4e2 url('../img/bg_input.png') left bo
 	border-bottom: 1px dotted #FDF1F1;
 	color: #FDF1F1;
 	font-style: oblique;
+	text-decoration: none;
 }
 
 #signUp li { float: left; position: relative; }
@@ -398,7 +399,7 @@ th {text-transform: uppercase;}
 }
 
 #splash_image { padding-bottom: 10px; padding-left: 60px; float: left; height: 180px;}
-#splash_text { border-bottom: 1px dotted #4a4342; padding-top: 29px; padding-bottom: 10px; margin-left: 30px; float: left; height: 103px; font-size: 300%; font-style: italic; width: 600px; line-height: 1.3; color: #d5d0ce;}
+#splash_text { border-bottom: 1px dotted #4a4342; padding-top: 24px; padding-bottom: 10px; margin-left: 30px; float: left; height: 103px; font-size: 300%; font-style: italic; width: 600px; line-height: 1.3; color: #d5d0ce;}
 
 #splash_image img{ border: 0;}
 #splash_text em{ color: #e1dddc; font-weight: bold;}
