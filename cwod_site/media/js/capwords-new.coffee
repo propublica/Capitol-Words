@@ -464,7 +464,6 @@ class window.CapitolWords
                 window.cw.annotation_line_coords['term'] = []
 
                 jQuery.getJSON (imgUrl + '&chof=json'), (data) ->
-
                     copy_coords = (c) ->
                         if c.name is 'line0'
                             window.cw.annotation_line_coords['term'].push (jQuery.extend true, [], c.coords)
@@ -866,7 +865,6 @@ class window.CapitolWords
             startYear = cw.minMonth.slice(0, 4)
             endYear = cw.maxMonth.slice(0, 4)
 
-            console.log "slidin' to #{startYear}, #{endYear}"
             $("#slider-range").slider("option", "values", [startYear, endYear])
             cw.limit cw.minMonth, cw.maxMonth
 
@@ -875,7 +873,8 @@ class window.CapitolWords
 
     readLegislatorHistory: ->
         hash = History.getState().hash.split('?')[1]
-        data = {}
+        data = {congress: 112}
+        $("#congress").val(112)
         if hash
             pieces = hash.split '&'
             chamber = party = congress = state = undefined
@@ -887,33 +886,34 @@ class window.CapitolWords
         this.legislatorSearch(data)
 
     readTermDetailPageHistory: ->
+        # TODO: range does not properly update
+        this.minMonth = "199601"
+        this.maxMonth = "201112"
         if typeof History.getState().hash is 'undefined'
             return
         hash = History.getState().hash.split('?')[1]
-        if not hash
-            return
-        pieces = [x.split '=' for x in hash.split '&'][0]
-        for piece in pieces
-            [k, v] = piece
-            if k == 'start'
-                this.minMonth = v
-                this.start_date = this.dateFromMonth(this.minMonth)
+        if hash
+            pieces = [x.split '=' for x in hash.split '&'][0]
+            for piece in pieces
+                [k, v] = piece
+                if k == 'start'
+                    this.minMonth = v
+                    this.start_date = this.dateFromMonth(this.minMonth)
 
-            else if k == 'end'
-                this.maxMonth = v
-                this.end_date = this.dateFromMonth(this.maxMonth)
+                else if k == 'end'
+                    this.maxMonth = v
+                    this.end_date = this.dateFromMonth(this.maxMonth)
 
-#            else if k == 'pt' and v == 'true'
-#                $('#overallTimeline').hide(->
-#                    $('#partyTimelineSelect').attr('checked', true)
-#                    $('#partyTimeline').show()
-#                )
-
+               # else if k == 'pt' and v == 'true'
+               #     $('#overallTimeline').hide(->
+               #         $('#partyTimelineSelect').attr('checked', true)
+               #         $('#partyTimeline').show()
+               #     )
 
         if this.minMonth or this.maxMonth
             startYear = this.minMonth.slice(0, 4)
             endYear = this.maxMonth.slice(0, 4)
-            $("#slider-range").slider("option", "values", [startYear, endYear])
+            $("#slider-range").slider("values", [startYear, endYear])
 
             this.limit this.minMonth, this.maxMonth
 
@@ -1119,7 +1119,7 @@ History.Adapter.bind window, 'statechange', ->
     if window.location.pathname.match /^\/legislator\/?$/
         cw.readLegislatorHistory()
 
-    else if window.location.pathname.match /^term\/[.+]\/?/
+    else if window.location.pathname.match /^\/term\/.+\/?$/
         cw.readTermDetailPageHistory()
         cw.populateTermDetailPage termDetailTerm
 
@@ -1148,7 +1148,7 @@ $(document).ready ->
         e.preventDefault()
         $('.toggleSearchCompare').slideToggle 'fast', 'swing'
 
-    $('#compareBtn').live 'click', (e) ->
+    $('#compareTermBtn').live 'click', (e) ->
         e.preventDefault()
         word = $(this).find('em').text()
         $('#terma').val word
@@ -1219,7 +1219,6 @@ $(document).ready ->
 
     if not _($('#slider-range')).isEmpty()
         d = new Date()
-
         if cw.minMonth and cw.maxMonth
             startYear = cw.minMonth.slice(0, 4)
             endYear = cw.maxMonth.slice(0, 4)
