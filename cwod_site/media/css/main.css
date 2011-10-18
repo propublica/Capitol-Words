@@ -259,10 +259,10 @@ th {text-transform: uppercase;}
 #signup { margin-top: 25px;}
 
 .legislatorImage { float: left; margin-right: 15px;}
-#legislatorDetail, #stateDetail { float: left; width: 600px;}
+#legislatorDetail, #stateDetail, #dateDetail, #monthDetail { float: left; width: 600px;}
 #legislatorMedia { float: left; width: 200px;}
 
-#legislatorDetail .editResults, #stateDetail a.editResults { margin-top: 15px; display: block;}
+#internalHead .editResults, #internalHead a.editResults { margin-top: 15px; display: block;}
 #legislatorDetail h2, #stateDetail h2 { float: left; }
 #main .withButton { float: left; width: auto; margin-right: 20px;}
 
@@ -715,4 +715,78 @@ body.home #containerWrapper{
 	padding-right: 0;
 	width: 950px;
 }
+#calendar #fullColumn{
+    width: 910px;
+    padding-top: 20px;
+}
+
+span.legImage{
+    width: 200px;
+    display: block;
+}
+
+#about h4{
+    color: #B99004;
+    margin-top: 30px;
+    clear: both;
+}
+#about h5{
+    margin-top: 30px;
+    clear: both;
+    font-size: 135%;
+}
+
+#about dl{
+    margin-bottom: 30px;
+}
+
+#about dd{
+    display: block;
+    float: left;
+    clear: bottom;
+    margin-bottom: 15px;
+    width: 300px;
+}
+
+#about dt{
+    float: left;
+    color: #FBF4F4;
+    padding-right: 10px;
+    clear: both;
+    width: 75px;
+}
+#about dd li, #about dd ul{
+    display: inline;
+}
+
+#about dd span{
+    font-weight: normal;
+    display: block;
+    padding-right: 5px;
+}
+
+#about dd ul{
+    display: inline;
+}
+
+#about dd p{
+    margin-bottom: 5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

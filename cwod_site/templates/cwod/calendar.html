@@ -5,13 +5,13 @@
 {% block title %}Calendar | {{ block.super }}{% endblock title %}
 
 {% block content %}
-
+<body id="calendar">
             <div id="main">
                 <div id="internalHead">
                     <h2>Calendar</h2>
                     <div class="clear"></div>
                 </div>
-                <div id="ltColumn" style="width: 100%;">
+                <div id="fullColumn">
                     <div class="module">
                         <ul class="normalList">
                             {% for year, months in years %}
@@ -30,5 +30,5 @@
                 </div>
                 <div class="clear"></div>
             </div>
-
+</body>
 {% endblock content %}
