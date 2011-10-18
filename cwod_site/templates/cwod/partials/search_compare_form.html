@@ -1,21 +1,21 @@
 <div id="searchCompare">
-    <form action="/search/" method="get" id="termSelect">
+    <form action="/" method="get" id="termSelect">
         <ul class="wordCompare clearfix">
             <li class="eachWord">
                 <label>Pick a word or phrase</label>
-                <input id="terma" class="id_addTerm" type="text" value="{{ termA|default:'Word or phrase' }}"/>
+                <input name="terma" id="terma" class="id_addTerm" type="text" value="{{ termA|default:'Word or phrase' }}"/>
                 <ul class="wordFilter">
                     <li>
                         <label> State</label>
-                        <select name="state" id="stateA">
+                        <select name="statea" id="stateA">
                             {% include "cwod/partials/state_select.html" %}
                         </select>
                     </li>
                     <li class="partyA partyChoice clear">
                         <ul class="clearfix">
-                            <li><label><input id="partyAAll" class="radio" type="radio" name="partyA" value="" CHECKED/>All</label></li>
-                            <li><label><input id="partyAD" class="radio" type="radio" name="partyA" value="D"/>Democrats</label></li>
-                            <li><label><input id="partyAR" class="radio" type="radio" name="partyA" value="R"/>Republicans</label></li>
+                            <li><label><input id="partyAAll" class="radio" type="radio" name="partya" value="" checked />All</label></li>
+                            <li><label><input id="partyAD" class="radio" type="radio" name="partya" value="D"/>Democrats</label></li>
+                            <li><label><input id="partyAR" class="radio" type="radio" name="partya" value="R"/>Republicans</label></li>
                         </ul>
                     </li>
                 </ul>
@@ -25,25 +25,25 @@
             </li>
             <li class="eachWord">
                 <label>Pick a word or phrase</label>
-                <input id="termb" class="id_addTerm" type="text" value="{{ termB|default:'Word or phrase' }}"/>
+                <input id="termb" name="termb" class="id_addTerm" type="text" value="{{ termB|default:'Word or phrase' }}"/>
                 <ul class="wordFilter">
                     <li>
                         <label>State</label>
-                        <select name="state" id="stateB">
+                        <select name="state" name="stateb" id="stateB">
                             {% include "cwod/partials/state_select.html" %}
                         </select>
                     </li>
                     <li class="partyB partyChoice clear">
                         <ul>
-                            <li><label><input id="partyBAll" class="radio" type="radio" name="partyB" value="" CHECKED/>All</label>
-                            <li><label><input id="partyBD" class="radio" type="radio" name="partyB" value="D"/>Democrats</label>
-                            <li><label><input id="partyBR" class="radio" type="radio" name="partyB" value="R"/>Republicans</label>
+                            <li><label><input id="partyBAll" class="radio" type="radio" name="partyb" value="" checked />All</label>
+                            <li><label><input id="partyBD" class="radio" type="radio" name="partyb" value="D"/>Democrats</label>
+                            <li><label><input id="partyBR" class="radio" type="radio" name="partyb" value="R"/>Republicans</label>
                         </ul>
                     </li>
                 </ul>
             </li>
             <li class="submit">
-                 <button id="compareBtn" class="compareSubmit buttonLink fullButton" type="button">
+                 <button id="compareBtn" class="compareSubmit buttonLink fullButton" type="submit">
                      <span>Compare</span>
                  </button>
                 {% comment %}

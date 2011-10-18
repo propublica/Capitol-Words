@@ -969,7 +969,6 @@
       };
       state = History.getState();
       hash = state.hash.split('?')[1];
-      console.log(hash);
       params = $.deparam(hash);
       if (hash) {
         _(_.defaults(params, cw.homepageDefaults)).each(function(v, k) {
@@ -1349,8 +1348,13 @@
     $('#partySelect, #stateSelect').change(function() {
       return cw.customizeChart();
     });
-    $('.compareSubmit').bind('click', function() {
-      return cw.submitHomepageCompareForm();
+    $('.compareSubmit').bind('click', function(e) {
+      if (window.location.pathname.match(/^\/?$/)) {
+        e.preventDefault();
+        return cw.submitHomepageCompareForm();
+      } else {
+        return true;
+      }
     });
     $('#termSelect input').bind('keyup', function(e) {
       if (e.keyCode === 13) {

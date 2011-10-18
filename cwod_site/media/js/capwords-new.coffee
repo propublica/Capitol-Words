@@ -836,8 +836,6 @@ class window.CapitolWords
         state = History.getState()
         hash = state.hash.split('?')[1]
 
-        console.log hash
-
         params = $.deparam(hash)
         # showAdvanced = _.without(_.intersection(params.keys, cw.homepageDefaults.keys), 'terma', 'termb', 'start', 'end').length
 
@@ -1185,8 +1183,12 @@ $(document).ready ->
     $('#partySelect, #stateSelect').change ->
         cw.customizeChart()
 
-    $('.compareSubmit').bind 'click', ->
-        cw.submitHomepageCompareForm()
+    $('.compareSubmit').bind 'click', (e) ->
+        if window.location.pathname.match /^\/?$/
+            e.preventDefault()
+            cw.submitHomepageCompareForm()
+        else
+            return true
 
     $('#termSelect input').bind 'keyup', (e) ->
         if e.keyCode == 13 then cw.submitHomepageCompareForm()
