@@ -10,31 +10,28 @@
                     <div id="social icons">
 
                     </div>
-					<div id="legislatorDetail">
+					<div id="dateDetail">
                         <h2 class="withButton">{{ date|date:"F j, Y" }}</h2>
                         <a class="editResults" href="{% url cwod_month_detail date.year date|date:"m" %}">Select a different date</a>
 						<div class="clear"></div>
 					</div>
-
                     <div class="clear"></div>
+					Jump to:
+                    {% for chamber, entry_list in entries %}
+                    {% if entry_list %}
+                    <a href="#{{ chamber|slugify }}">{{ chamber }}</a>&nbsp;
+                    {% endif %}
+                    {% endfor %}
                 </div>
                 <div id="ltColumn">
-
                     <div class="module">
-                        <div class="rightHeader">
-                            <h3>Entries in the Congressional Record</h3>
-                        </div>
-                        Jump to:
-                        {% for chamber, entry_list in entries %}
-                        {% if entry_list %}
-                        <a href="#{{ chamber|slugify }}">{{ chamber }}</a>&nbsp;
-                        {% endif %}
-                        {% endfor %}
-                        <br/><br/>
                         {% for chamber, entry_list in entries %}
                             {% if entry_list %}
-                            <h4 id="{{ chamber|slugify }}">{{ chamber }}</h4>
-                            <br/>
+	                        <div class="rightHeader">
+	                            <h3>Entries in the Congressional Record</h3>
+								<span id="{{ chamber|slugify }}">{{ chamber }}</span>
+	                        </div>
+
                             <table class="crEntries">
                                 <tbody>
                                 {% for entry in entry_list %}
@@ -80,22 +77,21 @@
                             <span class="pentagrams">Five</span>
                         </div>
 
-                            {% for gram_type, ngram_list in ngrams %}
-                            <ol class="barChart" id="{{ gram_type }}">
-                                {% for ngram in ngram_list %}
-                                <li>
-                                    <span class="tagValue" style="width:{{ ngram.ngram_pct }}%;">
-                                        <span class="tagPercent">{{ ngram.ngram_pct }}</span>
-                                        <span class="tagNumber">{{ ngram.count }}</span> 
-                                    </span> 
-                                    <span class="barChartTitle"><a href="{% url cwod_term_detail term=ngram.ngram %}">{{ ngram.ngram }}</a></span>
-                                </li>
-                                {% endfor %}
-                            </ol>
+                        {% for gram_type, ngram_list in ngrams %}
+                        <ol class="barChart" id="{{ gram_type }}">
+                            {% for ngram in ngram_list %}
+                            <li>
+                                <span class="tagValue" style="width:{{ ngram.ngram_pct }}%;">
+                                    <span class="tagPercent">{{ ngram.ngram_pct }}</span>
+                                    <span class="tagNumber">{{ ngram.count }}</span> 
+                                </span> 
+                                <span class="barChartTitle"><a href="{% url cwod_term_detail term=ngram.ngram %}">{{ ngram.ngram }}</a></span>
+                            </li>
                             {% endfor %}
-                        </div>
-
+                        </ol>
+                        {% endfor %}
                     </div>
+
                     <div class="leftModule">
                         {% if similar_dates %}
                         <div class="leftHeader">
