@@ -161,17 +161,19 @@
     };
     CapitolWords.prototype.annotation_callback = function() {
       var dp, _i, _len, _ref, _results;
-      if ((!window.cw.inchart) || (!window.cw.annotation_line_coords)) {
-        jQuery('.annotation').hide();
-        return;
-      }
-      _ref = window.cw.findActiveDataPoints();
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        dp = _ref[_i];
-        _results.push(window.cw.annotation_show(dp));
-      }
-      return _results;
+      try {
+        if ((!window.cw.inchart) || (!window.cw.annotation_line_coords)) {
+          jQuery('.annotation').hide();
+          return;
+        }
+        _ref = window.cw.findActiveDataPoints();
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          dp = _ref[_i];
+          _results.push(window.cw.annotation_show(dp));
+        }
+        return _results;
+      } catch (_e) {}
     };
     CapitolWords.prototype.debug_draw_outlines = function() {
       var COLORS, draw_point, selected, selected_chart, series, _i, _len, _ref, _ref2;
@@ -956,8 +958,9 @@
       return window.cw.annotation_interval = window.setInterval(window.cw.annotation_callback, window.cw.annotation_interval_frequency);
     };
     CapitolWords.prototype.readHomepageHistory = function(nosubmit) {
-      var cw, endYear, hash, param_id_map, params, showAdvanced, startYear, state;
+      var cw, endYear, hash, param_id_map, params, startYear, state;
       cw = this;
+      cw.minMonth = cw.maxMonth = false;
       param_id_map = {
         'terma': '#terma',
         'termb': '#termb',
@@ -966,8 +969,8 @@
       };
       state = History.getState();
       hash = state.hash.split('?')[1];
+      console.log(hash);
       params = $.deparam(hash);
-      showAdvanced = _.without(_.intersection(params.keys, cw.homepageDefaults.keys), 'terma', 'termb', 'start', 'end').length;
       if (hash) {
         _(_.defaults(params, cw.homepageDefaults)).each(function(v, k) {
           var id;
@@ -983,14 +986,11 @@
             return cw.maxMonth = v;
           }
         });
-        if (showAdvanced) {
-          $('ul.wordFilter').show();
-          $('.advanced').addClass('expanded');
-        }
         cw.minMonth = cw.minMonth || cw.homepageDefaults['start'];
         cw.maxMonth = cw.maxMonth || cw.homepageDefaults['end'];
         startYear = cw.minMonth.slice(0, 4);
         endYear = cw.maxMonth.slice(0, 4);
+        console.log("slidin' to " + startYear + ", " + endYear);
         $("#slider-range").slider("option", "values", [startYear, endYear]);
         cw.limit(cw.minMonth, cw.maxMonth);
         if (!nosubmit) {
@@ -1306,7 +1306,7 @@
     });
     $('#toggleSearchCompare').click(function(e) {
       e.preventDefault();
-      return $('.toggleSearchCompare').slideToggle();
+      return $('.toggleSearchCompare').slideToggle('fast', 'swing');
     });
     $('#compareBtn').live('click', function(e) {
       var word;
@@ -1428,7 +1428,7 @@
     $('.advanced').bind('click', function() {
       var t;
       t = $(this);
-      return $('ul.wordFilter').slideToggle('', function() {
+      return $('ul.wordFilter').slideToggle('fast', 'swing', function() {
         if ($(this).is(':visible')) {
           return t.addClass('expanded');
         } else {

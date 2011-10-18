@@ -102,11 +102,12 @@ class window.CapitolWords
                 callback()
 
     annotation_callback: () ->
-        if (not window.cw.inchart) or (not window.cw.annotation_line_coords)
-            jQuery('.annotation').hide()
-            return
+        try
+            if (not window.cw.inchart) or (not window.cw.annotation_line_coords)
+                jQuery('.annotation').hide()
+                return
 
-        window.cw.annotation_show dp for dp in window.cw.findActiveDataPoints()
+            window.cw.annotation_show dp for dp in window.cw.findActiveDataPoints()
 
     debug_draw_outlines: () ->
 
@@ -831,11 +832,15 @@ class window.CapitolWords
 
     readHomepageHistory: (nosubmit) ->
         cw = this
+        cw.minMonth = cw.maxMonth = false
         param_id_map = {'terma': '#terma', 'termb': '#termb', 'statea': '#stateA', 'stateb': '#stateB', }
         state = History.getState()
         hash = state.hash.split('?')[1]
+
+        console.log hash
+
         params = $.deparam(hash)
-        showAdvanced = _.without(_.intersection(params.keys, cw.homepageDefaults.keys), 'terma', 'termb', 'start', 'end').length
+        # showAdvanced = _.without(_.intersection(params.keys, cw.homepageDefaults.keys), 'terma', 'termb', 'start', 'end').length
 
         if hash
             _(_.defaults(params, cw.homepageDefaults)).each (v, k) ->
@@ -851,15 +856,17 @@ class window.CapitolWords
                 else if k == 'end' and v isnt cw.homepageDefaults[k]
                     cw.maxMonth = v
 
-            if showAdvanced
-                $('ul.wordFilter').show()
-                $('.advanced').addClass 'expanded'
+            # if showAdvanced
+            #     $('ul.wordFilter').show()
+            #     $('.advanced').addClass 'expanded'
 
             cw.minMonth = cw.minMonth or cw.homepageDefaults['start']
             cw.maxMonth = cw.maxMonth or cw.homepageDefaults['end']
 
             startYear = cw.minMonth.slice(0, 4)
             endYear = cw.maxMonth.slice(0, 4)
+
+            console.log "slidin' to #{startYear}, #{endYear}"
             $("#slider-range").slider("option", "values", [startYear, endYear])
             cw.limit cw.minMonth, cw.maxMonth
 
@@ -1139,7 +1146,7 @@ $(document).ready ->
 
     $('#toggleSearchCompare').click (e) ->
         e.preventDefault()
-        $('.toggleSearchCompare').slideToggle()
+        $('.toggleSearchCompare').slideToggle 'fast', 'swing'
 
     $('#compareBtn').live 'click', (e) ->
         e.preventDefault()
@@ -1242,7 +1249,7 @@ $(document).ready ->
 
     $('.advanced').bind 'click', ->
         t = $(this)
-        $('ul.wordFilter').slideToggle '', ->
+        $('ul.wordFilter').slideToggle 'fast', 'swing', ->
             if $(this).is ':visible' then t.addClass 'expanded' else t.removeClass 'expanded'
 
     $('#embed span').bind 'click', ->
