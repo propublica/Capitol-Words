@@ -773,13 +773,34 @@ span.legImage{
     margin-bottom: 5px;
 }
 
+#feedbackForm label{
+    width: 100px;
+    display: block;
+    margin-bottom: 5px;
 
+}
 
+#feedbackForm input, #feedbackForm textarea{
+    width: 557px;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 100%;
+}
+#feedbackForm li{
+    margin-bottom: 20px;
+}
 
-
-
-
-
+#feedbackForm textarea{
+	padding: 5px 8px 5px 8px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	background: #E6E4E2 url('../img/bg_input.png') left bottom repeat-x;
+	border: 1px solid #021017;
+	
+}
+#feedbackForm button{
+    float: right;
+}
 
 
 

@@ -11,6 +11,11 @@ urlpatterns = patterns('',
             direct_to_template,
             {'template': 'cwod/about.html', },
             name='cwod_about'),
+        
+        url(r'^contact\/?$',
+            direct_to_template,
+            {'template': 'cwod/contact.html', },
+            name='cwod_contact'),
 
         url(r'^search\/?$',
             search,
