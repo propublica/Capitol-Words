@@ -23,7 +23,7 @@
 
                     </div>
                     <h2 class="withButton">{{ term }}</h2>
-                    <a id="compareBtn" class="buttonLink fullButton" href="{% url cwod_home %}?terma={{ term|urlencode }}">Compare <em>{{ term }}</em></a>
+                    <a id="compareTermBtn" class="buttonLink fullButton" href="{% url cwod_home %}?terma={{ term|urlencode }}">Compare <em>{{ term }}</em></a>
                     <div class="clear"></div>
                 </div>
                 <div id="ltColumn">
@@ -65,7 +65,7 @@
                                     {#<li><input class="radio" type="radio" name="toggle" id="customTimelineSelect"/><label for="customTimelineSelect">Custom</label></li>#}
                                 </ul>
                                 <div class="clear"></div>
-                            </form>                           
+                            </form>
                             <div class="clear"></div>
                         </div>
                         <div class="chart">
@@ -76,7 +76,7 @@
                                 {% endif %}
                             </div>
                             <div class="annotation" id="annotation-party-0"><div class="inner-annotation"></div></div>
-                            <div class="annotation flipped" id="annotation-party-1"><div class="inner-annotation"></div></div>                            
+                            <div class="annotation flipped" id="annotation-party-1"><div class="inner-annotation"></div></div>
                             <div id="partyTimeline">
                                 {% if party_timeline_url %}
                                 <img src="{{ party_timeline_url }}" alt="Timeline of occurrences of '{{ term }}' by party"/>

@@ -18,6 +18,8 @@
 
                     <dt>State{% ifequal legislator.honorific "Rep." %} and District{% endifequal %}</dt>
                     <dd><a href="{% url cwod_state_detail state=legislator.state %}">{{ legislator.state|state_abbrev_to_full }}</a>{% ifequal legislator.honorific "Rep." %}, District {{ legislator.district }}{% endifequal %}</dd>
+                    <!-- Clearly I did not emulate the code correctly, or it's not there. <dt>Chamber</dt>
+                    <dd class="withBar">{{ legislator.chamber }}</dd>-->
                 </dl>
             </div>
             <div class="clear"></div>
@@ -56,7 +58,7 @@
                 <ul class="normalList">
                     {% for i in similar_legislators|slice:"5" %}
                     <li>
-                        <img class="legislatorImage" alt="legislator photo" src="{% legislator_thumbnail i.legislator.bioguide_id 40x50 %}" />
+                        <span class="legImage"><img class="legislatorImage" alt="legislator photo" src="{% legislator_thumbnail i.legislator.bioguide_id 40x50 %}" /></span>
                         {#<span class="percentMatch">{{ i.distance }}  Match</span>#}
                         <h5><a href="{% url cwod_legislator_detail bioguide_id=i.bioguide slug=i.legislator.slug %}">{{ i.legislator.honorific }} {{ i.legislator.full_name }}</a></h5>
                         <div class="clear"></div>
