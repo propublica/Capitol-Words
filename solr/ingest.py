@@ -384,7 +384,7 @@ class SolrDoc(object):
 
     def post(self, payload):
         """ Add a document to index """
-        con = HTTPConnection('localhost:8983')
+        con = HTTPConnection('ec2-184-72-184-231.compute-1.amazonaws.com:8983')
         con.putrequest('POST', '/solr/update/')
         con.putheader('content-length', str(len(payload)))
         con.putheader('content-type', 'text/xml; charset=UTF-8')
@@ -403,7 +403,7 @@ class SolrDoc(object):
     def commit(self):
         """ commit changes """
         DATA = '<commit/>'
-        con = HTTPConnection('localhost:8983')
+        con = HTTPConnection('ec2-184-72-184-231.compute-1.amazonaws.com:8983')
         con.putrequest('POST', '/solr/update/')
         con.putheader('content-length', str(len(DATA)))
         con.putheader('content-type', 'text/xml; charset=UTF-8')

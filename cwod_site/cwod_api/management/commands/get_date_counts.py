@@ -7,6 +7,7 @@ import urllib2
 
 from django.core.management.base import BaseCommand
 from cwod_api.models import NgramDateCount
+from ngrams.models import Date
 
 from dateutil.parser import parse as dateparse
 
@@ -98,3 +99,5 @@ class Command(BaseCommand):
                 ngramcount.count = num
                 ngramcount.save()
                 print date, field, num
+
+                d = Date.objects.get_or_create(date=date)
