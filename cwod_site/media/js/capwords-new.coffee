@@ -1193,10 +1193,10 @@ $(document).ready ->
     $('#termSelect input').bind 'keyup', (e) ->
         if e.keyCode == 13 then cw.submitHomepageCompareForm()
 
-    $('#termSelect input').bind 'focus', ->
+    $('#termSelect input[type=text]').bind 'focus', ->
         if $(this).val() == 'Word or phrase' then $(this).val ''
 
-    $('#termSelect input').bind 'blur', ->
+    $('#termSelect input[type=text]').bind 'blur', ->
         if $(this).val() == '' then $(this).val 'Word or phrase'
 
     $('#searchFilterButton').bind 'click', ->
