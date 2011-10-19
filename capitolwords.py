@@ -23,7 +23,7 @@ def run(date):
 if __name__ == '__main__':
     # check for the most recent congression record documents
     today = datetime.datetime.now()
-    yesterday = datetime.datetime(today.year, today.month, today.day-1)
+    yesterday = today - datetime.timedelta(1)
     run(yesterday)
 
     # now check the scraper log to see if any previous files had errors, and if so,

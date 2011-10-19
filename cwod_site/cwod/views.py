@@ -451,7 +451,10 @@ def entries_for_date(date):
             has_entries = True
 
         for entry in response:
-            chambers[entry['chamber']][(entry['title'], entry['pages'], entry['origin_url'])].add(entry['speaker_last'])
+            try:
+                chambers[entry['chamber']][(entry['title'], entry['pages'], entry['origin_url'])].add(entry['speaker_last'])
+            except KeyError:
+                continue
         if len(response) < 50:
             break
         page += 1
