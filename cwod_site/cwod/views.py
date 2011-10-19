@@ -531,7 +531,7 @@ MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', '
 def calendar(request):
     raw_months = capitolwords._month_list()
     max_year = max(raw_months) / 100
-    min_year = min(raw_months) / 100
+    min_year = 1+(min(raw_months) / 100)
 
     # this is embarrassing
     months = []
