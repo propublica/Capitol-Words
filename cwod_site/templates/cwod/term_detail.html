@@ -19,11 +19,9 @@
 
             <div id="main">
                 <div id="internalHead">
-                    <div id="social icons">
-
-                    </div>
                     <h2 class="withButton">{{ term }}</h2>
                     <a id="compareTermBtn" class="buttonLink fullButton" href="{% url cwod_home %}?terma={{ term|urlencode }}">Compare <em>{{ term }}</em></a>
+                    {% include "cwod/partials/share_buttons.html" %}
                     <div class="clear"></div>
                 </div>
                 <div id="ltColumn">

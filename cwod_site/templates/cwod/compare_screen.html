@@ -5,15 +5,15 @@
 <!--[if IE 9 ]>        <html lang="en" class="no-js ie9"> <![endif]-->
 <!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
     <head>
-    
+
         <meta charset="utf-8">
         <meta name="description" content="">
 
         <title>Capitol Words</title>
-    
+
         <link rel="stylesheet" href="main.css" type="text/css" media="screen" />
         <!--[if IE 7]>{% css "styles/buggy_7.css" %}<![endif]-->
-        {% js "js/google-analytics.js" %}    
+        {% js "js/google-analytics.js" %}
     </head>
     <body>
         <div id="containerWrapper">
@@ -25,9 +25,9 @@
                         <li><a href="#">Congress</a></li>
                         <li><a href="#">Parties</a></li>
                         <li><a href="#">Legislators</a></li>
-                    </ul>  
-                    <div class="clear"></div>  
-                </nav>    
+                    </ul>
+                    <div class="clear"></div>
+                </nav>
                 <a href="/"><h1>Capitol Words <small>a project of the Sunlight Foundation</small></h1></a>
                 <ul id="mainActions">
                     <li>
@@ -41,69 +41,66 @@
                     </li>
                     <li id="betweenItem">
                         <span>or</span>
-                    </li>    
+                    </li>
                     <li>
                         <a href="#">Compare Congressional Words and/or Phrases</a>
                     </li>
                 </ul>
                 <div class="clear"></div>
-					<div id="searchCompare">
-						<h5>
-							Compare Congressional Words and/or Phrases (add up to 5) <span class="tip"> e.g.: War in Iraq, or Obama</span>
-						</h5>
-					<form action="/search/" method="get">
-							<ul>
-								<li class="addTerm">
-								     <label>Add a word or phrase</label>
-								     <input id="id_addTerm" type="text"/>
-									 <button id="addTermBtn" class="buttonLink fullButton" type="submit">
-								         <span>+</span>
-								     </button>
-									<ul class="terms">
-										<li>
-											<button id="subtractTermBtn" class="buttonLink fullButton" type="submit">
-									         <span>-</span>
-									     </button>
-											banana
-										</li>
-										<li>
-											<button id="subtractTermBtn" class="buttonLink fullButton" type="submit">
-									         <span>-</span>
-									     </button>
-											orange
-										</li>
-									</ul>
-								</li>
-								<li class="filterBy">
-									<ul>
-										<li>
-											<label>State</label>
-				                            <select name="state">
-				                                <option value="state">Choose a State</option>
-				                            </select>
-										</li>
-										<li>
-				                            <label>Party</label>
-				                            <select name="party">
-				                                <option value="party">Choose a Party</option>
-				                            </select>
-										</li>
-									</ul>
-								</li>
-								<li class="submit">
-									 <button id="compareBtn" class="buttonLink fullButton" type="submit">
-								         <span>Compare</span>
-								     </button>
-								</li>
-							</ul>
-						</form>
-					</div>
+                    <div id="searchCompare">
+                        <h5>
+                            Compare Congressional Words and/or Phrases (add up to 5) <span class="tip"> e.g.: War in Iraq, or Obama</span>
+                        </h5>
+                    <form action="/search/" method="get">
+                            <ul>
+                                <li class="addTerm">
+                                     <label>Add a word or phrase</label>
+                                     <input id="id_addTerm" type="text"/>
+                                     <button id="addTermBtn" class="buttonLink fullButton" type="submit">
+                                         <span>+</span>
+                                     </button>
+                                    <ul class="terms">
+                                        <li>
+                                            <button id="subtractTermBtn" class="buttonLink fullButton" type="submit">
+                                             <span>-</span>
+                                         </button>
+                                            banana
+                                        </li>
+                                        <li>
+                                            <button id="subtractTermBtn" class="buttonLink fullButton" type="submit">
+                                             <span>-</span>
+                                         </button>
+                                            orange
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="filterBy">
+                                    <ul>
+                                        <li>
+                                            <label>State</label>
+                                            <select name="state">
+                                                <option value="state">Choose a State</option>
+                                            </select>
+                                        </li>
+                                        <li>
+                                            <label>Party</label>
+                                            <select name="party">
+                                                <option value="party">Choose a Party</option>
+                                            </select>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="submit">
+                                     <button id="compareBtn" class="buttonLink fullButton" type="submit">
+                                         <span>Compare</span>
+                                     </button>
+                                </li>
+                            </ul>
+                        </form>
+                    </div>
             </header>
             <div id="main">
                 <div id="internalHead">
-                    <div id="social icons">
-
-                    </div>
                     <h2 class="withButton">&#8220;War&#8221;</h2>
                     <a id="compareBtn" class="buttonLink fullButton" href="#">Compare &#8220;War&#8221;</a>
                     <div class="clear"></div>
@@ -117,8 +114,9 @@
                             <select name="time">
                                 <option value="time">Time Frame</option>
                             </select>
-                        </form>    
+                        </form>
                     </div>
+                    {% include "cwod/partials/share_buttons.html" %}
                 </div>
                 <div id="ltColumn">
                     <div class="module">
@@ -128,13 +126,13 @@
                         </div>
                         <form class="actionItem" action="" method="">
                             <ul class="partyBreakdown">
-                                <li><label><input class="radio" type="radio" name="word" />Overall</label></li> 
-                                <li><label><input class="radio" type="radio" name="word" />Party</label></li> 
+                                <li><label><input class="radio" type="radio" name="word" />Overall</label></li>
+                                <li><label><input class="radio" type="radio" name="word" />Party</label></li>
                             </ul>
                             <div class="clear"></div>
                         </form>
                         <div class="chart"></div>
-                    </div> 
+                    </div>
                     <div class="module">
                         <div class="rightHeader">
                             <h3>Frequency in Which Legislators Mention &#8220;War&#8221;</h3>
@@ -143,77 +141,77 @@
                         <ol class="barChart">
                             <li>
                                 <span class="tagValue" style="width:100%;">
-									<span class="tagPercent">100%</span>
-									<span class="tagNumber"><a href="#">30</a></span> 
-								</span> 
+                                    <span class="tagPercent">100%</span>
+                                    <span class="tagNumber"><a href="#">30</a></span>
+                                </span>
                                 <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                             </li>
                             <li>
                                 <span class="tagValue" style="width:80%;">
-									<span class="tagPercent">80%</span>
-									<span class="tagNumber"><a href="#">30</a></span> 
-								</span> 
+                                    <span class="tagPercent">80%</span>
+                                    <span class="tagNumber"><a href="#">30</a></span>
+                                </span>
                                 <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                             </li>
                             <li>
                                 <span class="tagValue" style="width:80%;">
-									<span class="tagPercent">80%</span>
-									<span class="tagNumber"><a href="#">30</a></span> 
-								</span> 
+                                    <span class="tagPercent">80%</span>
+                                    <span class="tagNumber"><a href="#">30</a></span>
+                                </span>
                                 <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                             </li>
                             <li>
                                 <span class="tagValue" style="width:70%;">
-									<span class="tagPercent">70%</span>
-									<span class="tagNumber"><a href="#">30</a></span>
-								</span> 
+                                    <span class="tagPercent">70%</span>
+                                    <span class="tagNumber"><a href="#">30</a></span>
+                                </span>
                                 <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                             </li>
                             <li>
                                 <span class="tagValue" style="width:70%;">
-									<span class="tagPercent">70%</span>
-									<span class="tagNumber"><a href="#">30</a></span> 
-								</span> 
+                                    <span class="tagPercent">70%</span>
+                                    <span class="tagNumber"><a href="#">30</a></span>
+                                </span>
                                 <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                             </li>
                             <li>
                                 <span class="tagValue" style="width:60%;">
-									<span class="tagPercent">60%</span>
-									<span class="tagNumber"><a href="#">30</a></span> 
-								</span> 
+                                    <span class="tagPercent">60%</span>
+                                    <span class="tagNumber"><a href="#">30</a></span>
+                                </span>
                                 <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                             </li>
                             <li>
                                 <span class="tagValue" style="width:60%;">
-									<span class="tagPercent">60%</span>
-									<span class="tagNumber"><a href="#">30</a></span> 
-								</span> 
+                                    <span class="tagPercent">60%</span>
+                                    <span class="tagNumber"><a href="#">30</a></span>
+                                </span>
                                 <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                             </li>
                             <li>
                                 <span class="tagValue" style="width:50%;">
-									<span class="tagPercent">50%</span>
-									<span class="tagNumber"><a href="#">30</a></span>
-								</span> 
+                                    <span class="tagPercent">50%</span>
+                                    <span class="tagNumber"><a href="#">30</a></span>
+                                </span>
                                 <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                             </li>
                             <li>
                                 <span class="tagValue" style="width:50%;">
-									<span class="tagPercent">50%</span>
-									<span class="tagNumber"><a href="#">30</a></span> 
-								</span> 
+                                    <span class="tagPercent">50%</span>
+                                    <span class="tagNumber"><a href="#">30</a></span>
+                                </span>
                                 <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                             </li>
                             <li>
                                 <span class="tagValue" style="width:40%;">
-									<span class="tagPercent">40%</span>
-									<span class="tagNumber"><a href="#">30</a></span> 
-								</span> 
+                                    <span class="tagPercent">40%</span>
+                                    <span class="tagNumber"><a href="#">30</a></span>
+                                </span>
                                 <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                             </li>
-                        </ol>    
+                        </ol>
                     </div>
-                </div>  
+                </div>
                 <div id="rtColumn">
                     <div class="leftModule">
                         <div class="leftHeader">
@@ -222,62 +220,62 @@
                         </div>
                         <ol class="barChart">
                             <li>
-                                <span class="tagValue" style="width:100%;">100%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:100%;">100%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:80%;">80%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:80%;">80%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:80%;">80%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:80%;">80%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:70%;">70%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:70%;">70%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:50%;">50%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:50%;">50%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:40%;">40%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:40%;">40%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:40%;">40%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:40%;">40%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:30%;">30%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:30%;">30%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:30%;">30%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:30%;">30%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:30%;">30%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:30%;">30%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
-                        </ol>    
+                        </ol>
                     </div>
                     <div class="leftModule">
                         <h4>Popularity of &#8220;War&#8221; by Party</h4>
                         <span class="tip">Current Time Frame</span>
                     </div>
-                </div>    
+                </div>
                 <div class="clear"></div>
             </div>
         </div>
@@ -287,10 +285,10 @@
                     <ul>
                         <li><a href="#">About</a></li>
                         <li><a href="#">Contact</a></li>
-                    </ul> 
-                    <div class="clear"></div>   
-                </nav>  
-            </div>  
+                    </ul>
+                    <div class="clear"></div>
+                </nav>
+            </div>
             <div id="footerContentWrapper">
                 <div id="footerContent">
                     <div id="popularPages">
@@ -301,8 +299,8 @@
                             <li><a href="#">Page Name</a></li>
                             <li><a href="#">Page Name</a></li>
                             <li><a href="#">Page Name</a></li>
-                        </ol>    
-                    </div>    
+                        </ol>
+                    </div>
                     <div id="popularWords">
                         <h5>Most Popular Word per Congressional Session</h5>
                         <table>
@@ -311,16 +309,6 @@
                                     <td><span class="date">January 1, 2010</span></td>
                                     <td><a href="#">Word of the Day</a></td>
                                     <td>Spoken 300 times</td>
-                                </tr>  
-                                <tr>
-                                    <td><span class="date">January 1, 2010</span></td>
-                                    <td><a href="#">Word of the Day</a></td>
-                                    <td>Spoken 300 times</td>
-                                </tr>
-                                <tr class="odd">
-                                    <td><span class="date">January 1, 2010</span></td>
-                                    <td><a href="#">Word of the Day</a></td>
-                                    <td>Spoken 300 times</td>
                                 </tr>
                                 <tr>
                                     <td><span class="date">January 1, 2010</span></td>
@@ -331,9 +319,19 @@
                                     <td><span class="date">January 1, 2010</span></td>
                                     <td><a href="#">Word of the Day</a></td>
                                     <td>Spoken 300 times</td>
-                                </tr>  
-                            <tbody>    
-                        </table>  
+                                </tr>
+                                <tr>
+                                    <td><span class="date">January 1, 2010</span></td>
+                                    <td><a href="#">Word of the Day</a></td>
+                                    <td>Spoken 300 times</td>
+                                </tr>
+                                <tr class="odd">
+                                    <td><span class="date">January 1, 2010</span></td>
+                                    <td><a href="#">Word of the Day</a></td>
+                                    <td>Spoken 300 times</td>
+                                </tr>
+                            <tbody>
+                        </table>
                    </div>
                   <div class="clear"></div>
                 </div>
@@ -360,13 +358,13 @@
                                     <button class="fullButton" type="submit">
                                         <span>Sign Up</span>
                                     </button>
-                                </li>    
-                            </ul>   
+                                </li>
+                            </ul>
                             <div class="clear"></div>
-                        </form>    
-                    </div>    
-                </div> 
-            </div>   
-        </footer>        
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </body>
 </html>

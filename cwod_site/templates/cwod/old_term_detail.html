@@ -6,186 +6,182 @@
 {% block title %}{{ term }} | {{ block.super }}{% endblock title %}
 
 {% block content %}
+<div id="main">
+    <div id="internalHead">
+        <div id="social icons">
 
-            <div id="main">
-                <div id="internalHead">
-                    <div id="social icons">
-
-                    </div>
-                    <h2 class="withButton">{{ term }}</h2>
-                    <a id="compareBtn" class="buttonLink fullButton" href="#">Compare <em>{{ term }}</em></a>
-                    <div class="clear"></div>
-                    {% comment %}
-                    <div class="editResults">
-                        <span>for all states, parties and all legislators</span>
-                        <a href="#">Edit</a>
-                    </div>
-                    {% endcomment %}
-                </div>
-                <div id="ltColumn">
-                    <div class="module chartModule">
-                        <div class="rightHeader withAction">
-                            <h3>Occurrences over time</h3>
-                            {#<span class="tip">Current Time Frame</span>#}
-                        </div>
-                        <form id="timelineToggle" class="actionItem" action="" method="">
-                            <ul class="partyBreakdown">
-                                <li><input class="radio" type="radio" checked name="toggle" id="overallTimelineSelect"/><label for="overallTimelineSelect">Overall</label></li>
-                                <li><input class="radio" type="radio" name="toggle" id="partyTimelineSelect"/><label for="partyTimelineSelect">By party</label></li>
-                                <li><input class="radio" type="radio" name="toggle" id="customTimelineSelect"/><label for="customTimelineSelect">Custom</label></li>
-                            </ul>
-                            <div class="clear"></div>
-                        </form>
-                        <div class="chart">
-                            <div id="overallTimeline">
-                                <img src="{{ timeline_url }}" alt="Timeline of occurrences of '{{ term }}'"/>
-                            </div>
-                            <div id="partyTimeline">
-                                <img src="{{ party_timeline_url }}" alt="Timeline of occurrences of '{{ term }}' by party"/>
-                            </div>
-                            <div id="customTimeline">
-                                <form name="customizeGraph" action="" method="get" id="formtest">
-                                    <input type="hidden" name="term" id="term" value="{{ term }}"/>
-                                    <select name="party" id="partySelect">
-                                        <option value="">All parties</option>
-                                        <option value="D">Democrats</option>
-                                        <option value="R">Republicans</option>
-                                    </select>
-                                    <select name="state" id="stateSelect">
-                                        <option value="">All states</option>
-                                        {% for abbrev, fullname in state_choices %}
-                                        <option value="{{ abbrev }}">{{ fullname }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </form>
-                                <img id="customChart" src="{{ timeline_url }}" alt="Custom timeline of occurrences of '{{ term }}'"/>
-                            </div>
-                        </div>
-                    </div> 
-                    <div class="module">
-                        <div class="rightHeader">
-                            <h3>Mentioned most often by</h3>
-                            {#<span class="tip">Current Time Frame</span>#}
-                        </div>
-                        <ol class="barChart">
-                            {% with legislators.0.count as base_count %}
-
-                            {% for legislator in legislators %}
-                            <li>
-                                <span class="tagValue" style="width:{{ legislator.count|divided_by:base_count }}%;">
-                                    <span class="tagPercent">{{ legislator.count|divided_by:base_count }}%</span>
-                                    <span class="tagNumber"></span>
-                                </span>
-                                <span class="barChartTitle"><a href="{% url cwod_legislator_detail bioguide_id=legislator.legislator.bioguide_id slug=legislator.legislator.slug %}">{{ legislator.legislator.honorific }} {{ legislator.legislator.name }}, {{ legislator.legislator.party }}-{{ legislator.legislator.state }}</a></span>
-                            </li>
-                            {% endfor %}
-
-                            {% endwith %}
-                        </ol>    
-                    </div>
-                    <div class="module">
-                        <div class="rightHeader">
-                            <h3>Occurrences in the Congressional Record</h3>
-                        </div>
-                        <ul>
-                            {% for entry in entries|slice:"5" %}
-                            <li>
-                            <h5><a href="{% entry_detail_url entry.origin_url entry.title %}">{{ entry.title|smart_title|typogrify }}</a></h5>
-                            <p>{{ entry.speaker_first }} {{ entry.speaker_last }}, {{ entry.speaker_party }}-{{ entry.speaker_state }}</p>
-                            <p>{{ entry.date|date_parse|date:"F j, Y" }}</p>
-                                <p>{{ entry.match|safe|typogrify }}</p>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-
-                        {% comment %}
-						<table>
-							<thead>
-								<tr>
-									<th class="sort legName">Name</th>
-									<th class="sort entTitle">Entry Title</th>
-									<th class="sort entDate">Date</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr class="odd">
-									<td><a href="">Legislator Name</a></td>
-									<td><a href="">Title of This Entry in the Congressional...</a></td>
-									<td>07-30-2011</td>
-								</tr>
-								<tr>
-									<td><a href="">Legislator Name</a></td>
-									<td><a href="">Title of This Entry in the Congressional...</a></td>
-									<td>07-27-2011</td>
-								</tr>
-								<tr class="odd">
-									<td><a href="">Legislator Name</a></td>
-									<td><a href="">Title of This Entry in the Congressional...</a></td>
-									<td>06-23-2011</td>
-								</tr>
-								<tr>
-									<td><a href="">Legislator Name</a></td>
-									<td><a href="">Title of This Entry in the Congressional...</a></td>
-									<td>06-22-2011</td>
-								</tr>
-								<tr class="odd">
-									<td><a href="">Legislator Name</a></td>
-									<td><a href="">Title of This Entry in the Congressional...</a></td>
-									<td>06-13-2011</td>
-								</tr>
-							</tbody>
-						</table>
-                        {% endcomment %}
-                    </div>
-                </div>  
-                <div id="rtColumn">
-                    <div class="leftModule">
-                        <div class="leftHeader">
-                            <h4>Popularity by state</h4>
-                            {#<span class="tip">Current Time Frame</span>#}
-                        </div>
-                        <ol class="barChart">
-                            {% with states.0.count as base_count %}
-
-                            {% for state in states %}
-                            <li>
-                                <span class="tagValue" style="width:{{ state.count|divided_by:base_count }}%;">
-                                    <span class="tagPercent">{{ state.count|divided_by:base_count }}%</span>
-                                    <span class="tagNumber"></span>
-                                </span>
-                                <span class="barChartTitle"><a href="{% url cwod_state_detail state.state %}">{{ state.state|state_abbrev_to_full }}</a></span>
-                            </li>
-                            {% endfor %}
-
-                            {% endwith %}
-                        </ol>    
-                    </div>
-                    <div class="leftModule">
-                        <h4>Popularity by party</h4>
-                        {#<span class="tip">Current Time Frame</span>#}
-						<div class="chart">
-                            <img src="{{ party_pie_url }}" alt="Pie chart of occurrences of '{{ term }}' by party" style="border: 0;"/>
-	                    </div>
-                    </div>
-                    {% if tree %}
-                    <div class="leftModule">
-                        <div class="leftHeader">
-                            <h4>Often followed by</h4>
-                        </div>
-                        <ol class="barChart">
-                            {% for next in tree|slice:"10" %}
-                            <li>
-                                <span class="barChartTitle"><a href="{% url cwod_term_detail term=next.phrase|underscorify %}">{{ next.phrase }}</a></span>
-                            </li>
-                            {% endfor %}
-                        </ol>
-                    </div>
-                    {% endif %}
-                </div>    
+        </div>
+        <h2 class="withButton">{{ term }}</h2>
+        <a id="compareBtn" class="buttonLink fullButton" href="#">Compare <em>{{ term }}</em></a>
+        <div class="clear"></div>
+        {% comment %}
+        <div class="editResults">
+            <span>for all states, parties and all legislators</span>
+            <a href="#">Edit</a>
+        </div>
+        {% endcomment %}
+    </div>
+    <div id="ltColumn">
+        <div class="module chartModule">
+            <div class="rightHeader withAction">
+                <h3>Occurrences over time</h3>
+                {#<span class="tip">Current Time Frame</span>#}
+            </div>
+            <form id="timelineToggle" class="actionItem" action="" method="">
+                <ul class="partyBreakdown">
+                    <li><input class="radio" type="radio" checked name="toggle" id="overallTimelineSelect"/><label for="overallTimelineSelect">Overall</label></li>
+                    <li><input class="radio" type="radio" name="toggle" id="partyTimelineSelect"/><label for="partyTimelineSelect">By party</label></li>
+                    <li><input class="radio" type="radio" name="toggle" id="customTimelineSelect"/><label for="customTimelineSelect">Custom</label></li>
+                </ul>
                 <div class="clear"></div>
+            </form>
+            <div class="chart">
+                <div id="overallTimeline">
+                    <img src="{{ timeline_url }}" alt="Timeline of occurrences of '{{ term }}'"/>
+                </div>
+                <div id="partyTimeline">
+                    <img src="{{ party_timeline_url }}" alt="Timeline of occurrences of '{{ term }}' by party"/>
+                </div>
+                <div id="customTimeline">
+                    <form name="customizeGraph" action="" method="get" id="formtest">
+                        <input type="hidden" name="term" id="term" value="{{ term }}"/>
+                        <select name="party" id="partySelect">
+                            <option value="">All parties</option>
+                            <option value="D">Democrats</option>
+                            <option value="R">Republicans</option>
+                        </select>
+                        <select name="state" id="stateSelect">
+                            <option value="">All states</option>
+                            {% for abbrev, fullname in state_choices %}
+                            <option value="{{ abbrev }}">{{ fullname }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                    <img id="customChart" src="{{ timeline_url }}" alt="Custom timeline of occurrences of '{{ term }}'"/>
+                </div>
             </div>
         </div>
+        <div class="module">
+            <div class="rightHeader">
+                <h3>Mentioned most often by</h3>
+                {#<span class="tip">Current Time Frame</span>#}
+            </div>
+            <ol class="barChart">
+                {% with legislators.0.count as base_count %}
 
+                {% for legislator in legislators %}
+                <li>
+                    <span class="tagValue" style="width:{{ legislator.count|divided_by:base_count }}%;">
+                        <span class="tagPercent">{{ legislator.count|divided_by:base_count }}%</span>
+                        <span class="tagNumber"></span>
+                    </span>
+                    <span class="barChartTitle"><a href="{% url cwod_legislator_detail bioguide_id=legislator.legislator.bioguide_id slug=legislator.legislator.slug %}">{{ legislator.legislator.honorific }} {{ legislator.legislator.name }}, {{ legislator.legislator.party }}-{{ legislator.legislator.state }}</a></span>
+                </li>
+                {% endfor %}
 
+                {% endwith %}
+            </ol>
+        </div>
+        <div class="module">
+            <div class="rightHeader">
+                <h3>Occurrences in the Congressional Record</h3>
+            </div>
+            <ul>
+                {% for entry in entries|slice:"5" %}
+                <li>
+                <h5><a href="{% entry_detail_url entry.origin_url entry.title %}">{{ entry.title|smart_title|typogrify }}</a></h5>
+                <p>{{ entry.speaker_first }} {{ entry.speaker_last }}, {{ entry.speaker_party }}-{{ entry.speaker_state }}</p>
+                <p>{{ entry.date|date_parse|date:"F j, Y" }}</p>
+                    <p>{{ entry.match|safe|typogrify }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+            {% comment %}
+            <table>
+                <thead>
+                    <tr>
+                        <th class="sort legName">Name</th>
+                        <th class="sort entTitle">Entry Title</th>
+                        <th class="sort entDate">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td><a href="">Legislator Name</a></td>
+                        <td><a href="">Title of This Entry in the Congressional...</a></td>
+                        <td>07-30-2011</td>
+                    </tr>
+                    <tr>
+                        <td><a href="">Legislator Name</a></td>
+                        <td><a href="">Title of This Entry in the Congressional...</a></td>
+                        <td>07-27-2011</td>
+                    </tr>
+                    <tr class="odd">
+                        <td><a href="">Legislator Name</a></td>
+                        <td><a href="">Title of This Entry in the Congressional...</a></td>
+                        <td>06-23-2011</td>
+                    </tr>
+                    <tr>
+                        <td><a href="">Legislator Name</a></td>
+                        <td><a href="">Title of This Entry in the Congressional...</a></td>
+                        <td>06-22-2011</td>
+                    </tr>
+                    <tr class="odd">
+                        <td><a href="">Legislator Name</a></td>
+                        <td><a href="">Title of This Entry in the Congressional...</a></td>
+                        <td>06-13-2011</td>
+                    </tr>
+                </tbody>
+            </table>
+            {% endcomment %}
+        </div>
+    </div>
+    <div id="rtColumn">
+        <div class="leftModule">
+            <div class="leftHeader">
+                <h4>Popularity by state</h4>
+                {#<span class="tip">Current Time Frame</span>#}
+            </div>
+            <ol class="barChart">
+                {% with states.0.count as base_count %}
+
+                {% for state in states %}
+                <li>
+                    <span class="tagValue" style="width:{{ state.count|divided_by:base_count }}%;">
+                        <span class="tagPercent">{{ state.count|divided_by:base_count }}%</span>
+                        <span class="tagNumber"></span>
+                    </span>
+                    <span class="barChartTitle"><a href="{% url cwod_state_detail state.state %}">{{ state.state|state_abbrev_to_full }}</a></span>
+                </li>
+                {% endfor %}
+
+                {% endwith %}
+            </ol>
+        </div>
+        <div class="leftModule">
+            <h4>Popularity by party</h4>
+            {#<span class="tip">Current Time Frame</span>#}
+            <div class="chart">
+                <img src="{{ party_pie_url }}" alt="Pie chart of occurrences of '{{ term }}' by party" style="border: 0;"/>
+            </div>
+        </div>
+        {% if tree %}
+        <div class="leftModule">
+            <div class="leftHeader">
+                <h4>Often followed by</h4>
+            </div>
+            <ol class="barChart">
+                {% for next in tree|slice:"10" %}
+                <li>
+                    <span class="barChartTitle"><a href="{% url cwod_term_detail term=next.phrase|underscorify %}">{{ next.phrase }}</a></span>
+                </li>
+                {% endfor %}
+            </ol>
+        </div>
+        {% endif %}
+    </div>
+    <div class="clear"></div>
+</div>
 {% endblock content %}

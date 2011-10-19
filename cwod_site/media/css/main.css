@@ -110,6 +110,9 @@ dl.tip { font-style: oblique; text-transform: lowercase; color: #746f6d; margin-
 .fullButton:hover { background: #5a5050 url('../img/bg_button.png') left 3px repeat-x; color: #eae5e5;}
 .fullButton:visited { color: #ffffff;}
 
+#socialIcons {float:right;clear:right;margin-top:10px;}
+.footer-social-icons {float:right;background:#494141;margin-top:12px;}
+#socialIcons iframe, .footer-social-icons iframe {float:left;margin:0 0 0 15px;}
 
 #containerWrapper { background: url('../img/bg.jpg') center top repeat-x;}
 #container, #footerSunlight, footer nav, #footerContent { margin: 0 auto; width: 940px; padding: 0 10px;}
@@ -176,6 +179,7 @@ input { padding: 5px 8px; background: #e6e4e2 url('../img/bg_input.png') left bo
 
 .editResults { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; text-transform: lowercase;}
 .editResults a { padding-left: 20px; display: inline-block;}
+#searchDetail {display:inline-block;zoom:1;*display:inline;}
 #searchDetail a { padding-left: 0; display: inline-block;}
 
 
@@ -269,7 +273,7 @@ th {text-transform: uppercase;}
 
 .metaData dt { display: none;}
 .metaData dd { float: left; line-height: 16px; color: #8c8583;}
-.withBar { margin-right: 20px; padding-right: 20px; border-right: 1px solid #666060;}
+.withBar { margin-right: 10px; padding-right: 10px; border-right: 1px solid #666060;}
 
 #internalHead h2 { margin-bottom: 10px;}
 
@@ -797,7 +801,7 @@ span.legImage{
 	-webkit-border-radius: 5px;
 	background: #E6E4E2 url('../img/bg_input.png') left bottom repeat-x;
 	border: 1px solid #021017;
-	
+
 }
 #feedbackForm button{
     float: right;

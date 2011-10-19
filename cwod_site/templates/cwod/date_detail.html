@@ -7,30 +7,29 @@
 {% block content %}
             <div id="main">
                 <div id="internalHead">
-                    <div id="social icons">
-
-                    </div>
-					<div id="dateDetail">
+                    <div id="dateDetail">
                         <h2 class="withButton">{{ date|date:"F j, Y" }}</h2>
                         <a class="editResults" href="{% url cwod_month_detail date.year date|date:"m" %}">Select a different date</a>
-						<div class="clear"></div>
-					</div>
+                        <div class="clear"></div>
+                    </div>
+                    {% include "cwod/partials/share_buttons.html" %}
                     <div class="clear"></div>
-					Jump to:
+                    Jump to:
                     {% for chamber, entry_list in entries %}
                     {% if entry_list %}
                     <a href="#{{ chamber|slugify }}">{{ chamber }}</a>&nbsp;
                     {% endif %}
                     {% endfor %}
+
                 </div>
                 <div id="ltColumn">
                     <div class="module">
                         {% for chamber, entry_list in entries %}
                             {% if entry_list %}
-	                        <div class="rightHeader">
-	                            <h3>Entries in the Congressional Record</h3>
-								<span id="{{ chamber|slugify }}">{{ chamber }}</span>
-	                        </div>
+                            <div class="rightHeader">
+                                <h3>Entries in the Congressional Record</h3>
+                                <span id="{{ chamber|slugify }}">{{ chamber }}</span>
+                            </div>
 
                             <table class="crEntries">
                                 <tbody>
@@ -56,7 +55,7 @@
                         {% endfor %}
 
                     </div>
-                </div>  
+                </div>
                 <div id="rtColumn">
                     <div class="leftModule">
                         <div class="leftHeader">
@@ -83,8 +82,8 @@
                             <li>
                                 <span class="tagValue" style="width:{{ ngram.ngram_pct }}%;">
                                     <span class="tagPercent">{{ ngram.ngram_pct }}</span>
-                                    <span class="tagNumber">{{ ngram.count }}</span> 
-                                </span> 
+                                    <span class="tagNumber">{{ ngram.count }}</span>
+                                </span>
                                 <span class="barChartTitle"><a href="{% url cwod_term_detail term=ngram.ngram %}">{{ ngram.ngram }}</a></span>
                             </li>
                             {% endfor %}
@@ -101,7 +100,7 @@
                             {% for similar_date in similar_dates|slice:"10" %}
                             <li>
                             {% with similar_date.date|date_parse as similar_date %}
-                                <span class="tagValue" style="width:0%;"></span> 
+                                <span class="tagValue" style="width:0%;"></span>
                                 <span class="tagNumber"></span>
                                 <span class="barChartTitle"><a href="{% url cwod_date_detail similar_date.year similar_date|date:"m" similar_date|date:"d" %}">{{ similar_date|date:"F j, Y" }}</a></span>
                             </li>
@@ -110,7 +109,7 @@
                         </ol>
                         {% endif %}
                     </div>
-                </div>    
+                </div>
                 <div class="clear"></div>
             </div>
         </div>
