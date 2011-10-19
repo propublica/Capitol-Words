@@ -1,4 +1,6 @@
 *.swp
 *.pyc
+*.pyo
 *~
-settings.py
+local_settings.py
+.DS_Store
