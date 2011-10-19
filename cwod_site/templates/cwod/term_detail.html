@@ -19,11 +19,9 @@
 
             <div id="main">
                 <div id="internalHead">
-                    <div id="social icons">
-
-                    </div>
                     <h2 class="withButton">{{ term }}</h2>
                     <a id="compareTermBtn" class="buttonLink fullButton" href="{% url cwod_home %}?terma={{ term|urlencode }}">Compare <em>{{ term }}</em></a>
+                    {% include "cwod/partials/share_buttons.html" %}
                     <div class="clear"></div>
                 </div>
                 <div id="ltColumn">
@@ -107,6 +105,7 @@
                         <div id="timeline"></div>
                         <div id="slider-range"></div>
                     </div>
+
                     <div class="module">
                         <div class="rightHeader">
                             <h3>Mentioned most often by</h3>
@@ -130,6 +129,7 @@
                     <div class="module">
                         <div class="rightHeader">
                             <h3>Occurrences in the Congressional Record</h3>
+
                         </div>
 
 

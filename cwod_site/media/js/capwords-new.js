@@ -1361,12 +1361,12 @@
         return cw.submitHomepageCompareForm();
       }
     });
-    $('#termSelect input').bind('focus', function() {
+    $('#termSelect input[type=text]').bind('focus', function() {
       if ($(this).val() === 'Word or phrase') {
         return $(this).val('');
       }
     });
-    $('#termSelect input').bind('blur', function() {
+    $('#termSelect input[type=text]').bind('blur', function() {
       if ($(this).val() === '') {
         return $(this).val('Word or phrase');
       }

@@ -1,0 +1,44 @@
+{% extends "cwod/base.html" %}
+
+{% block content %}
+<body id="contact">
+	<div id="main">
+		<div id="internalHead">
+			<h2>Contact</h2>
+				<div class="clear"></div>
+		</div>
+		<div id="ltColumn">
+			<div class="module">
+				
+				<div class="rightHeader">
+					<h3>We'd Love to Hear from You</h3>
+				</div>	
+				
+				
+				<p>Have an idea for how to make Capitol Words better? Want to learn more about Capitol Words or have a brilliant thought to share? Send us a note here. We love new people and ideas!</p>
+				<form id="feedbackForm" method="post" action="/feedback" accept-charset="UTF-8">
+					<ul>
+						<li>
+							<label for="feedback_name">Your Name</label>
+							<input id="feedback_name" type="text" name="feedback[name]">
+						</li>
+						<li>
+							<label for="feedback_email">Your Email</label>
+							<input id="feedback_email" type="text" name="feedback[email]">
+						</li>
+						<li>
+							<label for="feedback_message">Your Message</label>
+							<textarea id="feedback_message" rows="10" name="feedback[message]" cols="32"></textarea>
+						</li>
+						<li>
+							<button class="buttonLink fullButton" id="submit" type="submit">Submit</button>
+						</li>
+					</ul>
+				</form>
+			</div>
+		</div>
+		<div class="clear"></div>
+	</div>
+</body>
+
+{% endblock %}

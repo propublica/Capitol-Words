@@ -8,12 +8,13 @@
 
             <div id="main">
                 <div id="internalHead">
-					<div id="monthDetail">
-	                    <h2 class="withButton">{{ month_name }} {{ year }}</h2>
-	                    <a class="editResults" href="{% url cwod_calendar %}">Select a Different Month</a>
-	                    <div class="clear"></div>
-					</div>
-					<div class="clear"></div>
+                    <div id="monthDetail">
+                        <h2 class="withButton">{{ month_name }} {{ year }}</h2>
+                        <a class="editResults" href="{% url cwod_calendar %}">Select a Different Month</a>
+                        <div class="clear"></div>
+                    </div>
+                    {% include "cwod/partials/share_buttons.html" %}
+                    <div class="clear"></div>
                 </div>
 
                 <div id="ltColumn">
@@ -29,7 +30,7 @@
                 <div id="rtColumn">
                     <div class="leftModule">
                         <div class="leftHeader">
-	                        <h4>Days this month</h4>
+                            <h4>Days this month</h4>
                         </div>
                         {% for week, dates in dates_by_week %}
                         <ol style="margin-bottom: 20px;">

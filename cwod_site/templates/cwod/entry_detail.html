@@ -8,10 +8,9 @@
 {% block content %}
             <div id="main">
                 <div id="internalHead">
-                    <div id="social icons">
-
-                    </div>
                     <h2>{{ metadata.title|smart_title|typogrify }}</h2>
+                    {% include "cwod/partials/share_buttons.html" %}
+                    <div class="clear"></div>
                 </div>
                 <div id="ltColumn">
                     <article class="module">
@@ -25,7 +24,7 @@
                                 <dt>Legislative Body</dt>
                                 <dd class="withBar">{% ifequal metadata.chamber 'Extensions' %}Extensions of Remarks{% else %}{{ metadata.chamber }}{% endifequal %}</dd>
                                 <dt>Date</dt>
-                                <dd><a href="{% url cwod_date_detail metadata.date.year metadata.date|date:"m" metadata.date|date:"d" %}">{{ metadata.date|date:"l, N j, Y" }}</a></dd>
+                                <dd><a href="{% url cwod_date_detail metadata.date.year metadata.date|date:"m" metadata.date|date:"d" %}">{{ metadata.date|date:"D, N j, Y" }}</a></dd>
                             </dl>
                             <div class="clear"></div>
                         </div>

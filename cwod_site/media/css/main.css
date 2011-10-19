@@ -12,7 +12,6 @@ menu, nav, section, summary, time, mark, audio, video {
   outline:0;
   font-size:100%;
   vertical-align:baseline;
-  background:transparent;
 }
 article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section { display: block; }
 ul, ol { list-style: none; }
@@ -111,6 +110,9 @@ dl.tip { font-style: oblique; text-transform: lowercase; color: #746f6d; margin-
 .fullButton:hover { background: #5a5050 url('../img/bg_button.png') left 3px repeat-x; color: #eae5e5;}
 .fullButton:visited { color: #ffffff;}
 
+#socialIcons {float:right;clear:right;margin-top:10px;}
+.footer-social-icons {float:right;background:#494141;margin-top:12px;}
+#socialIcons iframe, .footer-social-icons iframe {float:left;margin:0 0 0 15px;}
 
 #containerWrapper { background: url('../img/bg.jpg') center top repeat-x;}
 #container, #footerSunlight, footer nav, #footerContent { margin: 0 auto; width: 940px; padding: 0 10px;}
@@ -138,7 +140,7 @@ h3 { color: #fbf4f4; font-size: 210%; font-weight: normal; line-height: 35px; }
 h4 { color: #ada7a3; font-size: 165%; font-weight: normal; line-height: 26px; }
 h5 { font-weight: normal; font-size: 140%; margin-bottom: 15px; }
 
-.rightHeader { background: url('../img/bg_secondTitle.png') 0 0 repeat-x; padding: 3px 30px; margin-left: -30px; margin-bottom: 30px; }
+.rightHeader { background: url('../img/bg_secondTitle.png') top left repeat-x; padding: 3px 30px; margin-left: -30px; margin-bottom: 30px; }
 .leftHeader { margin-bottom: 20px;}
 
 #internalHead {	 border-bottom: 1px dotted #4a4342; padding-bottom: 10px; background: url('../img/bg_headerLine.png') left 15px no-repeat; padding-left: 30px; }
@@ -177,6 +179,7 @@ input { padding: 5px 8px; background: #e6e4e2 url('../img/bg_input.png') left bo
 
 .editResults { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; text-transform: lowercase;}
 .editResults a { padding-left: 20px; display: inline-block;}
+#searchDetail {display:inline-block;zoom:1;*display:inline;}
 #searchDetail a { padding-left: 0; display: inline-block;}
 
 
@@ -223,6 +226,7 @@ input { padding: 5px 8px; background: #e6e4e2 url('../img/bg_input.png') left bo
 	border-bottom: 1px dotted #FDF1F1;
 	color: #FDF1F1;
 	font-style: oblique;
+	text-decoration: none;
 }
 
 #signUp li { float: left; position: relative; }
@@ -269,7 +273,7 @@ th {text-transform: uppercase;}
 
 .metaData dt { display: none;}
 .metaData dd { float: left; line-height: 16px; color: #8c8583;}
-.withBar { margin-right: 20px; padding-right: 20px; border-right: 1px solid #666060;}
+.withBar { margin-right: 10px; padding-right: 10px; border-right: 1px solid #666060;}
 
 #internalHead h2 { margin-bottom: 10px;}
 
@@ -399,7 +403,7 @@ th {text-transform: uppercase;}
 }
 
 #splash_image { padding-bottom: 10px; padding-left: 60px; float: left; height: 180px;}
-#splash_text { border-bottom: 1px dotted #4a4342; padding-top: 29px; padding-bottom: 10px; margin-left: 30px; float: left; height: 103px; font-size: 300%; font-style: italic; width: 600px; line-height: 1.3; color: #d5d0ce;}
+#splash_text { border-bottom: 1px dotted #4a4342; padding-top: 24px; padding-bottom: 10px; margin-left: 30px; float: left; height: 103px; font-size: 300%; font-style: italic; width: 600px; line-height: 1.3; color: #d5d0ce;}
 
 #splash_image img{ border: 0;}
 #splash_text em{ color: #e1dddc; font-weight: bold;}
@@ -774,13 +778,34 @@ span.legImage{
     margin-bottom: 5px;
 }
 
+#feedbackForm label{
+    width: 100px;
+    display: block;
+    margin-bottom: 5px;
 
+}
 
+#feedbackForm input, #feedbackForm textarea{
+    width: 557px;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 100%;
+}
+#feedbackForm li{
+    margin-bottom: 20px;
+}
 
+#feedbackForm textarea{
+	padding: 5px 8px 5px 8px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	background: #E6E4E2 url('../img/bg_input.png') left bottom repeat-x;
+	border: 1px solid #021017;
 
-
-
-
+}
+#feedbackForm button{
+    float: right;
+}
 
 
 
