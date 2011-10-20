@@ -21,4 +21,5 @@ numpy==1.5.1
 pygooglechart==0.3.0
 pymongo==1.9
 python-dateutil==1.5
+python-memcached
 python-sunlightapi==1.0.0

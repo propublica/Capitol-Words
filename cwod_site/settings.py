@@ -59,12 +59,14 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'locksmith.auth.middleware.APIKeyMiddleware',
-    # 'cwod_api.middleware.jsonp.JSONPMiddleware'
+    # 'cwod_api.middleware.jsonp.JSONPMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 SESSIONS_ENGINE = 'django.contrib.sessions.backends.cookies'
