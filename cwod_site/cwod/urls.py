@@ -11,7 +11,7 @@ urlpatterns = patterns('',
             direct_to_template,
             {'template': 'cwod/about.html', },
             name='cwod_about'),
-        
+
         url(r'^contact\/?$',
             direct_to_template,
             {'template': 'cwod/contact.html', },
@@ -22,7 +22,7 @@ urlpatterns = patterns('',
             {},
             name='cwod_search'),
 
-        url(r'^date\/(?P<year>\d{4})\/(?P<month>\d\d)\/(?P<day>\d\d)\/(?P<page_id>[-A-Z0-9]+)-(?P<slug>[-\w]+)\/?$',
+        url(r'^date\/(?P<year>\d{4})\/(?P<month>\d\d)\/(?P<day>\d\d)\/(?P<page_id>[-A-Z0-9]+)_(?P<slug>[-\w]+)\/?$',
             entry_detail,
             {},
             name='cwod_entry_detail'),
