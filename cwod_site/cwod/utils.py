@@ -1,3 +1,5 @@
+import re
+
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.defaultfilters import slugify
 
