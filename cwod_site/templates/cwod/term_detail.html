@@ -10,7 +10,7 @@
 </noscript>
 {% endif %}
 {{ block.super }}
-<script type="text/javascript">var termDetailTerm = "{{ term }}";</script>
+<script type="text/javascript">var termDetailTerm = "{{ term|urlencode|safe }}";</script>
 {% endblock head %}
 
 {% block title %}{{ term }} | {{ block.super }}{% endblock title %}

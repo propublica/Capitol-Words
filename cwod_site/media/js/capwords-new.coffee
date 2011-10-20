@@ -757,6 +757,8 @@ class window.CapitolWords
         History.pushState {'slid': slid}, '', "?#{hash}"
 
     phrases: ->
+        params = $('#termSelect').serialize()
+        console.log params
         phraseA = $('#terma').val()
         if phraseA == 'Word or phrase'
             phraseA = ''
@@ -813,6 +815,7 @@ class window.CapitolWords
         $('table#legislatorList tbody').fadeOut 'fast', buildTable
 
     populateTermDetailPage: (term) ->
+        term = unescape term
         this.getGraphData term
 
         this.getStatePopularity term, jQuery('#stateBarChart')

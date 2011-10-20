@@ -902,7 +902,9 @@
       }, '', "?" + hash);
     };
     CapitolWords.prototype.phrases = function() {
-      var SAMPLE_PHRASES, phraseA, phraseB;
+      var SAMPLE_PHRASES, params, phraseA, phraseB;
+      params = $('#termSelect').serialize();
+      console.log(params);
       phraseA = $('#terma').val();
       if (phraseA === 'Word or phrase') {
         phraseA = '';
@@ -944,6 +946,7 @@
       return $('table#legislatorList tbody').fadeOut('fast', buildTable);
     };
     CapitolWords.prototype.populateTermDetailPage = function(term) {
+      term = unescape(term);
       this.getGraphData(term);
       this.getStatePopularity(term, jQuery('#stateBarChart'));
       this.getPartyPieChart(term, jQuery('#partyPieChart'));
