@@ -34,12 +34,12 @@ class JSONPMiddleware(object):
         return None
 
     def process_response(self, request, response):
-        # try:
-        #     callback = request.jsonp_callback
-        #
-        # except AttributeError:
-        #     return response
-        #
-        # else:
-        #     response.content = '%s(%s)' % (re.sub(r'[^\w_]', '', callback), response.content.decode('utf-8'))
-        return response
+        try:
+            callback = request.jsonp_callback
+
+        except AttributeError:
+            return response
+
+        else:
+            response.content = '%s(%s)' % (re.sub(r'[^\w_]', '', callback), response.content.decode('utf-8'))
+            return response
