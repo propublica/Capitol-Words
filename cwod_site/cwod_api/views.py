@@ -792,8 +792,11 @@ class FullTextSearchHandler(GenericHandler):
                     'speaking': x.get('speaking'),
                     'title': x.get('document_title', ''),
                     'origin_url': create_gpo_url(x.get('crdoc', '')),
-                    'capitolwords_url': entry_detail_url(Parser(''), Token(0, "%s %s" % (x.get('document_title', ''),
-                                                                                create_gpo_url(x.get('crdoc', '')))),
+                    'capitolwords_url': entry_detail_url(
+                        Parser(''),
+                        Token(0, "%s %s" % (x.get('document_title', ''),
+                                            create_gpo_url(x.get('crdoc', ''))))
+                    ),
                     'speaker_first': x.get('speaker_firstname'),
                     'speaker_last': x.get('speaker_lastname'),
                     'speaker_party': x.get('speaker_party'),
