@@ -789,14 +789,12 @@ class FullTextSearchHandler(GenericHandler):
 
     def format_for_return(self, data, *args, **kwargs):
         num_found = data['response']['numFound']
-        title = x.get('document_title', '')
-        origin_url = create_gpo_url(x.get('crdoc', ''))
         results = [{'bioguide_id': x.get('speaker_bioguide'),
                     'date': re.sub(r'T\d\d\:\d\d:\d\dZ$', '', x['date']),
                     'speaking': x.get('speaking'),
-                    'title': title,
-                    'origin_url': origin_url,
-                    'capitolwords_url': EntryDetailUrlNode(origin_url, title),
+                    'title': x.get('document_title', ''),
+                    'origin_url': create_gpo_url(x.get('crdoc', '')),
+                    'capitolwords_url': EntryDetailUrlNode(x.get('document_title', ''), create_gpo_url(x.get('crdoc', ''))),
                     'speaker_first': x.get('speaker_firstname'),
                     'speaker_last': x.get('speaker_lastname'),
                     'speaker_party': x.get('speaker_party'),
