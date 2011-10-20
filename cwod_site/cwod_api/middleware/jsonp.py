@@ -21,6 +21,9 @@ class JSONPMiddleware(object):
         # Store on request object
         request.jsonp_callback = request.GET['callback']
 
+        # key path before mutating the GET dict
+        print request.get_full_path()
+
         # Remove from GET vars
         mutable = request.GET._mutable
         request.GET._mutable = True
@@ -30,6 +33,9 @@ class JSONPMiddleware(object):
         except KeyError:
             pass
         request.GET._mutable = mutable
+
+        # key path after mutating the GET dict
+        print request.get_full_path()
 
         return None
 
