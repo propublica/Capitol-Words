@@ -780,7 +780,7 @@ class FullTextSearchHandler(GenericHandler):
         if request.GET.get('sort'):
             kwargs['params']['sort'] = request.GET['sort']
 
-        kwargs['capitolwords_host'] = request.build_absolute_uri('/')
+        kwargs['capitolwords_host'] = request.build_absolute_uri('/').rstrip('/')
 
         return super(FullTextSearchHandler, self).read(request, *args, **kwargs)
 
