@@ -1,4 +1,5 @@
 import re
+import urllib
 
 class JSONPMiddleware(object):
     '''
@@ -21,9 +22,6 @@ class JSONPMiddleware(object):
         # Store on request object
         request.jsonp_callback = request.GET['callback']
 
-        # key path before mutating the GET dict
-        print request.get_full_path()
-
         # Remove from GET vars
         mutable = request.GET._mutable
         request.GET._mutable = True
@@ -34,8 +32,9 @@ class JSONPMiddleware(object):
             pass
         request.GET._mutable = mutable
 
-        # key path after mutating the GET dict
-        print request.get_full_path()
+        # Update request.META with our new querystring. Cache keys built with
+        # HTTPRequest.get_full_path() use request.META['QUERYSTRING'] rather than GET
+        request.META['QUERYSTRING'] = urllib.urlencode(request.GET)
 
         return None
 
