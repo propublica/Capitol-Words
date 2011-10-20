@@ -58,7 +58,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    # 'cwod_api.middleware.jsonp.JSONPMiddleware',
+    'cwod_api.middleware.jsonp.JSONPMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'locksmith.auth.middleware.APIKeyMiddleware',
     'django.middleware.common.CommonMiddleware',
