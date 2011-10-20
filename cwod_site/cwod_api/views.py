@@ -13,6 +13,7 @@ from django.core.cache import cache
 from django.db.models import *
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.db import connections, DatabaseError
+from django.template import Parser
 
 from bioguide.models import *
 from cwod_api.models import *
@@ -791,8 +792,8 @@ class FullTextSearchHandler(GenericHandler):
                     'speaking': x.get('speaking'),
                     'title': x.get('document_title', ''),
                     'origin_url': create_gpo_url(x.get('crdoc', '')),
-                    'capitolwords_url': entry_detail_url("%s %s" % (x.get('document_title', ''),
-                                                                    create_gpo_url(x.get('crdoc', '')))),
+                    'capitolwords_url': entry_detail_url(Parser(''), "%s %s" % (x.get('document_title', ''),
+                                                                                create_gpo_url(x.get('crdoc', '')))),
                     'speaker_first': x.get('speaker_firstname'),
                     'speaker_last': x.get('speaker_lastname'),
                     'speaker_party': x.get('speaker_party'),
