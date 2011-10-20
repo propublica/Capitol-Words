@@ -36,9 +36,13 @@ class JSONPMiddleware(object):
         # HTTPRequest.get_full_path() use request.META['QUERYSTRING'] rather than GET
         request.META['QUERYSTRING'] = urllib.urlencode(request.GET)
 
+        print request.get_full_path()
+
         return None
 
     def process_response(self, request, response):
+        print request.get_full_path()
+
         try:
             callback = request.jsonp_callback
 
