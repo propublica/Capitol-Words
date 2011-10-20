@@ -4,6 +4,7 @@ from itertools import groupby
 import re
 import datetime
 import json
+import logging
 import urllib
 import urllib2
 
@@ -27,6 +28,9 @@ import numpy
 
 from smooth import smooth
 
+from cwod.templatetags.capwords import EntryDetailUrlNode
+
+logger = logging.getLogger('cwod_api')
 
 class GenericHandler(BaseHandler):
 
@@ -36,7 +40,7 @@ class GenericHandler(BaseHandler):
                 'party': 'speaker_party',
                 'bioguide_id': 'speaker_bioguide',
                 'cr_pages': 'pages',
-                'volume': 'volume', 
+                'volume': 'volume',
                 'congress': 'congress',
                 'session': 'session',
                 'id': 'id',
@@ -79,6 +83,8 @@ class GenericHandler(BaseHandler):
 
     def read(self, request, *args, **kwargs):
 
+        logger.info('Requested %s, callback %s' % (request.path, request.GET.get('callback')))
+
         q = kwargs.get('q', [])
 
         per_page, offset = self.get_pagination(request)
@@ -88,7 +94,7 @@ class GenericHandler(BaseHandler):
             param_val = None
             if k in request.GET and request.GET[k]: # Make sure value isn't blank
                 param_val = request.GET[k]
-            if k in kwargs and kwargs[k]: 
+            if k in kwargs and kwargs[k]:
                 param_val = kwargs[k]
 
             # this is hacky, but the right way to do it seems to require changing ENTITIES, which
@@ -170,7 +176,7 @@ class GenericHandler(BaseHandler):
         url = 'http://%s:%s/solr/select?%s' % (settings.SOLR_SERVER,
                                                settings.SOLR_PORT,
                                                urllib.urlencode(params))
-        print url
+        # print url
         results = urllib2.urlopen(url).read()
 
         show_totals = request.GET.get('totals', 'false') == 'true'
@@ -370,7 +376,7 @@ def tokenize(term):
     from nltk import regexp_tokenize
 
     # Adapted From Natural Language Processing with Python
-    regex = r'''(?x) 
+    regex = r'''(?x)
     ([A-Z]\.)+                                      # Abbreviations (U.S.A., etc.)
   | ([A-Z]+\&[A-Z]+)                                # Internal ampersands (AT&T, etc.)
   | (Mr\.|Dr\.|Mrs\.|Ms\.)                          # Mr., Mrs., etc.
@@ -406,7 +412,7 @@ class PhraseOverTimeHandler(GenericHandler):
             from nltk.stem import PorterStemmer
             stemmer = PorterStemmer()
             stemmed = stemmer.stem(phrase.lower())
-            print stemmed
+            # print stemmed
             kwargs['q'] = ['stemmed_%s:"%s"' % (field, stemmed), ]
 
         else:
@@ -581,8 +587,8 @@ class ChartHandler(GenericHandler):
         counts = [x[1] for x in data]
         labels = [x[0] for x in data]
 
-        party_colors = {'R': 'bb3110', 
-                        'D': '295e72', 
+        party_colors = {'R': 'bb3110',
+                        'D': '295e72',
                         'Other': 'efefef'}
         colors = [party_colors.get(label) for label in labels]
 
@@ -625,7 +631,7 @@ class ChartHandler(GenericHandler):
             label += '%'
         else:
             label = int(maxcount)
-        index = chart.set_axis_labels(Axis.LEFT, [label,]) 
+        index = chart.set_axis_labels(Axis.LEFT, [label,])
         chart.set_axis_positions(index, [100,])
 
         if self.request.GET.get('legend', 'true') != 'false':
@@ -655,7 +661,7 @@ class ChartHandler(GenericHandler):
                 januaries = [x for x in months if x.endswith('01')]
                 january_indexes = [months.index(x) for x in januaries]
                 january_percentages = [int((x/float(len(months)))*100) for x in january_indexes]
-                
+
             #times = [x.get(granularity) for x in results['results']]
 
         width = int(self.request.GET.get('width', 575))
@@ -673,7 +679,7 @@ class ChartHandler(GenericHandler):
             label = '%.4f' % maxcount
         else:
             label = int(maxcount)
-        index = chart.set_axis_labels(Axis.LEFT, [label,]) 
+        index = chart.set_axis_labels(Axis.LEFT, [label,])
         chart.set_axis_positions(index, [100,])
 
         for n, counts in enumerate(allcounts):
@@ -707,7 +713,7 @@ def counts_over_time(*args, **kwargs):
         kw['date__gte'] = start_date
     if 'end_date' in kwargs:
         kw['date__lte'] = end_date
-    
+
     if kwargs.get('granularity') == 'month':
         return NgramDateCount.objects.filter(**kw).extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month').annotate(Sum('count'))
     elif kwargs.get('granularity') == 'year':
@@ -717,7 +723,7 @@ def counts_over_time(*args, **kwargs):
 
 
 class SimilarDocumentHandler(GenericHandler):
-    
+
     def read(self, request, *args, **kwargs):
         doc_id = request.GET.get('id')
         #params = {'q': 'id:%s AND speaker_bioguide:[\'\' TO *]' % origin_id,
@@ -783,11 +789,14 @@ class FullTextSearchHandler(GenericHandler):
 
     def format_for_return(self, data, *args, **kwargs):
         num_found = data['response']['numFound']
+        title = x.get('document_title', '')
+        origin_url = create_gpo_url(x.get('crdoc', ''))
         results = [{'bioguide_id': x.get('speaker_bioguide'),
                     'date': re.sub(r'T\d\d\:\d\d:\d\dZ$', '', x['date']),
                     'speaking': x.get('speaking'),
-                    'title': x.get('document_title', ''),
-                    'origin_url': create_gpo_url(x.get('crdoc', '')),
+                    'title': title,
+                    'origin_url': origin_url,
+                    'capitolwords_url': EntryDetailUrlNode(origin_url, title),
                     'speaker_first': x.get('speaker_firstname'),
                     'speaker_last': x.get('speaker_lastname'),
                     'speaker_party': x.get('speaker_party'),
@@ -891,7 +900,7 @@ class BillDetailHandler(BaseHandler):
 
 class BillListHandler(BaseHandler):
 
-    fields = ('slug', 'bill', 'bill_title', 'source', 
+    fields = ('slug', 'bill', 'bill_title', 'source',
               ('crdoc_set',
                   ('page_id', ),
               ),
@@ -908,9 +917,9 @@ class BillListHandler(BaseHandler):
 
 class DocListHandler(BaseHandler):
 
-    fields = ('document_title', 'slug', 'chamber', 'page_id', 
-                ('legislators', 
-                    ('first', 'middle', 'last', 'position', 'party', 'state', ), 
+    fields = ('document_title', 'slug', 'chamber', 'page_id',
+                ('legislators',
+                    ('first', 'middle', 'last', 'position', 'party', 'state', ),
                 ),
                 ('bills',
                     ('bill', 'bill_title', ),
@@ -955,7 +964,7 @@ class DocListHandler(BaseHandler):
 class DocDetailHandler(BaseHandler):
     fields = ('document_title', 'slug', 'chamber', 'page_id', 'date', 'congress', 'session',
                 ('legislators',
-                    ('first', 'middle', 'last', 'position', 'party', 'state', 'bioguide_id', ), 
+                    ('first', 'middle', 'last', 'position', 'party', 'state', 'bioguide_id', ),
                 ),
                 ('bills',
                     ('bill', 'bill_title', ),
@@ -963,10 +972,10 @@ class DocDetailHandler(BaseHandler):
                 ('representativesentence_set',
                     ('sentence', ),
                 ),
-                ('similar_documents', 
-                    ('document_title', 'slug', 'chamber', 'page_id', 'date', 'congress', 'session', 
+                ('similar_documents',
+                    ('document_title', 'slug', 'chamber', 'page_id', 'date', 'congress', 'session',
                         ('legislators',
-                            ('first', 'middle', 'last', 'position', 'party', 'state', 'bioguide_id', ), 
+                            ('first', 'middle', 'last', 'position', 'party', 'state', 'bioguide_id', ),
                         ),
                     ),
                 ),

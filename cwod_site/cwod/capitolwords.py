@@ -37,7 +37,7 @@ class capitolwords(object):
             params = dict([(k,v) for (k,v) in params.iteritems() if v is not None])
             param_str = '?%s' % urllib.urlencode(params)
         url = 'http://%s/%s.json%s' % (self.domain, func, param_str)
-        print url
+        # print url
 
         try:
             h = httplib2.Http()
