@@ -82,9 +82,6 @@ class GenericHandler(BaseHandler):
 
 
     def read(self, request, *args, **kwargs):
-
-        logger.info('Requested %s, callback %s' % (request.path, request.GET.get('callback')))
-
         q = kwargs.get('q', [])
 
         per_page, offset = self.get_pagination(request)
