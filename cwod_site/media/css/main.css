@@ -338,6 +338,7 @@ th {text-transform: uppercase;}
 #fullColumn #searchCompare, #fullColumn #compareGraphic{ margin-left: -30px; width: 890px; margin-bottom: 50px}
 
 #compareGraphic {background: url('../img/bg_secondTitle_alt.png') 0 0 repeat; padding: 20px 30px 30px 30px; margin: 0 25px 30px 0; display: visible;}
+#compareGraphic img.default {min-height:340px;}
 
 .thirdColumn {float: left; background: url('../img/bg_secondTitle_alt.png') 0 0 repeat; padding: 30px 30px 30px 30px; margin: -19px 25px 30px 0; display: visible; width: 240px;}
 .three.thirdColumn {margin-right: 0;}
