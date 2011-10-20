@@ -13,7 +13,6 @@ from django.core.cache import cache
 from django.db.models import *
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.db import connections, DatabaseError
-from django.template import Parser, Token
 
 from bioguide.models import *
 from cwod_api.models import *
@@ -29,7 +28,7 @@ import numpy
 
 from smooth import smooth
 
-from cwod.templatetags.capwords import entry_detail_url
+from cwod.utils import get_entry_detail_url
 
 logger = logging.getLogger('cwod_api')
 
@@ -792,11 +791,8 @@ class FullTextSearchHandler(GenericHandler):
                     'speaking': x.get('speaking'),
                     'title': x.get('document_title', ''),
                     'origin_url': create_gpo_url(x.get('crdoc', '')),
-                    'capitolwords_url': entry_detail_url(
-                        Parser(''),
-                        Token(0, "%s %s" % (x.get('document_title', ''),
-                                            create_gpo_url(x.get('crdoc', ''))))
-                    ),
+                    'capitolwords_url': getentry_detail_url(create_gpo_url(x.get('crdoc', '')),
+                                                            x.get('document_title', '')),
                     'speaker_first': x.get('speaker_firstname'),
                     'speaker_last': x.get('speaker_lastname'),
                     'speaker_party': x.get('speaker_party'),
