@@ -940,7 +940,7 @@
           }
         });
         return $('table#legislatorList tbody').find('img').error(function() {
-          return $(this).hide();
+          return $(this).attr('src', '/media/img/no_leg_image.gif');
         }).end().imagesLoaded(function() {}).fadeIn('fast');
       };
       return $('table#legislatorList tbody').fadeOut('fast', buildTable);
@@ -1307,7 +1307,7 @@
       cw.populateTermDetailPage(termDetailTerm);
     }
     $('img').error(function() {
-      return $(this).hide();
+      return $(this).attr('src', '/media/img/no_leg_image.gif');
     });
     $('#toggleSearchCompare').click(function(e) {
       e.preventDefault();

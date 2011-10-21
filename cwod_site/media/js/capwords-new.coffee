@@ -808,7 +808,7 @@ class window.CapitolWords
 
             $('table#legislatorList tbody')
                 .find('img').error ->
-                    $(this).hide()
+                    $(this).attr('src', '/media/img/no_leg_image.gif')
                 .end()
                 .imagesLoaded(->).fadeIn 'fast'
 
@@ -1143,7 +1143,7 @@ $(document).ready ->
 
 
     $('img').error ->
-        $(this).hide()
+        $(this).attr('src', '/media/img/no_leg_image.gif')
 
     $('#toggleSearchCompare').click (e) ->
         e.preventDefault()
