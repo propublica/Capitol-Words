@@ -23,7 +23,7 @@
                             <br/>
                             Top words:
                             {% for ngram in item.2 %}
-                            <em>{{ ngram.ngram }}</em>{% if not forloop.last %},{% endif %}
+                            <a href="{% url cwod_term_detail term=ngram.ngram %}"><em>{{ ngram.ngram }}</em></a>{% if not forloop.last %},{% endif %}
                             {% endfor %}
                             </li>
                             {% endfor %}
