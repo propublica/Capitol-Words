@@ -6,12 +6,6 @@ PROJECT_ROOT = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
-)
-
-MANAGERS = ADMINS
-
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -71,6 +65,11 @@ MIDDLEWARE_CLASSES = (
 
 SESSIONS_ENGINE = 'django.contrib.sessions.backends.cookies'
 SESSION_COOKIE_HTTPONLY = True
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+EMAIL_BACKEND = "postmark.backends.PostmarkBackend"
+EMAIL_FROM = "contact@sunlightfoundation.com"
 
 ROOT_URLCONF = 'urls'
 

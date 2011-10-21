@@ -6,9 +6,10 @@ argparse==1.2.1
 boto==2.0
 distribute==0.6.10
 django-debug-toolbar==0.8.5
--e git://github.com/sunlightlabs/django-locksmith.git#egg=django_locksmith-0.5.0
+-e git+https://github.com/sunlightlabs/django-locksmith.git#egg=django_locksmith-0.5.0
 django-mediasync==2.2.0
 django-piston==0.2.2
+-e git+https://github.com/dvogel/django-postmark.git#egg=django_postmark_dev
 django-typogrify==1.2.2
 gunicorn==0.11.2
 httplib2==0.6.0

@@ -808,10 +808,18 @@ span.legImage{
     float: right;
 }
 
+ul.messages li {
+    border-radius: 5px;
+    padding: 1px 10px;
+    color: #FFF;
+}
 
-
-
-
+ul.messages li.success {
+    background: #457F46;
+}
+ul.messages li.error {
+    background: #7F252B;
+}
 
 
 

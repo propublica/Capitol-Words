@@ -17,6 +17,11 @@ urlpatterns = patterns('',
             {'template': 'cwod/contact.html', },
             name='cwod_contact'),
 
+        url(r'^feedback\/?$',
+            submit_feedback,
+            {},
+            name='cwod_submit_feedback'),
+
         url(r'^search\/?$',
             search,
             {},

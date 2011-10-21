@@ -9,8 +9,10 @@ import copy
 from dateutil.parser import parse as dateparse
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.localflavor.us.us_states import US_STATES, STATE_CHOICES, US_TERRITORIES
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import connections, DatabaseError
 from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
@@ -159,7 +161,7 @@ def term_detail(request, term):
                                           entity_type='party',
                                           labels='true')
 
-    # Commonly said be these legislators
+    # Commonly said by these legislators
     legislators = capitolwords.phrase_by_entity_type('legislator', phrase=term, sort='relative', per_page=10)
     for legislator in legislators:
         legislator['legislator'] = LegislatorRole.objects.filter(bioguide_id=legislator['legislator']).order_by('-congress').select_related()[0]
@@ -391,6 +393,22 @@ def state_detail(request, state):
              'bodies': bodies,
              }, context_instance=RequestContext(request))
 
+@login_required
+def submit_feedback(request):
+    if request.POST:
+        name = request.POST.get('feedback[name]')
+        email = request.POST.get('feedback[email]')
+        message = request.POST.get('feedback[message]')
+        if name and email and message:
+            subject = "[Capitol Words] Contact from %s" % email
+            if send_mail(subject, message, '%s <%s>' % (name, settings.EMAIL_FROM), [admin[1] for admin in settings.ADMINS]):
+                messages.add_message(request, messages.SUCCESS, 'Thanks, your message was sent.')
+            else:
+                messages.add_message(request, messages.ERROR, 'There was an error sending your message.')
+        else:
+            messages.add_message(request, messages.ERROR, 'Please fill out all fields and try again.')
+
+    return render_to_response('cwod/contact.html', {}, context_instance = RequestContext(request))
 
 def party_list(request):
     return
