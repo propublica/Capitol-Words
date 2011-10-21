@@ -16,9 +16,10 @@
                 <dd class="withBar">{{ legislator.party }}</dd>
 
                 <dt>State{% ifequal legislator.honorific "Rep." %} and District{% endifequal %}</dt>
-                <dd><a href="{% url cwod_state_detail state=legislator.state %}">{{ legislator.state|state_abbrev_to_full }}</a>{% ifequal legislator.honorific "Rep." %}, District {{ legislator.district }}{% endifequal %}</dd>
-                <!-- Clearly I did not emulate the code correctly, or it's not there. <dt>Chamber</dt>
-                <dd class="withBar">{{ legislator.chamber }}</dd>-->
+                <dd class="withBar"><a href="{% url cwod_state_detail state=legislator.state %}">{{ legislator.state|state_abbrev_to_full }}</a>{% ifequal legislator.honorific "Rep." %}, District {{ legislator.district }}{% endifequal %}</dd>
+
+                <dt>Chamber</dt>
+                <dd>{% ifequal legislator.honorific "Rep." %}House{% else %}Senate{% endifequal %}</dd>
             </dl>
         </div>
         {% include "cwod/partials/share_buttons.html" %}
