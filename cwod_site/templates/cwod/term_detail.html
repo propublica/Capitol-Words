@@ -152,7 +152,7 @@
                                                 </tr>
                                                 <tr colspan="2">
                                                     <td colspan="2" class="legislators">
-                                                    <a href="">{{ entry.speaker_first }} {{ entry.speaker_last }}, {{ entry.speaker_party }}-{{ entry.speaker_state }}</a>
+                                                    <a href="{% url cwod_legislator_detail bioguide_id=entry.bioguide_id slug=entry.speaker_first|add:" "|add:entry.speaker_last|slugify %}">{{ entry.speaker_first }} {{ entry.speaker_last }}, {{ entry.speaker_party }}-{{ entry.speaker_state }}</a>
                                                     </td>
                                                 </tr>
                                                 <tr colspan="2">
