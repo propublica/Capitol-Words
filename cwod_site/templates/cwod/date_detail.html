@@ -80,11 +80,11 @@
                         <ol class="barChart" id="{{ gram_type }}">
                             {% for ngram in ngram_list %}
                             <li>
-                                <span class="tagValue" style="width:{{ ngram.ngram_pct }}%;">
-                                    <span class="tagPercent">{{ ngram.ngram_pct }}</span>
+                                <span class="tagValue" style="width:{% widthratio ngram.tfidf ngram_list.0.tfidf 100 %}%;">
+                                    <span class="tagPercent">{% widthratio ngram.tfidf ngram_list.0.tfidf 100 %}</span>
                                     <span class="tagNumber">{{ ngram.count }}</span>
                                 </span>
-                                <span class="barChartTitle"><a href="{% url cwod_term_detail term=ngram.ngram %}">{{ ngram.ngram }}</a></span>
+                                <span class="barChartTitle"><a title="{{ ngram.count }} mentions, {{ ngram.tfidf }}% of all words spoken this day" href="{% url cwod_term_detail term=ngram.ngram %}">{{ ngram.ngram }}</a></span>
                             </li>
                             {% endfor %}
                         </ol>
