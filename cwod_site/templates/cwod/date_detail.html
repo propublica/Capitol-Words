@@ -84,7 +84,11 @@
                                     <span class="tagPercent">{% widthratio ngram.tfidf ngram_list.0.tfidf 100 %}</span>
                                     <span class="tagNumber">{{ ngram.count }}</span>
                                 </span>
-                                <span class="barChartTitle"><a title="{{ ngram.count }} mentions, {{ ngram.tfidf }}% of all words spoken this day" href="{% url cwod_term_detail term=ngram.ngram %}">{{ ngram.ngram }}</a></span>
+                                <span class="barChartTitle"><a title="{{ ngram.count }} mentions, {{ ngram.tfidf }}% of all phrases spoken this day" href="{% url cwod_term_detail term=ngram.ngram %}">{{ ngram.ngram }}</a></span>
+                            </li>
+                            {% empty %}
+                            <li>
+                                <span class="empty">No phrases.</span>
                             </li>
                             {% endfor %}
                         </ol>
@@ -99,10 +103,10 @@
                         <ol class="barChart">
                             {% for similar_date in similar_dates|slice:"10" %}
                             <li>
-                            {% with similar_date.date|date_parse as similar_date %}
-                                <span class="tagValue" style="width:0%;"></span>
+                            {% with similar_date.date|date_parse as date %}
+                                <span class="tagValue" style="width:{% widthratio similar_date.distance 1 100 %}%;"></span>
                                 <span class="tagNumber"></span>
-                                <span class="barChartTitle"><a href="{% url cwod_date_detail similar_date.year similar_date|date:"m" similar_date|date:"d" %}">{{ similar_date|date:"F j, Y" }}</a></span>
+                                <span class="barChartTitle"><a href="{% url cwod_date_detail date.year date|date:"m" date|date:"d" %}">{{ date|date:"F j, Y" }}</a></span>
                             </li>
                             {% endwith %}
                             {% endfor %}

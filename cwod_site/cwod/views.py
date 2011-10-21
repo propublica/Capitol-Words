@@ -435,7 +435,7 @@ def date_detail(request, year, month, day):
                                         entity_type='date',
                                         entity_value=date,
                                         n=n,
-                                        per_page=30
+                                        per_page=30,
                                         )
     ngrams = ngrams.iteritems()
 
