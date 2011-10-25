@@ -23,12 +23,12 @@
 
                 </div>
                 <div id="ltColumn">
-                    <div class="module">
                         {% for chamber, entry_list in entries %}
                             {% if entry_list %}
+							<div class="module">
                             <div class="rightHeader">
                                 <h3>Entries in the Congressional Record</h3>
-                                <span id="{{ chamber|slugify }}">{{ chamber }}</span>
+                                <h4 id="{{ chamber|slugify }}">{{ chamber }}</h4>
                             </div>
 
                             <table class="crEntries">
@@ -56,10 +56,10 @@
                                 {% endfor %}
                                 </tbody>
                             </table>
+	                    </div>
                             {% endif %}
                         {% endfor %}
 
-                    </div>
                 </div>
                 <div id="rtColumn">
                     <div class="leftModule">
