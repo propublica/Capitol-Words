@@ -63,7 +63,7 @@ iframe { display: block; margin: 10px 0; }
 
 a:hover, a:active { outline: none; }
 a, a:active, a:visited { color: #b99004; }
-a:hover { color: #e7b303; }
+a:hover, .ngramMenu span:hover { color: #e7b303; }
 
 nav ul, nav li { margin: 0; }
 small { font-size: 85%; }
@@ -554,7 +554,7 @@ span.emHighlight { background-color: red !important; /*#fff0b3 !important;*/ col
 
 div.ngramMenu { margin-bottom: 15px; }
 
-div.ngramMenu span { text-decoration: underline; cursor: pointer; color: #e7b303; }
+div.ngramMenu span { text-decoration: underline; cursor: pointer; color: #b99004; }
 
 div.ngramMenu span#selected { text-decoration: none; cursor: default; }
 
