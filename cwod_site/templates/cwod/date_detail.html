@@ -38,7 +38,10 @@
                                         <td>
                                             <table>
                                                 <tr>
-                                                    <td class="entTitle"><a href="{% entry_detail_url entry.0.2 entry.0.0 %}">{{ entry.0.0|title|typogrify }}</a></td>
+                                                    <td class="entTitle">
+                                                      <a href="{% entry_detail_url entry.0.2 entry.0.0 %}">{{ entry.0.0|title|typogrify }}</a>
+                                                      <p>{{ entry.0.3|truncatewords:30 }}</p>
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td class="legislators">

@@ -8,6 +8,7 @@ import copy
 
 from dateutil.parser import parse as dateparse
 
+from cwod.utils import flatten_param_dicts
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.localflavor.us.us_states import US_STATES, STATE_CHOICES, US_TERRITORIES
@@ -426,6 +427,7 @@ def wordtree(request):
 def date_detail(request, year, month, day):
     date = datetime.date(year=int(year), month=int(month), day=int(day))
     entries = entries_for_date(date)
+    print entries
     if not entries:
         raise Http404
 
@@ -470,7 +472,9 @@ def entries_for_date(date):
 
         for entry in response:
             try:
-                chambers[entry['chamber']][(entry['title'], entry['pages'], entry['origin_url'])].add(entry['speaker_last'])
+                chambers[entry['chamber']][(entry['title'], entry['pages'], entry['origin_url'], entry['speaking'][0])].add(entry['speaker_last'])
+            except KeyError:
+                chambers[entry['chamber']][(entry['title'], entry['pages'], entry['origin_url'], '')].add(entry['speaker_last'])
             except KeyError:
                 continue
         if len(response) < 50:
@@ -620,12 +624,41 @@ def decode_embed(request, code):
     except Embed.DoesNotExist:
         raise Http404
 
-    return render_to_response('cwod/embed.html',
-                              {'img_src': obj.img_src,
-                               'url': obj.url,
-                               'title': obj.title,
-                               'chart_type': obj.chart_type,
-                               })
+    return render_to_response('cwod/embed.html', {'embed': obj})
+
+
+def encode_embed(request):
+    allowed_keys = [
+        'img_src',
+        'overall_img_src',
+        'by_party_img_src',
+        'url',
+        'title',
+        'chart_type',
+        'chart_color',
+        'extra',]
+
+    defaults = {
+        'extra': '{}',
+        'img_src': '',
+        'overall_img_src': '',
+        'by_party_img_src': '',
+    }
+
+    if request.method == 'POST':
+        # hack square braced keys into dicts
+        post = flatten_param_dicts(request.POST.copy(), allowed_keys)
+        values = dict([(k,v) for k, v in post.items() if k in allowed_keys])
+        values.update(defaults=defaults)
+        obj, created = Embed.objects.get_or_create(**values)
+        values.pop('defaults')
+        # un-clobber passed in values clobbered by defaults
+        obj.__dict__.update(**values)
+        obj.save()
+        return HttpResponse(obj.js_url())
+
+    return HttpResponse('')
+
 
 def js_embed(request):
     code = request.GET.get('c')
@@ -635,20 +668,3 @@ def js_embed(request):
                               {'code': code},
                               mimetype='text/javascript',
                               )
-
-
-def encode_embed(request):
-    if request.method == 'POST':
-        img_src = request.POST.get('img_src')
-        url = request.POST.get('url')
-        title = request.POST.get('title')
-        chart_type = request.POST.get('chart_type')
-        if img_src and url and title and chart_type:
-            obj, created = Embed.objects.get_or_create(img_src=img_src,
-                                                       url=url,
-                                                       title=title,
-                                                       chart_type=chart_type
-                                                       )
-            return HttpResponse(obj.js_url())
-
-    return HttpResponse('')

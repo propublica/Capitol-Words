@@ -15,3 +15,19 @@ def get_entry_detail_url(origin_url, title):
     except NoReverseMatch:
         url = ''
     return url
+
+def flatten_param_dicts(qdict, allowed_keys):
+    '''hacks rails-like foo[property] functionality into GET & POST params'''
+    for k, v in qdict.items():
+        if '[' in k:
+            match = re.match(r'(?P<key1>\w+?)\[(?P<key2>\w+?)\]', k)
+            if match.group('key1') in allowed_keys:
+                key1 = str(match.group('key1'))
+                key2 = str(match.group('key2'))
+                try:
+                    qdict[key1]
+                except KeyError:
+                    qdict[key1] = {}
+                qdict[key1][key2] = str(v)
+                del qdict[k]
+    return qdict
