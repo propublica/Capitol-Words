@@ -32,7 +32,7 @@
                         <div class="crContent">
 
                         {% for chunk in chunks %}
-                            <div class="crSpeaker">
+                            <div class="crSpeaker {% if not chunk.bioguide_id %}crInterlude{% endif %}">
                             {% if chunk.bioguide_id %}
                                 {% with chunk|legislator_lookup as legislator %}
                                 <h4><a href="{% url cwod_legislator_detail bioguide_id=chunk.bioguide_id slug=legislator.slug %}">{{ legislator.honorific }} {{ legislator.full_name }}</a></h4>
@@ -48,7 +48,7 @@
                                 {% endwith %}
                             {% endif %}
                             {% for graf in chunk.speaking %}
-                            <p {% if not chunk.bioguide_id %}class="crInterlude"{% endif %}>{{ graf }}</p>
+                            <p>{{ graf }}</p>
                             {% endfor %}
                             <div class="clear"></div>
                         </div>
