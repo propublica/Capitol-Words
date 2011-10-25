@@ -822,12 +822,20 @@ class LegislatorLookupHandler(BaseHandler):
 
         bioguide_id = request.GET.get('bioguide_id', None)
         if not bioguide_id:
+            is_third_party = False
             legislators = []
             allowed_params = ['chamber', 'party', 'congress', 'state', ]
             for k, v in request.GET.iteritems():
                 if k in allowed_params and v:
                     kwargs[k] = v
-            for legislator in LegislatorRole.objects.filter(**kwargs).order_by('last'):
+                if k == 'party' and v == '3':
+                    is_third_party = True
+                    del kwargs[k]
+            legislators = LegislatorRole.objects.filter(**kwargs)
+            if is_third_party:
+                legislators = legislators.exclude(party__iexact='d').exclude(party__iexact='r')
+            legislators = legislators.order_by('last')
+            for legislator in legislators:
                 legislators.append({'name': unicode(legislator),
                                     'state': legislator.state,
                                     'party': legislator.party,
