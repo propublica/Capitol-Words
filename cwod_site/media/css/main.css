@@ -202,7 +202,9 @@ input { padding: 5px 8px; background: #e6e4e2 url('../img/bg_input.png') left bo
 .internalModule { margin-bottom: 30px;}
 
 .barChart, #main table { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
-.barChart a, #main table a { color: #fdf1f1; border-bottom: 1px dotted #A79E9C; text-decoration: none;}
+.barChart a, #main table a, .barChart a, #main table a { color: #fdf1f1; border-bottom: 1px dotted #A79E9C; text-decoration: none;}
+.states.module a.topWords { color: #fdf1f1; border-bottom: 1px dotted #A79E9C; text-decoration: none;}
+
 #main table { color: #fdf1f1;}
 
 .tagValue { background: url('../img/bg_barTexture.jpg') 0 0 repeat-x;	position: absolute; height: 100%;}
@@ -286,7 +288,9 @@ th {text-transform: uppercase;}
 .leftModule .metaData { padding-top: 8px;}
 .normalList li { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dotted #4A4342;height:80px;}
 .states ul.normalList{ width:auto; }
-.states ul.normalList li{ float:left;width:32%;margin-right:1% }
+.states ul.normalList li{ float:left;width:29%;margin-right:2%; padding-right:2%; }
+.states h5{
+}
 
 #webButton { background: url('../img/icons/web.png') 0 0 no-repeat;}
 #twitterButton {background: url('../img/icons/twitter.png') 0 0 no-repeat; }

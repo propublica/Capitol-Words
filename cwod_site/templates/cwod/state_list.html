@@ -19,11 +19,10 @@
                         <ul class="normalList">
                         {% for state_chunk in state_chunks %}
                             {% for item in state_chunk %}
-                            <li><a href="{% url cwod_state_detail state=item.0 %}">{{ item.1 }}</a>
-                            <br/>
+                            <li><h5><a href="{% url cwod_state_detail state=item.0 %}">{{ item.1 }}</a></h5>
                             Top words:
                             {% for ngram in item.2 %}
-                            <a href="{% url cwod_term_detail term=ngram.ngram %}"><em>{{ ngram.ngram }}</em></a>{% if not forloop.last %},{% endif %}
+                            <a class="topWords" href="{% url cwod_term_detail term=ngram.ngram %}"><em>{{ ngram.ngram }}</em></a>{% if not forloop.last %},{% endif %}
                             {% endfor %}
                             </li>
                             {% endfor %}
