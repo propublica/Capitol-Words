@@ -284,7 +284,9 @@ th {text-transform: uppercase;}
 #main img { padding: 5px; border: 1px solid #484444;}
 
 .leftModule .metaData { padding-top: 8px;}
-.normalList li { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dotted #4A4342;}
+.normalList li { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dotted #4A4342;height:80px;}
+.states ul.normalList{ width:auto; }
+.states ul.normalList li{ float:left;width:32%;margin-right:1% }
 
 #webButton { background: url('../img/icons/web.png') 0 0 no-repeat;}
 #twitterButton {background: url('../img/icons/twitter.png') 0 0 no-repeat; }
