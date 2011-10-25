@@ -145,6 +145,10 @@ h5 { font-weight: normal; font-size: 140%; margin-bottom: 15px; }
 
 #internalHead {	 border-bottom: 1px dotted #4a4342; padding-bottom: 10px; background: url('../img/bg_headerLine.png') left 15px no-repeat; padding-left: 30px; }
 #compareBtn, #compareTermBtn { float: right; }
+#compareTermBtn{
+    min-width: 135px;
+    text-align: center;
+}
 
 input { padding: 5px 8px; background: #e6e4e2 url('../img/bg_input.png') left bottom repeat-x; -moz-border-radius: 5px; -webkit-border-radius: 5px; border: 1px solid #021017; }
 
