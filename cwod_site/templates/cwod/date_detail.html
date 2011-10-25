@@ -43,11 +43,13 @@
                                                       <p>{{ entry.0.3|truncatewords:30 }}</p>
                                                     </td>
                                                 </tr>
+                                                {% if entry.1|to_list|first %}{# (has speakers) #}
                                                 <tr>
                                                     <td class="legislators">
-                                                        {% for member in entry.1|to_list|slice:"5" %}{% if member %}{{ member }}{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}{% if entry.1|length > 5 %}, others{%endif %}
+                                                        Speaking: {% for member in entry.1|to_list|slice:"5" %}{% if member %}{{ member }}{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}{% if entry.1|length > 5 %}, others{%endif %}
                                                     </td>
                                                 </tr>
+                                                {% endif %}
                                             </table>
                                         </td>
                                     </tr>
