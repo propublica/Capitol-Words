@@ -811,16 +811,20 @@ span.legImage{
 }
 
 ul.messages li {
-    border-radius: 5px;
     padding: 1px 10px;
     color: #FFF;
+    font-style: italic;
+    padding: 0 20px 0 20px;
 }
 
 ul.messages li.success {
-    background: #457F46;
+    background: url("../img/bg_rightView.png") right top no-repeat, url("../img/bg_leftView.png") left top no-repeat;
+    color: #B99004;
+    
 }
 ul.messages li.error {
-    background: #7F252B;
+    background: url("../img/bg_rightView.png") right top no-repeat, url("../img/bg_leftView.png") left top no-repeat;
+    color: #B13557;
 }
 
 
