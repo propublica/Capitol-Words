@@ -831,11 +831,11 @@ class LegislatorLookupHandler(BaseHandler):
                 if k == 'party' and v == '3':
                     is_third_party = True
                     del kwargs[k]
-            legislators = LegislatorRole.objects.filter(**kwargs)
+            legislator_qs = LegislatorRole.objects.filter(**kwargs)
             if is_third_party:
-                legislators = legislators.exclude(party__iexact='d').exclude(party__iexact='r')
-            legislators = legislators.order_by('last')
-            for legislator in legislators:
+                legislator_qs = legislator_qs.exclude(party__iexact='d').exclude(party__iexact='r')
+            legislator_qs = legislator_qs.order_by('last')
+            for legislator in legislator_qs:
                 legislators.append({'name': unicode(legislator),
                                     'state': legislator.state,
                                     'party': legislator.party,
