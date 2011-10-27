@@ -79,6 +79,11 @@ def legislator_lookup(chunk):
 def state_abbrev_to_full(abbrev):
     return dict(US_STATES).get(abbrev, abbrev)
 
+@register.filter(name='state_abbrev_to_full_or_all')
+def state_abbrev_to_full_or_all(abbrev):
+    if not abbrev:
+        return 'All States'
+    return dict(US_STATES).get(abbrev, abbrev)
 
 @register.filter(name='state_abbrev_to_ap')
 def state_abbrev_to_ap(abbrev):
@@ -100,6 +105,22 @@ def party_initial_to_abbrev(initial):
         initial = initials[initial]
     except KeyError:
         pass
+    return initial
+
+@register.filter(name='party_initial_to_plural_name')
+def party_initial_to_plural_name(initial):
+    initials = {
+        'D': 'Democrats',
+        'R': 'Republicans',
+        'I': 'Independents'
+    }
+    if not initial or initial.lower() in ['all']:
+        return 'All Parties'
+    else:
+        try:
+            return initials[initial]
+        except KeyError:
+            pass
     return initial
 
 

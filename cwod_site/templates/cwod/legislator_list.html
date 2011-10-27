@@ -56,9 +56,8 @@
                         <li>
                             <label>Congress</label>
                             <select id="congress" name="congress">
-                                <option value=""></option>
                                 {% for congress in congresses %}
-                                <option value="{{ congress }}" {% if forloop.first %}SELECTED{% endif %}>{{ congress }}</option>
+                                <option value="{{ congress }}" {% if forloop.first %}selected{% endif %}>{{ congress }}</option>
                                 {% endfor %}
                             </select>
                         </li>

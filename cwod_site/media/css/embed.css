@@ -2,7 +2,7 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
 abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp,
 small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, figcaption, figure,  footer, header, hgroup, 
+article, aside, canvas, details, figcaption, figure,  footer, header, hgroup,
 menu, nav, section, summary, time, mark, audio, video {
   margin:0;
   padding:0;
@@ -18,8 +18,8 @@ menu, nav, section, summary, time, mark, audio, video {
 #capWordsEmbed ul, #capWordsEmbed ol { list-style: none; }
 #capWordsEmbed .clear { clear: both;}
 
-#capWordsEmbed .dark { width: 630px; min-height: 325px; color: #a79e9c; font-family: Georgia, "Times New Roman", Times, serif; line-height: 22px; font-size: 13px; font-weight: normal; background: url(../img/bg_pattern.jpg) center top repeat;} 
-#capWordsEmbed .light { width: 630px; min-height: 325px; color: #766a67; font-family: Georgia, "Times New Roman", Times, serif; line-height: 22px; font-size: 13px; font-weight: normal; background: url(../img/bg_pattern_light.jpg) center top repeat;} 
+#capWordsEmbed .dark { width: 630px; min-height: 325px; color: #a79e9c; font-family: Georgia, "Times New Roman", Times, serif; line-height: 22px; font-size: 13px; font-weight: normal; background: url(../img/bg_pattern.jpg) center top repeat;}
+#capWordsEmbed .light { width: 630px; min-height: 325px; color: #766a67; font-family: Georgia, "Times New Roman", Times, serif; line-height: 22px; font-size: 13px; font-weight: normal; background: url(../img/bg_pattern_light.jpg) center top repeat;}
 
 #capWordsEmbed .dark #ltColumn { float: left; width: 575px; margin-right: 30px; background: url('../img/bg_mainLine.png') left top repeat-y; padding-left: 30px; padding-top: 20px}
 #capWordsEmbed .light #ltColumn { float: left; width: 575px; margin-right: 30px; background: url('../img/bg_mainLine_light.png') left top repeat-y; padding-left: 30px; padding-top: 20px}
@@ -47,14 +47,14 @@ menu, nav, section, summary, time, mark, audio, video {
 #capWordsEmbed .termsInChart{
 	font-style: italic;
 }
-#capWordsEmbed .actionItem { font-size: 120%; text-transform: lowercase; margin-bottom: 40px;}
+#capWordsEmbed .actionItem { font-size: 120%; text-transform: lowercase; margin-bottom: 10px;}
 #capWordsEmbed .radio { float: left; margin-right: 10px; width: 15px; margin-top: 4px;}
 #capWordsEmbed #timelineToggle{width: 49%; float: left;}
 #capWordsEmbed #countToggle {width: 49%; float: left; border-left: 2px solid #B99004;}
 #capWordsEmbed .partyBreakdown li { float: left; margin-right: 20px;}
 #capWordsEmbed .relVSraw li { float: left; margin-right: 20px; }
 #capWordsEmbed .relVSraw {padding-left: 62px;}
-#capWordsEmbed #main .chart img { border: 0; } /*!important*/
+#capWordsEmbed #main .chart img { border: 0; margin-bottom:10px; } /*!important*/
 #capWordsEmbed .chart img#termChart, #capWordsEmbed .chart img#partyTermChart{
 	border-bottom: 7px solid #3C3333;
 }

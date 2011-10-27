@@ -101,6 +101,7 @@ INSTALLED_APPS = (
     'cwod',
     'cwod_api',
     'bioguide',
+    'jsonfield',
     # 'locksmith.hub',
     'locksmith.auth',
     'gunicorn',
@@ -108,6 +109,56 @@ INSTALLED_APPS = (
     'mediasync',
     'typogrify',
 )
+
+'''
+MEDIASYNC = {
+    'BACKEND': 'mediasync.backends.s3',
+    'AWS_KEY': MEDIASYNC_AWS_KEY,
+    'AWS_SECRET': MEDIASYNC_AWS_SECRET,
+    'AWS_BUCKET': MEDIASYNC_AWS_BUCKET,
+    'AWS_PREFIX': MEDIASYNC_AWS_PREFIX,
+    'MEDIA_URL': '/media/',
+    'SERVE_REMOTE': False,
+    'STATIC_ROOT': '/media/',
+}
+'''
+from local_settings import (MEDIASYNC_AWS_KEY, MEDIASYNC_AWS_SECRET,
+                            MEDIASYNC_AWS_BUCKET, MEDIASYNC_AWS_PREFIX)
+
+MEDIASYNC = {
+    'BACKEND': 'mediasync.backends.s3',
+    'AWS_KEY': MEDIASYNC_AWS_KEY,
+    'AWS_SECRET': MEDIASYNC_AWS_SECRET,
+    'AWS_BUCKET': MEDIASYNC_AWS_BUCKET,
+    'AWS_PREFIX': MEDIASYNC_AWS_PREFIX,
+    'MEDIA_URL': '/media/',
+    'SERVE_REMOTE': False,
+    'STATIC_ROOT': os.path.join(PROJECT_ROOT, 'cwod_site', 'media'),
+    'PROCESSORS': (
+            'mediasync.processors.slim.css_minifier',
+            #'mediasync.processors.closurecompiler.compile',
+        ),
+    'JOINED': {
+            #'css/joined.css': ['css/main.css','css/jquery.ui/jquery.ui.all.css'],
+            'js/joined.js': ['js/underscore/underscore-min.js',
+                             'js/spin/spin.min.js',
+                             'js/history/scripts/compressed/amplify.store.js',
+                             'js/history/scripts/compressed/history.adapter.jquery.js',
+                             'js/history/scripts/compressed/history.js',
+                             'js/history/scripts/compressed/history.html4.js',
+                             'js/jquery.ui/jquery.ui.core.js',
+                             'js/jquery.ui/jquery.ui.widget.js',
+                             'js/jquery.ui/jquery.ui.mouse.js',
+                             'js/jquery.ui/jquery.ui.slider.js',
+                             'js/jquery.imagesloaded.js',
+                             'js/emphasis/emphasis.js',
+                             'js/google-chart.js',
+                             'js/capitolwords.js',
+                             'js/annotations.js',
+                             'js/app.js',],
+            },
+
+}
 
 try:
     from local_settings import *

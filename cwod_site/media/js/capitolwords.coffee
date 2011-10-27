@@ -1,4 +1,8 @@
-spinner = null
+###
+CapitolWords
+main application class
+Requires: jQuery, jQuery ui slider, underscore
+###
 $ = jQuery
 
 ###
@@ -23,11 +27,9 @@ $.cleanedValue = (str) ->
     str = decodeURIComponent(str).replace /\+/g, ' '
     return $.trim($("<div>#{str}</div>").text())
 
-###
-CapitolWords
-main application class
-###
+
 class window.CapitolWords
+    cw: this
     a: {}
     b: {}
     debug_progress: 0
@@ -46,6 +48,7 @@ class window.CapitolWords
     maxMonth: undefined
     random_phrase_i: undefined
     smoothing: 0
+    spinner: null
     year_values: []
     states :
         "AL": "Alabama",            "AK": "Alaska",         "AZ": "Arizona",        "AR": "Arkansas",
@@ -82,7 +85,6 @@ class window.CapitolWords
         url = 'http://capitolwords.org/api/legislators.json'
         bioguide_id = result['legislator']
         pct = (result['count'] / maxcount) * 100
-        cw = this
         $.ajax
             dataType: 'jsonp'
             url: url
@@ -103,19 +105,18 @@ class window.CapitolWords
 
     annotation_callback: () ->
         try
-            if (not window.cw.inchart) or (not window.cw.annotation_line_coords)
+            if (not cw.inchart) or (not cw.annotation_line_coords)
                 jQuery('.annotation').hide()
                 return
 
-            window.cw.annotation_show dp for dp in window.cw.findActiveDataPoints()
+            cw.annotation_show dp for dp in cw.findActiveDataPoints()
 
     debug_draw_outlines: () ->
-
         COLORS = ['blue', 'green', 'red', 'orange', 'pink']
-        [selected, selected_chart] = window.cw.findSelectedChart()
+        [selected, selected_chart] = cw.findSelectedChart()
 
         draw_point = (series) ->
-            if window.cw.debug_progress > (series.length/2)
+            if cw.debug_progress > (series.length/2)
                 return
 
             FUZZ_X = 5
@@ -125,21 +126,21 @@ class window.CapitolWords
                 FUZZ_Y = 13
 
             jQuery('<div class="dot" style="position:absolute; background-color:' + COLORS[1] + '; width:2px; height:2px"></div>').css({
-                left: jQuery(selected_chart).offset().left + series[window.cw.debug_progress] + FUZZ_X,
-                top: jQuery(selected_chart).offset().top + series[window.cw.debug_progress + 1] + FUZZ_Y,
+                left: jQuery(selected_chart).offset().left + series[cw.debug_progress] + FUZZ_X,
+                top: jQuery(selected_chart).offset().top + series[cw.debug_progress + 1] + FUZZ_Y,
             }).appendTo(jQuery(selected_chart).parent())
 
-        draw_point series for series in window.cw.annotation_line_coords[selected]
+        draw_point series for series in cw.annotation_line_coords[selected]
 
-        window.cw.debug_progress += 2
+        cw.debug_progress += 2
 
-        window.setTimeout window.cw.debug_draw_outlines, 50
+        window.setTimeout cw.debug_draw_outlines, 50
 
 
 
 
     annotation_show: (dp) ->
-        [selected, selected_chart] = window.cw.findSelectedChart()
+        [selected, selected_chart] = cw.findSelectedChart()
 
         FUZZ_X = 5
         FUZZ_Y = 6
@@ -172,7 +173,7 @@ class window.CapitolWords
         jQuery('#annotation-'+selected+'-'+dp_series_i).show()
 
     build_legend: ->
-        [termA, termB] = window.cw.phrases()
+        [termA, termB] = cw.phrases()
 
         partyA = $('.partyA input:checked').eq(0).val()
         stateA = $('#stateA').val()
@@ -254,11 +255,11 @@ class window.CapitolWords
 
         imgUrl = this.showChart [partyAPercentages, partyBPercentages,], labelPositions[0], labelPositions[1], 575, 300, [colors[this.partyResults[0][0]], colors[this.partyResults[1][0]],], [this.partyResults[0][0], this.partyResults[1][0],]
 
-        window.cw.annotation_line_coords['party'] = []
+        cw.annotation_line_coords['party'] = []
         jQuery.getJSON (imgUrl + '&chof=json'), (data) ->
             copy_coords = (c) ->
                 if c.name.match /^line/
-                    window.cw.annotation_line_coords['party'].push (jQuery.extend true, [], c.coords)
+                    cw.annotation_line_coords['party'].push (jQuery.extend true, [], c.coords)
 
             copy_coords(csj) for csj in data.chartshape
 
@@ -266,10 +267,10 @@ class window.CapitolWords
         jQuery('#partyTimeline').html imgTag
 
         ((((jQuery '#partyTermChart').mouseenter (event) ->
-           window.cw.inchart = true).mouseleave (event) ->
-              window.cw.inchart = false).mousemove (event) ->
-                 window.cw.pagex = event.pageX).click (event) ->
-                     window.cw.handleChartClick event
+           cw.inchart = true).mouseleave (event) ->
+              cw.inchart = false).mousemove (event) ->
+                 cw.pagex = event.pageX).click (event) ->
+                     cw.handleChartClick event
 
 
     buildXLabels: (values) ->
@@ -315,7 +316,7 @@ class window.CapitolWords
     findActiveDataPoints: ->
         return_vals = []
 
-        [selected, selected_chart] = window.cw.findSelectedChart()
+        [selected, selected_chart] = cw.findSelectedChart()
 
         DETECTION_FUZZ_X = 6
         if selected is 'homepage'
@@ -323,13 +324,13 @@ class window.CapitolWords
 
         series_i = 0
 
-        while series_i<window.cw.annotation_line_coords[selected].length
+        while series_i<cw.annotation_line_coords[selected].length
             datapoint_i = 0
-            while ((window.cw.annotation_line_coords[selected][series_i][datapoint_i]+DETECTION_FUZZ_X)<(window.cw.pagex - (jQuery selected_chart).offset().left) and (datapoint_i<window.cw.annotation_results[selected][series_i].length*2))
+            while ((cw.annotation_line_coords[selected][series_i][datapoint_i]+DETECTION_FUZZ_X)<(cw.pagex - (jQuery selected_chart).offset().left) and (datapoint_i<cw.annotation_results[selected][series_i].length*2))
                 datapoint_i += 2
 
-            if (datapoint_i/2) < window.cw.annotation_results[selected][series_i].length
-                return_vals.push [ series_i, window.cw.annotation_results[selected][series_i][datapoint_i/2], window.cw.annotation_line_coords[selected][series_i][datapoint_i], window.cw.annotation_line_coords[selected][series_i][datapoint_i+1] ]
+            if (datapoint_i/2) < cw.annotation_results[selected][series_i].length
+                return_vals.push [ series_i, cw.annotation_results[selected][series_i][datapoint_i/2], cw.annotation_line_coords[selected][series_i][datapoint_i], cw.annotation_line_coords[selected][series_i][datapoint_i+1] ]
 
             series_i += 1
 
@@ -391,22 +392,40 @@ class window.CapitolWords
 
     getEmbedCode: (container) ->
         # Determine which graph is being shown.
-        if $('#partyTimeline').is(':visible')
-            imgSrc = $('#partyTimeline img').attr 'src'
-        else
-            imgSrc = $('#overallTimeline img').attr 'src'
-
-
-        data =
-            img_src: imgSrc
+        fields =
             url: window.location.href
+            chart_color: if $('#embedDark:checked').length then 2 else 1
             title: window.document.title.split(' | ')[0]
-            chart_type: if $('#embedDark:checked').length == 1 then 'dark' else 'light'
+            img_src: ''
+            by_party_img_src: ''
+            overall_img_src: ''
+
+        $('#partyTimeline img').each ->
+            fields['by_party_img_src'] = $('#partyTimeline img').attr 'src'
+            fields['overall_img_src'] = $('#overallTimeline img').attr 'src'
+            fields['chart_type'] = if $('#partyTimeline img').is(':visible') then 2 else 1
+            window.termDetailTerm && fields['extra'] = {'term': termDetailTerm}
+        $('#compareGraphic img.default').each ->
+            fields['img_src'] = $(this).attr 'src'
+            fields['chart_type'] = 3
+            [terma, termb] = cw.phrases()
+            fields['extra'] =
+                terma: terma
+                termb: termb
+                statea: $('#stateA').val()
+                stateb: $('#stateB').val()
+                partya: $('input[name=partya]').val()
+                partyb: $('input[name=partyb]').val()
+
+        # resize charts to embed dimension`
+        for key in ['img_src', 'by_party_img_src', 'overall_img_src']
+            fields[key] = fields[key].replace /chs=[\dx]+/, 'chs=570x200'
 
         $.ajax
             type: 'POST'
             url: '/embed/'
-            data: data
+            data: fields
+            enctype: 'miltipart/form-data'
             success: (url) ->
                 full_url = "http://capitolwords.org#{url}"
                 script = """<script type="text/javascript" src="#{full_url}"></script>"""
@@ -459,14 +478,14 @@ class window.CapitolWords
 
                 imgUrl = cw.showChart [percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300',]
 
-                window.cw.annotation_results['term'] = []
-                window.cw.annotation_results['term'].push results
-                window.cw.annotation_line_coords['term'] = []
+                cw.annotation_results['term'] = []
+                cw.annotation_results['term'].push results
+                cw.annotation_line_coords['term'] = []
 
                 jQuery.getJSON (imgUrl + '&chof=json'), (data) ->
                     copy_coords = (c) ->
                         if c.name is 'line0'
-                            window.cw.annotation_line_coords['term'].push (jQuery.extend true, [], c.coords)
+                            cw.annotation_line_coords['term'].push (jQuery.extend true, [], c.coords)
 
                     copy_coords(csj) for csj in data.chartshape
 
@@ -474,10 +493,10 @@ class window.CapitolWords
                     jQuery('#overallTimeline').html overallImgTag
 
                     ((((jQuery '#termChart').mouseenter (event) ->
-                       window.cw.inchart = true).mouseleave (event) ->
-                          window.cw.inchart = false).mousemove (event) ->
-                             window.cw.pagex = event.pageX).click (event) ->
-                                 window.cw.handleChartClick event
+                       cw.inchart = true).mouseleave (event) ->
+                          cw.inchart = false).mousemove (event) ->
+                             cw.pagex = event.pageX).click (event) ->
+                                 cw.handleChartClick event
 
                 if cw.minMonth and cw.maxMonth
                     cw.limit cw.minMonth, cw.maxMonth
@@ -582,7 +601,7 @@ class window.CapitolWords
         parties = ['R', 'D', ]
         renderWhenDone = _(parties.length).after(render)
 
-        window.cw.annotation_results['party'] = []
+        cw.annotation_results['party'] = []
         _(parties).each (party) ->
             data = {
                 'party': party,
@@ -600,7 +619,7 @@ class window.CapitolWords
                     partyData.push [party, results]
                     renderWhenDone()
 
-                    window.cw.annotation_results['party'].push results
+                    cw.annotation_results['party'].push results
             }
 
     getPartyPieChart: (term, div, width, height, callback) ->
@@ -666,7 +685,7 @@ class window.CapitolWords
                     div.append html
 
     handleChartClick: (event) ->
-        active_data_point_result = window.cw.findActiveDataPoints()[0][1]
+        active_data_point_result = cw.findActiveDataPoints()[0][1]
         url = '/date/'+active_data_point_result.month.substr(0,4)+'/'+active_data_point_result.month.substr(4,2)
         window.location.href = url
 
@@ -719,8 +738,8 @@ class window.CapitolWords
             #$('#customChart').attr('src', imgUrl)
 
         else # homepage
-            window.cw.annotation_results['homepage'][0] = _(this.a['all']).select func
-            window.cw.annotation_results['homepage'][1] = _(this.b['all']).select func
+            cw.annotation_results['homepage'][0] = _(this.a['all']).select func
+            cw.annotation_results['homepage'][1] = _(this.b['all']).select func
 
             aVals = _(this.a['all']).select func
             bVals = _(this.b['all']).select func
@@ -758,7 +777,6 @@ class window.CapitolWords
 
     phrases: ->
         params = $('#termSelect').serialize()
-        console.log params
         phraseA = $('#terma').val()
         if phraseA == 'Word or phrase'
             phraseA = ''
@@ -766,7 +784,7 @@ class window.CapitolWords
         if phraseB == 'Word or phrase'
             phraseB = ''
 
-        if (window.cw.random_phrase_i isnt undefined) or (phraseA=='') and (phraseB=='') and (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))
+        if (cw.random_phrase_i isnt undefined) or (phraseA=='') and (phraseB=='') and (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))
             SAMPLE_PHRASES = [
                 ['global warming', 'climate change'],
                 ['iraq', 'afghanistan'],
@@ -774,9 +792,9 @@ class window.CapitolWords
                 ['ozone', 'carbon dioxide'],
                 ['bailout', 'big banks']
             ]
-            if window.cw.random_phrase_i is undefined
-                window.cw.random_phrase_i = Math.floor(Math.random() * SAMPLE_PHRASES.length)
-            return SAMPLE_PHRASES[window.cw.random_phrase_i]
+            if cw.random_phrase_i is undefined
+                cw.random_phrase_i = Math.floor(Math.random() * SAMPLE_PHRASES.length)
+            return SAMPLE_PHRASES[cw.random_phrase_i]
 
         return [phraseA, phraseB]
 
@@ -829,11 +847,10 @@ class window.CapitolWords
         if this.start_date and this.end_date
             this.getCREntries term
 
-        window.clearInterval window.cw.annotation_interval
-        window.cw.annotation_interval = window.setInterval window.cw.annotation_callback, window.cw.annotation_interval_frequency
+        window.clearInterval cw.annotation_interval
+        cw.annotation_interval = window.setInterval cw.annotation_callback, cw.annotation_interval_frequency
 
     readHomepageHistory: (nosubmit) ->
-        cw = this
         cw.minMonth = cw.maxMonth = false
         param_id_map = {'terma': '#terma', 'termb': '#termb', 'statea': '#stateA', 'stateb': '#stateB', }
         state = History.getState()
@@ -960,27 +977,27 @@ class window.CapitolWords
             chart.set_axis_positions 'x', x_label_positions
 
         if $('#annotation-homepage-0').length>0
-            window.cw.annotation_line_coords['homepage'] = []
+            cw.annotation_line_coords['homepage'] = []
             jQuery.getJSON (chart.url() + '&chof=json'), (data) ->
                 copy_coords = (c) ->
                     if c.name.match /^line/
-                        window.cw.annotation_line_coords['homepage'].push (jQuery.extend true, [], c.coords)
+                        cw.annotation_line_coords['homepage'].push (jQuery.extend true, [], c.coords)
 
                 copy_coords(csj) for csj in data.chartshape
 
             $('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url()).fadeIn 100
 
             ((((jQuery '#chart img.realChart, #compareGraphic img.default').mouseenter (event) ->
-               window.cw.inchart = true).mouseleave (event) ->
-                  window.cw.inchart = false).mousemove (event) ->
-                     window.cw.pagex = event.pageX).click (event) ->
-                         window.cw.handleChartClick event
+               cw.inchart = true).mouseleave (event) ->
+                  cw.inchart = false).mousemove (event) ->
+                     cw.pagex = event.pageX).click (event) ->
+                         cw.handleChartClick event
 
-            window.clearInterval window.cw.annotation_interval
-            window.cw.annotation_interval = window.setInterval window.cw.annotation_callback, window.cw.annotation_interval_frequency
+            window.clearInterval cw.annotation_interval
+            cw.annotation_interval = window.setInterval cw.annotation_callback, cw.annotation_interval_frequency
 
-        if spinner
-            spinner.stop()
+        if cw.spinner
+            cw.spinner.stop()
 
         chart.url()
 
@@ -1026,15 +1043,15 @@ class window.CapitolWords
 
         target = document.getElementById 'compareGraphic'
         # stop the spinner first if it's already running
-        spinner && spinner.stop && spinner.stop()
-        spinner = new Spinner(opts).spin target
+        cw.spinner && cw.spinner.stop && cw.spinner.stop()
+        cw.spinner = new Spinner(opts).spin target
 
         url = 'http://capitolwords.org/api/dates.json'
 
         [phraseA, phraseB] = cw.phrases()
 
-        window.cw.annotation_results['homepage'] = [[], []]
-        window.cw.annotation_line_coords['homepage'] = []
+        cw.annotation_results['homepage'] = [[], []]
+        cw.annotation_line_coords['homepage'] = []
 
         querya = $.ajax
             dataType: 'jsonp'
@@ -1051,7 +1068,7 @@ class window.CapitolWords
                 cw.a['all'] = aResults
                 cw.a['counts'] = _(aResults).pluck 'count'
                 cw.a['percentages'] = _(aResults).pluck 'percentage'
-                window.cw.annotation_results['homepage'][0] = (jQuery.extend true, [], aResults)
+                cw.annotation_results['homepage'][0] = (jQuery.extend true, [], aResults)
 
         queryb = $.ajax
             dataType: 'jsonp'
@@ -1068,7 +1085,7 @@ class window.CapitolWords
                 cw.b['all'] = bResults
                 cw.b['counts'] = _(bResults).pluck 'count'
                 cw.b['percentages'] = _(bResults).pluck 'percentage'
-                window.cw.annotation_results['homepage'][1] = (jQuery.extend true, [], bResults)
+                cw.annotation_results['homepage'][1] = (jQuery.extend true, [], bResults)
 
         $.when(querya, queryb)
             .done ->
@@ -1080,12 +1097,12 @@ class window.CapitolWords
                     positions = labelPositions[1]
                     cw.showChart [cw.a['percentages'], cw.b['percentages']], labels, positions
             .then ->
-                if spinner
-                    spinner.stop()
+                if cw.spinner
+                    cw.spinner.stop()
 
                 $('#compareGraphic div.key').eq(0).replaceWith(cw.build_legend_html())
 
-                window.cw.random_phrase_i = undefined
+                cw.random_phrase_i = undefined
 
         if not skipState
             this.makeHomepageHistoryState(true)
@@ -1097,178 +1114,3 @@ class window.CapitolWords
 
     trimGraph: ->
         if this.year_values.length == 2 then true else false
-
-###
-Create a global CW instance within this closure
-###
-cw = new window.CapitolWords
-window.cw = cw
-History = window.History
-
-###
-Add csrf token to ajax POSTs
-###
-$(document).ajaxSend (event, xhr, settings) ->
-    # Adapted from https://docs.djangoproject.com/en/dev/ref/contrib/csrf/
-    if (settings.type is 'POST') and cw.sameOrigin(settings.url)
-        xhr.setRequestHeader "X-CSRFToken", cw.getCookie('csrftoken')
-
-###
-Handle special routes
-###
-History.Adapter.bind window, 'statechange', ->
-    if window.location.pathname.match /^\/legislator\/?$/
-        cw.readLegislatorHistory()
-
-    else if window.location.pathname.match /^\/term\/.+\/?$/
-        cw.readTermDetailPageHistory()
-        cw.populateTermDetailPage termDetailTerm
-
-    else if window.location.pathname.match /^\/?$/
-        cw.readHomepageHistory()
-
-# force statechange on initial load
-$(window).trigger 'statechange'
-
-###
-DomReady Handler
-###
-$(document).ready ->
-    if typeof termDetailTerm isnt 'undefined'
-        cw.readTermDetailPageHistory()
-        cw.populateTermDetailPage termDetailTerm
-        #$('#partyTimelineSelect, #overallTimelineSelect').bind('change', (x) ->
-        #    cw.makeHomepageHistoryState()
-        #)
-
-
-    $('img').error ->
-        $(this).attr('src', '/media/img/no_leg_image.gif')
-
-    $('#toggleSearchCompare').click (e) ->
-        e.preventDefault()
-        $('.toggleSearchCompare').slideToggle 'fast', 'swing'
-
-    $('#compareTermBtn').live 'click', (e) ->
-        e.preventDefault()
-        word = $(this).find('em').text()
-        $('#terma').val word
-        $('#toggleSearchCompare').trigger 'click'
-
-    $('.ngramMenu span').bind 'click', (x) ->
-        classToShow = $(this).attr 'class'
-        $('.ngramMenu span').removeAttr('id')
-        $(this).attr('id', 'selected')
-        $('.barChart:visible').eq(0).hide 0, ->
-            $("ol##{classToShow}").show(0)
-
-    $('#timelineToggle input').bind 'click', ->
-        selectedId = $('input[name=toggle]:checked', '#timelineToggle').attr 'id'
-        timelines = [
-            ['party', $('#partyTimeline')],
-            ['overall', $('#overallTimeline')],
-            #['custom', $('#customTimeline')],
-        ]
-        selected = {
-            'overallTimelineSelect': 'overall',
-            'partyTimelineSelect': 'party',
-            #'customTimelineSelect': 'custom',
-        }[selectedId]
-
-        _(timelines).each (timeline) ->
-            name = timeline[0]
-            obj = timeline[1]
-            if name == selected
-                obj.show()
-            else
-                obj.hide()
-
-    $('#partySelect, #stateSelect').change ->
-        cw.customizeChart()
-
-    $('.compareSubmit').bind 'click', (e) ->
-        if window.location.pathname.match /^\/?$/
-            e.preventDefault()
-            cw.submitHomepageCompareForm()
-        else
-            return true
-
-    $('#termSelect input').bind 'keyup', (e) ->
-        if e.keyCode == 13 then cw.submitHomepageCompareForm()
-
-    $('#termSelect input[type=text]').bind 'focus', ->
-        if $(this).val() == 'Word or phrase' then $(this).val ''
-
-    $('#termSelect input[type=text]').bind 'blur', ->
-        if $(this).val() == '' then $(this).val 'Word or phrase'
-
-    $('#searchFilterButton').bind 'click', ->
-        pieces = []
-        $('#searchFilter select').each (select) ->
-            id = $(this).attr 'id'
-            val = $(this).val()
-            pieces.push "#{id}=#{val}"
-        hash = pieces.join '&'
-        History.pushState {}, '', "/legislator?#{hash}"
-        cw.legislatorSearch({})
-
-    $('#signUp').find('input[type=text]').bind 'focus', ->
-        el = $(this)
-        try
-          el.parent().find('label[for=' + el.attr('id') + ']').eq(0).addClass('hidden')
-    .bind 'blur', ->
-        el = $(this)
-        if !el.val()
-          try
-            el.parent().find('label[for=' + el.attr('id') + ']').eq(0).removeClass('hidden')
-
-    if not _($('#slider-range')).isEmpty()
-        d = new Date()
-        if cw.minMonth and cw.maxMonth
-            startYear = cw.minMonth.slice(0, 4)
-            endYear = cw.maxMonth.slice(0, 4)
-        else
-            startYear = 1996
-            endYear = d.getFullYear()
-
-        $('#slider-range').slider
-            range: true
-            min: 1996
-            max: d.getFullYear()
-            values: [startYear, endYear]
-            slide: (event, ui) ->
-                $('#years').val "#{ui.values[0]}-#{ui.values[1]}"
-            stop: (event, ui) ->
-                cw.minMonth = "#{ui.values[0]}01"
-                cw.maxMonth = "#{ui.values[1]}12"
-                if not _(_(cw.a).keys()).isEmpty() or not _(_(cw.b).keys()).isEmpty()
-                    cw.limit cw.minMonth, cw.maxMonth
-                else if typeof termDetailTerm isnt 'undefined' # For slider on term detail page
-                    cw.limit cw.minMonth, cw.maxMonth
-                    cw.buildPartyGraph cw.minMonth, cw.maxMonth
-                    cw.start_date = cw.dateFromMonth(cw.minMonth)
-                    cw.end_date = cw.dateFromMonth(cw.maxMonth)
-                    cw.populateTermDetailPage termDetailTerm
-                cw.makeHomepageHistoryState(true)
-
-    $('.advanced').bind 'click', ->
-        t = $(this)
-        $('ul.wordFilter').slideToggle 'fast', 'swing', ->
-            if $(this).is ':visible' then t.addClass 'expanded' else t.removeClass 'expanded'
-
-    $('#embed span').bind 'click', ->
-        t = $('.embedContainer')
-        if t.is ':visible'
-            t.slideUp()
-        else
-            cw.getEmbedCode t
-
-    $('#customizeEmbed input').change ->
-        cw.getEmbedCode $('.embedContainer')
-
-    # reset images, bind ajax calls to do the same
-    (area = $('#rtColumn')) && area.length && area.imagesLoaded ->
-
-    # fire sample search if arriving fresh on the homepage
-    if (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))
-        cw.submitHomepageCompareForm()
