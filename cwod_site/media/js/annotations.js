@@ -60,7 +60,7 @@
           try {
             value = this.datasets[0][idx];
           } catch (e) {
-            this.refresh();
+            return this.refresh();
           }
           parts = varName.split('.');
           for (_i = 0, _len = parts.length; _i < _len; _i++) {
@@ -109,7 +109,7 @@
         if (isNaN(coords[0])) {
           return this.annotationEl.hide();
         } else {
-          step = this.step(evt.offsetX) + this.startOffset();
+          step = this.step(evt.layerX) + this.startOffset();
           this.annotationEl.show().stop().animate({
             'left': coords[0],
             'top': coords[1]
@@ -201,7 +201,7 @@
     };
     Annotation.prototype.point = function(evt) {
       var coordset, overlap, pair, step, x, y, ys;
-      x = evt.offsetX;
+      x = evt.layerX;
       step = this.step(x);
       pair = [NaN, NaN];
       if ((0 <= step && step < this.coords[0].length)) {

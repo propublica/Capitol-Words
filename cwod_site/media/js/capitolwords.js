@@ -432,7 +432,7 @@
         fields['img_src'] = $(this).attr('src');
         fields['chart_type'] = 3;
         _ref = cw.phrases(), terma = _ref[0], termb = _ref[1];
-        fields['extra'] = {
+        return fields['extra'] = {
           terma: terma,
           termb: termb,
           statea: $('#stateA').val(),
@@ -441,7 +441,6 @@
           partyb: $('input[name=partyb]').val(),
           dataurls: cw.getDataUrlsForImage($(this))
         };
-        return console.log(fields['extra']);
       });
       _ref = ['img_src', 'by_party_img_src', 'overall_img_src'];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {

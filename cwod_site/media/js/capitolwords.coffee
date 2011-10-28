@@ -331,8 +331,6 @@ class window.CapitolWords
                 partyb: $('input[name=partyb]').val()
                 dataurls: cw.getDataUrlsForImage $(this)
 
-            console.log fields['extra']
-
         # resize charts to embed dimension`
         for key in ['img_src', 'by_party_img_src', 'overall_img_src']
             fields[key] = fields[key].replace /chs=[\dx]+/, 'chs=570x200'
