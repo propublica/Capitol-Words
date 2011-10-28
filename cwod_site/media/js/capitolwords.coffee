@@ -808,7 +808,7 @@ class window.CapitolWords
         _(data).each (item) ->
             #values = cw.smooth(item, Number(cw.smoothing) || 1)
             values = item
-            maxValue = Math.round(_(values).max()*1000)/10000
+            maxValue = Math.round(_(values).max()*10000)/10000
             if maxValue > max
                 max = Math.round(maxValue*10000)/10000
             chart.add_data values
