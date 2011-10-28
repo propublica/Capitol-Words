@@ -194,9 +194,13 @@ $(document).ready ->
                 data
             new Annotation this, {iterable:iterable, heading:heading, template:template}
 
+    $('#compareGraphic img.default').each ->
+        if not $(this).parent().hasClass('annotation-wrap')
+            $(this).trigger 'load.capitolwords'
+
     # reset images, bind ajax calls to do the same
     (area = $('#rtColumn')) && area.length && area.imagesLoaded ->
 
     # fire sample search if arriving fresh on the homepage
-    if (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /[\?#]/))
+    if (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /\?/))
         cw.submitHomepageCompareForm()

@@ -183,7 +183,7 @@ class window.CapitolWords
         params =
             x_positions:labelPositions[0]
             x_label_positions:labelPositions[1]
-            width:575
+            width:565
             height:300
             colors:[colors[this.partyResults[0][0]], colors[this.partyResults[1][0]],]
             legend:[this.partyResults[0][0], this.partyResults[1][0],]
@@ -372,7 +372,7 @@ class window.CapitolWords
                 percentages = _(results).pluck 'percentage'
                 labelPositions = cw.buildXLabels results
 
-                imgUrl = cw.showChart [percentages], {x_labels:labelPositions[0], x_label_positions:labelPositions[1], width:575, height:300, colors:['E0B300',]}
+                imgUrl = cw.showChart [percentages], {x_labels:labelPositions[0], x_label_positions:labelPositions[1], width:565, height:300, colors:['E0B300',]}
 
                 overallImgTag = """<img id="termChart"
                                         src="#{imgUrl}"
@@ -592,7 +592,7 @@ class window.CapitolWords
             vals = _(this.results).select func
             percentages = _(vals).pluck 'percentage'
             labelPositions = this.buildXLabels vals
-            imgUrl = this.showChart [percentages], {x_labels:labelPositions[0], x_label_positions:labelPositions[1], width:575, height:300, colors:['E0B300',]}
+            imgUrl = this.showChart [percentages], {x_labels:labelPositions[0], x_label_positions:labelPositions[1], width:565, height:300, colors:['E0B300',]}
             $('#termChart').attr('src', imgUrl)
             #$('#customChart').attr('src', imgUrl)
 

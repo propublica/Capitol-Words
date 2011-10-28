@@ -156,7 +156,7 @@
           this.annotationEl.show().stop().animate({
             'left': coords[0],
             'top': coords[1]
-          }, 60).children('.inner-annotation').html(this.applyTemplate(step));
+          }, 10).children('.inner-annotation').html(this.applyTemplate(step));
           date = this.datasets[0][step].month;
           year = date.slice(0, 4);
           month = date.slice(4, 6);

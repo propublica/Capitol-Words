@@ -258,7 +258,7 @@
       params = {
         x_positions: labelPositions[0],
         x_label_positions: labelPositions[1],
-        width: 575,
+        width: 565,
         height: 300,
         colors: [colors[this.partyResults[0][0]], colors[this.partyResults[1][0]]],
         legend: [this.partyResults[0][0], this.partyResults[1][0]]
@@ -486,7 +486,7 @@
           imgUrl = cw.showChart([percentages], {
             x_labels: labelPositions[0],
             x_label_positions: labelPositions[1],
-            width: 575,
+            width: 565,
             height: 300,
             colors: ['E0B300']
           });
@@ -721,7 +721,7 @@
         imgUrl = this.showChart([percentages], {
           x_labels: labelPositions[0],
           x_label_positions: labelPositions[1],
-          width: 575,
+          width: 565,
           height: 300,
           colors: ['E0B300']
         });

@@ -133,7 +133,7 @@ class window.Annotation
             else
                 step = @step(x) + @startOffset()
                 @annotationEl
-                    .show().stop().animate({'left': coords[0], 'top': coords[1]}, 60)
+                    .show().stop().animate({'left': coords[0], 'top': coords[1]}, 10)
                     .children('.inner-annotation').html(@applyTemplate step)
                 date = @datasets[0][step].month
                 year = date.slice 0, 4

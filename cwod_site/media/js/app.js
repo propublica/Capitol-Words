@@ -219,8 +219,13 @@
         });
       }
     });
+    $('#compareGraphic img.default').each(function() {
+      if (!$(this).parent().hasClass('annotation-wrap')) {
+        return $(this).trigger('load.capitolwords');
+      }
+    });
     (area = $('#rtColumn')) && area.length && area.imagesLoaded(function() {});
-    if ((window.location.pathname.match(/(^\/?$|homepage\.html)/)) && (!(window.location.href.match(/[\?#]/)))) {
+    if ((window.location.pathname.match(/(^\/?$|homepage\.html)/)) && (!(window.location.href.match(/\?/)))) {
       return cw.submitHomepageCompareForm();
     }
   });
