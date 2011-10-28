@@ -193,14 +193,14 @@
       var legend, partyA, partyB, stateA, stateB, template, termA, termB;
       legend = this.build_legend();
       termA = legend[0] && legend[0].split(' [')[0] || "(no term)";
-      partyA = $('.partyA input:checked').eq(0).parent().text().trim();
+      partyA = $.trim($('.partyA input:checked').eq(0).parent().text());
       if (partyA === 'All') {
         partyA = 'All Parties';
       }
       stateA = $('#stateA');
       stateA = stateA.val() && this.states[stateA.val()] || "All states";
       termB = legend[1] && legend[1].split(' [')[0] || "(no term)";
-      partyB = $('.partyB input:checked').eq(0).parent().text().trim();
+      partyB = $.trim($('.partyB input:checked').eq(0).parent().text());
       if (partyB === 'All') {
         partyB = 'All Parties';
       }

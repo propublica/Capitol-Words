@@ -104,12 +104,13 @@
         return this.annotationEl.hide();
       }, this));
       return this.el.bind('mousemove.annotation', __bind(function(evt) {
-        var date, month, step, year;
+        var date, month, step, x, year;
+        x = evt.layerX || evt.offsetX;
         coords = this.point(evt);
         if (isNaN(coords[0])) {
           return this.annotationEl.hide();
         } else {
-          step = this.step(evt.layerX) + this.startOffset();
+          step = this.step(x) + this.startOffset();
           this.annotationEl.show().stop().animate({
             'left': coords[0],
             'top': coords[1]
@@ -201,7 +202,7 @@
     };
     Annotation.prototype.point = function(evt) {
       var coordset, overlap, pair, step, x, y, ys;
-      x = evt.layerX;
+      x = evt.layerX || evt.offsetX;
       step = this.step(x);
       pair = [NaN, NaN];
       if ((0 <= step && step < this.coords[0].length)) {

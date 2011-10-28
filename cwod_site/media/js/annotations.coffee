@@ -102,11 +102,12 @@ class window.Annotation
         @el.parent().bind 'mouseleave.annotation', (evt) =>
             @annotationEl.hide()
         @el.bind 'mousemove.annotation', (evt) =>
+            x = evt.layerX or evt.offsetX
             coords = @point evt
             if isNaN coords[0]
                 @annotationEl.hide()
             else
-                step = @step(evt.layerX) + @startOffset()
+                step = @step(x) + @startOffset()
                 @annotationEl
                     .show().stop().animate({'left': coords[0], 'top': coords[1]}, 60)
                     .children('.inner-annotation').html(@applyTemplate step)
@@ -176,7 +177,7 @@ class window.Annotation
         return dfd.promise()
 
     point: (evt) ->
-        x = evt.layerX
+        x = evt.layerX or evt.offsetX
         step = @step(x)
         pair = [NaN, NaN]
         if 0 <= step < @coords[0].length
