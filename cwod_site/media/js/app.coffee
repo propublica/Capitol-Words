@@ -175,7 +175,7 @@ $(document).ready ->
     $('#customizeEmbed input').change ->
         cw.getEmbedCode $('.embedContainer')
 
-    $('#compareGraphic img.default, img#termChart, img#partyTermChart').live 'load.capitolwords', ->
+    $('#compareGraphic img.default, #overallTimeline img, #partyTimeline img').live 'load.capitolwords', ->
         existingAnnotation = $(this).data('annotation')
         if existingAnnotation
             existingAnnotation.refresh()
@@ -194,7 +194,7 @@ $(document).ready ->
                 data
             new Annotation this, {iterable:iterable, heading:heading, template:template}
 
-    $('#compareGraphic img.default').each ->
+    $('#compareGraphic img.default, #overallTimeline img, #partyTimeline img').each ->
         if not $(this).parent().hasClass('annotation-wrap')
             $(this).trigger 'load.capitolwords'
 
