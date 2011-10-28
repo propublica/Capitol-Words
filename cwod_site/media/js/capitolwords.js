@@ -427,7 +427,7 @@
           overall_dataurls: cw.getDataUrlsForImage($('#overallTimeline img').eq(0))
         };
       });
-      $('#compareGraphic img.default').each(function() {
+      $('#compareGraphic img#compareTimeline').each(function() {
         var terma, termb, _ref;
         fields['img_src'] = $(this).attr('src');
         fields['chart_type'] = 3;
@@ -856,6 +856,8 @@
         endYear = cw.maxMonth.slice(0, 4);
         $("#slider-range").slider("option", "values", [startYear, endYear]);
         cw.limit(cw.minMonth, cw.maxMonth);
+        this.getPartyPieChart(params['terma'], $('#term1piechart'));
+        this.getPartyPieChart(params['termb'], $('#term2piechart'));
         if (!nosubmit) {
           return cw.submitHomepageCompareForm(true);
         }
@@ -954,7 +956,7 @@
       if (!legend) {
         legend = this.build_legend();
       }
-      if (!_(legend).isEmpty()) {
+      if (!_(legend).isEmpty() && !location.pathname.match(/^\/?$/)) {
         chart.set_legend(legend);
       }
       chart.set_colors(colors.slice(0, legend.length));
@@ -965,7 +967,7 @@
       if (x_label_positions) {
         chart.set_axis_positions('x', x_label_positions);
       }
-      img = $('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url());
+      img = $('#chart img.realChart, #compareGraphic img#compareTimeline').attr('src', chart.url());
       if (typeof requestedUrls === 'object' && requestedUrls.length) {
         if (requestedUrls.length > 1) {
           for (i in requestedUrls) {

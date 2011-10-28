@@ -67,14 +67,11 @@
                             <div class="clear"></div>
                         </div>
                         <div class="chart">
-                            <div class="annotation" id="annotation-term-0"><div class="inner-annotation"></div></div>
                             <div id="overallTimeline">
                                 {% if timeline_url %}
                                 <img src="{{ timeline_url }}" alt="Timeline of occurrences of '{{ term }}'"/>
                                 {% endif %}
                             </div>
-                            <div class="annotation" id="annotation-party-0"><div class="inner-annotation"></div></div>
-                            <div class="annotation flipped" id="annotation-party-1"><div class="inner-annotation"></div></div>
                             <div id="partyTimeline">
                                 {% if party_timeline_url %}
                                 <img src="{{ party_timeline_url }}" alt="Timeline of occurrences of '{{ term }}' by party"/>

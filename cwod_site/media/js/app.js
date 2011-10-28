@@ -191,7 +191,7 @@
     $('#customizeEmbed input').change(function() {
       return cw.getEmbedCode($('.embedContainer'));
     });
-    $('#compareGraphic img.default, #overallTimeline img, #partyTimeline img').live('load.capitolwords', function() {
+    $('#compareGraphic img#compareTimeline, #overallTimeline img, #partyTimeline img').live('load.capitolwords', function() {
       var existingAnnotation, heading, iterable, template;
       existingAnnotation = $(this).data('annotation');
       if (existingAnnotation) {
@@ -219,7 +219,7 @@
         });
       }
     });
-    $('#compareGraphic img.default, #overallTimeline img, #partyTimeline img').each(function() {
+    $('#compareGraphic img#compareTimeline, #overallTimeline img, #partyTimeline img').each(function() {
       if (!$(this).parent().hasClass('annotation-wrap')) {
         return $(this).trigger('load.capitolwords');
       }

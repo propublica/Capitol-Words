@@ -1,14 +1,8 @@
-{% load jsonify capwords %}<!DOCTYPE html>
+{% spaceless %}{% load jsonify capwords %}<!DOCTYPE html>
 <head>
 <link rel="stylesheet" href="../../media/css/embed.css" type="text/css" media="screen,projection" charset="utf-8">
-<link rel="stylesheet" href="../../media/css/jquery.ui/jquery.ui.all.css" type="text/css" media="screen,projection" charset="utf-8">
 <script src="../../media/js/underscore/underscore-min.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-<script src="../../media/js/google-chart.js" type="text/javascript" charset="utf-8"></script>
-<script src="../../media/js/jquery.ui/jquery.ui.core.js" type="text/javascript" charset="utf-8"></script>
-<script src="../../media/js/jquery.ui/jquery.ui.widget.js" type="text/javascript" charset="utf-8"></script>
-<script src="../../media/js/jquery.ui/jquery.ui.mouse.js" type="text/javascript" charset="utf-8"></script>
-<script src="../../media/js/jquery.ui/jquery.ui.slider.js" type="text/javascript" charset="utf-8"></script>
 <script src="../../media/js/annotations.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
@@ -160,6 +154,7 @@
         , endYear = {{ embed.end_date|date:"Y"|jsonify }}
         , endDate = {{ embed.end_date|date:"Ym"|jsonify }}
         , chartType = {{ embed.get_chart_type_display|jsonify }}
+        , url = {{ embed.url|jsonify }}
         {% if embed.extra.term %}, termDetailTerm = {{ embed.extra.term|jsonify }}{% endif %}
         ;
 
@@ -190,7 +185,7 @@
               });
               return data
             };
-            new Annotation(this, {iterable:iterable, heading:heading, template:template, startDate: startDate, endDate: endDate})
+            new Annotation(this, {iterable:iterable, heading:heading, template:template, startDate: startDate, endDate: endDate, linkTo: url})
           };
       });
 
@@ -262,3 +257,4 @@
 </html>-->
 
 {% endcomment %}
+{% endspaceless %}

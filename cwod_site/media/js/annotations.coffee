@@ -27,6 +27,8 @@ Usage: new Annotation($('img#myChart'), params)
     - endDate (optional):
         A YYYYMM string representing the last month to display annotations for.
         The default is the current month.
+    - linkTo (optional):
+        Bypasses the normal date-linking behavior, for embeds.
 
 Data-params:
 It is expected that `el` will include a Google Charts src attribute, as well as a
@@ -67,13 +69,15 @@ class window.Annotation
     template = 'instantiate with new Annotation(el, {iterable, template, heading, startDate, endDate})'
 
     constructor: (@el, @params) ->
-        {@iterable, @template, @heading, @startDate, @endDate} = @params
+        {@iterable, @template, @heading, @startDate, @endDate, @linkTo} = @params
         if !@template
             @template = @heading
             @heading = null
         @el = $(@el)
         @el.data 'annotation', this
         @el.wrap '<a class="annotation-wrap" target="_top" href="#"></a>'
+        if @linkTo
+            @el.parent().attr 'href', @linkTo
         @el.parent().css('position', 'relative')
         @annotationEl = $('<div class="annotation"><div class="inner-annotation"></div></div>')
                             .css('position', 'absolute')
@@ -138,7 +142,8 @@ class window.Annotation
                 date = @datasets[0][step].month
                 year = date.slice 0, 4
                 month = date.slice 4, 6
-                @el.parent().attr 'href', "/date/#{year}/#{month}"
+                if not @linkTo
+                    @el.parent().attr 'href', "/date/#{year}/#{month}"
 
     destroy: ->
         @annotationEl.hide()

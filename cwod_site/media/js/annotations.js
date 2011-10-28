@@ -28,6 +28,8 @@
       - endDate (optional):
           A YYYYMM string representing the last month to display annotations for.
           The default is the current month.
+      - linkTo (optional):
+          Bypasses the normal date-linking behavior, for embeds.
   
   Data-params:
   It is expected that `el` will include a Google Charts src attribute, as well as a
@@ -79,7 +81,7 @@
       var _ref;
       this.el = el;
       this.params = params;
-      _ref = this.params, this.iterable = _ref.iterable, this.template = _ref.template, this.heading = _ref.heading, this.startDate = _ref.startDate, this.endDate = _ref.endDate;
+      _ref = this.params, this.iterable = _ref.iterable, this.template = _ref.template, this.heading = _ref.heading, this.startDate = _ref.startDate, this.endDate = _ref.endDate, this.linkTo = _ref.linkTo;
       if (!this.template) {
         this.template = this.heading;
         this.heading = null;
@@ -87,6 +89,9 @@
       this.el = $(this.el);
       this.el.data('annotation', this);
       this.el.wrap('<a class="annotation-wrap" target="_top" href="#"></a>');
+      if (this.linkTo) {
+        this.el.parent().attr('href', this.linkTo);
+      }
       this.el.parent().css('position', 'relative');
       this.annotationEl = $('<div class="annotation"><div class="inner-annotation"></div></div>').css('position', 'absolute').css('top', '50%').hide();
       this.el.after(this.annotationEl);
@@ -160,7 +165,9 @@
           date = this.datasets[0][step].month;
           year = date.slice(0, 4);
           month = date.slice(4, 6);
-          return this.el.parent().attr('href', "/date/" + year + "/" + month);
+          if (!this.linkTo) {
+            return this.el.parent().attr('href', "/date/" + year + "/" + month);
+          }
         }
       }, this));
     };

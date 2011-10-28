@@ -318,7 +318,7 @@ class window.CapitolWords
             fields['extra'] =
                 by_party_dataurls: cw.getDataUrlsForImage $('#partyTimeline img').eq(0)
                 overall_dataurls: cw.getDataUrlsForImage $('#overallTimeline img').eq(0)
-        $('#compareGraphic img.default').each ->
+        $('#compareGraphic img#compareTimeline').each ->
             fields['img_src'] = $(this).attr 'src'
             fields['chart_type'] = 3
             [terma, termb] = cw.phrases()
@@ -819,7 +819,7 @@ class window.CapitolWords
             colors = ['8E2844', 'A85B08', 'AF9703']
         if not legend
             legend = this.build_legend()
-        chart.set_legend legend if not _(legend).isEmpty()
+        chart.set_legend legend if not _(legend).isEmpty() and not location.pathname.match /^\/?$/ # no legend on homepage
         chart.set_colors(colors.slice(0, legend.length))
 
         chart.set_axis_labels 'y', ['', "#{max}%"]
@@ -830,7 +830,7 @@ class window.CapitolWords
         if x_label_positions
             chart.set_axis_positions 'x', x_label_positions
 
-        img = $('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url())
+        img = $('#chart img.realChart, #compareGraphic img#compareTimeline').attr('src', chart.url())
 
         if typeof requestedUrls == 'object' and requestedUrls.length
             if requestedUrls.length > 1

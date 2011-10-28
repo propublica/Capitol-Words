@@ -21,7 +21,7 @@ menu,nav,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;outli
 #capWordsEmbed .light .rightHeader{background:url('../img/bg_secondTitle_light.png') top left repeat-x;padding:3px 30px;margin-left:-30px;margin-bottom:10px;}
 #capWordsEmbed .withAction{margin-bottom:10px;}
 #capWordsEmbed .withAction h3{}
-#capWordsEmbed h3{font-family:Baskerville,Georgia,"Times New Roman",Times,serif;}
+#capWordsEmbed h3{font-family:'Baskerville',Georgia,"Times New Roman",Times,serif;}
 #capWordsEmbed .dark h3{color:#fbf4f4;font-size:210%;font-weight:normal;line-height:35px;}
 #capWordsEmbed .light h3{color:#ffffff;font-size:210%;font-weight:normal;line-height:35px;}
 #capWordsEmbed .termsInChart{font-style:italic;}
@@ -54,7 +54,7 @@ menu,nav,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;outli
 .annotation-wrap{text-decoration:none;display:block;clear:both;margin:0;padding:0;}
 .annotation{font-size:11px;z-index:99;line-height:13px;color:#2d2525;margin:-30px 0 0 -2px;position:absolute;display:none;background:url(../img/annotation_arrow.png) 2% 50% no-repeat;padding:0 0 0 8px;z-index:999}
 .annotation.flipped{background:url(../img/annotation_arrow_flipped.png) 98% 50% no-repeat;padding:0 8px 0 0;margin-left:4px;}
-.annotation .inner-annotation{background-color:#f2f1ed;margin:0;width:160px;height:50px;padding:6px 4px 6px 12px;border-radius:4px;position:relative;box-shadow:0 0 6px rgba(0,0,0,0.35);}
+.annotation .inner-annotation{background-color:#f2f1ed;background-color:rgba(255,255,255,0.95);margin:0;width:160px;height:50px;padding:6px 4px 6px 12px;border-radius:4px;position:relative;box-shadow:0 0 6px rgba(0,0,0,0.35);}
 .annotation .inner-annotation p{margin-bottom:00.25em;}
 .annotation .inner-annotation .meta{font-weight:bold;}
 .annotation .inner-annotation .data span{width:8px;height:8px;margin-right:2px;display:inline-block;background:black;zoom:1;*display:inline}
