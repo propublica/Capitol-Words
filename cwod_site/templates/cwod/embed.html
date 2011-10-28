@@ -9,7 +9,7 @@
 <script src="../../media/js/jquery.ui/jquery.ui.widget.js" type="text/javascript" charset="utf-8"></script>
 <script src="../../media/js/jquery.ui/jquery.ui.mouse.js" type="text/javascript" charset="utf-8"></script>
 <script src="../../media/js/jquery.ui/jquery.ui.slider.js" type="text/javascript" charset="utf-8"></script>
-<script src="../../media/js/capitolwords.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../media/js/annotations.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
     <div id="capWordsEmbed">
@@ -49,17 +49,27 @@
                     <div class="chart">
                         {% if embed.img_src %}
                         <div id="compareGraphic" style="{% ifnotequal embed.get_chart_type_display 'Double' %}display:none{% endifnotequal %}">
-                            <img src="{{ embed.img_src }}" alt="Timeline of occurrences of {{ embed.terms }}" class="default" />
+                            <img src="{{ embed.img_src }}"
+                                 alt="Timeline of occurrences of {{ embed.terms }}"
+                                 class="default"
+                                 {% for url in embed.extra.dataurls %}data-dataurl{{ forloop.counter0 }}="{{ url }}"{% endfor %}
+                                 />
                         </div>
                         {% endif %}
                         {% if embed.overall_img_src %}
                         <div id="overallTimeline" style="{% ifnotequal embed.get_chart_type_display 'Overall' %}display:none{% endifnotequal %}">
-                            <img src="{{ embed.overall_img_src }}" alt="Timeline of occurrences of '{{ embed.terms }}'"/>
+                            <img src="{{ embed.overall_img_src }}"
+                                 alt="Timeline of occurrences of '{{ embed.terms }}'"
+                                 {% for url in embed.extra.overall_dataurls %}data-dataurl="{{ url }}"{% endfor %}
+                                 />
                         </div>
                         {% endif %}
                         {% if embed.by_party_img_src %}
                         <div id="partyTimeline" style="{% ifnotequal embed.get_chart_type_display 'By Party' %}display:none{% endifnotequal %}">
-                            <img src="{{ embed.by_party_img_src }}" alt="Timeline of occurrences of '{{ embed.terms }}' by party"/>
+                            <img src="{{ embed.by_party_img_src }}"
+                                 alt="Timeline of occurrences of '{{ embed.terms }}' by party"
+                                 {% for url in embed.extra.by_party_dataurls %}data-dataurl{{ forloop.counter0 }}="{{ url }}"{% endfor %}
+                                 />
                         </div>
                         {% endif %}
                         <!-- {% comment %}
@@ -146,63 +156,12 @@
       var $ = jQuery
         , chartData = {{ embed.extra|jsonify }}
         , startYear = {{ embed.start_date|date:"Y"|jsonify }}
+        , startDate = {{ embed.start_date|date:"Ym"|jsonify }}
         , endYear = {{ embed.end_date|date:"Y"|jsonify }}
+        , endDate = {{ embed.end_date|date:"Ym"|jsonify }}
         , chartType = {{ embed.get_chart_type_display|jsonify }}
-        , minMonth
-        , maxMonth
         {% if embed.extra.term %}, termDetailTerm = {{ embed.extra.term|jsonify }}{% endif %}
-        , cw = new CapitolWords
         ;
-
-      {% comment %}
-        $('#slider-range').slider({
-          range: true,
-          min: 1996,
-          max: new Date().getFullYear(),
-          values: [startYear, endYear],
-          slide: function(event, ui) {
-            return $('#years').val("" + ui.values[0] + "-" + ui.values[1]);
-          },
-          stop: function(event, ui) {
-            minMonth = "" + ui.values[0] + "01";
-            maxMonth = "" + ui.values[1] + "12";
-            if (chartType == 'Double') {
-              // 2-term compare branch
-            } else if (typeof termDetailTerm !== 'undefined') {
-              // 1-term branch
-            }
-          }
-        });
-
-        limit = function(minMonth, maxMonth) {
-          var aVals, bVals, func, imgUrl, labelPositions, labels, percentages, positions, vals;
-          if (minMonth && maxMonth) {
-            func = function(v) {
-              return v['month'] >= minMonth && v['month'] <= maxMonth;
-            };
-          } else {
-            func = function() {
-              return true;
-            };
-          };
-          if (chartType != 'Double') {
-            vals = _(this.results).select(func);
-            percentages = _(vals).pluck('percentage');
-            labelPositions = this.buildXLabels(vals);
-            imgUrl = this.showChart([percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300']);
-            return $('#termChart').attr('src', imgUrl);
-          } else {
-            cw.annotation_results['homepage'][0] = _(this.a['all']).select(func);
-            cw.annotation_results['homepage'][1] = _(this.b['all']).select(func);
-            aVals = _(this.a['all']).select(func);
-            bVals = _(this.b['all']).select(func);
-            labelPositions = this.buildXLabels(aVals);
-            labels = labelPositions[0];
-            positions = labelPositions[1];
-            return this.showChart([_(aVals).pluck('percentage'), _(bVals).pluck('percentage')], labels, positions);
-          };
-        };
-      {% endcomment %}
 
       // toggle charts
       $('#timelineToggle').change(function(){
@@ -210,10 +169,31 @@
         $('#' + active + 'Timeline').show().siblings().hide();
       });
 
-      // draw legend
-
-
       // annotations
+      $('#compareGraphic img.default, #overallTimeline img, #partyTimeline img').each(function(){
+          existingAnnotation = $(this).data('annotation');
+          if(existingAnnotation)
+            existingAnnotation.refresh();
+          else{
+            var heading = '<p class="meta">${verboseMonth}</p>';
+            var template = '<p class="data"><span class="color-${i}"></span> ${count} ${noun} (${percentage}%)</p>';
+            var iterable = function(data){
+              var data = data.results;
+              $.each(data, function(i, obj){
+                var o,y,m,mos;
+                o = obj.month;
+                y = o.substr(0,4);
+                m = parseInt(o.substr(4,2), 10);
+                mos = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                data[i].verboseMonth = mos[m] + ' ' + y;
+                data[i].noun = (obj.count == 1) ? 'mention' : 'mentions';
+              });
+              return data
+            };
+            new Annotation(this, {iterable:iterable, heading:heading, template:template, startDate: startDate, endDate: endDate})
+          };
+      });
+
 
     </script>
 </body>

@@ -93,7 +93,7 @@
     });
     $('#termSelect input').bind('keyup', function(e) {
       if (e.keyCode === 13) {
-        return cw.submitHomepageCompareForm();
+        return $('.compareSubmit').trigger('click');
       }
     });
     $('#termSelect input[type=text]').bind('focus', function() {
@@ -190,6 +190,34 @@
     });
     $('#customizeEmbed input').change(function() {
       return cw.getEmbedCode($('.embedContainer'));
+    });
+    $('#compareGraphic img.default, img#termChart, img#partyTermChart').live('load.capitolwords', function() {
+      var existingAnnotation, heading, iterable, template;
+      existingAnnotation = $(this).data('annotation');
+      if (existingAnnotation) {
+        return existingAnnotation.refresh();
+      } else {
+        heading = '<p class="meta">${verboseMonth}</p>';
+        template = '<p class="data"><span class="color-${i}"></span> ${count} ${noun} (${percentage}%)</p>';
+        iterable = function(data) {
+          data = data.results;
+          $.each(data, function(i, obj) {
+            var m, mos, o, y;
+            o = obj.month;
+            y = o.substr(0, 4);
+            m = parseInt(o.substr(4, 2), 10);
+            mos = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            data[i].verboseMonth = "" + mos[m] + " " + y;
+            return obj.noun = obj.count === 1 ? 'mention' : 'mentions';
+          });
+          return data;
+        };
+        return new Annotation(this, {
+          iterable: iterable,
+          heading: heading,
+          template: template
+        });
+      }
     });
     (area = $('#rtColumn')) && area.length && area.imagesLoaded(function() {});
     if ((window.location.pathname.match(/(^\/?$|homepage\.html)/)) && (!(window.location.href.match(/[\?#]/)))) {

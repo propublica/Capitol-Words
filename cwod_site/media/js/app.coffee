@@ -101,7 +101,7 @@ $(document).ready ->
             return true
 
     $('#termSelect input').bind 'keyup', (e) ->
-        if e.keyCode == 13 then cw.submitHomepageCompareForm()
+        if e.keyCode == 13 then $('.compareSubmit').trigger 'click'
 
     $('#termSelect input[type=text]').bind 'focus', ->
         if $(this).val() == 'Word or phrase' then $(this).val ''
@@ -174,6 +174,25 @@ $(document).ready ->
 
     $('#customizeEmbed input').change ->
         cw.getEmbedCode $('.embedContainer')
+
+    $('#compareGraphic img.default, img#termChart, img#partyTermChart').live 'load.capitolwords', ->
+        existingAnnotation = $(this).data('annotation')
+        if existingAnnotation
+            existingAnnotation.refresh()
+        else
+            heading = '<p class="meta">${verboseMonth}</p>'
+            template = '<p class="data"><span class="color-${i}"></span> ${count} ${noun} (${percentage}%)</p>'
+            iterable = (data) ->
+                data = data.results
+                $.each data, (i, obj) ->
+                    o = obj.month
+                    y = o.substr 0,4
+                    m = parseInt o.substr(4,2), 10
+                    mos = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                    data[i].verboseMonth = "#{mos[m]} #{y}"
+                    obj.noun = if obj.count is 1 then 'mention' else 'mentions'
+                data
+            new Annotation this, {iterable:iterable, heading:heading, template:template}
 
     # reset images, bind ajax calls to do the same
     (area = $('#rtColumn')) && area.length && area.imagesLoaded ->

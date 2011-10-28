@@ -20,14 +20,18 @@ def flatten_param_dicts(qdict, allowed_keys):
     '''hacks rails-like foo[property] functionality into GET & POST params'''
     for k, v in qdict.items():
         if '[' in k:
-            match = re.match(r'(?P<key1>\w+?)\[(?P<key2>\w+?)\]', k)
-            if match.group('key1') in allowed_keys:
+            match = re.match(r'(?P<key1>\w+?)\[(?P<key2>\w+?)\](?P<is_arr>\[\])?', k)
+            if match and match.group('key1') in allowed_keys:
                 key1 = str(match.group('key1'))
                 key2 = str(match.group('key2'))
+                is_arr = str(match.group('is_arr'))
                 try:
                     qdict[key1]
                 except KeyError:
                     qdict[key1] = {}
-                qdict[key1][key2] = str(v)
+                if is_arr != 'None':
+                    qdict[key1][key2] = qdict.getlist(k)
+                else:
+                    qdict[key1][key2] = str(v)
                 del qdict[k]
     return qdict

@@ -56,7 +56,7 @@ class Embed(models.Model):
     url = models.TextField()
     title = models.CharField(max_length=255)
     start_date = models.DateField(default='1996-01-01')
-    end_date = models.DateTimeField(default=datetime.date.today())
+    end_date = models.DateField(default=datetime.date.today())
     chart_color = models.SmallIntegerField(max_length=255, choices=CHART_COLOR_CHOICES)
     chart_type = models.SmallIntegerField(max_length=255, choices=CHART_TYPE_CHOICES)
     extra = jsonfield.JSONField(blank=True, default='{}')

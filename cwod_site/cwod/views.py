@@ -636,6 +636,8 @@ def encode_embed(request):
         'title',
         'chart_type',
         'chart_color',
+        'start_date',
+        'end_date',
         'extra',]
 
     defaults = {
@@ -648,6 +650,19 @@ def encode_embed(request):
     if request.method == 'POST':
         # hack square braced keys into dicts
         post = flatten_param_dicts(request.POST.copy(), allowed_keys)
+        # sanitize dates to be parseable
+        try:
+            start = post['start_date']
+            post['start_date'] = "%s-%s-01" % (start[0:4], start[4:6])
+        except KeyError:
+            pass
+        try:
+            end = post['end_date']
+            post['end_date'] = "%s-%s-01" % (end[0:4], end[4:6])
+        except KeyError:
+            pass
+        print post['start_date']
+        print post['end_date']
         values = dict([(k,v) for k, v in post.items() if k in allowed_keys])
         values.update(defaults=defaults)
         obj, created = Embed.objects.get_or_create(**values)

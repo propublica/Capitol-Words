@@ -27,6 +27,10 @@ $.cleanedValue = (str) ->
     str = decodeURIComponent(str).replace /\+/g, ' '
     return $.trim($("<div>#{str}</div>").text())
 
+currentMonth = ->
+    d = new Date()
+    pad = if d.getMonth() + 1 > 9 then '' else '0'
+    "#{d.getFullYear()}#{pad}#{d.getMonth() + 1}"
 
 class window.CapitolWords
     cw: this
@@ -36,12 +40,12 @@ class window.CapitolWords
     homepageDefaults:
         'terma':'Word or phrase'
         'termb': 'Word or phrase'
-        'statea':''
-        'stateb':''
-        'partya':'All'
+        'statea': ''
+        'stateb': ''
+        'partya': 'All'
         'partyb': 'All'
-        'start':'199601'
-        'end':'201112'
+        'start': '199601'
+        'end': currentMonth()
     itemsToCompare: []
     legislatorData: []
     minMonth: undefined
@@ -69,17 +73,6 @@ class window.CapitolWords
         "GU": "Guam",                                       "MP": "Northern Mariana Islands",
         "PR": "Puerto Rico",                                "VI": "Virgin Islands",
 
-    # annotation properties
-    annotation_interval: null
-    annotation_interval_frequency: 50
-    annotation_line_coords: []
-    annotation_results: {
-        term: [],
-        homepage: [[], []],
-        party: []
-    }
-    inchart: false
-
 
     addLegislatorToChart: (result, maxcount, div, callback) ->
         url = 'http://capitolwords.org/api/legislators.json'
@@ -103,74 +96,6 @@ class window.CapitolWords
 
                 callback()
 
-    annotation_callback: () ->
-        try
-            if (not cw.inchart) or (not cw.annotation_line_coords)
-                jQuery('.annotation').hide()
-                return
-
-            cw.annotation_show dp for dp in cw.findActiveDataPoints()
-
-    debug_draw_outlines: () ->
-        COLORS = ['blue', 'green', 'red', 'orange', 'pink']
-        [selected, selected_chart] = cw.findSelectedChart()
-
-        draw_point = (series) ->
-            if cw.debug_progress > (series.length/2)
-                return
-
-            FUZZ_X = 5
-            FUZZ_Y = 6
-            if selected is 'homepage'
-                FUZZ_X = 12
-                FUZZ_Y = 13
-
-            jQuery('<div class="dot" style="position:absolute; background-color:' + COLORS[1] + '; width:2px; height:2px"></div>').css({
-                left: jQuery(selected_chart).offset().left + series[cw.debug_progress] + FUZZ_X,
-                top: jQuery(selected_chart).offset().top + series[cw.debug_progress + 1] + FUZZ_Y,
-            }).appendTo(jQuery(selected_chart).parent())
-
-        draw_point series for series in cw.annotation_line_coords[selected]
-
-        cw.debug_progress += 2
-
-        window.setTimeout cw.debug_draw_outlines, 50
-
-
-
-
-    annotation_show: (dp) ->
-        [selected, selected_chart] = cw.findSelectedChart()
-
-        FUZZ_X = 5
-        FUZZ_Y = 6
-        if selected is 'homepage'
-            FUZZ_X = 12
-            FUZZ_Y = 13
-
-        dp_series_i = dp[0]
-        dp_result = dp[1]
-        dp_x = dp[2]
-        dp_y = dp[3]
-
-        MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-        annotation_month = MONTHS[(parseInt (dp_result.month.substr 4, 2), 10) - 1]
-        annotation_year = dp_result.month.substr 0, 4
-        annotation_text = ('<span class="annotation-count">' + dp_result.count + ' mention' + (if dp_result.count!=1 then 's' else '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>')
-        (jQuery '#annotation-'+selected+'-'+dp_series_i+' .inner-annotation').html annotation_text
-
-        if not ((jQuery '#annotation-'+selected+'-'+dp_series_i).hasClass 'flipped')
-            (jQuery '#annotation-'+selected+'-'+dp_series_i).css {
-                left: jQuery(selected_chart).offset().left + dp_x + FUZZ_X,
-                top: jQuery(selected_chart).offset().top + dp_y + FUZZ_Y
-            }
-        else
-            (jQuery '#annotation-'+selected+'-'+dp_series_i).css {
-                right: jQuery(window).width() - (jQuery(selected_chart).offset().left + dp_x + FUZZ_X),
-                top: jQuery(selected_chart).offset().top + dp_y + FUZZ_Y
-            }
-
-        jQuery('#annotation-'+selected+'-'+dp_series_i).show()
 
     build_legend: ->
         [termA, termB] = cw.phrases()
@@ -236,13 +161,16 @@ class window.CapitolWords
         """
         template
 
-    buildPartyGraph: (minMonth, maxMonth) ->
+    buildPartyGraph: (minMonth, maxMonth, requestedUrls) ->
         if minMonth and maxMonth
             func = (v) ->
                 v['month'] >= minMonth and v['month'] <= maxMonth
         else
             func = ->
                 true
+
+        if not requestedUrls
+            requestedUrls = this.getDataUrlsForImage $('#partyTermChart')
 
         vals = [_(x[1]).select(func) for x in this.partyResults][0]
         labelPositions = this.buildXLabels vals[0]
@@ -251,27 +179,26 @@ class window.CapitolWords
         percentages = [partyAPercentages, partyBPercentages, ]
         parties = [x[0] for x in this.partyResults]
 
-        colors = {'R': 'bb3110', 'D': '295e72', }
+        colors = {'D': '295e72', 'R': 'bb3110',}
+        params =
+            x_positions:labelPositions[0]
+            x_label_positions:labelPositions[1]
+            width:575
+            height:300
+            colors:[colors[this.partyResults[0][0]], colors[this.partyResults[1][0]],]
+            legend:[this.partyResults[0][0], this.partyResults[1][0],]
 
-        imgUrl = this.showChart [partyAPercentages, partyBPercentages,], labelPositions[0], labelPositions[1], 575, 300, [colors[this.partyResults[0][0]], colors[this.partyResults[1][0]],], [this.partyResults[0][0], this.partyResults[1][0],]
+        # we don't bother passing requestedUrls here because 'showChart' only operates
+        # directly on the homepage chart; otherwise it returns a url.
+        imgUrl = this.showChart [partyAPercentages, partyBPercentages,], params
 
-        cw.annotation_line_coords['party'] = []
-        jQuery.getJSON (imgUrl + '&chof=json'), (data) ->
-            copy_coords = (c) ->
-                if c.name.match /^line/
-                    cw.annotation_line_coords['party'].push (jQuery.extend true, [], c.coords)
+        imgTag = $ """<img id="partyTermChart"
+                         src="#{imgUrl}" />"""
 
-            copy_coords(csj) for csj in data.chartshape
-
-        imgTag = "<img id=\"partyTermChart\" src=\"#{imgUrl}\"/>"
-        jQuery('#partyTimeline').html imgTag
-
-        ((((jQuery '#partyTermChart').mouseenter (event) ->
-           cw.inchart = true).mouseleave (event) ->
-              cw.inchart = false).mousemove (event) ->
-                 cw.pagex = event.pageX).click (event) ->
-                     cw.handleChartClick event
-
+        if typeof requestedUrls != 'undefined'
+            for i, url of requestedUrls
+                imgTag.attr('data-dataurl' + i, url)
+        $('#partyTimeline').html imgTag
 
     buildXLabels: (values) ->
         years = _(_(values).pluck('month')).select((x) ->
@@ -312,37 +239,6 @@ class window.CapitolWords
     endDate: ->
         d = new Date()
         if this.year_values[1] then "#{this.year_values[1]}-12-31" else "#{d.getFullYear()}-12-31"
-
-    findActiveDataPoints: ->
-        return_vals = []
-
-        [selected, selected_chart] = cw.findSelectedChart()
-
-        DETECTION_FUZZ_X = 6
-        if selected is 'homepage'
-            DETECTION_FUZZ_X = 21
-
-        series_i = 0
-
-        while series_i<cw.annotation_line_coords[selected].length
-            datapoint_i = 0
-            while ((cw.annotation_line_coords[selected][series_i][datapoint_i]+DETECTION_FUZZ_X)<(cw.pagex - (jQuery selected_chart).offset().left) and (datapoint_i<cw.annotation_results[selected][series_i].length*2))
-                datapoint_i += 2
-
-            if (datapoint_i/2) < cw.annotation_results[selected][series_i].length
-                return_vals.push [ series_i, cw.annotation_results[selected][series_i][datapoint_i/2], cw.annotation_line_coords[selected][series_i][datapoint_i], cw.annotation_line_coords[selected][series_i][datapoint_i+1] ]
-
-            series_i += 1
-
-        return return_vals
-
-    findSelectedChart: ->
-        if (jQuery '#annotation-homepage-0').length>0
-            return ['homepage', 'img.default']
-        else if (jQuery('#overallTimelineSelect').attr 'checked')!='checked'
-            return ['party', '#partyTermChart']
-        else
-            return ['term', '#termChart']
 
     getCookie: (name) ->
         if document.cookie and (document.cookie isnt '')
@@ -390,6 +286,18 @@ class window.CapitolWords
                     """
                 $('#crEntries').html(html)
 
+    getDataUrlsForImage: (el) ->
+        requestedUrls = []
+        if (url = $(el).attr 'data-dataurl')
+            requestedUrls.push url
+        else
+            i = 0
+            while (url = $(el).attr "data-dataurl#{i}")
+                requestedUrls.push url
+                i++
+
+        requestedUrls
+
     getEmbedCode: (container) ->
         # Determine which graph is being shown.
         fields =
@@ -399,12 +307,17 @@ class window.CapitolWords
             img_src: ''
             by_party_img_src: ''
             overall_img_src: ''
+            start_date: $.deparam(location.href.split('?')[1])['start'] or cw.minMonth or cw.homepageDefaults['start']
+            end_date: $.deparam(location.href.split('?')[1])['end'] or cw.maxMonth or cw.homepageDefaults['end']
 
         $('#partyTimeline img').each ->
             fields['by_party_img_src'] = $('#partyTimeline img').attr 'src'
             fields['overall_img_src'] = $('#overallTimeline img').attr 'src'
             fields['chart_type'] = if $('#partyTimeline img').is(':visible') then 2 else 1
             window.termDetailTerm && fields['extra'] = {'term': termDetailTerm}
+            fields['extra'] =
+                by_party_dataurls: cw.getDataUrlsForImage $('#partyTimeline img').eq(0)
+                overall_dataurls: cw.getDataUrlsForImage $('#overallTimeline img').eq(0)
         $('#compareGraphic img.default').each ->
             fields['img_src'] = $(this).attr 'src'
             fields['chart_type'] = 3
@@ -416,6 +329,9 @@ class window.CapitolWords
                 stateb: $('#stateB').val()
                 partya: $('input[name=partya]').val()
                 partyb: $('input[name=partyb]').val()
+                dataurls: cw.getDataUrlsForImage $(this)
+
+            console.log fields['extra']
 
         # resize charts to embed dimension`
         for key in ['img_src', 'by_party_img_src', 'overall_img_src']
@@ -433,26 +349,6 @@ class window.CapitolWords
 
         container.slideDown()
 
-    getGraph: (term) ->
-        data =
-            'phrase': term
-            'granularity': 'month'
-            'percentages': 'true'
-            'mincount': 0
-            'legend': false
-
-        url = 'http://capitolwords.org/api/chart/timeline.json'
-        $.ajax
-            dataType: 'jsonp'
-            url: url
-            data: data
-            success: (data) ->
-                results = data['results']
-                imgUrl = results['url']
-                overallImgTag = """<img src="#{imgUrl}" alt="Timeline of occurrences of #{term}"/>"""
-                #customImgTag = """<img id="customChart" src="#{imgUrl}" alt="Custom timeline of occurrences of "#{term}"/>"""
-                $('#overallTimeline').html overallImgTag
-                #$('#customTimeline').append customImgTag
 
     getGraphData: (term) ->
         data = {
@@ -465,7 +361,9 @@ class window.CapitolWords
         url = 'http://capitolwords.org/api/dates.json'
         cw = this
 
-        jQuery.ajax {
+        requestedUrl = "#{url}?#{$.param(data)}"
+
+        $.ajax {
             dataType: 'jsonp',
             url: url,
             data: data,
@@ -476,30 +374,19 @@ class window.CapitolWords
                 percentages = _(results).pluck 'percentage'
                 labelPositions = cw.buildXLabels results
 
-                imgUrl = cw.showChart [percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300',]
+                imgUrl = cw.showChart [percentages], {x_labels:labelPositions[0], x_label_positions:labelPositions[1], width:575, height:300, colors:['E0B300',]}
 
-                cw.annotation_results['term'] = []
-                cw.annotation_results['term'].push results
-                cw.annotation_line_coords['term'] = []
-
-                jQuery.getJSON (imgUrl + '&chof=json'), (data) ->
-                    copy_coords = (c) ->
-                        if c.name is 'line0'
-                            cw.annotation_line_coords['term'].push (jQuery.extend true, [], c.coords)
-
-                    copy_coords(csj) for csj in data.chartshape
-
-                    overallImgTag = "<img id=\"termChart\" src=\"#{imgUrl}\" alt=\"Timeline of occurrences of #{term}\"/>"
-                    jQuery('#overallTimeline').html overallImgTag
-
-                    ((((jQuery '#termChart').mouseenter (event) ->
-                       cw.inchart = true).mouseleave (event) ->
-                          cw.inchart = false).mousemove (event) ->
-                             cw.pagex = event.pageX).click (event) ->
-                                 cw.handleChartClick event
+                overallImgTag = """<img id="termChart"
+                                        src="#{imgUrl}"
+                                        alt="Timeline of occurrences of #{term}"
+                                        data-dataurl="#{requestedUrl}" />"""
+                $('#overallTimeline').html overallImgTag
 
                 if cw.minMonth and cw.maxMonth
                     cw.limit cw.minMonth, cw.maxMonth
+
+                $('#termChart, #partyTermChart').trigger('load.capitolwords')
+
         }
 
     getLegislatorPopularity: (term, div) ->
@@ -554,27 +441,6 @@ class window.CapitolWords
 
                 cw.addLegislatorToChart result, maxcount, div, renderWhenDone for result in results
 
-    getPartyGraph: (term) ->
-        url = 'http://capitolwords.org/api/chart/timeline.json'
-        cw = this
-        $.ajax
-            dataType: 'jsonp'
-            url: url
-            data:
-                'phrase': term
-                'granularity': 'month'
-                'percentages': 'true'
-                'mincount': 0
-                'legend': true
-                'split_by_party': true
-                'start_date': cw.start_date
-                'end_date': cw.end_date
-            success: (data) ->
-                results = data['results']
-                imgUrl = results['url']
-                imgTag = """<img src="#{imgUrl}" alt="Timeline of occurrences of #{term}"/>"""
-                $('#partyTimeline').html imgTag
-
 
     getPartyGraphData: (term) ->
         data = {
@@ -588,6 +454,7 @@ class window.CapitolWords
         cw = this
 
         partyData = []
+        requestedUrls = []
 
         render = () ->
             chartData = []
@@ -596,12 +463,11 @@ class window.CapitolWords
             _(partyData).each (partyResult) ->
                 cw.partyResults.push partyResult
 
-            cw.buildPartyGraph cw.minMonth, cw.maxMonth
+            cw.buildPartyGraph cw.minMonth, cw.maxMonth, requestedUrls
 
-        parties = ['R', 'D', ]
+        parties = ['D', 'R', ]
         renderWhenDone = _(parties.length).after(render)
 
-        cw.annotation_results['party'] = []
         _(parties).each (party) ->
             data = {
                 'party': party,
@@ -610,6 +476,7 @@ class window.CapitolWords
                 'percentages': true,
                 'mincount': 0,
             }
+            requestedUrls.push "#{url}?#{$.param(data)}"
             jQuery.ajax {
                 dataType: 'jsonp',
                 url: url,
@@ -619,7 +486,6 @@ class window.CapitolWords
                     partyData.push [party, results]
                     renderWhenDone()
 
-                    cw.annotation_results['party'].push results
             }
 
     getPartyPieChart: (term, div, width, height, callback) ->
@@ -684,11 +550,6 @@ class window.CapitolWords
                     """
                     div.append html
 
-    handleChartClick: (event) ->
-        active_data_point_result = cw.findActiveDataPoints()[0][1]
-        url = '/date/'+active_data_point_result.month.substr(0,4)+'/'+active_data_point_result.month.substr(4,2)
-        window.location.href = url
-
     highlightEntries: (entries, term) ->
         entry_matches = []
         regexp = new RegExp(term, "ig")
@@ -733,20 +594,17 @@ class window.CapitolWords
             vals = _(this.results).select func
             percentages = _(vals).pluck 'percentage'
             labelPositions = this.buildXLabels vals
-            imgUrl = this.showChart [percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300',]
+            imgUrl = this.showChart [percentages], {x_labels:labelPositions[0], x_label_positions:labelPositions[1], width:575, height:300, colors:['E0B300',]}
             $('#termChart').attr('src', imgUrl)
             #$('#customChart').attr('src', imgUrl)
 
         else # homepage
-            cw.annotation_results['homepage'][0] = _(this.a['all']).select func
-            cw.annotation_results['homepage'][1] = _(this.b['all']).select func
-
             aVals = _(this.a['all']).select func
             bVals = _(this.b['all']).select func
             labelPositions = this.buildXLabels aVals
             labels = labelPositions[0]
             positions = labelPositions[1]
-            this.showChart [_(aVals).pluck('percentage'), _(bVals).pluck('percentage')], labels, positions
+            this.showChart [_(aVals).pluck('percentage'), _(bVals).pluck('percentage')], {x_labels:labels, x_label_positions:positions}
 
     makeHomepageHistoryState: (slid) ->
         cw = this
@@ -847,9 +705,6 @@ class window.CapitolWords
         if this.start_date and this.end_date
             this.getCREntries term
 
-        window.clearInterval cw.annotation_interval
-        cw.annotation_interval = window.setInterval cw.annotation_callback, cw.annotation_interval_frequency
-
     readHomepageHistory: (nosubmit) ->
         cw.minMonth = cw.maxMonth = false
         param_id_map = {'terma': '#terma', 'termb': '#termb', 'statea': '#stateA', 'stateb': '#stateB', }
@@ -942,8 +797,9 @@ class window.CapitolWords
         origin = protocol + sr_origin
         (url == origin || url.slice(0, origin.length + 1) == origin + '/') || (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') || !(/^(\/\/|http:|https:).*/.test(url))
 
-    showChart: (data, x_labels, x_label_positions, width, height, colors, legend) ->
-        width = width or 860
+    showChart: (data, params) ->
+        {x_labels, x_label_positions, width, height, colors, legend, requestedUrls} = params
+        width = width or 880
         height = height or 340
 
         chart = new GoogleChart width, height
@@ -976,25 +832,17 @@ class window.CapitolWords
         if x_label_positions
             chart.set_axis_positions 'x', x_label_positions
 
-        if $('#annotation-homepage-0').length>0
-            cw.annotation_line_coords['homepage'] = []
-            jQuery.getJSON (chart.url() + '&chof=json'), (data) ->
-                copy_coords = (c) ->
-                    if c.name.match /^line/
-                        cw.annotation_line_coords['homepage'].push (jQuery.extend true, [], c.coords)
+        img = $('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url())
 
-                copy_coords(csj) for csj in data.chartshape
+        if typeof requestedUrls == 'object' and requestedUrls.length
+            if requestedUrls.length > 1
+                for i, url of requestedUrls
+                    img.attr("data-dataurl#{i}", url)
+            else
+                img.attr('data-dataurl', requestedUrls[0])
+        img.fadeIn 500
 
-            $('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url()).fadeIn 100
-
-            ((((jQuery '#chart img.realChart, #compareGraphic img.default').mouseenter (event) ->
-               cw.inchart = true).mouseleave (event) ->
-                  cw.inchart = false).mousemove (event) ->
-                     cw.pagex = event.pageX).click (event) ->
-                         cw.handleChartClick event
-
-            window.clearInterval cw.annotation_interval
-            cw.annotation_interval = window.setInterval cw.annotation_callback, cw.annotation_interval_frequency
+        img.trigger 'load.capitolwords'
 
         if cw.spinner
             cw.spinner.stop()
@@ -1047,55 +895,59 @@ class window.CapitolWords
         cw.spinner = new Spinner(opts).spin target
 
         url = 'http://capitolwords.org/api/dates.json'
+        requestedUrls = []
 
         [phraseA, phraseB] = cw.phrases()
 
-        cw.annotation_results['homepage'] = [[], []]
-        cw.annotation_line_coords['homepage'] = []
+        queryaData =
+            phrase: phraseA
+            state: $('#stateA').val() or ''
+            party: $('.partyA input:checked').eq(0).val()
+            granularity: 'month'
+            percentages: true
+            mincount: 0
 
+        requestedUrls.push "#{url}?#{$.param(queryaData)}"
         querya = $.ajax
             dataType: 'jsonp'
             url: url
-            data:
-                phrase: phraseA
-                state: $('#stateA').val() or ''
-                party: $('.partyA input:checked').eq(0).val()
-                granularity: 'month'
-                percentages: true
-                mincount: 0
+            data: queryaData
             success: (data) ->
                 aResults = data['results']
                 cw.a['all'] = aResults
                 cw.a['counts'] = _(aResults).pluck 'count'
                 cw.a['percentages'] = _(aResults).pluck 'percentage'
-                cw.annotation_results['homepage'][0] = (jQuery.extend true, [], aResults)
 
+        querybData =
+            phrase: phraseB
+            state: $('#stateB').val() or ''
+            party: $('.partyB input:checked').eq(0).val()
+            granularity: 'month'
+            percentages: true
+            mincount: 0
+
+        requestedUrls.push "#{url}?#{$.param(querybData)}"
         queryb = $.ajax
             dataType: 'jsonp'
             url : url
-            data:
-                phrase: phraseB
-                state: $('#stateB').val() or ''
-                party: $('.partyB input:checked').eq(0).val()
-                granularity: 'month'
-                percentages: true
-                mincount: 0
+            data: querybData
             success: (data) ->
                 bResults = data['results']
                 cw.b['all'] = bResults
                 cw.b['counts'] = _(bResults).pluck 'count'
                 cw.b['percentages'] = _(bResults).pluck 'percentage'
-                cw.annotation_results['homepage'][1] = (jQuery.extend true, [], bResults)
 
         $.when(querya, queryb)
             .done ->
+                # if cw.minMonth or cw.maxMonth
+                #     cw.limit cw.minMonth, cw.maxMonth
+                # else
+                labelPositions = cw.buildXLabels cw.a['all']
+                labels = labelPositions[0]
+                positions = labelPositions[1]
+                cw.showChart [cw.a['percentages'], cw.b['percentages']], {x_labels:labels, x_label_positions:positions, requestedUrls:requestedUrls}
                 if cw.minMonth or cw.maxMonth
                     cw.limit cw.minMonth, cw.maxMonth
-                else
-                    labelPositions = cw.buildXLabels cw.a['all']
-                    labels = labelPositions[0]
-                    positions = labelPositions[1]
-                    cw.showChart [cw.a['percentages'], cw.b['percentages']], labels, positions
             .then ->
                 if cw.spinner
                     cw.spinner.stop()

@@ -4,7 +4,7 @@
   main application class
   Requires: jQuery, jQuery ui slider, underscore
   */
-  var $;
+  var $, currentMonth;
   var __indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++) {
       if (this[i] === item) return i;
@@ -41,6 +41,12 @@
     str = decodeURIComponent(str).replace(/\+/g, ' ');
     return $.trim($("<div>" + str + "</div>").text());
   };
+  currentMonth = function() {
+    var d, pad;
+    d = new Date();
+    pad = d.getMonth() + 1 > 9 ? '' : '0';
+    return "" + (d.getFullYear()) + pad + (d.getMonth() + 1);
+  };
   window.CapitolWords = (function() {
     function CapitolWords() {}
     CapitolWords.prototype.cw = CapitolWords;
@@ -55,7 +61,7 @@
       'partya': 'All',
       'partyb': 'All',
       'start': '199601',
-      'end': '201112'
+      'end': currentMonth()
     };
     CapitolWords.prototype.itemsToCompare = [];
     CapitolWords.prototype.legislatorData = [];
@@ -126,15 +132,6 @@
       "PR": "Puerto Rico",
       "VI": "Virgin Islands"
     };
-    CapitolWords.prototype.annotation_interval = null;
-    CapitolWords.prototype.annotation_interval_frequency = 50;
-    CapitolWords.prototype.annotation_line_coords = [];
-    CapitolWords.prototype.annotation_results = {
-      term: [],
-      homepage: [[], []],
-      party: []
-    };
-    CapitolWords.prototype.inchart = false;
     CapitolWords.prototype.addLegislatorToChart = function(result, maxcount, div, callback) {
       var bioguide_id, pct, url;
       url = 'http://capitolwords.org/api/legislators.json';
@@ -159,81 +156,6 @@
           return callback();
         }
       });
-    };
-    CapitolWords.prototype.annotation_callback = function() {
-      var dp, _i, _len, _ref, _results;
-      try {
-        if ((!cw.inchart) || (!cw.annotation_line_coords)) {
-          jQuery('.annotation').hide();
-          return;
-        }
-        _ref = cw.findActiveDataPoints();
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          dp = _ref[_i];
-          _results.push(cw.annotation_show(dp));
-        }
-        return _results;
-      } catch (_e) {}
-    };
-    CapitolWords.prototype.debug_draw_outlines = function() {
-      var COLORS, draw_point, selected, selected_chart, series, _i, _len, _ref, _ref2;
-      COLORS = ['blue', 'green', 'red', 'orange', 'pink'];
-      _ref = cw.findSelectedChart(), selected = _ref[0], selected_chart = _ref[1];
-      draw_point = function(series) {
-        var FUZZ_X, FUZZ_Y;
-        if (cw.debug_progress > (series.length / 2)) {
-          return;
-        }
-        FUZZ_X = 5;
-        FUZZ_Y = 6;
-        if (selected === 'homepage') {
-          FUZZ_X = 12;
-          FUZZ_Y = 13;
-        }
-        return jQuery('<div class="dot" style="position:absolute; background-color:' + COLORS[1] + '; width:2px; height:2px"></div>').css({
-          left: jQuery(selected_chart).offset().left + series[cw.debug_progress] + FUZZ_X,
-          top: jQuery(selected_chart).offset().top + series[cw.debug_progress + 1] + FUZZ_Y
-        }).appendTo(jQuery(selected_chart).parent());
-      };
-      _ref2 = cw.annotation_line_coords[selected];
-      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-        series = _ref2[_i];
-        draw_point(series);
-      }
-      cw.debug_progress += 2;
-      return window.setTimeout(cw.debug_draw_outlines, 50);
-    };
-    CapitolWords.prototype.annotation_show = function(dp) {
-      var FUZZ_X, FUZZ_Y, MONTHS, annotation_month, annotation_text, annotation_year, dp_result, dp_series_i, dp_x, dp_y, selected, selected_chart, _ref;
-      _ref = cw.findSelectedChart(), selected = _ref[0], selected_chart = _ref[1];
-      FUZZ_X = 5;
-      FUZZ_Y = 6;
-      if (selected === 'homepage') {
-        FUZZ_X = 12;
-        FUZZ_Y = 13;
-      }
-      dp_series_i = dp[0];
-      dp_result = dp[1];
-      dp_x = dp[2];
-      dp_y = dp[3];
-      MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      annotation_month = MONTHS[(parseInt(dp_result.month.substr(4, 2), 10)) - 1];
-      annotation_year = dp_result.month.substr(0, 4);
-      annotation_text = '<span class="annotation-count">' + dp_result.count + ' mention' + (dp_result.count !== 1 ? 's' : '') + '</span><br /><span class="annotation-date">in ' + annotation_month + ' ' + annotation_year + '</span>';
-      (jQuery('#annotation-' + selected + '-' + dp_series_i + ' .inner-annotation')).html(annotation_text);
-      if (!((jQuery('#annotation-' + selected + '-' + dp_series_i)).hasClass('flipped'))) {
-        (jQuery('#annotation-' + selected + '-' + dp_series_i)).css({
-          left: jQuery(selected_chart).offset().left + dp_x + FUZZ_X,
-          top: jQuery(selected_chart).offset().top + dp_y + FUZZ_Y
-        });
-      } else {
-        (jQuery('#annotation-' + selected + '-' + dp_series_i)).css({
-          right: jQuery(window).width() - (jQuery(selected_chart).offset().left + dp_x + FUZZ_X),
-          top: jQuery(selected_chart).offset().top + dp_y + FUZZ_Y
-        });
-      }
-      return jQuery('#annotation-' + selected + '-' + dp_series_i).show();
     };
     CapitolWords.prototype.build_legend = function() {
       var legend, legendA, legendB, partyA, partyB, stateA, stateB, termA, termB, _ref;
@@ -287,8 +209,8 @@
       template = "<div class=\"key\">\n    Comparing\n    <span class=\"wordOne\">\n        <span class=\"color\"></span><a href=\"/term/" + termA + "\" class=\"wordOne\">" + termA + "</a>\n        <span class=\"filters\">[" + stateA + ", " + partyA + "]</span>\n    </span>\n    and\n    <span class=\"wordTwo\">\n        <span class=\"color\"></span><a href=\"/term/" + termB + "\" class=\"wordTwo\">" + termB + "</a>\n        <span class=\"filters\">[" + stateB + ", " + partyB + "]</span>\n    </span>\n</div>";
       return template;
     };
-    CapitolWords.prototype.buildPartyGraph = function(minMonth, maxMonth) {
-      var colors, func, imgTag, imgUrl, labelPositions, parties, partyAPercentages, partyBPercentages, percentages, vals, x;
+    CapitolWords.prototype.buildPartyGraph = function(minMonth, maxMonth, requestedUrls) {
+      var colors, func, i, imgTag, imgUrl, labelPositions, params, parties, partyAPercentages, partyBPercentages, percentages, url, vals, x;
       if (minMonth && maxMonth) {
         func = function(v) {
           return v['month'] >= minMonth && v['month'] <= maxMonth;
@@ -297,6 +219,9 @@
         func = function() {
           return true;
         };
+      }
+      if (!requestedUrls) {
+        requestedUrls = this.getDataUrlsForImage($('#partyTermChart'));
       }
       vals = [
         (function() {
@@ -327,37 +252,26 @@
         }).call(this)
       ];
       colors = {
-        'R': 'bb3110',
-        'D': '295e72'
+        'D': '295e72',
+        'R': 'bb3110'
       };
-      imgUrl = this.showChart([partyAPercentages, partyBPercentages], labelPositions[0], labelPositions[1], 575, 300, [colors[this.partyResults[0][0]], colors[this.partyResults[1][0]]], [this.partyResults[0][0], this.partyResults[1][0]]);
-      cw.annotation_line_coords['party'] = [];
-      jQuery.getJSON(imgUrl + '&chof=json', function(data) {
-        var copy_coords, csj, _i, _len, _ref, _results;
-        copy_coords = function(c) {
-          if (c.name.match(/^line/)) {
-            return cw.annotation_line_coords['party'].push(jQuery.extend(true, [], c.coords));
-          }
-        };
-        _ref = data.chartshape;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          csj = _ref[_i];
-          _results.push(copy_coords(csj));
+      params = {
+        x_positions: labelPositions[0],
+        x_label_positions: labelPositions[1],
+        width: 575,
+        height: 300,
+        colors: [colors[this.partyResults[0][0]], colors[this.partyResults[1][0]]],
+        legend: [this.partyResults[0][0], this.partyResults[1][0]]
+      };
+      imgUrl = this.showChart([partyAPercentages, partyBPercentages], params);
+      imgTag = $("<img id=\"partyTermChart\"\nsrc=\"" + imgUrl + "\" />");
+      if (typeof requestedUrls !== 'undefined') {
+        for (i in requestedUrls) {
+          url = requestedUrls[i];
+          imgTag.attr('data-dataurl' + i, url);
         }
-        return _results;
-      });
-      imgTag = "<img id=\"partyTermChart\" src=\"" + imgUrl + "\"/>";
-      jQuery('#partyTimeline').html(imgTag);
-      return ((((jQuery('#partyTermChart')).mouseenter(function(event) {
-        return cw.inchart = true;
-      })).mouseleave(function(event) {
-        return cw.inchart = false;
-      })).mousemove(function(event) {
-        return cw.pagex = event.pageX;
-      })).click(function(event) {
-        return cw.handleChartClick(event);
-      });
+      }
+      return $('#partyTimeline').html(imgTag);
     };
     CapitolWords.prototype.buildXLabels = function(values) {
       var labels, positions, year, years;
@@ -421,36 +335,6 @@
         return "" + (d.getFullYear()) + "-12-31";
       }
     };
-    CapitolWords.prototype.findActiveDataPoints = function() {
-      var DETECTION_FUZZ_X, datapoint_i, return_vals, selected, selected_chart, series_i, _ref;
-      return_vals = [];
-      _ref = cw.findSelectedChart(), selected = _ref[0], selected_chart = _ref[1];
-      DETECTION_FUZZ_X = 6;
-      if (selected === 'homepage') {
-        DETECTION_FUZZ_X = 21;
-      }
-      series_i = 0;
-      while (series_i < cw.annotation_line_coords[selected].length) {
-        datapoint_i = 0;
-        while ((cw.annotation_line_coords[selected][series_i][datapoint_i] + DETECTION_FUZZ_X) < (cw.pagex - (jQuery(selected_chart)).offset().left) && (datapoint_i < cw.annotation_results[selected][series_i].length * 2)) {
-          datapoint_i += 2;
-        }
-        if ((datapoint_i / 2) < cw.annotation_results[selected][series_i].length) {
-          return_vals.push([series_i, cw.annotation_results[selected][series_i][datapoint_i / 2], cw.annotation_line_coords[selected][series_i][datapoint_i], cw.annotation_line_coords[selected][series_i][datapoint_i + 1]]);
-        }
-        series_i += 1;
-      }
-      return return_vals;
-    };
-    CapitolWords.prototype.findSelectedChart = function() {
-      if ((jQuery('#annotation-homepage-0')).length > 0) {
-        return ['homepage', 'img.default'];
-      } else if ((jQuery('#overallTimelineSelect').attr('checked')) !== 'checked') {
-        return ['party', '#partyTermChart'];
-      } else {
-        return ['term', '#termChart'];
-      }
-    };
     CapitolWords.prototype.getCookie = function(name) {
       var cookie, cookieContent, cookieName, cookies, _i, _len, _ref;
       if (document.cookie && (document.cookie !== '')) {
@@ -505,6 +389,20 @@
         }
       });
     };
+    CapitolWords.prototype.getDataUrlsForImage = function(el) {
+      var i, requestedUrls, url;
+      requestedUrls = [];
+      if ((url = $(el).attr('data-dataurl'))) {
+        requestedUrls.push(url);
+      } else {
+        i = 0;
+        while ((url = $(el).attr("data-dataurl" + i))) {
+          requestedUrls.push(url);
+          i++;
+        }
+      }
+      return requestedUrls;
+    };
     CapitolWords.prototype.getEmbedCode = function(container) {
       var fields, key, _i, _len, _ref;
       fields = {
@@ -513,29 +411,37 @@
         title: window.document.title.split(' | ')[0],
         img_src: '',
         by_party_img_src: '',
-        overall_img_src: ''
+        overall_img_src: '',
+        start_date: $.deparam(location.href.split('?')[1])['start'] || cw.minMonth || cw.homepageDefaults['start'],
+        end_date: $.deparam(location.href.split('?')[1])['end'] || cw.maxMonth || cw.homepageDefaults['end']
       };
       $('#partyTimeline img').each(function() {
         fields['by_party_img_src'] = $('#partyTimeline img').attr('src');
         fields['overall_img_src'] = $('#overallTimeline img').attr('src');
         fields['chart_type'] = $('#partyTimeline img').is(':visible') ? 2 : 1;
-        return window.termDetailTerm && (fields['extra'] = {
+        window.termDetailTerm && (fields['extra'] = {
           'term': termDetailTerm
         });
+        return fields['extra'] = {
+          by_party_dataurls: cw.getDataUrlsForImage($('#partyTimeline img').eq(0)),
+          overall_dataurls: cw.getDataUrlsForImage($('#overallTimeline img').eq(0))
+        };
       });
       $('#compareGraphic img.default').each(function() {
         var terma, termb, _ref;
         fields['img_src'] = $(this).attr('src');
         fields['chart_type'] = 3;
         _ref = cw.phrases(), terma = _ref[0], termb = _ref[1];
-        return fields['extra'] = {
+        fields['extra'] = {
           terma: terma,
           termb: termb,
           statea: $('#stateA').val(),
           stateb: $('#stateB').val(),
           partya: $('input[name=partya]').val(),
-          partyb: $('input[name=partyb]').val()
+          partyb: $('input[name=partyb]').val(),
+          dataurls: cw.getDataUrlsForImage($(this))
         };
+        return console.log(fields['extra']);
       });
       _ref = ['img_src', 'by_party_img_src', 'overall_img_src'];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -556,31 +462,8 @@
       });
       return container.slideDown();
     };
-    CapitolWords.prototype.getGraph = function(term) {
-      var data, url;
-      data = {
-        'phrase': term,
-        'granularity': 'month',
-        'percentages': 'true',
-        'mincount': 0,
-        'legend': false
-      };
-      url = 'http://capitolwords.org/api/chart/timeline.json';
-      return $.ajax({
-        dataType: 'jsonp',
-        url: url,
-        data: data,
-        success: function(data) {
-          var imgUrl, overallImgTag, results;
-          results = data['results'];
-          imgUrl = results['url'];
-          overallImgTag = "<img src=\"" + imgUrl + "\" alt=\"Timeline of occurrences of " + term + "\"/>";
-          return $('#overallTimeline').html(overallImgTag);
-        }
-      });
-    };
     CapitolWords.prototype.getGraphData = function(term) {
-      var cw, data, url;
+      var cw, data, requestedUrl, url;
       data = {
         'phrase': term,
         'granularity': 'month',
@@ -589,48 +472,31 @@
       };
       url = 'http://capitolwords.org/api/dates.json';
       cw = this;
-      return jQuery.ajax({
+      requestedUrl = "" + url + "?" + ($.param(data));
+      return $.ajax({
         dataType: 'jsonp',
         url: url,
         data: data,
         success: function(data) {
-          var counts, imgUrl, labelPositions, percentages, results;
+          var counts, imgUrl, labelPositions, overallImgTag, percentages, results;
           results = data['results'];
           cw.results = results;
           counts = _(results).pluck('count');
           percentages = _(results).pluck('percentage');
           labelPositions = cw.buildXLabels(results);
-          imgUrl = cw.showChart([percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300']);
-          cw.annotation_results['term'] = [];
-          cw.annotation_results['term'].push(results);
-          cw.annotation_line_coords['term'] = [];
-          jQuery.getJSON(imgUrl + '&chof=json', function(data) {
-            var copy_coords, csj, overallImgTag, _i, _len, _ref;
-            copy_coords = function(c) {
-              if (c.name === 'line0') {
-                return cw.annotation_line_coords['term'].push(jQuery.extend(true, [], c.coords));
-              }
-            };
-            _ref = data.chartshape;
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              csj = _ref[_i];
-              copy_coords(csj);
-            }
-            overallImgTag = "<img id=\"termChart\" src=\"" + imgUrl + "\" alt=\"Timeline of occurrences of " + term + "\"/>";
-            jQuery('#overallTimeline').html(overallImgTag);
-            return ((((jQuery('#termChart')).mouseenter(function(event) {
-              return cw.inchart = true;
-            })).mouseleave(function(event) {
-              return cw.inchart = false;
-            })).mousemove(function(event) {
-              return cw.pagex = event.pageX;
-            })).click(function(event) {
-              return cw.handleChartClick(event);
-            });
+          imgUrl = cw.showChart([percentages], {
+            x_labels: labelPositions[0],
+            x_label_positions: labelPositions[1],
+            width: 575,
+            height: 300,
+            colors: ['E0B300']
           });
+          overallImgTag = "<img id=\"termChart\"\nsrc=\"" + imgUrl + "\"\nalt=\"Timeline of occurrences of " + term + "\"\ndata-dataurl=\"" + requestedUrl + "\" />";
+          $('#overallTimeline').html(overallImgTag);
           if (cw.minMonth && cw.maxMonth) {
-            return cw.limit(cw.minMonth, cw.maxMonth);
+            cw.limit(cw.minMonth, cw.maxMonth);
           }
+          return $('#termChart, #partyTermChart').trigger('load.capitolwords');
         }
       });
     };
@@ -682,34 +548,8 @@
         }
       });
     };
-    CapitolWords.prototype.getPartyGraph = function(term) {
-      var cw, url;
-      url = 'http://capitolwords.org/api/chart/timeline.json';
-      cw = this;
-      return $.ajax({
-        dataType: 'jsonp',
-        url: url,
-        data: {
-          'phrase': term,
-          'granularity': 'month',
-          'percentages': 'true',
-          'mincount': 0,
-          'legend': true,
-          'split_by_party': true,
-          'start_date': cw.start_date,
-          'end_date': cw.end_date
-        },
-        success: function(data) {
-          var imgTag, imgUrl, results;
-          results = data['results'];
-          imgUrl = results['url'];
-          imgTag = "<img src=\"" + imgUrl + "\" alt=\"Timeline of occurrences of " + term + "\"/>";
-          return $('#partyTimeline').html(imgTag);
-        }
-      });
-    };
     CapitolWords.prototype.getPartyGraphData = function(term) {
-      var cw, data, parties, partyData, render, renderWhenDone, url;
+      var cw, data, parties, partyData, render, renderWhenDone, requestedUrls, url;
       data = {
         'phrase': term,
         'granularity': 'month',
@@ -719,6 +559,7 @@
       url = 'http://capitolwords.org/api/dates.json';
       cw = this;
       partyData = [];
+      requestedUrls = [];
       render = function() {
         var chartData, legendItems;
         chartData = [];
@@ -727,11 +568,10 @@
         _(partyData).each(function(partyResult) {
           return cw.partyResults.push(partyResult);
         });
-        return cw.buildPartyGraph(cw.minMonth, cw.maxMonth);
+        return cw.buildPartyGraph(cw.minMonth, cw.maxMonth, requestedUrls);
       };
-      parties = ['R', 'D'];
+      parties = ['D', 'R'];
       renderWhenDone = _(parties.length).after(render);
-      cw.annotation_results['party'] = [];
       return _(parties).each(function(party) {
         data = {
           'party': party,
@@ -740,6 +580,7 @@
           'percentages': true,
           'mincount': 0
         };
+        requestedUrls.push("" + url + "?" + ($.param(data)));
         return jQuery.ajax({
           dataType: 'jsonp',
           url: url,
@@ -748,8 +589,7 @@
             var results;
             results = data['results'];
             partyData.push([party, results]);
-            renderWhenDone();
-            return cw.annotation_results['party'].push(results);
+            return renderWhenDone();
           }
         });
       });
@@ -823,12 +663,6 @@
         }
       });
     };
-    CapitolWords.prototype.handleChartClick = function(event) {
-      var active_data_point_result, url;
-      active_data_point_result = cw.findActiveDataPoints()[0][1];
-      url = '/date/' + active_data_point_result.month.substr(0, 4) + '/' + active_data_point_result.month.substr(4, 2);
-      return window.location.href = url;
-    };
     CapitolWords.prototype.highlightEntries = function(entries, term) {
       var entry_matches, regexp;
       entry_matches = [];
@@ -885,17 +719,24 @@
         vals = _(this.results).select(func);
         percentages = _(vals).pluck('percentage');
         labelPositions = this.buildXLabels(vals);
-        imgUrl = this.showChart([percentages], labelPositions[0], labelPositions[1], 575, 300, ['E0B300']);
+        imgUrl = this.showChart([percentages], {
+          x_labels: labelPositions[0],
+          x_label_positions: labelPositions[1],
+          width: 575,
+          height: 300,
+          colors: ['E0B300']
+        });
         return $('#termChart').attr('src', imgUrl);
       } else {
-        cw.annotation_results['homepage'][0] = _(this.a['all']).select(func);
-        cw.annotation_results['homepage'][1] = _(this.b['all']).select(func);
         aVals = _(this.a['all']).select(func);
         bVals = _(this.b['all']).select(func);
         labelPositions = this.buildXLabels(aVals);
         labels = labelPositions[0];
         positions = labelPositions[1];
-        return this.showChart([_(aVals).pluck('percentage'), _(bVals).pluck('percentage')], labels, positions);
+        return this.showChart([_(aVals).pluck('percentage'), _(bVals).pluck('percentage')], {
+          x_labels: labels,
+          x_label_positions: positions
+        });
       }
     };
     CapitolWords.prototype.makeHomepageHistoryState = function(slid) {
@@ -980,10 +821,8 @@
         this.getPartyGraphData(term);
       }
       if (this.start_date && this.end_date) {
-        this.getCREntries(term);
+        return this.getCREntries(term);
       }
-      window.clearInterval(cw.annotation_interval);
-      return cw.annotation_interval = window.setInterval(cw.annotation_callback, cw.annotation_interval_frequency);
     };
     CapitolWords.prototype.readHomepageHistory = function(nosubmit) {
       var endYear, hash, param_id_map, params, startYear, state;
@@ -1090,9 +929,10 @@
       origin = protocol + sr_origin;
       return (url === origin || url.slice(0, origin.length + 1) === origin + '/') || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + '/') || !(/^(\/\/|http:|https:).*/.test(url));
     };
-    CapitolWords.prototype.showChart = function(data, x_labels, x_label_positions, width, height, colors, legend) {
-      var chart, cw, max, maxValue, values;
-      width = width || 860;
+    CapitolWords.prototype.showChart = function(data, params) {
+      var chart, colors, cw, height, i, img, legend, max, maxValue, requestedUrls, url, values, width, x_label_positions, x_labels;
+      x_labels = params.x_labels, x_label_positions = params.x_label_positions, width = params.width, height = params.height, colors = params.colors, legend = params.legend, requestedUrls = params.requestedUrls;
+      width = width || 880;
       height = height || 340;
       chart = new GoogleChart(width, height);
       values = [];
@@ -1126,36 +966,19 @@
       if (x_label_positions) {
         chart.set_axis_positions('x', x_label_positions);
       }
-      if ($('#annotation-homepage-0').length > 0) {
-        cw.annotation_line_coords['homepage'] = [];
-        jQuery.getJSON(chart.url() + '&chof=json', function(data) {
-          var copy_coords, csj, _i, _len, _ref, _results;
-          copy_coords = function(c) {
-            if (c.name.match(/^line/)) {
-              return cw.annotation_line_coords['homepage'].push(jQuery.extend(true, [], c.coords));
-            }
-          };
-          _ref = data.chartshape;
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            csj = _ref[_i];
-            _results.push(copy_coords(csj));
+      img = $('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url());
+      if (typeof requestedUrls === 'object' && requestedUrls.length) {
+        if (requestedUrls.length > 1) {
+          for (i in requestedUrls) {
+            url = requestedUrls[i];
+            img.attr("data-dataurl" + i, url);
           }
-          return _results;
-        });
-        $('#chart img.realChart, #compareGraphic img.default').attr('src', chart.url()).fadeIn(100);
-        ((((jQuery('#chart img.realChart, #compareGraphic img.default')).mouseenter(function(event) {
-          return cw.inchart = true;
-        })).mouseleave(function(event) {
-          return cw.inchart = false;
-        })).mousemove(function(event) {
-          return cw.pagex = event.pageX;
-        })).click(function(event) {
-          return cw.handleChartClick(event);
-        });
-        window.clearInterval(cw.annotation_interval);
-        cw.annotation_interval = window.setInterval(cw.annotation_callback, cw.annotation_interval_frequency);
+        } else {
+          img.attr('data-dataurl', requestedUrls[0]);
+        }
       }
+      img.fadeIn(500);
+      img.trigger('load.capitolwords');
       if (cw.spinner) {
         cw.spinner.stop();
       }
@@ -1199,7 +1022,7 @@
       }
     };
     CapitolWords.prototype.submitHomepageCompareForm = function(skipState) {
-      var cw, opts, phraseA, phraseB, querya, queryb, target, url, _ref;
+      var cw, opts, phraseA, phraseB, querya, queryaData, queryb, querybData, requestedUrls, target, url, _ref;
       cw = this;
       opts = {
         lines: 12,
@@ -1215,58 +1038,62 @@
       cw.spinner && cw.spinner.stop && cw.spinner.stop();
       cw.spinner = new Spinner(opts).spin(target);
       url = 'http://capitolwords.org/api/dates.json';
+      requestedUrls = [];
       _ref = cw.phrases(), phraseA = _ref[0], phraseB = _ref[1];
-      cw.annotation_results['homepage'] = [[], []];
-      cw.annotation_line_coords['homepage'] = [];
+      queryaData = {
+        phrase: phraseA,
+        state: $('#stateA').val() || '',
+        party: $('.partyA input:checked').eq(0).val(),
+        granularity: 'month',
+        percentages: true,
+        mincount: 0
+      };
+      requestedUrls.push("" + url + "?" + ($.param(queryaData)));
       querya = $.ajax({
         dataType: 'jsonp',
         url: url,
-        data: {
-          phrase: phraseA,
-          state: $('#stateA').val() || '',
-          party: $('.partyA input:checked').eq(0).val(),
-          granularity: 'month',
-          percentages: true,
-          mincount: 0
-        },
+        data: queryaData,
         success: function(data) {
           var aResults;
           aResults = data['results'];
           cw.a['all'] = aResults;
           cw.a['counts'] = _(aResults).pluck('count');
-          cw.a['percentages'] = _(aResults).pluck('percentage');
-          return cw.annotation_results['homepage'][0] = jQuery.extend(true, [], aResults);
+          return cw.a['percentages'] = _(aResults).pluck('percentage');
         }
       });
+      querybData = {
+        phrase: phraseB,
+        state: $('#stateB').val() || '',
+        party: $('.partyB input:checked').eq(0).val(),
+        granularity: 'month',
+        percentages: true,
+        mincount: 0
+      };
+      requestedUrls.push("" + url + "?" + ($.param(querybData)));
       queryb = $.ajax({
         dataType: 'jsonp',
         url: url,
-        data: {
-          phrase: phraseB,
-          state: $('#stateB').val() || '',
-          party: $('.partyB input:checked').eq(0).val(),
-          granularity: 'month',
-          percentages: true,
-          mincount: 0
-        },
+        data: querybData,
         success: function(data) {
           var bResults;
           bResults = data['results'];
           cw.b['all'] = bResults;
           cw.b['counts'] = _(bResults).pluck('count');
-          cw.b['percentages'] = _(bResults).pluck('percentage');
-          return cw.annotation_results['homepage'][1] = jQuery.extend(true, [], bResults);
+          return cw.b['percentages'] = _(bResults).pluck('percentage');
         }
       });
       $.when(querya, queryb).done(function() {
         var labelPositions, labels, positions;
+        labelPositions = cw.buildXLabels(cw.a['all']);
+        labels = labelPositions[0];
+        positions = labelPositions[1];
+        cw.showChart([cw.a['percentages'], cw.b['percentages']], {
+          x_labels: labels,
+          x_label_positions: positions,
+          requestedUrls: requestedUrls
+        });
         if (cw.minMonth || cw.maxMonth) {
           return cw.limit(cw.minMonth, cw.maxMonth);
-        } else {
-          labelPositions = cw.buildXLabels(cw.a['all']);
-          labels = labelPositions[0];
-          positions = labelPositions[1];
-          return cw.showChart([cw.a['percentages'], cw.b['percentages']], labels, positions);
         }
       }).then(function() {
         if (cw.spinner) {
