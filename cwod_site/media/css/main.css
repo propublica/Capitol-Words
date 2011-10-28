@@ -341,19 +341,6 @@ li.embedDark,li.embedLight{width:127px;}
 .embedCode textarea{width:282px;height:80px;padding:5px;color:#FBF4F4;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;background:#514949 url('../img/bg_input.png') left bottom repeat-x;border:1px solid #021017;}
 #compareGraphic #embed a{margin-top:0;margin-bottom:5px;}
 #compareGraphic .embedContainer{margin-left:-243px;margin-top:0;}
-.annotation{font-size:11px;z-index:99;line-height:13px;color:#2d2525;margin:-30px 0 0 -2px;position:absolute;display:none;background:url(../img/annotation_arrow.png) 2% 50% no-repeat;padding:0 0 0 8px;}
-.annotation.flipped{background:url(../img/annotation_arrow_flipped.png) 98% 50% no-repeat;padding:0 8px 0 0;margin-left:4px;}
-.annotation .inner-annotation{background-color:#f2f1ed;margin:0;width:150px;height:50px;padding:6px 4px 6px 12px;border-radius:4px;position:relative;}
-.annotation .inner-annotation p{margin-bottom:00.25em;}
-.annotation .inner-annotation .meta{font-weight:bold;}
-.annotation .inner-annotation .data span{width:8px;height:8px;display:inline-block;background:black;zoom:1;*display:inline}
-.annotation .inner-annotation .data span.color-0{background:#791834;}
-.annotation .inner-annotation .data span.color-1{background:#954809;}
-#overallTimeline .annotation .inner-annotation .data span.color-0{background:#fa8609;}
-#partyTimeline .annotation .inner-annotation .data span.color-0{background:#204a5e;}
-#partyTimeline .annotation .inner-annotation .data span.color-1{background:#aa1e0c;}
-.annotation .annotation-count{font-weight:bold;}
-.annotation .annotation-date{font-style:italic;}
 #overallTimeline,#partyTimeline,img.default{cursor:pointer;}
 body.home #containerWrapper{background:url('../img/bg_home.jpg') center top repeat-x;}
 .home #main{background:url('../img/bg_headerLine_home.png') left 3px no-repeat;padding-top:55px;display:inline-block;}
@@ -378,3 +365,17 @@ span.legImage{width:200px;display:block;}
 ul.messages li{padding:1px 10px;color:#FFF;font-style:italic;padding:0 20px 0 20px;}
 ul.messages li.success{background:url("../img/bg_rightView.png") right top no-repeat,url("../img/bg_leftView.png") left top no-repeat;color:#B99004;}
 ul.messages li.error{background:url("../img/bg_rightView.png") right top no-repeat,url("../img/bg_leftView.png") left top no-repeat;color:#B13557;}
+/* annotations */
+.annotation{font-size:11px;z-index:99;line-height:13px;color:#2d2525;margin:-30px 0 0 -2px;position:absolute;display:none;background:url(../img/annotation_arrow.png) 2% 50% no-repeat;padding:0 0 0 8px;}
+.annotation.flipped{background:url(../img/annotation_arrow_flipped.png) 98% 50% no-repeat;padding:0 8px 0 0;margin-left:4px;}
+.annotation .inner-annotation{background-color:#f2f1ed;margin:0;width:150px;height:50px;padding:6px 4px 6px 12px;border-radius:4px;position:relative;box-shadow:0 0 6px rgba(0,0,0,0.35);}
+.annotation .inner-annotation p{margin-bottom:00.25em;}
+.annotation .inner-annotation .meta{font-weight:bold;}
+.annotation .inner-annotation .data span{width:8px;height:8px;display:inline-block;background:black;zoom:1;*display:inline}
+.annotation .inner-annotation .data span.color-0{background:#791834;}
+.annotation .inner-annotation .data span.color-1{background:#954809;}
+#overallTimeline .annotation .inner-annotation .data span.color-0{background:#fa8609;}
+#partyTimeline .annotation .inner-annotation .data span.color-0{background:#204a5e;}
+#partyTimeline .annotation .inner-annotation .data span.color-1{background:#aa1e0c;}
+.annotation .annotation-count{font-weight:bold;}
+.annotation .annotation-date{font-style:italic;}

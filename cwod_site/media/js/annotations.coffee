@@ -1,21 +1,45 @@
-# New annotation class for Capitol Words sparklines
-# Requires:
-#   jQuery
-#   underscore.js
-# Arguments: el, iterable, [heading], template
-#   el: a target image node, including a set of
-#     attrs data-datasrc(n) containing the data urls to be
-#     fetched for numbers of mentions, etc,
-#   iterable: a json path for extracting the list to be iterated on
-#     out of the response from data-datasrc
-#   heading: Optional. A string, similar to template, to be rendered only once at
-#     the beginning of the annotation. Only has access to the first dataset.
-#   template, a simple string of data to be interpolated into an
-#     annotation element, such as:
-#     '<p class="annotationInner"><span class="mentions">${slice.mentions} mentions</span>\
-#      <span class="date">in ${slice.month} ${slice.year}</span></p>'
-#     Only ${} is supported, no other jQuery Template syntax features
-#     will be interpolated.
+###
+Annotation class for Capitol Words sparklines
+
+Requires:
+- jQuery
+- underscore.js
+
+Usage: new Annotation($('img#myChart'), params)
+- el, {params}
+- el: a target image node, including a set of
+     attrs data-datasrc(n) containing the data urls to be
+     fetched for numbers of mentions, etc,
+- {params}: A JSON structure including:
+    - template (required):
+        A string of data to be interpolated with each sparkline's dataset
+        and appended into the annotation box, 1 per dataset
+    - heading (optional):
+        A template-like string to optionally be applied before the first
+        dataset's template is rendered; for example to create a date heading.
+        will only have access to the first dataset when rendering
+    - iterable (optional):
+        A function to pre-process the ajax response for each incoming dataset.
+        The default is to pass the data straight through
+    - startDate (optional):
+        A YYYYMM string representing the first month to display annotations for.
+        The default is '199601'
+    - endDate (optional):
+        A YYYYMM string representing the last month to display annotations for.
+        The default is the current month.
+
+Data-params:
+It is expected that `el` will include a Google Charts src attribute, as well as a
+data-dataurl attribute for each dataset to be displayed. The `src` attr is used to fetch
+a json representation of the chart, and `data-dataurl`s point to the Capitol Words API query
+the chart was built from. If more than one dataurl is present (i.e., 2 lines in a chart), they
+should be serialized as `data-dataurl0`, `data-dataurl1`, etc.
+
+A Note on templates:
+While the goal was to provide a syntax that would allow reuse of possibly pre-existing
+jQuery templates, only ${} is supported. Other $.template syntax features will NOT be interpolated.
+
+###
 $ = jQuery
 $.deparam ||= (qs) ->
     params = {}

@@ -65,3 +65,6 @@ menu,nav,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;outli
 #partyTimeline .annotation .inner-annotation .data span.color-1{background:#aa1e0c;}
 .annotation .annotation-count{font-weight:bold;}
 .annotation .annotation-date{font-style:italic;}
+.light .annotation .inner-annotation {background-color:#82827b;background-color:rgba(130,130,123,0.95);color:#fff;}
+.light .annotation{background:url(../img/annotation_arrow_dark.png) 2% 50% no-repeat;}
+.light .annotation.flipped{background:url(../img/annotation_arrow_dark_flipped.png) 98% 50% no-repeat;}
