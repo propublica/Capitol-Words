@@ -27,6 +27,16 @@ $.cleanedValue = (str) ->
     str = decodeURIComponent(str).replace /\+/g, ' '
     return $.trim($("<div>#{str}</div>").text())
 
+###
+jQuery.sum
+returns the sum of an array
+###
+$.sum = (arr) ->
+    sum = 0
+    for val in arr
+        sum += val
+    return sum
+
 currentMonth = ->
     d = new Date()
     pad = if d.getMonth() + 1 > 9 then '' else '0'
@@ -147,12 +157,10 @@ class window.CapitolWords
         stateB = stateB.val() and this.states[stateB.val()] or "All states"
         template = """
         <div class="key">
-            Comparing
             <span class="wordOne">
                 <span class="color"></span><a href="/term/#{termA}" class="wordOne">#{termA}</a>
                 <span class="filters">[#{stateA}, #{partyA}]</span>
             </span>
-            and
             <span class="wordTwo">
                 <span class="color"></span><a href="/term/#{termB}" class="wordTwo">#{termB}</a>
                 <span class="filters">[#{stateB}, #{partyB}]</span>
@@ -893,9 +901,13 @@ class window.CapitolWords
         cw.spinner = new Spinner(opts).spin target
 
         url = 'http://capitolwords.org/api/dates.json'
+        breakdownUrl = 'http://capitolwords.org/api/chart/pie.json'
         requestedUrls = []
 
         [phraseA, phraseB] = cw.phrases()
+
+        startDate = if cw.minMonth then "#{cw.minMonth.slice(0,4)}-#{cw.minMonth.slice(4,6)}-01" else "1996-01-01"
+        endDate = if cw.maxMonth then "#{cw.maxMonth.slice(0,4)}-#{cw.maxMonth.slice(4,6)}-31" else "#{Date().getFullYear}-#{Date().getMonth()+1}-#{Date().getDate()}"
 
         queryaData =
             phrase: phraseA
@@ -935,7 +947,36 @@ class window.CapitolWords
                 cw.b['counts'] = _(bResults).pluck 'count'
                 cw.b['percentages'] = _(bResults).pluck 'percentage'
 
-        $.when(querya, queryb)
+        breakdownaData =
+            phrase: phraseA
+            output: 'data'
+            entity_type: 'party'
+            start_date: startDate
+            end_date: endDate
+
+        breakdowna = $.ajax
+            dataType: 'jsonp'
+            url: breakdownUrl
+            data: breakdownaData
+            success: (data) ->
+                cw.a['breakdown'] = data.data
+
+        breakdownbData =
+            phrase: phraseB
+            output: 'data'
+            entity_type: 'party'
+            start_date: startDate
+            end_date: endDate
+
+        breakdownb = $.ajax
+            dataType: 'jsonp'
+            url: breakdownUrl
+            data: breakdownbData
+            success: (data) ->
+                cw.b['breakdown'] = data.data
+
+
+        $.when(querya, queryb, breakdowna, breakdownb)
             .done ->
                 # if cw.minMonth or cw.maxMonth
                 #     cw.limit cw.minMonth, cw.maxMonth
@@ -950,7 +991,20 @@ class window.CapitolWords
                 if cw.spinner
                     cw.spinner.stop()
 
-                $('#compareGraphic div.key').eq(0).replaceWith(cw.build_legend_html())
+                legend_html = cw.build_legend_html()
+                $('#compareGraphic div.key span.wordOne span.legend-text').eq(0).html($(legend_html).find('span.wordOne').html())
+                $('#compareGraphic div.key span.wordTwo span.legend-text').eq(0).html($(legend_html).find('span.wordTwo').html())
+
+                # update percentage bar chart
+                aTotal = $.sum(cw.a.breakdown[1])
+                for i, party of cw.a.breakdown[0]
+                    $("#compareGraphic .key .wordOne .party-breakdown .#{party}").animate({'width': "#{(cw.a.breakdown[1][i] / aTotal) * 100}%"})
+                    $("#compareGraphic .key .wordOne .party-breakdown-labels .#{party} .percentage}").html("#{((cw.a.breakdown[1][i] / aTotal) * 100).toFixed(0)}%")
+
+                bTotal = $.sum(cw.b.breakdown[1])
+                for i, party of cw.b.breakdown[0]
+                    $("#compareGraphic .key .wordTwo .party-breakdown .#{party}").animate({'width': "#{(cw.b.breakdown[1][i] / bTotal) * 100}%"})
+                    $("#compareGraphic .key .wordTwo .party-breakdown-labels .#{party} .percentage}").html("#{((cw.b.breakdown[1][i] / bTotal) * 100).toFixed(0)}%")
 
                 cw.random_phrase_i = undefined
 

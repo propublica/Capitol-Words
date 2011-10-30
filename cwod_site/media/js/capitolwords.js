@@ -41,6 +41,19 @@
     str = decodeURIComponent(str).replace(/\+/g, ' ');
     return $.trim($("<div>" + str + "</div>").text());
   };
+  /*
+  jQuery.sum
+  returns the sum of an array
+  */
+  $.sum = function(arr) {
+    var sum, val, _i, _len;
+    sum = 0;
+    for (_i = 0, _len = arr.length; _i < _len; _i++) {
+      val = arr[_i];
+      sum += val;
+    }
+    return sum;
+  };
   currentMonth = function() {
     var d, pad;
     d = new Date();
@@ -206,7 +219,7 @@
       }
       stateB = $('#stateB');
       stateB = stateB.val() && this.states[stateB.val()] || "All states";
-      template = "<div class=\"key\">\n    Comparing\n    <span class=\"wordOne\">\n        <span class=\"color\"></span><a href=\"/term/" + termA + "\" class=\"wordOne\">" + termA + "</a>\n        <span class=\"filters\">[" + stateA + ", " + partyA + "]</span>\n    </span>\n    and\n    <span class=\"wordTwo\">\n        <span class=\"color\"></span><a href=\"/term/" + termB + "\" class=\"wordTwo\">" + termB + "</a>\n        <span class=\"filters\">[" + stateB + ", " + partyB + "]</span>\n    </span>\n</div>";
+      template = "<div class=\"key\">\n    <span class=\"wordOne\">\n        <span class=\"color\"></span><a href=\"/term/" + termA + "\" class=\"wordOne\">" + termA + "</a>\n        <span class=\"filters\">[" + stateA + ", " + partyA + "]</span>\n    </span>\n    <span class=\"wordTwo\">\n        <span class=\"color\"></span><a href=\"/term/" + termB + "\" class=\"wordTwo\">" + termB + "</a>\n        <span class=\"filters\">[" + stateB + ", " + partyB + "]</span>\n    </span>\n</div>";
       return template;
     };
     CapitolWords.prototype.buildPartyGraph = function(minMonth, maxMonth, requestedUrls) {
@@ -856,8 +869,6 @@
         endYear = cw.maxMonth.slice(0, 4);
         $("#slider-range").slider("option", "values", [startYear, endYear]);
         cw.limit(cw.minMonth, cw.maxMonth);
-        this.getPartyPieChart(params['terma'], $('#term1piechart'));
-        this.getPartyPieChart(params['termb'], $('#term2piechart'));
         if (!nosubmit) {
           return cw.submitHomepageCompareForm(true);
         }
@@ -1023,7 +1034,7 @@
       }
     };
     CapitolWords.prototype.submitHomepageCompareForm = function(skipState) {
-      var cw, opts, phraseA, phraseB, querya, queryaData, queryb, querybData, requestedUrls, target, url, _ref;
+      var breakdownUrl, breakdowna, breakdownaData, breakdownb, breakdownbData, cw, endDate, opts, phraseA, phraseB, querya, queryaData, queryb, querybData, requestedUrls, startDate, target, url, _ref;
       cw = this;
       opts = {
         lines: 12,
@@ -1039,8 +1050,11 @@
       cw.spinner && cw.spinner.stop && cw.spinner.stop();
       cw.spinner = new Spinner(opts).spin(target);
       url = 'http://capitolwords.org/api/dates.json';
+      breakdownUrl = 'http://capitolwords.org/api/chart/pie.json';
       requestedUrls = [];
       _ref = cw.phrases(), phraseA = _ref[0], phraseB = _ref[1];
+      startDate = cw.minMonth ? "" + (cw.minMonth.slice(0, 4)) + "-" + (cw.minMonth.slice(4, 6)) + "-01" : "1996-01-01";
+      endDate = cw.maxMonth ? "" + (cw.maxMonth.slice(0, 4)) + "-" + (cw.maxMonth.slice(4, 6)) + "-31" : "" + (Date().getFullYear) + "-" + (Date().getMonth() + 1) + "-" + (Date().getDate());
       queryaData = {
         phrase: phraseA,
         state: $('#stateA').val() || '',
@@ -1083,7 +1097,37 @@
           return cw.b['percentages'] = _(bResults).pluck('percentage');
         }
       });
-      $.when(querya, queryb).done(function() {
+      breakdownaData = {
+        phrase: phraseA,
+        output: 'data',
+        entity_type: 'party',
+        start_date: startDate,
+        end_date: endDate
+      };
+      breakdowna = $.ajax({
+        dataType: 'jsonp',
+        url: breakdownUrl,
+        data: breakdownaData,
+        success: function(data) {
+          return cw.a['breakdown'] = data.data;
+        }
+      });
+      breakdownbData = {
+        phrase: phraseB,
+        output: 'data',
+        entity_type: 'party',
+        start_date: startDate,
+        end_date: endDate
+      };
+      breakdownb = $.ajax({
+        dataType: 'jsonp',
+        url: breakdownUrl,
+        data: breakdownbData,
+        success: function(data) {
+          return cw.b['breakdown'] = data.data;
+        }
+      });
+      $.when(querya, queryb, breakdowna, breakdownb).done(function() {
         var labelPositions, labels, positions;
         labelPositions = cw.buildXLabels(cw.a['all']);
         labels = labelPositions[0];
@@ -1097,10 +1141,31 @@
           return cw.limit(cw.minMonth, cw.maxMonth);
         }
       }).then(function() {
+        var aTotal, bTotal, i, legend_html, party, _ref2, _ref3;
         if (cw.spinner) {
           cw.spinner.stop();
         }
-        $('#compareGraphic div.key').eq(0).replaceWith(cw.build_legend_html());
+        legend_html = cw.build_legend_html();
+        $('#compareGraphic div.key span.wordOne span.legend-text').eq(0).html($(legend_html).find('span.wordOne').html());
+        $('#compareGraphic div.key span.wordTwo span.legend-text').eq(0).html($(legend_html).find('span.wordTwo').html());
+        aTotal = $.sum(cw.a.breakdown[1]);
+        _ref2 = cw.a.breakdown[0];
+        for (i in _ref2) {
+          party = _ref2[i];
+          $("#compareGraphic .key .wordOne .party-breakdown ." + party).animate({
+            'width': "" + ((cw.a.breakdown[1][i] / aTotal) * 100) + "%"
+          });
+          $("#compareGraphic .key .wordOne .party-breakdown-labels ." + party + " .percentage}").html("" + (((cw.a.breakdown[1][i] / aTotal) * 100).toFixed(0)) + "%");
+        }
+        bTotal = $.sum(cw.b.breakdown[1]);
+        _ref3 = cw.b.breakdown[0];
+        for (i in _ref3) {
+          party = _ref3[i];
+          $("#compareGraphic .key .wordTwo .party-breakdown ." + party).animate({
+            'width': "" + ((cw.b.breakdown[1][i] / bTotal) * 100) + "%"
+          });
+          $("#compareGraphic .key .wordTwo .party-breakdown-labels ." + party + " .percentage}").html("" + (((cw.b.breakdown[1][i] / bTotal) * 100).toFixed(0)) + "%");
+        }
         return cw.random_phrase_i = void 0;
       });
       if (!skipState) {

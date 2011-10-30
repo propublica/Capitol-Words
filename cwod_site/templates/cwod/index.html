@@ -20,44 +20,72 @@
 {% block content %}
 <div id="main">
     <div id="fullColumn">
-        <div id="compareGraphic">
+        <div id="compareGraphic" class="clearfix">
 
-            <div class="key">
+            <div id="embed">
+              <a href="#">embed</a>
+              <div class="embedContainer">
+                  <form id="customizeEmbed" class="actionItem" action="" method="">
+                      <ul class="partyBreakdown">
+                          <li class="embedDark">
+                              <input class="radio" type="radio" checked name="toggle" id="embedDark"/>
+                              <label for="embedDark">Dark</label>
+                              <img src="../../media/img/embed_dark.jpg" width="90" height="38" alt="Embed Dark">
+                          </li>
+                          <li class="embedLight">
+                              <input class="radio" type="radio" name="toggle" id="embedLight"/>
+                              <label for="embedLight">Light</label>
+                              <img src="../../media/img/embed_light.jpg" width="90" height="38" alt="Embed Light">
+                          </li>
+                          <li class="embedCode">
+                              <label for="embedCode">Embed Code</label>
+                              <textarea id="embedCode" type="text"></textarea>
+                          </li>
+                      </ul>
+                      <div class="clear"></div>
+                  </form>
+              </div>
+            </div>
+
+            <div class="key clearfix">
                 Comparing
                 <span class="wordOne">
-                    <span class="color"></span><a href="/term/war" class="wordOne">war</a>
-                    <span class="filters">[All states, All Parties]</span>
+                    <span class="legend-text">
+                        <span class="color"></span><a href="/term/war" class="wordOne">war</a>
+                        <span class="filters">[All states, All Parties]</span>
+                    </span>
+                    <span class="party-breakdown">
+                        <span class="D"></span>
+                        <span class="R"></span>
+                    </span>
+                    <span class="party-breakdown-labels">
+                        <span class="D">
+                            <span class="name">Democrats </span> <span class="percentage">0%</span>
+                        </span>
+                        <span class="R">
+                            <span class="name">Republicans </span> <span class="percentage">0%</span>
+                        </span>
+                    </span>
                 </span>
                 and
                 <span class="wordTwo">
-                    <span class="color"></span><a href="/term/peace" class="wordTwo">peace</a>
-                    <span class="filters">[All states, All Parties]</span>
+                    <span class="legend-text">
+                        <span class="color"></span><a href="/term/peace" class="wordTwo">peace</a>
+                        <span class="filters">[All states, All Parties]</span>
+                    </span>
+                    <span class="party-breakdown">
+                        <span class="D"></span>
+                        <span class="R"></span>
+                    </span>
+                    <span class="party-breakdown-labels">
+                        <span class="D">
+                            <span class="name">Democrats </span> <span class="percentage">0%</span>
+                        </span>
+                        <span class="R">
+                            <span class="name">Republicans </span> <span class="percentage">0%</span>
+                        </span>
+                    </span>
                 </span>
-            </div>
-
-            <div id="embed">
-                <a href="#">embed</a>
-                <div class="embedContainer">
-                    <form id="customizeEmbed" class="actionItem" action="" method="">
-                        <ul class="partyBreakdown">
-                            <li class="embedDark">
-                                <input class="radio" type="radio" checked name="toggle" id="embedDark"/>
-                                <label for="embedDark">Dark</label>
-                                <img src="../../media/img/embed_dark.jpg" width="90" height="38" alt="Embed Dark">
-                            </li>
-                            <li class="embedLight">
-                                <input class="radio" type="radio" name="toggle" id="embedLight"/>
-                                <label for="embedLight">Light</label>
-                                <img src="../../media/img/embed_light.jpg" width="90" height="38" alt="Embed Light">
-                            </li>
-                            <li class="embedCode">
-                                <label for="embedCode">Embed Code</label>
-                                <textarea id="embedCode" type="text"></textarea>
-                            </li>
-                        </ul>
-                        <div class="clear"></div>
-                    </form>
-                </div>
             </div>
 
             <img id="compareTimeline" class="default" src="http://chart.apis.google.com/chart?cht=lc&amp;chs=860x340&amp;chd=e:JIJhH0I7J0MlICKeMwQXJJK-KvKOJRL7MZTBHOIiKDBkKYSVOrNmJCKbHcSaKOJ7JdPDIVNQSOj-j3TQOTJiKMK-QPbxJXK-PRJiQvMyMTKRJ6K3InIXMUHNJHKTKzMoIQf0T-WZPcWINESJJVTMQoLYKnWksHMsaGUcWXsse9P3LDSbVbWAcTODTuQbOYaaQIcmbZR2W3PyRfNMVLR2LiNgRJUaObPCQsZMSILBNBP6OIM7ojR-RjftNbOKWJ..hwZmX2RHi9AAcvTSR2LvMnT7NpR9PVOAI2P4L-H8LILBHKJVKJLQMPKCJBGhH6MDP2HSKgLSJgKeKjKWPLHlNcAAOlJzL3LxOkFSO2VTOJJgM4,D8FvHFGVD7E0C8D.C2DlFDGCFlElE7F3GOTBE6CSEDBkHWGhGnIOEzDbDbGPDDEBCXHPEXJDUQLjIJIVF4D4D5E9FDAAJFF4FKDRH9EyGgEYEvD2FfFPLZEEE3D9EpEuC4HGEOEXFAFmCeGMHNJCF7DMCwElLUFDEWFFFKHYEoENFWJBCfEEHwFOGZEGDBFUDlFjIbEyFUD6FOEbEYGVGNFtEbEyDnEAEFEVE5IKEBFwFtFuEkI2GAGgFvE1D1GrGTDrDyFKFrAAGEEZDEDPErGVE3GREeDrCLEgCiB.DdCqF5DaEgB3DyEoDSB-DzDQDgCyD5COGaEZDqDiDCBRE6AADbGVFBGSHCAmGiE1E2CwGq&amp;chg=0,50,2,5,undefined,undefined&amp;chf=bg,s,00000000&amp;chco=8E2844,A85B08&amp;chdlp=t|l&amp;chdl=war|peace&amp;chxt=y,x&amp;chxl=0:||0.0191%|1:|1/96|1/97|1/98|1/99|1/00|1/01|1/02|1/03|1/04|1/05|1/06|1/07|1/08|1/09|1/10|1/11&amp;chxp=1,0,6,13,19,25,31,38,44,50,56,63,69,75,81,88,94">
