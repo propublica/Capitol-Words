@@ -551,6 +551,8 @@ class ChartHandler(GenericHandler):
             handler = PhraseByCategoryHandler()
             kwargs['entity_type'] = request.GET.get('entity_type')
             data = handler.read(request, *args, **kwargs)
+            if request.GET.get('output') == 'data':
+                return {'data': json.dumps(self._pie(data['results']))}
             return {'results': {'url': self._pie(data['results']), }, }
 
         return {'error': 'Invalid chart type.', }
@@ -592,6 +594,8 @@ class ChartHandler(GenericHandler):
             chart.set_pie_labels(labels)
         chart.set_colours(colors)
         chart.fill_solid('bg', '00000000') # Make the background transparent
+        if self.request.GET.get('output') == 'data':
+            return counts
         return chart.get_url()
 
     def _line(self, results):
