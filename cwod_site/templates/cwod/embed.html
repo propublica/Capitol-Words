@@ -11,7 +11,7 @@
             <div id="ltColumn">
                 <div class="module chartModule">
                     <div class="rightHeader withAction">
-                        <h3><a href="{{ embed.url }}">{{ embed.title }}</a></h3>
+                        <h3><a href="{{ embed.url }}">{{ embed.title|default:"Capitol Words" }}</a></h3>
                         {% ifequal embed.get_chart_type_display 'Double' %}
                         <div class="key">
                             <span class="wordOne"><span class="color"></span><a href"{% url cwod_term_detail term=embed.extra.terma %}" class="wordOne">"{{ embed.extra.terma|title }}"</a>
