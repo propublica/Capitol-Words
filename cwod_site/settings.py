@@ -89,6 +89,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'cwod.context_processors.recent_top_unigrams',
     'cwod.context_processors.search_terms',
+    'cwod.context_processors.frontend_apikey',
 )
 
 INSTALLED_APPS = (
