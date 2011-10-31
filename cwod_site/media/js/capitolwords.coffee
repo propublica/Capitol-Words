@@ -1004,7 +1004,7 @@ class window.CapitolWords
                     $("#compareGraphic .key .wordOne .party-breakdown .R").animate({'width': 0})
                     $("#compareGraphic .key .wordOne .party-breakdown-labels .R .percentage").html("0%")
                 for i, party of cw.a.breakdown[0]
-                    $("#compareGraphic .key .wordOne .party-breakdown .#{party}").animate({'width': "#{(cw.a.breakdown[1][i] / aTotal) * 100}%"})
+                    $("#compareGraphic .key .wordOne .party-breakdown .#{party}").animate({'width': "#{((cw.a.breakdown[1][i] / aTotal) * 100).toFixed(0)}%"})
                     $("#compareGraphic .key .wordOne .party-breakdown-labels .#{party} .percentage").html("#{((cw.a.breakdown[1][i] / aTotal) * 100).toFixed(0)}%")
 
                 bTotal = $.sum(cw.b.breakdown[1])

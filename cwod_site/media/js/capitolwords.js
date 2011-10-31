@@ -1166,7 +1166,7 @@
         for (i in _ref2) {
           party = _ref2[i];
           $("#compareGraphic .key .wordOne .party-breakdown ." + party).animate({
-            'width': "" + ((cw.a.breakdown[1][i] / aTotal) * 100) + "%"
+            'width': "" + (((cw.a.breakdown[1][i] / aTotal) * 100).toFixed(0)) + "%"
           });
           $("#compareGraphic .key .wordOne .party-breakdown-labels ." + party + " .percentage").html("" + (((cw.a.breakdown[1][i] / aTotal) * 100).toFixed(0)) + "%");
         }
