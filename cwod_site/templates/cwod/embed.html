@@ -49,7 +49,7 @@ window.cwod_apikey = '{{ FRONTEND_API_KEY }}'
                             <img src="{{ embed.img_src }}"
                                  alt="Timeline of occurrences of {{ embed.terms }}"
                                  class="default"
-                                 {% for url in embed.extra.dataurls %}data-dataurl{{ forloop.counter0 }}="{{ url }}"{% endfor %}
+                                 {% for url in embed.extra.dataurls %}data-dataurl{{ forloop.counter0 }}="{{ url }}" {% endfor %}
                                  />
                         </div>
                         {% endif %}
