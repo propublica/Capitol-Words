@@ -409,7 +409,7 @@ def submit_feedback(request):
         else:
             messages.add_message(request, messages.ERROR, 'Please fill out all fields and try again.')
 
-    return render_to_response('cwod/contact.html', {}, context_instance = RequestContext(request))
+    return render_to_response('cwod/contact.html', {}, context_instance=RequestContext(request))
 
 def party_list(request):
     return
@@ -624,7 +624,7 @@ def decode_embed(request, code):
     except Embed.DoesNotExist:
         raise Http404
 
-    return render_to_response('cwod/embed.html', {'embed': obj})
+    return render_to_response('cwod/embed.html', {'embed': obj}, context_instance=RequestContext(request))
 
 
 def encode_embed(request):
