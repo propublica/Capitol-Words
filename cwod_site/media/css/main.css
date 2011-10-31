@@ -227,22 +227,22 @@ ul.wordFilter{/* display:none;*/}
 .thirdColumn .tagValue{text-indent:-9999em;}
 .partyChoice li{float:left;margin-right:17px;margin-bottom:0;}
 /* Term comparison key */
-.key{font-style:italic;margin-bottom:5px;width:80%;float:left}
+.key{font-style:italic;margin-bottom:5px;width:80%;float:left;}
 .key a{text-decoration:underline;margin-right:0;margin-left:5px;}
 .moreComparisons{float:right;}
-.wordOne,.wordTwo{margin-right:20px;margin-left:20px;display:inline-block;zoom:1;*display:inline;}
+.wordOne,.wordTwo{margin-right:20px;margin-left:20px;display:inline-block;zoom:1;*display:inline;vertical-align:top;}
 .wordOne span.color,.wordTwo span.color{width:13px;height:13px;display:inline-block;margin-right:5px;text-decoration:none;vertical-align:middle;}
 .wordOne span.color{background:#902b47;}
 .wordTwo span.color{background:#a85b08;}
 /* Party Breakdowns */
 .party-breakdown{display:block;margin-top:0.5em;overflow-x:hidden;border:1px solid #222; background-color:#ddd;box-shadow: inset 0 0 1px rgba(0,0,0,0.5);}
 .party-breakdown span{height:5px;float:left;margin:0;box-shadow: inset 0 0 1px rgba(0,0,0,0.5);}
-.party-breakdown span.D{background-color:#1d5e72;width:0;float:right}
-.party-breakdown span.R{background-color:#c02b00;width:0}
+.party-breakdown span.D{background-color:#1d5e72;width:0;}
+.party-breakdown span.R{background-color:#c02b00;width:0;float:right}
 
 .party-breakdown-labels span.name{font:normal 11px "helvetica neue", helvetica, arial;color:#eee;}
-.party-breakdown-labels span.D{float:right;}
-.party-breakdown-labels span.R{float:left;}
+.party-breakdown-labels span.D{float:left;}
+.party-breakdown-labels span.R{float:right;}
 .filters{font-style:normal;display:inline-block;}
 ol#bigrams,
 ol#trigrams,
