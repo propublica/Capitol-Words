@@ -20,6 +20,9 @@
 
         {% js "js/google-analytics.js" %}
         <script src="//platform.twitter.com/widgets.js" type="text/javascript"></script>
+        <script type="text/javascript">
+        window.cwod_apikey = '{{ FRONTEND_API_KEY }}'
+        </script>
 
         <!--[if IE 7]>{% css "css/buggy_7.css" %}<![endif]-->
         {% endblock head %}

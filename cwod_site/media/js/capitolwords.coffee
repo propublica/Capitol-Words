@@ -93,7 +93,8 @@ class window.CapitolWords
             url: url
             async: false
             data:
-                'bioguide_id': bioguide_id
+                bioguide_id: bioguide_id
+                apikey: window.cwod_apikey
             success: (data) ->
                 data = data['results']
                 url = "/legislator/#{bioguide_id}-#{data['slug']}"
@@ -233,6 +234,7 @@ class window.CapitolWords
                 'percentages': 'true'
                 'legend': 'false'
                 'mincount': 0
+                'apikey': window.cwod_apikey
             success: (data) ->
                 results = data['results']
                 imgUrl = results['url']
@@ -265,6 +267,7 @@ class window.CapitolWords
             'start_date': cw.start_date
             'end_date': cw.end_date
             'sort': 'date desc,score desc'
+            'apikey': window.cwod_apikey
         $.ajax
             dataType: 'jsonp'
             url: url
@@ -317,6 +320,7 @@ class window.CapitolWords
             overall_img_src: ''
             start_date: $.deparam(location.href.split('?')[1])['start'] or cw.minMonth or cw.homepageDefaults['start']
             end_date: $.deparam(location.href.split('?')[1])['end'] or cw.maxMonth or cw.homepageDefaults['end']
+            apikey: window.cwod_apikey
 
         $('#partyTimeline img').each ->
             fields['by_party_img_src'] = $('#partyTimeline img').attr 'src'
@@ -357,12 +361,12 @@ class window.CapitolWords
 
 
     getGraphData: (term) ->
-        data = {
-            'phrase': term,
-            'granularity': 'month',
-            'percentages': 'true',
-            'mincount': 0,
-        }
+        data = 
+            'phrase': term
+            'granularity': 'month'
+            'percentages': 'true'
+            'mincount': 0
+            'apikey': window.cwod_apikey
 
         url = 'http://capitolwords.org/api/dates.json'
         cw = this
@@ -407,6 +411,7 @@ class window.CapitolWords
                 'per_page': 10
                 'start_date': cw.start_date
                 'end_date': cw.end_date
+                'apikey': window.cwod_apikey
             success: (data) ->
                 results = data['results']
                 maxcount = results[0]['count']
@@ -481,6 +486,7 @@ class window.CapitolWords
                 'granularity': 'month',
                 'percentages': true,
                 'mincount': 0,
+                'apikey': window.cwod_apikey
             }
             requestedUrls.push "#{url}?#{$.param(data)}"
             jQuery.ajax {
@@ -509,6 +515,7 @@ class window.CapitolWords
                 'height': height
                 'start_date': cw.start_date
                 'end_date': cw.end_date
+                'apikey': window.cwod_apikey
             success: (data) ->
                 results = data['results']
                 imgUrl = results['url']
@@ -534,6 +541,7 @@ class window.CapitolWords
                 'per_page': 10
                 'start_date': cw.start_date
                 'end_date': cw.end_date
+                'apikey': window.cwod_apikey
             success: (data) ->
                 div.html ''
                 results = data['results']
@@ -581,6 +589,7 @@ class window.CapitolWords
             party: data['party'] or $('#party').val()
             congress: data['congress'] or $('#congress').val()
             state: data['state'] or $('#state').val()
+            apikey: window.cwod_apikey
         $.ajax
             dataType: 'jsonp'
             url: 'http://capitolwords.org/api/legislators.json'
@@ -916,6 +925,7 @@ class window.CapitolWords
             granularity: 'month'
             percentages: true
             mincount: 0
+            apikey: window.cwod_apikey
 
         requestedUrls.push "#{url}?#{$.param(queryaData)}"
         querya = $.ajax
@@ -935,6 +945,7 @@ class window.CapitolWords
             granularity: 'month'
             percentages: true
             mincount: 0
+            apikey: window.cwod_apikey
 
         requestedUrls.push "#{url}?#{$.param(querybData)}"
         queryb = $.ajax
@@ -953,6 +964,7 @@ class window.CapitolWords
             entity_type: 'party'
             start_date: startDate
             end_date: endDate
+            apikey: window.cwod_apikey
 
         breakdowna = $.ajax
             dataType: 'jsonp'
@@ -967,6 +979,7 @@ class window.CapitolWords
             entity_type: 'party'
             start_date: startDate
             end_date: endDate
+            apikey: window.cwod_apikey
 
         breakdownb = $.ajax
             dataType: 'jsonp'

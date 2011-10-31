@@ -1,3 +1,4 @@
+from django.conf import settings
 from ngrams.models import NgramsByDate
 
 def recent_top_unigrams(request):
@@ -12,3 +13,9 @@ def search_terms(request):
         'termA': request.GET.get('terma'),
         'termB': request.GET.get('termb'),
         }
+
+def frontend_apikey(request):
+    try:
+        return {'FRONTEND_API_KEY': settings.FRONTEND_API_KEY}
+    except AttributeError:
+        return {}

@@ -155,7 +155,8 @@
         url: url,
         async: false,
         data: {
-          'bioguide_id': bioguide_id
+          bioguide_id: bioguide_id,
+          apikey: window.cwod_apikey
         },
         success: function(data) {
           data = data['results'];
@@ -322,7 +323,8 @@
           'granularity': 'month',
           'percentages': 'true',
           'legend': 'false',
-          'mincount': 0
+          'mincount': 0,
+          'apikey': window.cwod_apikey
         },
         success: function(data) {
           var imgTag, imgUrl, results;
@@ -372,7 +374,8 @@
         'bioguide_id': "['' TO *]",
         'start_date': cw.start_date,
         'end_date': cw.end_date,
-        'sort': 'date desc,score desc'
+        'sort': 'date desc,score desc',
+        'apikey': window.cwod_apikey
       };
       return $.ajax({
         dataType: 'jsonp',
@@ -426,7 +429,8 @@
         by_party_img_src: '',
         overall_img_src: '',
         start_date: $.deparam(location.href.split('?')[1])['start'] || cw.minMonth || cw.homepageDefaults['start'],
-        end_date: $.deparam(location.href.split('?')[1])['end'] || cw.maxMonth || cw.homepageDefaults['end']
+        end_date: $.deparam(location.href.split('?')[1])['end'] || cw.maxMonth || cw.homepageDefaults['end'],
+        apikey: window.cwod_apikey
       };
       $('#partyTimeline img').each(function() {
         fields['by_party_img_src'] = $('#partyTimeline img').attr('src');
@@ -480,7 +484,8 @@
         'phrase': term,
         'granularity': 'month',
         'percentages': 'true',
-        'mincount': 0
+        'mincount': 0,
+        'apikey': window.cwod_apikey
       };
       url = 'http://capitolwords.org/api/dates.json';
       cw = this;
@@ -524,7 +529,8 @@
           'sort': 'relative',
           'per_page': 10,
           'start_date': cw.start_date,
-          'end_date': cw.end_date
+          'end_date': cw.end_date,
+          'apikey': window.cwod_apikey
         },
         success: function(data) {
           var listItems, maxcount, render, renderWhenDone, result, results, _i, _len, _results;
@@ -590,7 +596,8 @@
           'phrase': term,
           'granularity': 'month',
           'percentages': true,
-          'mincount': 0
+          'mincount': 0,
+          'apikey': window.cwod_apikey
         };
         requestedUrls.push("" + url + "?" + ($.param(data)));
         return jQuery.ajax({
@@ -625,7 +632,8 @@
           'width': width,
           'height': height,
           'start_date': cw.start_date,
-          'end_date': cw.end_date
+          'end_date': cw.end_date,
+          'apikey': window.cwod_apikey
         },
         success: function(data) {
           var imgUrl, results;
@@ -653,7 +661,8 @@
           'sort': 'relative',
           'per_page': 10,
           'start_date': cw.start_date,
-          'end_date': cw.end_date
+          'end_date': cw.end_date,
+          'apikey': window.cwod_apikey
         },
         success: function(data) {
           var maxcount, results;
@@ -705,7 +714,8 @@
         chamber: data['chamber'] || $('#chamber').val(),
         party: data['party'] || $('#party').val(),
         congress: data['congress'] || $('#congress').val(),
-        state: data['state'] || $('#state').val()
+        state: data['state'] || $('#state').val(),
+        apikey: window.cwod_apikey
       };
       return $.ajax({
         dataType: 'jsonp',
@@ -1062,7 +1072,8 @@
         party: $('.partyA input:checked').eq(0).val(),
         granularity: 'month',
         percentages: true,
-        mincount: 0
+        mincount: 0,
+        apikey: window.cwod_apikey
       };
       requestedUrls.push("" + url + "?" + ($.param(queryaData)));
       querya = $.ajax({
@@ -1083,7 +1094,8 @@
         party: $('.partyB input:checked').eq(0).val(),
         granularity: 'month',
         percentages: true,
-        mincount: 0
+        mincount: 0,
+        apikey: window.cwod_apikey
       };
       requestedUrls.push("" + url + "?" + ($.param(querybData)));
       queryb = $.ajax({
@@ -1103,7 +1115,8 @@
         output: 'data',
         entity_type: 'party',
         start_date: startDate,
-        end_date: endDate
+        end_date: endDate,
+        apikey: window.cwod_apikey
       };
       breakdowna = $.ajax({
         dataType: 'jsonp',
@@ -1118,7 +1131,8 @@
         output: 'data',
         entity_type: 'party',
         start_date: startDate,
-        end_date: endDate
+        end_date: endDate,
+        apikey: window.cwod_apikey
       };
       breakdownb = $.ajax({
         dataType: 'jsonp',

@@ -199,7 +199,10 @@
     Annotation.prototype.getJSONPVar = function(url) {
       return $.ajax({
         url: url,
-        dataType: 'jsonp'
+        dataType: 'jsonp',
+        data: {
+          'apikey': window.cwod_apikey
+        }
       });
     };
     Annotation.prototype.loadCoords = function() {

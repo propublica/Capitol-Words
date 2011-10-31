@@ -102,7 +102,7 @@ INSTALLED_APPS = (
     'cwod_api',
     'bioguide',
     'jsonfield',
-    'locksmith.hub',
+    # 'locksmith.hub',
     'locksmith.auth',
     'gunicorn',
     'ngrams',

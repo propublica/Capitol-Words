@@ -175,6 +175,7 @@ class window.Annotation
         $.ajax
             url: url
             dataType: 'jsonp'
+            data: {'apikey': window.cwod_apikey}
 
     loadCoords: ->
         dfd = $.Deferred()
