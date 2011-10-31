@@ -1034,7 +1034,7 @@
       }
     };
     CapitolWords.prototype.submitHomepageCompareForm = function(skipState) {
-      var breakdownUrl, breakdowna, breakdownaData, breakdownb, breakdownbData, cw, endDate, opts, phraseA, phraseB, querya, queryaData, queryb, querybData, requestedUrls, startDate, target, url, _ref;
+      var breakdownUrl, breakdowna, breakdownaData, breakdownb, breakdownbData, cw, d, endDate, opts, phraseA, phraseB, querya, queryaData, queryb, querybData, requestedUrls, startDate, target, url, _ref;
       cw = this;
       opts = {
         lines: 12,
@@ -1053,8 +1053,9 @@
       breakdownUrl = 'http://capitolwords.org/api/chart/pie.json';
       requestedUrls = [];
       _ref = cw.phrases(), phraseA = _ref[0], phraseB = _ref[1];
+      d = new Date;
       startDate = cw.minMonth ? "" + (cw.minMonth.slice(0, 4)) + "-" + (cw.minMonth.slice(4, 6)) + "-01" : "1996-01-01";
-      endDate = cw.maxMonth ? "" + (cw.maxMonth.slice(0, 4)) + "-" + (cw.maxMonth.slice(4, 6)) + "-31" : "" + (Date().getFullYear) + "-" + (Date().getMonth() + 1) + "-" + (Date().getDate());
+      endDate = cw.maxMonth ? "" + (cw.maxMonth.slice(0, 4)) + "-" + (cw.maxMonth.slice(4, 6)) + "-31" : "" + (d.getFullYear()) + "-" + (d.getMonth() + 1) + "-" + (d.getDate());
       queryaData = {
         phrase: phraseA,
         state: $('#stateA').val() || '',

@@ -905,9 +905,9 @@ class window.CapitolWords
         requestedUrls = []
 
         [phraseA, phraseB] = cw.phrases()
-
+        d = new Date
         startDate = if cw.minMonth then "#{cw.minMonth.slice(0,4)}-#{cw.minMonth.slice(4,6)}-01" else "1996-01-01"
-        endDate = if cw.maxMonth then "#{cw.maxMonth.slice(0,4)}-#{cw.maxMonth.slice(4,6)}-31" else "#{Date().getFullYear}-#{Date().getMonth()+1}-#{Date().getDate()}"
+        endDate = if cw.maxMonth then "#{cw.maxMonth.slice(0,4)}-#{cw.maxMonth.slice(4,6)}-31" else "#{d.getFullYear()}-#{d.getMonth()+1}-#{d.getDate()}"
 
         queryaData =
             phrase: phraseA
