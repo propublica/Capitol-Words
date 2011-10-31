@@ -1154,13 +1154,13 @@
           $("#compareGraphic .key .wordOne .party-breakdown .D").animate({
             'width': 0
           });
-          $("#compareGraphic .key .wordOne .party-breakdown-labels .D .percentage}").html("0%");
+          $("#compareGraphic .key .wordOne .party-breakdown-labels .D .percentage").html("0%");
         }
         if (__indexOf.call(cw.a.breakdown[0], 'R') < 0) {
           $("#compareGraphic .key .wordOne .party-breakdown .R").animate({
             'width': 0
           });
-          $("#compareGraphic .key .wordOne .party-breakdown-labels .R .percentage}").html("0%");
+          $("#compareGraphic .key .wordOne .party-breakdown-labels .R .percentage").html("0%");
         }
         _ref2 = cw.a.breakdown[0];
         for (i in _ref2) {
@@ -1168,20 +1168,20 @@
           $("#compareGraphic .key .wordOne .party-breakdown ." + party).animate({
             'width': "" + ((cw.a.breakdown[1][i] / aTotal) * 100) + "%"
           });
-          $("#compareGraphic .key .wordOne .party-breakdown-labels ." + party + " .percentage}").html("" + (((cw.a.breakdown[1][i] / aTotal) * 100).toFixed(0)) + "%");
+          $("#compareGraphic .key .wordOne .party-breakdown-labels ." + party + " .percentage").html("" + (((cw.a.breakdown[1][i] / aTotal) * 100).toFixed(0)) + "%");
         }
         bTotal = $.sum(cw.b.breakdown[1]);
         if (__indexOf.call(cw.b.breakdown[0], 'D') < 0) {
           $("#compareGraphic .key .wordTwo .party-breakdown .D").animate({
             'width': 0
           });
-          $("#compareGraphic .key .wordTwo .party-breakdown-labels .D .percentage}").html("0%");
+          $("#compareGraphic .key .wordTwo .party-breakdown-labels .D .percentage").html("0%");
         }
         if (__indexOf.call(cw.b.breakdown[0], 'R') < 0) {
           $("#compareGraphic .key .wordTwo .party-breakdown .R").animate({
             'width': 0
           });
-          $("#compareGraphic .key .wordTwo .party-breakdown-labels .R .percentage}").html("0%");
+          $("#compareGraphic .key .wordTwo .party-breakdown-labels .R .percentage").html("0%");
         }
         _ref3 = cw.b.breakdown[0];
         for (i in _ref3) {
@@ -1189,7 +1189,7 @@
           $("#compareGraphic .key .wordTwo .party-breakdown ." + party).animate({
             'width': "" + ((cw.b.breakdown[1][i] / bTotal) * 100) + "%"
           });
-          $("#compareGraphic .key .wordTwo .party-breakdown-labels ." + party + " .percentage}").html("" + (((cw.b.breakdown[1][i] / bTotal) * 100).toFixed(0)) + "%");
+          $("#compareGraphic .key .wordTwo .party-breakdown-labels ." + party + " .percentage").html("" + (((cw.b.breakdown[1][i] / bTotal) * 100).toFixed(0)) + "%");
         }
         return cw.random_phrase_i = void 0;
       });
