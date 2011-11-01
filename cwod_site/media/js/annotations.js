@@ -174,6 +174,7 @@
     Annotation.prototype.destroy = function() {
       this.annotationEl.hide();
       this.el.unbind('.annotation');
+      this.el.parent().unbind('.annotation');
       this.coordsurl = null;
       this.coords = [];
       this.dataurls = [];
