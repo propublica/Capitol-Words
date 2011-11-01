@@ -199,7 +199,7 @@ $(document).ready ->
             $(this).trigger 'load.capitolwords'
 
     # reset images, bind ajax calls to do the same
-    (area = $('#rtColumn')) && area.length && area.imagesLoaded ->
+    (area = $('#rtColumn, .crContent')) && area.length && area.imagesLoaded ->
 
     # fire sample search if arriving fresh on the homepage
     if (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /\?/))

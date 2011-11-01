@@ -224,7 +224,7 @@
         return $(this).trigger('load.capitolwords');
       }
     });
-    (area = $('#rtColumn')) && area.length && area.imagesLoaded(function() {});
+    (area = $('#rtColumn, .crContent')) && area.length && area.imagesLoaded(function() {});
     if ((window.location.pathname.match(/(^\/?$|homepage\.html)/)) && (!(window.location.href.match(/\?/)))) {
       return cw.submitHomepageCompareForm();
     }
