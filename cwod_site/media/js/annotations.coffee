@@ -148,6 +148,7 @@ class window.Annotation
     destroy: ->
         @annotationEl.hide()
         @el.unbind '.annotation'
+        @el.parent().unbind '.annotation'
         @coordsurl = null
         @coords = []
         @dataurls = []
