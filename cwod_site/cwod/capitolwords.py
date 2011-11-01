@@ -15,7 +15,7 @@ try:
     import json
 except ImportError:
     import simplejson as json
-    
+
 class ApiError(Exception):
     """ Exception for API errors """
 
@@ -35,6 +35,10 @@ class capitolwords(object):
         param_str = ''
         if params:
             params = dict([(k,v) for (k,v) in params.iteritems() if v is not None])
+            try:
+                params.update({'apikey': self.api_key})
+            except KeyError:
+                raise ApiError('You must supply an API Key')
             param_str = '?%s' % urllib.urlencode(params)
         url = 'http://%s/%s.json%s' % (self.domain, func, param_str)
         # print url
@@ -53,7 +57,7 @@ class capitolwords(object):
             raise ApiError(e.read())
         except ValueError, e:
             raise ApiError('Invalid Response')
-            
+
     def phrase_by_date_range(self, **params):
         result = capitolwords._apicall(self, 'dates', params)['results']
         return result
@@ -65,15 +69,15 @@ class capitolwords(object):
     def piechart(self, **params):
         result = capitolwords._apicall(self, 'chart/pie', params)['results']
         return result
-        
+
     def phrase_by_entity_type(self, entity_type, **params):
         result = capitolwords._apicall(self, 'phrases/%s' % entity_type, params)['results']
         return result
-        
+
     def top_phrases(self, **params):
         result = capitolwords._apicall(self, 'phrases', params)
         return result
-        
+
     def get_legislator(self, **params):
         result = capitolwords._apicall(self, 'legislators', params)
         return result
