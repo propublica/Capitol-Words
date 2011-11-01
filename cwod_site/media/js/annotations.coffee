@@ -245,8 +245,7 @@ class window.Annotation
             if not @startDate then @startDate = '199601'
             if not @endDate
                 d = new Date()
-                pad = if d.getMonth() + 1 > 9 then '' else '0'
-                @endDate = "#{d.getFullYear()}#{pad}#{d.getMonth() + 1}"
+                @endDate = "#{d.getFullYear()}12"
 
         if (url = @el.attr 'data-dataurl')
             @dataurls.push url

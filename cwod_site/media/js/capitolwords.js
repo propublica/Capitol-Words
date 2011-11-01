@@ -1065,7 +1065,7 @@
       _ref = cw.phrases(), phraseA = _ref[0], phraseB = _ref[1];
       d = new Date;
       startDate = cw.minMonth ? "" + (cw.minMonth.slice(0, 4)) + "-" + (cw.minMonth.slice(4, 6)) + "-01" : "1996-01-01";
-      endDate = cw.maxMonth ? "" + (cw.maxMonth.slice(0, 4)) + "-" + (cw.maxMonth.slice(4, 6)) + "-31" : "" + (d.getFullYear()) + "-" + (d.getMonth() + 1) + "-" + (d.getDate());
+      endDate = cw.maxMonth ? "" + (cw.maxMonth.slice(0, 4)) + "-12-31" : "" + (d.getFullYear()) + "-12-31";
       queryaData = {
         phrase: phraseA,
         state: $('#stateA').val() || '',

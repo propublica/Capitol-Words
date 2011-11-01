@@ -287,7 +287,7 @@
       return pair;
     };
     Annotation.prototype.refresh = function() {
-      var d, i, pad, qparams, qs, url;
+      var d, i, qparams, qs, url;
       this.destroy();
       if (!this.startDate && !this.endDate) {
         qs = window.location.href.split('?')[1];
@@ -303,8 +303,7 @@
         }
         if (!this.endDate) {
           d = new Date();
-          pad = d.getMonth() + 1 > 9 ? '' : '0';
-          this.endDate = "" + (d.getFullYear()) + pad + (d.getMonth() + 1);
+          this.endDate = "" + (d.getFullYear()) + "12";
         }
       }
       if ((url = this.el.attr('data-dataurl'))) {
