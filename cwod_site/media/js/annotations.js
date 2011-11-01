@@ -271,6 +271,7 @@
           }).call(this)
         ][0];
         y = _.min(ys);
+        x = this.coords[0][step][0];
         pair = [x, y];
         if (pair[0] + this.annotationEl.outerWidth() > this.el.width()) {
           pair[0] -= this.annotationEl.outerWidth();

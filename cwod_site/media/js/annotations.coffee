@@ -213,6 +213,7 @@ class window.Annotation
         if 0 <= step < @coords[0].length
             ys = [coordset[step].slice()[1] for coordset in @coords][0]
             y = _.min(ys)
+            x = @coords[0][step][0]
             # y = 0
             # $.each(ys, (idx, val) ->
             #     y += val
