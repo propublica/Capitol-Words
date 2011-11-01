@@ -70,9 +70,6 @@ class window.Annotation
 
     constructor: (@el, @params) ->
         {@iterable, @template, @heading, @startDate, @endDate, @linkTo} = @params
-        if !@template
-            @template = @heading
-            @heading = null
         @el = $(@el)
         @el.data 'annotation', this
         @el.wrap '<a class="annotation-wrap" target="_top" href="#"></a>'
@@ -157,7 +154,7 @@ class window.Annotation
         @slices = []
         @_months = null
         @_total = null
-        # if startDAte and/or endDate were passed to the constructor, this
+        # if startDate and/or endDate were passed to the constructor, this
         # is an embed, so leave them as they are
         if not (@params['startDate'] or @params['endDate'])
             @startDate = null

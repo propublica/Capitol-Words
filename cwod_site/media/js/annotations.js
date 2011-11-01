@@ -82,10 +82,6 @@
       this.el = el;
       this.params = params;
       _ref = this.params, this.iterable = _ref.iterable, this.template = _ref.template, this.heading = _ref.heading, this.startDate = _ref.startDate, this.endDate = _ref.endDate, this.linkTo = _ref.linkTo;
-      if (!this.template) {
-        this.template = this.heading;
-        this.heading = null;
-      }
       this.el = $(this.el);
       this.el.data('annotation', this);
       this.el.wrap('<a class="annotation-wrap" target="_top" href="#"></a>');
