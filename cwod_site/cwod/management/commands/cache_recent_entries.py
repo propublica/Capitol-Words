@@ -48,7 +48,7 @@ class Command(BaseCommand):
         entries.sort(lambda x, y: cmp(len(x[-1]), len(y[-1])), reverse=True)
 
         for entry_details, speakers in entries[:10]:
-            title, pagenum, origin_url = entry_details
+            title, pagenum, origin_url, excerpt = entry_details
             kwargs = {'date': date.date,
                       'title': smart_title(title),
                       'slug': slugify(title)[:50],
