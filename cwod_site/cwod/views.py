@@ -506,7 +506,6 @@ def get_similar_entries(chunks, num=10):
     return similar[:num]
 
 
-@login_required
 def entry_detail(request, year, month, day, page_id, slug):
     date = datetime.date(year=int(year), month=int(month), day=int(day))
     chunks = []
