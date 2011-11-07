@@ -31,17 +31,17 @@ class capitolwords(object):
         self.last_call['params'] = params
         self.last_call['response'] = response
 
-    def _apicall(self, func, params=None, method='GET'):
+    def _apicall(self, func, params={}, method='GET'):
         param_str = ''
         if params:
             params = dict([(k,v) for (k,v) in params.iteritems() if v is not None])
-            try:
-                params.update({'apikey': self.api_key})
-            except KeyError:
-                raise ApiError('You must supply an API Key')
-            param_str = '?%s' % urllib.urlencode(params)
+        try:
+            params.update({'apikey': self.api_key})
+        except KeyError:
+            raise ApiError('You must supply an API Key')
+        param_str = '?%s' % urllib.urlencode(params)
         url = 'http://%s/%s.json%s' % (self.domain, func, param_str)
-        # print url
+        print url
 
         try:
             h = httplib2.Http()
