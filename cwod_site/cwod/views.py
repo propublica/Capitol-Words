@@ -308,7 +308,7 @@ def _highlight_entries(entries, term):
         match = None
         for graf in entry['speaking']:
             graf = graf.replace('\n', '')
-            versions_of_term = re.findall(term, graf, re.I)
+            versions_of_term = re.findall(re.escape(term), graf, re.I)
             if versions_of_term:
                 match = re.sub('(%s)' % '|'.join([x for x in set(versions_of_term)]),
                                r'<em>\1</em>', graf)
