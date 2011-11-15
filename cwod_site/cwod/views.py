@@ -50,6 +50,7 @@ STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
              'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don',
              'should', 'now', '\.', '\?', '\!' ]
 
+PUNCTUATION = ['?', '!', '.', ',', '(', ')', ';', ':', "'", '"', ]
 
 @login_required
 def index(request):
@@ -64,8 +65,10 @@ def index(request):
 @login_required
 def faster_term_detail(request, term):
     # For better URLs, replace spaces with underscores
-    if re.search(r'\s', term):
-        url = reverse('cwod_term_detail', kwargs={'term': re.sub(r'\s+', '_', term)})
+    if re.search(r'[\s%s]' % ''.join(PUNCTUATION), term):
+        term = re.sub(r'[%s]' % ''.join(PUNCTUATION), '', term)
+        term = re.sub(r'\s', '_', term)
+        url = reverse('cwod_term_detail', kwargs={'term': term})
         return HttpResponsePermanentRedirect(url)
 
     if request.GET.get('js') == 'false':
@@ -104,9 +107,11 @@ def faster_term_detail(request, term):
 @login_required
 def term_detail(request, term):
 
-    # For better URLs, replace spaces with underscores
-    if re.search(r'\s', term):
-        url = reverse('cwod_term_detail', kwargs={'term': re.sub(r'\s+', '_', term)})
+    # For better URLs, replace spaces with underscores & strip punctuation
+    if re.search(r'[\s%s]' % ''.join(PUNCTUATION), term):
+        term = re.sub(r'[%s]' % ''.join(PUNCTUATION), '', term)
+        term = re.sub(r'\s', '_', term)
+        url = reverse('cwod_term_detail', kwargs={'term': term})
         return HttpResponsePermanentRedirect(url)
 
     term = re.sub(r'_', ' ', term)
@@ -308,7 +313,10 @@ def _highlight_entries(entries, term):
         match = None
         for graf in entry['speaking']:
             graf = graf.replace('\n', '')
-            versions_of_term = re.findall(re.escape(term), graf, re.I)
+            term_parts = re.split(r'\s', term)
+            exp = r'[\s%s]+?' % ''.join(PUNCTUATION)
+            term = exp.join(term_parts)
+            versions_of_term = re.findall(term, graf, re.I)
             if versions_of_term:
                 match = re.sub('(%s)' % '|'.join([x for x in set(versions_of_term)]),
                                r'<em>\1</em>', graf)
