@@ -784,8 +784,6 @@ class FullTextSearchHandler(GenericHandler):
         if request.GET.get('sort'):
             kwargs['params']['sort'] = request.GET['sort']
 
-        kwargs['capitolwords_host'] = request.build_absolute_uri('/').rstrip('/')
-
         return super(FullTextSearchHandler, self).read(request, *args, **kwargs)
 
     def format_for_return(self, data, *args, **kwargs):
@@ -795,9 +793,9 @@ class FullTextSearchHandler(GenericHandler):
                     'speaking': x.get('speaking'),
                     'title': x.get('document_title', ''),
                     'origin_url': create_gpo_url(x.get('crdoc', '')),
-                    'capitolwords_url': kwargs['capitolwords_host'] +
-                                            get_entry_detail_url(create_gpo_url(x.get('crdoc', '')),
-                                                                 x.get('document_title', '')),
+                    'capitolwords_url': settings.CAPWORDS_ROOT +
+                                        get_entry_detail_url(create_gpo_url(x.get('crdoc', '')),
+                                                             x.get('document_title', '')),
                     'speaker_first': x.get('speaker_firstname'),
                     'speaker_last': x.get('speaker_lastname'),
                     'speaker_party': x.get('speaker_party'),
