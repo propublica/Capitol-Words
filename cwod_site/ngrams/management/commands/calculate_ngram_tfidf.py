@@ -146,7 +146,7 @@ class Command(BaseCommand):
                 dest='field',
                 default=None,
                 help='Field to calculate ngram tfidf for'),
-            make_option('--congress', 
+            make_option('--congress',
                 action='store',
                 dest='congress',
                 help='Restrict calculation to the given congress')
@@ -179,7 +179,7 @@ class Command(BaseCommand):
 
         for facet in reversed(facets):
             print facet
-            for n in range(1,2):
+            for n in range(1,6):
 
                 if (facet, n) in already:
                     continue
