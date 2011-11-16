@@ -398,8 +398,10 @@
           });
           entries = cw.highlightEntries(entries, term);
           html = "";
-          _(entries).each(function(entry) {
-            return html += "<li>\n    <h5><a href=\"\">" + (cw.titleCase(entry['title'])) + "</a></h5>\n    <p>" + entry['speaker_first'] + " " + entry['speaker_last'] + ", " + entry['speaker_party'] + "-" + entry['speaker_state'] + "</p>\n    <p>" + entry.date + "</p>\n    <p>" + entry.match + "</p>\n</li>";
+          _(entries).each(function(entry, idx) {
+            var cycle;
+            cycle = idx % 2 ? 'odd' : 'even';
+            return html += "<tr class=\"" + cycle + "\"><td colspan=\"2\">\n    <table>\n        <tbody>\n            <tr>\n                <td class=\"entTitle\"><a href=\"" + entry.capitolwords_url + "\">" + (cw.titleCase(entry.title)) + "</a></td>\n                <td class=\"entDate\">" + entry.date + "</td>\n            </tr>\n            <tr colspan=\"2\">\n                <td colspan=\"2\" class=\"legislators\">\n                <a href=\"/legislator/" + entry.bioguide_id + "\">" + entry.speaker_first + " " + entry.speaker_last + ", " + entry.speaker_party + "-" + entry.speaker_state + "</a>\n                </td>\n            </tr>\n            <tr colspan=\"2\">\n                <td colspan=\"2\" class=\"abstract\">\n                    " + entry.match + "\n                </td>\n            </tr>\n        </tbody>\n    </table>\n</td></tr>";
           });
           return $('#crEntries').html(html);
         }
@@ -685,15 +687,17 @@
       });
     };
     CapitolWords.prototype.highlightEntries = function(entries, term) {
-      var entry_matches, regexp;
+      var delim, entry_matches, regexp, term_parts;
       entry_matches = [];
-      regexp = new RegExp(term, "ig");
+      term_parts = term.split(/[\s\-]/);
+      delim = '[\\s?!.,();:\'"\\-]+?';
+      regexp = new RegExp(term_parts.join(delim), "ig");
       _(entries).each(function(entry) {
         var match;
         match = null;
         _(entry['speaking']).each(function(graf) {
           var matcher, versions_of_term;
-          graf = graf.replace(/\n/, '');
+          graf = graf.replace(/\n/, ' ');
           versions_of_term = _(graf.match(regexp)).uniq();
           if (!_(versions_of_term).isEmpty()) {
             matcher = new RegExp('(' + versions_of_term.join('|') + ')');

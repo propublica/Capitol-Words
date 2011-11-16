@@ -50,7 +50,7 @@ STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
              'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don',
              'should', 'now', '\.', '\?', '\!' ]
 
-PUNCTUATION = ['?', '!', '.', ',', '(', ')', ';', ':', "'", '"', ]
+PUNCTUATION = ['?', '!', '.', ',', '(', ')', ';', ':', "'", '"',]
 
 @login_required
 def index(request):
@@ -309,13 +309,13 @@ def state_list(request):
 
 
 def _highlight_entries(entries, term):
+    term_parts = re.split(r'[\s\-]', term)
+    exp = r'[\s\-%s]+?' % ''.join(PUNCTUATION)
+    term = exp.join(term_parts)
     for entry in entries:
         match = None
         for graf in entry['speaking']:
             graf = graf.replace('\n', '')
-            term_parts = re.split(r'\s', term)
-            exp = r'[\s%s]+?' % ''.join(PUNCTUATION)
-            term = exp.join(term_parts)
             versions_of_term = re.findall(term, graf, re.I)
             if versions_of_term:
                 match = re.sub('(%s)' % '|'.join([x for x in set(versions_of_term)]),

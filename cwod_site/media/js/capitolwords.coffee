@@ -286,14 +286,29 @@ class window.CapitolWords
                 entries = cw.highlightEntries(entries, term)
 
                 html = ""
-                _(entries).each (entry) ->
+                _(entries).each (entry, idx) ->
+                    cycle = if idx % 2 then 'odd' else 'even'
                     html += """
-                        <li>
-                            <h5><a href="">#{cw.titleCase(entry['title'])}</a></h5>
-                            <p>#{entry['speaker_first']} #{entry['speaker_last']}, #{entry['speaker_party']}-#{entry['speaker_state']}</p>
-                            <p>#{entry.date}</p>
-                            <p>#{entry.match}</p>
-                        </li>
+                    <tr class="#{cycle}"><td colspan="2">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td class="entTitle"><a href="#{entry.capitolwords_url}">#{cw.titleCase(entry.title)}</a></td>
+                                    <td class="entDate">#{entry.date}</td>
+                                </tr>
+                                <tr colspan="2">
+                                    <td colspan="2" class="legislators">
+                                    <a href="/legislator/#{entry.bioguide_id}">#{entry.speaker_first} #{entry.speaker_last}, #{entry.speaker_party}-#{entry.speaker_state}</a>
+                                    </td>
+                                </tr>
+                                <tr colspan="2">
+                                    <td colspan="2" class="abstract">
+                                        #{entry.match}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td></tr>
                     """
                 $('#crEntries').html(html)
 
@@ -361,7 +376,7 @@ class window.CapitolWords
 
 
     getGraphData: (term) ->
-        data = 
+        data =
             'phrase': term
             'granularity': 'month'
             'percentages': 'true'
@@ -566,11 +581,13 @@ class window.CapitolWords
 
     highlightEntries: (entries, term) ->
         entry_matches = []
-        regexp = new RegExp(term, "ig")
+        term_parts = term.split(/[\s\-]/)
+        delim = '[\\s?!.,();:\'"\\-]+?'
+        regexp = new RegExp(term_parts.join(delim), "ig")
         _(entries).each (entry) ->
             match = null
             _(entry['speaking']).each (graf) ->
-                graf = graf.replace /\n/, ''
+                graf = graf.replace /\n/, ' '
                 versions_of_term = _(graf.match regexp).uniq()
                 if not _(versions_of_term).isEmpty()
                     matcher = new RegExp '(' + versions_of_term.join('|') + ')'
