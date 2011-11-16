@@ -55,6 +55,7 @@ $.deparam ||= (qs) ->
 class window.Annotation
     el = null
     annotationEl = null
+    callstack = []
     coordsurl = null
     coords = []
     dataurls = []
@@ -143,9 +144,12 @@ class window.Annotation
                     @el.parent().attr 'href', "/date/#{year}/#{month}"
 
     destroy: ->
+        _(@callstack).each (req) ->
+            req.abort()
         @annotationEl.hide()
         @el.unbind '.annotation'
         @el.parent().unbind '.annotation'
+        @callstack = []
         @coordsurl = null
         @coords = []
         @dataurls = []
@@ -170,10 +174,12 @@ class window.Annotation
         return dfd.promise()
 
     getJSONPVar: (url) ->
-        $.ajax
-            url: url
-            dataType: 'jsonp'
-            data: {'apikey': window.cwod_apikey}
+        req = $.ajax
+                url: url
+                dataType: 'jsonp'
+                data: {'apikey': window.cwod_apikey}
+        @callstack.push req
+        req
 
     loadCoords: ->
         dfd = $.Deferred()
@@ -261,12 +267,15 @@ class window.Annotation
                 @bindMouse()
 
     step: (x) ->
-        @_total ||= @coords[0].length
-        min = @coords[0][0][0]
-        max = @coords[0][@_total-1][0]
-        range = max - min
-        stepsize = range/@_total
-        return Math.floor((x - min) / stepsize)
+        try
+            @_total ||= @coords[0].length
+            min = @coords[0][0][0]
+            max = @coords[0][@_total-1][0]
+            range = max - min
+            stepsize = range/@_total
+            return Math.floor((x - min) / stepsize)
+        catch e
+            @refresh()
 
     startOffset: ->
         @_months ||= _.pluck(@datasets[0], 'month')

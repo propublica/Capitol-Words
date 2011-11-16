@@ -61,9 +61,10 @@
     return params;
   });
   window.Annotation = (function() {
-    var annotationEl, coords, coordsurl, datasets, dataurls, el, endDate, heading, iterable, lines, slices, startDate, template;
+    var annotationEl, callstack, coords, coordsurl, datasets, dataurls, el, endDate, heading, iterable, lines, slices, startDate, template;
     el = null;
     annotationEl = null;
+    callstack = [];
     coordsurl = null;
     coords = [];
     dataurls = [];
@@ -168,9 +169,13 @@
       }, this));
     };
     Annotation.prototype.destroy = function() {
+      _(this.callstack).each(function(req) {
+        return req.abort();
+      });
       this.annotationEl.hide();
       this.el.unbind('.annotation');
       this.el.parent().unbind('.annotation');
+      this.callstack = [];
       this.coordsurl = null;
       this.coords = [];
       this.dataurls = [];
@@ -194,13 +199,16 @@
       return dfd.promise();
     };
     Annotation.prototype.getJSONPVar = function(url) {
-      return $.ajax({
+      var req;
+      req = $.ajax({
         url: url,
         dataType: 'jsonp',
         data: {
           'apikey': window.cwod_apikey
         }
       });
+      this.callstack.push(req);
+      return req;
     };
     Annotation.prototype.loadCoords = function() {
       var dfd;
@@ -320,12 +328,16 @@
     };
     Annotation.prototype.step = function(x) {
       var max, min, range, stepsize;
-      this._total || (this._total = this.coords[0].length);
-      min = this.coords[0][0][0];
-      max = this.coords[0][this._total - 1][0];
-      range = max - min;
-      stepsize = range / this._total;
-      return Math.floor((x - min) / stepsize);
+      try {
+        this._total || (this._total = this.coords[0].length);
+        min = this.coords[0][0][0];
+        max = this.coords[0][this._total - 1][0];
+        range = max - min;
+        stepsize = range / this._total;
+        return Math.floor((x - min) / stepsize);
+      } catch (e) {
+        return this.refresh();
+      }
     };
     Annotation.prototype.startOffset = function() {
       var offset;
