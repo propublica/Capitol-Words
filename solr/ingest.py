@@ -57,17 +57,18 @@ def make_ngrams(xml, filename):
 
 
             # Adapted From Natural Language Processing with Python
-            regex = r'''(?x) 
-            ([A-Z]\.)+                                      # Abbreviations (U.S.A., etc.)
-          | ([A-Z]+\&[A-Z]+)                                # Internal ampersands (AT&T, etc.)
-          | (Mr\.|Dr\.|Mrs\.|Ms\.)                          # Mr., Mrs., etc.
-          | \d*\.\d+                                        # Numbers with decimal points.
-          | \d\d?:\d\d                                      # Times.
-          | \$?[,0-9]+                                      # Numbers with thousands separators.
-          | (((a|A)|(p|P))\.(m|M)\.)                        # a.m., p.m., A.M., P.M.
-          | \w+((-|')\w+)*                                  # Words with optional internal hyphens.
-          | \$?\d+(\.\d+)?%?                                # Currency and percentages.
-          | \.\.\.                                          # Ellipsis
+            regex = r'''(?x)
+            (?:H|S)\.\ ?(?:(?:J|R)\.\ )?(?:Con\.\ )?(?:Res\.\ )?\d+ # Bills
+          | ([A-Z]\.)+                                              # Abbreviations (U.S.A., etc.)
+          | ([A-Z]+\&[A-Z]+)                                        # Internal ampersands (AT&T, etc.)
+          | (Mr\.|Dr\.|Mrs\.|Ms\.)                                  # Mr., Mrs., etc.
+          | \d*\.\d+                                                # Numbers with decimal points.
+          | \d\d?:\d\d                                              # Times.
+          | \$?[,0-9]+                                              # Numbers with thousands separators.
+          | (((a|A)|(p|P))\.(m|M)\.)                                # a.m., p.m., A.M., P.M.
+          | \w+((-|')\w+)*                                          # Words with optional internal hyphens.
+          | \$?\d+(\.\d+)?%?                                        # Currency and percentages.
+          | \.\.\.                                                  # Ellipsis
           | [][.,;"'?():-_`]
             '''
 
@@ -77,7 +78,7 @@ def make_ngrams(xml, filename):
                         for x in nltk.regexp_tokenize(sentence, regex)
                         if re.search(r'[a-z0-9.?!]', x.lower())]
 
-            ngrams += [item for sublist in [['<field name="%s">%s</field>' % (field, escape(' '.join(ngram))) 
+            ngrams += [item for sublist in [['<field name="%s">%s</field>' % (field, escape(' '.join(ngram)))
                             for ngram in nltk.util.ngrams(words, n+1)]
                                 for n, field in enumerate(fields)] for item in sublist]
 
@@ -328,7 +329,7 @@ class SolrDoc(object):
                 speaker_metadata = self.get_speaker_metadata(current_speaker)
                 if speaker_metadata == None:
                     speaker_metadata = ''
-            else: 
+            else:
                 speaker_metadata = ''
             speaker_line = speaker_line.encode('utf-8')
             body = body.encode('utf-8')

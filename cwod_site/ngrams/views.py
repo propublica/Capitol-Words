@@ -41,14 +41,14 @@ class GenericHandler(Resource):
         if getattr(self, 'granularity', None) is not None:
             entities.append(granularity)
 
-        # The list of entities in model names are always 
+        # The list of entities in model names are always
         # in alphabetical order.
         entities.sort(key=lambda x: x[0])
 
         ngram_field = self.NGRAM_FIELDS[n-1]
 
         # Example model names: UnigramsByCountChamberDate,
-        # TrigramsByCountBioguideCongress, PentagramsByCountYear 
+        # TrigramsByCountBioguideCongress, PentagramsByCountYear
         return '%sByCount%s' % (ngram_field.title(),
                                 ''.join([x.title() for x in entities])
                                )
@@ -58,7 +58,7 @@ class GenericHandler(Resource):
         """Get the model object from ngrams.models
         using the model name.
 
-        If it doesn't exist, it's likely that there 
+        If it doesn't exist, it's likely that there
         is a bad combination of entities.
         """
         self.modelname = self.get_modelname(len(tokens), entities)
@@ -72,7 +72,7 @@ class GenericHandler(Resource):
         """Remove punctuation-only tokens.
         """
         return [re.sub(r',', '', x.lower().rstrip('-').strip("'"))
-                for x in tokens 
+                for x in tokens
                 if re.search(r'[a-z0-9.?!]', x.lower())]
 
 
@@ -82,17 +82,18 @@ class GenericHandler(Resource):
         in the script that creates Solr documents, but without
         capturing groups.
         """
-        regex = r'''(?x) 
-        (?:[A-Z]\.)+                                  # Abbreviations (U.S.A., etc.)
-      | [A-Z]+\&[A-Z]+                                # Internal ampersands (AT&T, etc.)
-      | (?:Mr\.|Dr\.|Mrs\.|Ms\.)                      # Mr., Mrs., etc.
-      | \d*\.\d+                                      # Numbers with decimal points.
-      | \d\d?:\d\d                                    # Times.
-      | \$?[,0-9]+                                    # Numbers with thousands separators.
-      | (?:(?:(?:a|A)|(?:p|P))\.(?:m|M)\.)            # a.m., p.m., A.M., P.M.
-      | \w+(?:(?:-|')\w+)*                            # Words with optional internal hyphens.
-      | \$?\d+(?:\.\d+)?%?                            # Currency and percentages.
-      | \.\.\.                                        # Ellipsis
+        regex = r'''(?x)
+        (?:H|S)\.\ ?(?:(?:J|R)\.\ )?(?:Con\.\ )?(?:Res\.\ )?\d+ # Bills
+      | (?:[A-Z]\.)+                                            # Abbreviations (U.S.A., etc.)
+      | [A-Z]+\&[A-Z]+                                          # Internal ampersands (AT&T, etc.)
+      | (?:Mr\.|Dr\.|Mrs\.|Ms\.)                                # Mr., Mrs., etc.
+      | \d*\.\d+                                                # Numbers with decimal points.
+      | \d\d?:\d\d                                              # Times.
+      | \$?[,0-9]+                                              # Numbers with thousands separators.
+      | (?:(?:(?:a|A)|(?:p|P))\.(?:m|M)\.)                      # a.m., p.m., A.M., P.M.
+      | \w+(?:(?:-|')\w+)*                                      # Words with optional internal hyphens.
+      | \$?\d+(?:\.\d+)?%?                                      # Currency and percentages.
+      | \.\.\.                                                  # Ellipsis
       | [][.,;"'?(?:):-_`]
         '''
         regexp = re.compile(regex, re.UNICODE | re.MULTILINE | re.DOTALL | re.IGNORECASE)

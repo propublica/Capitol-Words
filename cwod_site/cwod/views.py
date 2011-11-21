@@ -50,7 +50,7 @@ STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
              'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don',
              'should', 'now', '\.', '\?', '\!' ]
 
-PUNCTUATION = ['?', '!', '.', ',', '(', ')', ';', ':', "'", '"',]
+PUNCTUATION = ['?', '!', '.', ',']
 
 @login_required
 def index(request):
@@ -64,10 +64,10 @@ def index(request):
 
 @login_required
 def faster_term_detail(request, term):
-    # For better URLs, replace spaces with underscores
-    if re.search(r'[\s%s]' % ''.join(PUNCTUATION), term):
-        term = re.sub(r'[%s]' % ''.join(PUNCTUATION), '', term)
-        term = re.sub(r'\s', '_', term)
+    # For better URLs, replace spaces with underscores and strip trailing punctuation
+    if re.search(r'\s', term) or re.search(r'[%s]$' % ''.join(PUNCTUATION), term):
+        term = re.sub(r'[%s]$' % ''.join(PUNCTUATION), '', term)
+        term = re.sub(r'\s', '_', term.strip())
         url = reverse('cwod_term_detail', kwargs={'term': term})
         return HttpResponsePermanentRedirect(url)
 
@@ -107,10 +107,10 @@ def faster_term_detail(request, term):
 @login_required
 def term_detail(request, term):
 
-    # For better URLs, replace spaces with underscores & strip punctuation
-    if re.search(r'[\s%s]' % ''.join(PUNCTUATION), term):
-        term = re.sub(r'[%s]' % ''.join(PUNCTUATION), '', term)
-        term = re.sub(r'\s', '_', term)
+    # For better URLs, replace spaces with underscores & strip trailing punctuation
+    if re.search(r'\s', term) or re.search(r'[%s]$' % ''.join(PUNCTUATION), term):
+        term = re.sub(r'[%s]$' % ''.join(PUNCTUATION), '', term)
+        term = re.sub(r'\s', '_', term.strip())
         url = reverse('cwod_term_detail', kwargs={'term': term})
         return HttpResponsePermanentRedirect(url)
 

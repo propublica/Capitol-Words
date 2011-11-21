@@ -372,16 +372,17 @@ def tokenize(term):
 
     # Adapted From Natural Language Processing with Python
     regex = r'''(?x)
-    ([A-Z]\.)+                                      # Abbreviations (U.S.A., etc.)
-  | ([A-Z]+\&[A-Z]+)                                # Internal ampersands (AT&T, etc.)
-  | (Mr\.|Dr\.|Mrs\.|Ms\.)                          # Mr., Mrs., etc.
-  | \d*\.\d+                                        # Numbers with decimal points.
-  | \d\d?:\d\d                                      # Times.
-  | \$?[,0-9]+                                      # Numbers with thousands separators.
-  | (((a|A)|(p|P))\.(m|M)\.)                        # a.m., p.m., A.M., P.M.
-  | \w+((-|')\w+)*                                  # Words with optional internal hyphens.
-  | \$?\d+(\.\d+)?%?                                # Currency and percentages.
-  | \.\.\.                                          # Ellipsis
+    (?:H|S)\.\ ?(?:(?:J|R)\.\ )?(?:Con\.\ )?(?:Res\.\ )?\d+ # Bills
+  | ([A-Z]\.)+                                              # Abbreviations (U.S.A., etc.)
+  | ([A-Z]+\&[A-Z]+)                                        # Internal ampersands (AT&T, etc.)
+  | (Mr\.|Dr\.|Mrs\.|Ms\.)                                  # Mr., Mrs., etc.
+  | \d*\.\d+                                                # Numbers with decimal points.
+  | \d\d?:\d\d                                              # Times.
+  | \$?[,0-9]+                                              # Numbers with thousands separators.
+  | (((a|A)|(p|P))\.(m|M)\.)                                # a.m., p.m., A.M., P.M.
+  | \w+((-|')\w+)*                                          # Words with optional internal hyphens.
+  | \$?\d+(\.\d+)?%?                                        # Currency and percentages.
+  | \.\.\.                                                  # Ellipsis
   | [][.,;"'?():-_`]
     '''
     return regexp_tokenize(term, regex)
