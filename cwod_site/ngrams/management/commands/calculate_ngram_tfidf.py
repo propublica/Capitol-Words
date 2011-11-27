@@ -160,10 +160,10 @@ class Command(BaseCommand):
         calculator = Calculator(field, congress)
 
         if field == 'speaker_bioguide':
-            already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_bioguide.csv', 'r'))])
+            already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_bioguide.csv', 'r')) if len(x) > 1])
             facets = list_active_legislators_first()
         elif field == 'year_month':
-            already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_month.csv', 'r'))])
+            already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_month.csv', 'r')) if len(x) > 1])
             facets = calculator.list_facets()
         elif field == 'date':
             already = []

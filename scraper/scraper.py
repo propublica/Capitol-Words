@@ -8,11 +8,11 @@ try:
 except:
     import simplejson as json
 
-    
+
 class CRScraper(object):
     def __init__(self):
         # use httplib so that we can retrieve the headers before retrieving the
-	    # body. 
+        # body.
         self.domain = "www.gpo.gov"
         self.path = "/fdsys/delivery/getpackage.action"
         self.date = None
@@ -22,17 +22,17 @@ class CRScraper(object):
 
     def set_date(self, date):
         ''' given a date object, retrieve the documents for that given date and
-        save them to the filesystem.''' 
+        save them to the filesystem.'''
         self.date = date
         self.datestring = date.strftime("%Y-%m-%d")
-        self.url = self.path + "?packageId=CREC-%s" % self.datestring    
+        self.url = self.path + "?packageId=CREC-%s" % self.datestring
 
     def was_in_session(self):
-        # check the response header to make sure the Record exists for this date. 
+        # check the response header to make sure the Record exists for this date.
         conn = httplib.HTTPConnection(self.domain, timeout=25)
         conn.request("HEAD", self.url)
         # the connection can be a little dodgy, let it try connecting a few
-        # times if needed. 
+        # times if needed.
         could_not_connect = 0
         while could_not_connect < 3:
             try:
@@ -54,7 +54,7 @@ class CRScraper(object):
     def retrieve(self):
         tmpfile = os.path.join(TMP_DIR, "CREC-%s.zip" % self.datestring)
 
-        # download the zipfile if we don't already have it. 
+        # download the zipfile if we don't already have it.
         rightsize = lambda tmpfile: os.path.getsize(tmpfile) == self.zipsize
         if not os.path.exists(tmpfile) or not rightsize(tmpfile):
             zip = urllib.urlopen('http://' + self.domain + self.url)
@@ -65,7 +65,7 @@ class CRScraper(object):
         else: print '%s exists. skipping download' % tmpfile
 
         # prepare the directory to copy the zipped files into. use strftime
-        # here to ensure day and month directories are always 2 digits. 
+        # here to ensure day and month directories are always 2 digits.
         save_path = os.path.join(CWOD_HOME, 'raw/%d/%s/%s/' % (self.date.year,
         self.date.strftime("%m"), self.date.strftime("%d")))
         if not os.path.exists(save_path):
@@ -101,7 +101,7 @@ class CRScraper(object):
                     print e
             else:
                 print 'file %s already exists. skipping.' % saveas
-        
+
         # do some sanity checking
         if errors or len(os.listdir(save_path)) != num_expected_files:
             status = "errors"
@@ -127,10 +127,10 @@ class CRScraper(object):
         scraper_lines = scraper_log.readlines()
         scraper_log.close()
         update_line = None
-        # if this date is already in the log file, update it. 
+        # if this date is already in the log file, update it.
         for linenum, logline in enumerate(scraper_lines):
             if datestring in logline:
-                # update the status of that line 
+                # update the status of that line
                 update_line = linenum
         if update_line:
             scraper_lines[update_line] = '%s, %s\n' % (datestring, status)
@@ -179,16 +179,16 @@ def daterange_list(start, end):
     return dates
 
 def usage():
-    return ''' 
+    return '''
 Several ways to invoke the scraper:
 
 0. "./scraper.py" will display this message (and do nothing)
 
-1. "./scraper.py all" will go back in time retrieving all daily congressional records until the date specified as OLDEST_DATE in settings.py. You probably want to use this with caution, but it can be useful during initial setup. 
+1. "./scraper.py all" will go back in time retrieving all daily congressional records until the date specified as OLDEST_DATE in settings.py. You probably want to use this with caution, but it can be useful during initial setup.
 
-2. "./scraper.py backto dd/mm/yyyy" will retrieve congressional records back to the date given. 
+2. "./scraper.py backto dd/mm/yyyy" will retrieve congressional records back to the date given.
 
-3. "./scraper.py dd/mm/yyyy - dd/mm/yyyy" will retreive congressional records for all days within the range given. the first date should occur before the second date in time. 
+3. "./scraper.py dd/mm/yyyy - dd/mm/yyyy" will retreive congressional records for all days within the range given. the first date should occur before the second date in time.
 
 4. "./scraper.py dd/mm/yyyy" will retreive the congressional record for the day given.
     '''
@@ -219,7 +219,7 @@ if __name__ == '__main__':
             start = date_from_string(sys.argv[2])
             dates = daterange_list(start, end)
 
-        elif len(sys.argv) == 4: 
+        elif len(sys.argv) == 4:
             start = date_from_string(sys.argv[1])
             end = date_from_string(sys.argv[3])
             dates = daterange_list(start, end)
@@ -236,11 +236,11 @@ if __name__ == '__main__':
         print "Checking Congressional Record for %s" % date
         if CRScraper().retrieve_by_date(date):
             print 'Will now sleep for 10 seconds before retrieving next record...zzz...'
-            time.sleep(10) 
+            time.sleep(10)
         else:
             if len(dates) == 1:
                 sys.exit()
             else:
-                #print 'sleeping for 5 seconds...zzz...' 
+                #print 'sleeping for 5 seconds...zzz...'
                 #time.sleep(5)
                 continue
