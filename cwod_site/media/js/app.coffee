@@ -86,7 +86,7 @@ $(document).ready ->
             name = timeline[0]
             obj = timeline[1]
             if name == selected
-                obj.show()
+                obj.show().imagesLoaded ->
             else
                 obj.hide()
 

@@ -74,7 +74,7 @@
         name = timeline[0];
         obj = timeline[1];
         if (name === selected) {
-          return obj.show();
+          return obj.show().imagesLoaded(function() {});
         } else {
           return obj.hide();
         }
