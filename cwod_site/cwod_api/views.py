@@ -385,7 +385,9 @@ def tokenize(term):
   | \.\.\.                                                  # Ellipsis
   | [][.,;"'?():-_`]
     '''
-    return regexp_tokenize(term, regex)
+    # Strip punctuation from this one; solr doesn't know about any of it
+    tokens = [re.sub(r'[.,?!]', '', token) for token in regexp_tokenize(term,regex)]
+    return tokens
 
 
 class PhraseOverTimeHandler(GenericHandler):
