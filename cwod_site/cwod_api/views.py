@@ -371,7 +371,7 @@ def tokenize(term):
     from nltk import regexp_tokenize
 
     # Adapted From Natural Language Processing with Python
-    regex = r'''(?x)
+    regex = r'''(?xi)
     (?:H|S)\.\ ?(?:(?:J|R)\.\ )?(?:Con\.\ )?(?:Res\.\ )?\d+ # Bills
   | ([A-Z]\.)+                                              # Abbreviations (U.S.A., etc.)
   | ([A-Z]+\&[A-Z]+)                                        # Internal ampersands (AT&T, etc.)
