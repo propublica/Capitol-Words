@@ -74,11 +74,12 @@ class TestSolrNumbers(unittest.TestCase):
             #solrdoc_pct_of_total = solrdoc_count / float(total_date_count)
             yield {'phrase': phrase,
                    'top_count': count,
-                   'date_count': total_date_count, 
+                   'date_count': total_date_count,
                    #'solrdoc_count': solrdoc_count,
                    #'solrdoc_pct': solrdoc_pct_of_total,
                    }
 
+    # TODO: Import API tokenizer and fix this & next
     def top_bioguide_ids_for_phrase(self, phrase):
         field = self.fields[len(phrase.split())-1]
         data = {'q': '%s:"%s"' % (field, phrase),

@@ -386,7 +386,8 @@ def tokenize(term):
   | [][.,;"'?():-_`]
     '''
     # Strip punctuation from this one; solr doesn't know about any of it
-    tokens = [re.sub(r'[.,?!]', '', token) for token in regexp_tokenize(term,regex)]
+    tokens = regexp_tokenize(term,regex)
+    # tokens = [re.sub(r'[.,?!]', '', token) for token in tokens]
     return tokens
 
 
@@ -396,11 +397,11 @@ class PhraseOverTimeHandler(GenericHandler):
         phrase = request.GET.get('phrase') or kwargs.get('phrase')
         if not phrase:
             return {'error': 'A value for the "phrase" parameter is required.', 'results': []}
-
-        phrase = ' '.join(tokenize(phrase))
+        tokens = tokenize(phrase)
+        phrase = ' '.join(tokens)
         if not phrase:
             return {'error': 'A value for the "phrase" parameter is required.', 'results': []}
-        n = len(phrase.split())
+        n = len(tokens)
         if n not in range(1, 6):
             return {'error': 'The value given for the parameter "n" is invalid. An integer between one and five is required.', 'results': [], }
 
