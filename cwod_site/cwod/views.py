@@ -309,7 +309,7 @@ def state_list(request):
 
 
 def _highlight_entries(entries, term):
-    term_parts = re.split(r'[\s\-]', term)
+    term_parts = [re.sub(r"'s", "(?:'s)?", part) for part in re.split(r'[\s\-]', term)]
     exp = r'[\s\-%s]+?' % ''.join(PUNCTUATION)
     term = r'(?<=\b)%s(?=\b)' % exp.join(term_parts)
     for entry in entries:
