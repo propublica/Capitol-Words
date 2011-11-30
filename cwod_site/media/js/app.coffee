@@ -87,6 +87,7 @@ $(document).ready ->
             obj = timeline[1]
             if name == selected
                 obj.show().imagesLoaded ->
+                    $(this).find('img').load()
             else
                 obj.hide()
 
@@ -200,6 +201,7 @@ $(document).ready ->
 
     # reset images, bind ajax calls to do the same
     (area = $('#rtColumn, .crContent')) && area.length && area.imagesLoaded ->
+        $(this).find('img').load()
 
     # fire sample search if arriving fresh on the homepage
     if (window.location.pathname.match /(^\/?$|homepage\.html)/) and (not (window.location.href.match /\?/))

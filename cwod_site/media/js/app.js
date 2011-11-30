@@ -74,7 +74,9 @@
         name = timeline[0];
         obj = timeline[1];
         if (name === selected) {
-          return obj.show().imagesLoaded(function() {});
+          return obj.show().imagesLoaded(function() {
+            return $(this).find('img').load();
+          });
         } else {
           return obj.hide();
         }
@@ -224,7 +226,9 @@
         return $(this).trigger('load.capitolwords');
       }
     });
-    (area = $('#rtColumn, .crContent')) && area.length && area.imagesLoaded(function() {});
+    (area = $('#rtColumn, .crContent')) && area.length && area.imagesLoaded(function() {
+      return $(this).find('img').load();
+    });
     if ((window.location.pathname.match(/(^\/?$|homepage\.html)/)) && (!(window.location.href.match(/\?/)))) {
       return cw.submitHomepageCompareForm();
     }
