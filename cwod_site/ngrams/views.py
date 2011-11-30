@@ -89,7 +89,7 @@ class GenericHandler(Resource):
       | (?:Mr\.|Dr\.|Mrs\.|Ms\.)                                # Mr., Mrs., etc.
       | \d*\.\d+                                                # Numbers with decimal points.
       | \d\d?:\d\d                                              # Times.
-      | \$?[,0-9]+                                              # Numbers with thousands separators.
+      | \$?[,\.0-9]+                                            # Numbers with thousands separators, (incl currency).
       | (?:(?:(?:a|A)|(?:p|P))\.(?:m|M)\.)                      # a.m., p.m., A.M., P.M.
       | \w+(?:(?:-|')\w+)*                                      # Words with optional internal hyphens.
       | \$?\d+(?:\.\d+)?%?                                      # Currency and percentages.
