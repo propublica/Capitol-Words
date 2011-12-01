@@ -12,12 +12,15 @@ then the ingest script, respectively. Important for manually bringing in bulk
 records. '''
 
 if __name__ == '__main__':
+    interactive = False
     parent_path = sys.argv[1]
+    if len(sys.argv) == 3 and sys.argv[2] == 'interactive':
+        interactive = True
     for level in os.walk(parent_path):
         files = level[2]
         thisdir = level[0]
         if len(files) > 0:
-            xml_dir = parse_directory(thisdir)
+            xml_dir = parse_directory(thisdir, interactive)
             solr_ingest_dir(xml_dir)
 
 
