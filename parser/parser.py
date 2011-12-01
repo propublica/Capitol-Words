@@ -381,7 +381,8 @@ class CRParser(object):
             pagenums = re.search(r'(Pg.*)', granule).groups()[0]
         except AttributeError, IndexError:
             print '%s does not contain any page numbers' % granule
-            sys.exit()
+            return
+            # sys.exit()
 
         try:
             item = doc.xpath("//relatedItem[re:test(., '%s')]" % pagenums,
