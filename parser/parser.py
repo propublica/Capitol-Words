@@ -377,7 +377,11 @@ class CRParser(object):
         self.congress = doc.xpath('extension/congress')[0].text
         self.session = doc.xpath('//session')[0].text
 
-        pagenums = re.search(r'(Pg.*)', granule).groups()[0]
+        try:
+            pagenums = re.search(r'(Pg.*)', granule).groups()[0]
+        except IndexError:
+            print '%s does not contain any page numbers' % granule
+            sys.exit()
 
         try:
             item = doc.xpath("//relatedItem[re:test(., '%s')]" % pagenums,

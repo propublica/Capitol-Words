@@ -13,6 +13,7 @@ import urllib2
 from dateutil.parser import parse as dateparse
 
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 from ngrams.models import *
 
 
@@ -160,10 +161,13 @@ class Command(BaseCommand):
         calculator = Calculator(field, congress)
 
         if field == 'speaker_bioguide':
-            already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_bioguide.csv', 'r')) if len(x) > 1])
+            # already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_bioguide.csv', 'r')) if len(x) > 1])
+            already = set([(x.bioguide_id, int(x.n)) for x in NgramsByBioguide.objects.raw('select * from ngrams_ngramsbybioguide group by bioguide_id, n')])
             facets = list_active_legislators_first()
         elif field == 'year_month':
-            already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_month.csv', 'r')) if len(x) > 1])
+            NgramsByMonth.objects.filter(month=current_month).delete()
+            # already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_month.csv', 'r')) if len(x) > 1])
+            already = set([(x.month, int(x.n)) for x in NgramsByMonth.objects.raw('select * from ngrams_ngramsbymonth group by month, n')])
             facets = calculator.list_facets()
         elif field == 'date':
             already = []
@@ -178,40 +182,63 @@ class Command(BaseCommand):
             facets = calculator.list_facets()
 
         for facet in reversed(facets):
-            print facet
-            for n in range(1,6):
+            with transaction.commit_on_success():
 
-                if (facet, n) in already:
-                    continue
+                print facet
+                for n in range(1,6):
 
-                ngrams = []
-                ngrams_for_facet = calculator.list_ngrams_for_facet(n, facet)
-                facet_total_ngrams = sum([x[1] for x in ngrams_for_facet])
-
-                for ngram, count in ngrams_for_facet:
-                    try:
-                        df = calculator.docfreq(n, ngram)
-                        idf = math.log(calculator.docs() / df)
-                        tf = count / float(facet_total_ngrams)
-                        tfidf = tf * idf
-                        if tfidf == 0:
+                    if (facet, n) in already:
+                        # recreate 'this' month, as calculated last week (we will run this weekly)
+                        if field == 'year_month' and facet == (datetime.datetime.today() - datetime.timedelta(7)).strftime('%Y%m'):
+                            pass
+                        # always recreate terms for speakers
+                        elif field == 'speaker_bioguide':
+                            pass
+                        else:
                             continue
-                        #diversity = calculator.get_date_diversity(facet, n, ngram)
-                        ngrams.append((ngram, tfidf, count))
-                    except:
-                        #print 'ERROR'
-                        continue
 
-                ngrams.sort(key=itemgetter(1), reverse=True)
+                    ngrams = []
+                    ngrams_for_facet = calculator.list_ngrams_for_facet(n, facet)
+                    facet_total_ngrams = sum([x[1] for x in ngrams_for_facet])
 
-                for ngram, tfidf, count in ngrams:
-                    output = map(str, [facet, n, ngram, tfidf, int(count), ])
-                    if congress:
-                        output.append(congress)
-                    #writer.writerow(output)
-                    if field == 'date':
-                        NgramsByDate.objects.create(n=n,
-                                                    date=date,
-                                                    ngram=ngram,
-                                                    tfidf=tfidf,
-                                                    count=count)
+                    for ngram, count in ngrams_for_facet:
+                        try:
+                            df = calculator.docfreq(n, ngram)
+                            idf = math.log(calculator.docs() / df)
+                            tf = count / float(facet_total_ngrams)
+                            tfidf = tf * idf
+                            if tfidf == 0:
+                                continue
+                            #diversity = calculator.get_date_diversity(facet, n, ngram)
+                            ngrams.append((ngram, tfidf, count))
+                        except:
+                            #print 'ERROR'
+                            continue
+
+                    ngrams.sort(key=itemgetter(1), reverse=True)
+
+                    for ngram, tfidf, count in ngrams:
+                        output = map(str, [facet, n, ngram, tfidf, int(count), ])
+                        if congress:
+                            output.append(congress)
+                        #writer.writerow(output)
+                        if field == 'date':
+                            NgramsByDate.objects.create(n=n,
+                                                        date=date,
+                                                        ngram=ngram,
+                                                        tfidf=tfidf,
+                                                        count=count)
+                        if field == 'year_month':
+                            NgramsByMonth.objects.filter(month=facet, n=n).delete()
+                            NgramsByMonth.objects.create(n=n,
+                                                         month=facet,
+                                                         ngram=ngram,
+                                                         tfidf=tfidf,
+                                                         count=count)
+                        if field == 'speaker_bioguide':
+                            NgramsByMonth.objects.filter(bioguide_id=facet, n=n).delete()
+                            NgramsByBioguide.objects.create(n=n,
+                                                            bioguide_id=facet,
+                                                            ngram=ngram,
+                                                            tfidf=tfidf,
+                                                            count=count)
