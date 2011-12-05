@@ -18,7 +18,6 @@ from ngrams.models import *
 
 
 class Calculator(object):
-
     def __init__(self, facet_field, congress=None):
         #self.n = n
         #self.gram = ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ][self.n-1]
@@ -140,7 +139,6 @@ def list_active_legislators_first():
 #if __name__ == '__main__':
 
 class Command(BaseCommand):
-
     option_list = BaseCommand.option_list + (
             make_option('--field',
                 action='store',
@@ -150,28 +148,42 @@ class Command(BaseCommand):
             make_option('--congress',
                 action='store',
                 dest='congress',
-                help='Restrict calculation to the given congress')
+                help='Restrict calculation to the given congress'),
+            make_option('--values',
+                action='store',
+                dest='field_values',
+                default=None,
+                help='Specific values to iterate for field, if applicable'),
     )
 
 
     def handle(self, *args, **options):
         field = options.get('field')
         congress = options.get('congress')
+        field_values = options.get('field_values')
 
         calculator = Calculator(field, congress)
-
+        # generate facets based on somewhat sane defaults, or accept a comma-delimited list of strings to compare
         if field == 'speaker_bioguide':
             # already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_bioguide.csv', 'r')) if len(x) > 1])
             already = set([(x.bioguide_id, int(x.n)) for x in NgramsByBioguide.objects.raw('select * from ngrams_ngramsbybioguide group by bioguide_id, n')])
+            if field_values:
+                facets = [args.strip() for arg in field_values.split(',')]
             facets = list_active_legislators_first()
         elif field == 'year_month':
             NgramsByMonth.objects.filter(month=current_month).delete()
             # already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_month.csv', 'r')) if len(x) > 1])
             already = set([(x.month, int(x.n)) for x in NgramsByMonth.objects.raw('select * from ngrams_ngramsbymonth group by month, n')])
-            facets = calculator.list_facets()
+            if field_values:
+                facets = [int(args.strip()) for arg in field_values.split(',')]
+            else:
+                facets = calculator.list_facets()
         elif field == 'date':
             already = []
-            dates = Date.objects.values_list('date', flat=True).order_by('-date').distinct()[:1]
+            if field_values:
+                dates = [args.strip() for arg in field_values.split(',')]
+            else:
+                dates = Date.objects.values_list('date', flat=True).order_by('-date').distinct()[:1]
             missing = []
             for date in dates:
                 if NgramsByDate.objects.filter(date=date).count() == 0:
