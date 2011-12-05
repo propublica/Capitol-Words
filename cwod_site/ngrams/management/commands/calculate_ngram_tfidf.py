@@ -180,13 +180,13 @@ class Command(BaseCommand):
         elif field == 'date':
             already = []
             if field_values:
-                dates = [facet.strip() for facet in field_values.split(',')]
+                missing = [dateparse(facet.strip()) for facet in field_values.split(',')]
             else:
                 dates = Date.objects.values_list('date', flat=True).order_by('-date').distinct()[:1]
-            missing = []
-            for date in dates:
-                if NgramsByDate.objects.filter(date=date).count() == 0:
-                    missing.append(date)
+                missing = []
+                for date in dates:
+                    if NgramsByDate.objects.filter(date=date).count() == 0:
+                        missing.append(date)
             facets = ['%sT12:00:00Z' % date.strftime('%Y-%m-%d') for date in missing]
         else:
             already = []
