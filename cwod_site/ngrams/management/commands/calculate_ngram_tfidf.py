@@ -205,7 +205,7 @@ class Command(BaseCommand):
                         # always recreate terms for speakers
                         elif field == 'speaker_bioguide':
                             pass
-                        elif field == 'date' and facet in field_values:
+                        elif field == 'date' and facet[0:10] in field_values:
                             pass
                         else:
                             continue
