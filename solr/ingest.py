@@ -68,7 +68,7 @@ def make_ngrams(xml, filename):
           | (((a|A)|(p|P))\.(m|M)\.)                                # a.m., p.m., A.M., P.M.
           | \w+((-|')\w+)*                                          # Words with optional internal hyphens.
           | \$?\d+(\.\d+)?%?                                        # Currency and percentages.
-          | \.\.\.                                                  # Ellipsis
+          | (?<=\b)\.\.\.(?=\b)                                     # Ellipses surrounded by word borders
           | [][.,;"'?():-_`]
             '''
 

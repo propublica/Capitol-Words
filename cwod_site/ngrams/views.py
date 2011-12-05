@@ -93,7 +93,7 @@ class GenericHandler(Resource):
       | (?:(?:(?:a|A)|(?:p|P))\.(?:m|M)\.)                      # a.m., p.m., A.M., P.M.
       | \w+(?:(?:-|')\w+)*                                      # Words with optional internal hyphens.
       | \$?\d+(?:\.\d+)?%?                                      # Currency and percentages.
-      | \.\.\.                                                  # Ellipsis
+      | (?<=\b)\.\.\.(?=\b)                                     # Ellipses surrounded by word borders
       | [][.,;"'?(?:):-_`]
         '''
         regexp = re.compile(regex, re.UNICODE | re.MULTILINE | re.DOTALL | re.IGNORECASE)
