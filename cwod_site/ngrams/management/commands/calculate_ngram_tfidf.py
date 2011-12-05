@@ -234,6 +234,7 @@ class Command(BaseCommand):
                             output.append(congress)
                         #writer.writerow(output)
                         if field == 'date':
+                            NgramsByDate.objects.filter(date=date, n=n).delete()
                             NgramsByDate.objects.create(n=n,
                                                         date=date,
                                                         ngram=ngram,
