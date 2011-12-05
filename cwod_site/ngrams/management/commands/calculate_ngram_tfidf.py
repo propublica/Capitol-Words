@@ -168,19 +168,19 @@ class Command(BaseCommand):
             # already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_bioguide.csv', 'r')) if len(x) > 1])
             already = set([(x.bioguide_id, int(x.n)) for x in NgramsByBioguide.objects.raw('select * from ngrams_ngramsbybioguide group by bioguide_id, n')])
             if field_values:
-                facets = [args.strip() for arg in field_values.split(',')]
+                facets = [facet.strip() for facet in field_values.split(',')]
             facets = list_active_legislators_first()
         elif field == 'year_month':
             # already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_month.csv', 'r')) if len(x) > 1])
             already = set([(x.month, int(x.n)) for x in NgramsByMonth.objects.raw('select * from ngrams_ngramsbymonth group by month, n')])
             if field_values:
-                facets = [int(args.strip()) for arg in field_values.split(',')]
+                facets = [int(facet.strip()) for facet in field_values.split(',')]
             else:
                 facets = calculator.list_facets()
         elif field == 'date':
             already = []
             if field_values:
-                dates = [args.strip() for arg in field_values.split(',')]
+                dates = [facet.strip() for facet in field_values.split(',')]
             else:
                 dates = Date.objects.values_list('date', flat=True).order_by('-date').distinct()[:1]
             missing = []
