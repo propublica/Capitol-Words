@@ -171,7 +171,6 @@ class Command(BaseCommand):
                 facets = [args.strip() for arg in field_values.split(',')]
             facets = list_active_legislators_first()
         elif field == 'year_month':
-            NgramsByMonth.objects.filter(month=current_month).delete()
             # already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_month.csv', 'r')) if len(x) > 1])
             already = set([(x.month, int(x.n)) for x in NgramsByMonth.objects.raw('select * from ngrams_ngramsbymonth group by month, n')])
             if field_values:
