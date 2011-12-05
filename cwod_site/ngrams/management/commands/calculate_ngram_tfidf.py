@@ -236,21 +236,21 @@ class Command(BaseCommand):
                             output.append(congress)
                         #writer.writerow(output)
                         if field == 'date':
-                            NgramsByDate.objects.filter(date=date, n=n).delete()
+                            NgramsByDate.objects.filter(date=date, n=n, ngram=ngram).delete()
                             NgramsByDate.objects.create(n=n,
                                                         date=date,
                                                         ngram=ngram,
                                                         tfidf=tfidf,
                                                         count=count)
                         if field == 'year_month':
-                            NgramsByMonth.objects.filter(month=facet, n=n).delete()
+                            NgramsByMonth.objects.filter(month=facet, n=n, ngram=ngram).delete()
                             NgramsByMonth.objects.create(n=n,
                                                          month=facet,
                                                          ngram=ngram,
                                                          tfidf=tfidf,
                                                          count=count)
                         if field == 'speaker_bioguide':
-                            NgramsByMonth.objects.filter(bioguide_id=facet, n=n).delete()
+                            NgramsByMonth.objects.filter(bioguide_id=facet, n=n, ngram=ngram).delete()
                             NgramsByBioguide.objects.create(n=n,
                                                             bioguide_id=facet,
                                                             ngram=ngram,
