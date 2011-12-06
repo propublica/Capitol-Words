@@ -68,7 +68,7 @@ def make_ngrams(xml, filename):
           | (((a|A)|(p|P))\.(m|M)\.)                                # a.m., p.m., A.M., P.M.
           | \w+((-|')\w+)*                                          # Words with optional internal hyphens.
           | \$?\d+(\.\d+)?%?                                        # Currency and percentages.
-          | (?<=\b)\.\.\.(?=\b)                                     # Ellipses surrounded by word borders
+          | (?<=\b)\.{3,4}(?=\b)                                     # Ellipses surrounded by word borders
           | [][.,;"'?():-_`]
             '''
 
@@ -76,7 +76,7 @@ def make_ngrams(xml, filename):
             # and do some cleanup of the tokens
             words = [re.sub(r',', '', x.lower().rstrip('-').strip("'"))
                         for x in nltk.regexp_tokenize(sentence, regex)
-                        if re.search(r'[a-z0-9.?!]', x.lower())]
+                        if re.search(r'[a-z0-9.?!]', x.lower()) and not re.search(r'[.]{5,}', x.lower())]
 
             ngrams += [item for sublist in [['<field name="%s">%s</field>' % (field, escape(' '.join(ngram)))
                             for ngram in nltk.util.ngrams(words, n+1)]
