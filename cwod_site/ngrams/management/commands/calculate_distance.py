@@ -76,11 +76,11 @@ class Command(BaseCommand):
         cursor = connections['ngrams'].cursor()
         query = 'SELECT DISTINCT %s from ngrams_ngramsby%s' % (field if not field == 'bioguide' else 'bioguide_id',
                                                                field)
-        if values_to_compare:
+        if len(values_to_compare):
             keys = set(values_to_compare)
         else:
             cursor.execute(query)
-            keys = set([str(key[0]) for key in cursor.fetchall()])
+            keys = set([str(key[0]) for key in cursor.fetchall() if key[0]])
         pairs = combinations(keys, 2)
 
         for keypair in pairs:
