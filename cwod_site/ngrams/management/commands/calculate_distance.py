@@ -9,11 +9,12 @@ from ngrams.models import *
 
 class Calculator(object):
     def __init__(self, field, models, keypair):
+        self.field = field
         self.models = models
         self.keypair = keypair
         self.ngram_map = {}
         for model in models:
-            key = model.__dict__[field if not field == 'bioguide' else 'bioguide_id']
+            key = model.__dict__[get_field(self.field)]
             try:
                 self.ngram_map[model.ngram][key] = model.tfidf
             except KeyError:
@@ -46,6 +47,22 @@ class Calculator(object):
     def get_vector(self, key):
         return tuple([ngram.get(key, 0) for ngram in self.ngram_map.values()])
 
+def get_model(field):
+    return {
+        'date': NgramsByDate,
+        'month': NgramsByMonth,
+        'state': NgramsByState,
+        'bioguide': NgramsByBioguide
+        }[field]
+
+
+def get_field(field):
+    try:
+        return {
+            'bioguide': 'bioguide_id'
+            }[field]
+    except KeyError:
+        return field
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
@@ -61,22 +78,14 @@ class Command(BaseCommand):
                 help='Specific values to limit calculations among'),
     )
 
-    MODEL_MAP = {
-        'date': NgramsByDate,
-        'month': NgramsByMonth,
-        'state': NgramsByState,
-        'bioguide': NgramsByBioguide
-        }
-
     def handle(self, *args, **options):
         field = options.get('field')
         if not field:
             raise Exception('You must specify a field! Options are: date, month, state, bioguide')
-        values_to_compare = [value.strip() for value in options.get('values').split(',')]
+        values_to_compare = [value.strip() for value in options.get('values').split(',') if value]
         cursor = connections['ngrams'].cursor()
-        query = 'SELECT DISTINCT %s from ngrams_ngramsby%s' % (field if not field == 'bioguide' else 'bioguide_id',
-                                                               field)
-        if len(values_to_compare):
+        query = 'SELECT DISTINCT %s from ngrams_ngramsby%s' % (get_field(field), field)
+        if values_to_compare:
             keys = set(values_to_compare)
         else:
             cursor.execute(query)
@@ -85,7 +94,7 @@ class Command(BaseCommand):
 
         for keypair in pairs:
             # with transaction.commit_on_success():
-            current_models = self._get_models(self.field, keypair)
+            current_models = self._get_models(field, keypair)
             calculator = Calculator(field, current_models, keypair)
             distance = calculator.calculate()
             # INSERT STUFF!
@@ -93,10 +102,10 @@ class Command(BaseCommand):
 
     def _get_models(self, field, values_to_compare):
         if values_to_compare:
-            params = {'%s__in' % field: values_to_compare}
-            ngrams = MODEL_MAP[field].objects.filter(**params)
+            params = {'%s__in' % get_field(field): values_to_compare}
+            ngrams = get_model(field).objects.filter(**params)
         else:
-            ngrams = MODEL_MAP[field].objects.all()
+            ngrams = get_model(field).objects.all()
 
         return ngrams
 
