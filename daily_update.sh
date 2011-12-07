@@ -21,6 +21,10 @@ for i in `find /opt/data/raw/$yesterday -name '*PgS*.txt'`; do
     /projects/capwords/bin/python /projects/capwords/src/Capitol-Words/parser/parser.py $i;
 done
 
+for i in `find /opt/data/raw/$yesterday -name '*PgE*.txt'`; do
+    /projects/capwords/bin/python /projects/capwords/src/Capitol-Words/parser/parser.py $i;
+done
+
 for i in `find /opt/data/xml/$yesterday -mtime -1 -name '*.xml'`; do
     /projects/capwords/bin/python /projects/capwords/src/Capitol-Words/solr/ingest.py $i --solrdocs-only;
 done
@@ -32,5 +36,4 @@ curl "http://ec2-184-72-184-231.compute-1.amazonaws.com:8983/solr/update?commit=
 source /projects/capwords/bin/activate
 /usr/bin/env python /projects/capwords/src/Capitol-Words/cwod_site/manage.py get_date_counts --date=$date_count_date
 /usr/bin/env python /projects/capwords/src/Capitol-Words/cwod_site/manage.py calculate_ngram_tfidf --field=date
-#/usr/bin/env python /projects/capwords/src/Capitol-Words/cwod_site/manage.py calculate_ngram_tfidf --field=year_month
 /usr/bin/env python /projects/capwords/src/Capitol-Words/cwod_site/manage.py cache_recent_entries

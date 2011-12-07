@@ -169,7 +169,14 @@ class Command(BaseCommand):
             already = set([(x.bioguide_id, int(x.n)) for x in NgramsByBioguide.objects.raw('select * from ngrams_ngramsbybioguide group by bioguide_id, n')])
             if field_values:
                 facets = [facet.strip() for facet in field_values.split(',')]
-            facets = list_active_legislators_first()
+            else:
+                facets = list_active_legislators_first()
+        elif field == 'speaker_state':
+            already = set([(x.state, int(x.n)) for x in NgramsByState.objects.raw('select * from ngrams_ngramsbystate group by state, n')])
+            if field_values:
+                facets = [facet.strip() for facet in field_values.split(',')]
+            else:
+                facets = calculator.list_facets()
         elif field == 'year_month':
             # already = set([(x[0], int(x[1])) for x in csv.reader(open(r'ngrams_by_month.csv', 'r')) if len(x) > 1])
             already = set([(x.month, int(x.n)) for x in NgramsByMonth.objects.raw('select * from ngrams_ngramsbymonth group by month, n')])
@@ -202,8 +209,8 @@ class Command(BaseCommand):
                         # recreate 'this' month, as calculated last week (we will run this weekly)
                         if field == 'year_month' and facet == (datetime.datetime.today() - datetime.timedelta(7)).strftime('%Y%m'):
                             pass
-                        # always recreate terms for speakers
-                        elif field == 'speaker_bioguide':
+                        # always recreate terms for speakers and states
+                        elif field in ['speaker_bioguide', 'speaker_state']:
                             pass
                         elif field == 'date' and facet[0:10] in field_values:
                             pass
@@ -256,3 +263,9 @@ class Command(BaseCommand):
                                                             ngram=ngram,
                                                             tfidf=tfidf,
                                                             count=count)
+                        if field == 'speaker_state':
+                            NgramsByState.objects.filter(state=facet, n=n, ngram=ngram).delete()
+                            NgramsByState.objects.create(n=n,
+                                                         state=facet,
+                                                         tfidf=tfidf,
+                                                         count=count)
