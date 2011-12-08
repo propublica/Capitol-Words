@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.contrib.localflavor.us.us_states import US_STATES as STATES_TUPLE
