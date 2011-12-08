@@ -125,7 +125,7 @@ class TopUnigrams(models.Model):
 
 
 class DistanceDate(models.Model):
-    a = models.DateField()
+    a = models.DateField(db_index=True)
     b = models.DateField()
     cosine_distance = models.FloatField()
 
@@ -142,3 +142,51 @@ class DistanceDate(models.Model):
                                      self.b.strftime('%m'),
                                      self.b.strftime('%d'), ])
 
+class DistanceMonth(models.Model):
+    a = models.PositiveIntegerField(db_index=True)
+    b = models.PositiveIntegerField()
+    cosine_distance = models.FloatField()
+
+    class Meta:
+        ordering = ['-cosine_distance', ]
+        db_table = 'distance_month'
+
+    def __unicode__(self):
+        return self.b.strftime('%Y-%m-%d')
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('cwod_month_detail', [str(self.b)[0:4],
+                                      str(self.b)[4:2], ])
+
+class DistanceState(models.Model):
+    a = models.CharField(max_length=2, db_index=True)
+    b = models.CharField(max_length=2)
+    cosine_distance = models.FloatField()
+
+    class Meta:
+        ordering = ['-cosine_distance', ]
+        db_table = 'distance_state'
+
+    def __unicode__(self):
+        return self.b.strftime('%Y-%m-%d')
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('cwod_state_detail', [self.b, ])
+
+class DistanceBioguide(models.Model):
+    a = models.CharField(max_length=8, db_index=True)
+    b = models.CharField(max_length=8)
+    cosine_distance = models.FloatField()
+
+    class Meta:
+        ordering = ['-cosine_distance', ]
+        db_table = 'distance_bioguide'
+
+    def __unicode__(self):
+        return self.b.strftime('%Y-%m-%d')
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('cwod_legislator_detail', [self.b, ])

@@ -5,6 +5,7 @@ from scipy.spatial.distance import cosine as cosine_distance
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections, transaction
+from django.template.filters import title
 from ngrams.models import *
 
 class Calculator(object):
@@ -23,7 +24,8 @@ class Calculator(object):
     def calculate(self):
         a = self.get_vector(self.keypair[0])
         b = self.get_vector(self.keypair[1])
-        return cosine_distance(a, b)
+        # we store these as 1=congruent
+        return 1 - cosine_distance(a, b)
 
 
     # def cosine_distance(self, a, b):
@@ -54,6 +56,9 @@ def get_model(field):
         'state': NgramsByState,
         'bioguide': NgramsByBioguide
         }[field]
+
+def get_distance_model(field):
+    return "Distance%s" % title(field)
 
 
 def get_field(field):
@@ -93,12 +98,27 @@ class Command(BaseCommand):
         pairs = combinations(keys, 2)
 
         for keypair in pairs:
-            # with transaction.commit_on_success():
-            current_models = self._get_models(field, keypair)
-            calculator = Calculator(field, current_models, keypair)
-            distance = calculator.calculate()
-            # INSERT STUFF!
-            print "%s to %s: %s" % (keypair[0], keypair[1], distance)
+            with transaction.commit_on_success():
+                current_models = self._get_models(field, keypair)
+                calculator = Calculator(field, current_models, keypair)
+                distance = calculator.calculate()
+                obj1, created1 = get_distance_model(field).objects.get_or_create(a=keypair[0], 
+                                                                                 b=keypair[1], 
+                                                                                 defaults={
+                                                                                     'cosine_distance': distance,
+                                                                                     })
+                if not created1:
+                    obj1.__dict__.update({'cosine_distance': distance})
+                    obj1.save()
+                obj2, created2 = get_distance_model(field).objects.get_or_create(a=keypair[1],
+                                                                                 b=keypair[0],
+                                                                                 defaults={
+                                                                                     'cosine_distance': distance,
+                                                                                     })
+                if not created2:
+                    obj2.__dict__.update({'cosine_distance': distance})
+                    obj2.save()
+                print "%s to %s: %s" % (keypair[0], keypair[1], distance)
 
     def _get_models(self, field, values_to_compare):
         if values_to_compare:
