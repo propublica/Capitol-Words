@@ -160,7 +160,7 @@ class DistanceMonth(models.Model):
         year = int(str(self.b)[0:4])
         month = int(str(self.b)[4:6])
         date = datetime.date(year, month, 1)
-        return self.b.strftime('%B %Y')
+        return date.strftime('%B %Y')
 
     @models.permalink
     def get_absolute_url(self):
