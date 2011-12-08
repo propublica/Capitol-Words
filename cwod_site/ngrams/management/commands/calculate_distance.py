@@ -5,7 +5,7 @@ from scipy.spatial.distance import cosine as cosine_distance
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections, transaction
-from django.template.defaultfilters import title
+
 from ngrams.models import *
 
 class Calculator(object):
@@ -29,25 +29,6 @@ class Calculator(object):
         if isnan(distance):
             distance = 0
         return distance
-
-
-    # def cosine_distance(self, a, b):
-    #     '''Calculates the distance between n-dimensional vectors a, b
-    #        http://stackoverflow.com/questions/1823293/optimized-method-for-calculating-cosine-distance-in-python
-    #        '''
-    #     if len(a) != len(b):
-    #         raise ValueError, "a and b must be the same length"
-    #     numerator = 0
-    #     denoma = 0
-    #     denomb = 0
-    #     for i in range(len(a)):
-    #         ai = a[i]
-    #         bi = b[i]
-    #         numerator += ai*bi
-    #         denoma += ai*ai
-    #         denomb += bi*bi
-    #     result = 1 - numerator / (sqrt(denoma)*sqrt(denomb))
-    #     return result
 
     def get_vector(self, key):
         return tuple([ngram.get(key, 0) for ngram in self.ngram_map.values()])
@@ -97,6 +78,11 @@ class Command(BaseCommand):
                 dest='values',
                 default='',
                 help='Specific values to limit calculations among'),
+            make_option('--test',
+                action='store',
+                dest='test',
+                default=False,
+                help='Set this to true to skip writing to the database'),
     )
 
     def handle(self, *args, **options):
@@ -104,6 +90,10 @@ class Command(BaseCommand):
         if not field:
             raise ValueError('You must specify a field! Options are: date, month, state, bioguide')
         values_to_compare = [value.strip() for value in options.get('values').split(',') if value]
+        test = options.get('test')
+
+        if test:
+            print '*** This is a test; the database will not be updated ***'
 
         if field == 'bioguide':
             cursor = connections['default'].cursor()
@@ -132,22 +122,24 @@ class Command(BaseCommand):
                 current_models = self._get_models(field, keypair)
                 calculator = Calculator(field, current_models, keypair)
                 distance = calculator.calculate()
-                obj1, created1 = get_distance_model(field).objects.get_or_create(a=keypair[0],
-                                                                                 b=keypair[1],
-                                                                                 defaults={
-                                                                                     'cosine_distance': distance,
-                                                                                     })
-                if not created1:
-                    obj1.__dict__.update({'cosine_distance': distance})
-                    obj1.save()
-                obj2, created2 = get_distance_model(field).objects.get_or_create(a=keypair[1],
-                                                                                 b=keypair[0],
-                                                                                 defaults={
-                                                                                     'cosine_distance': distance,
-                                                                                     })
-                if not created2:
-                    obj2.__dict__.update({'cosine_distance': distance})
-                    obj2.save()
+                if not test:
+                    obj1, created1 = get_distance_model(field).objects.get_or_create(a=keypair[0],
+                                                                                     b=keypair[1],
+                                                                                     defaults={
+                                                                                         'cosine_distance': distance,
+                                                                                         })
+                    if not created1:
+                        obj1.__dict__.update({'cosine_distance': distance})
+                        obj1.save()
+                    obj2, created2 = get_distance_model(field).objects.get_or_create(a=keypair[1],
+                                                                                     b=keypair[0],
+                                                                                     defaults={
+                                                                                         'cosine_distance': distance,
+                                                                                         })
+                    if not created2:
+                        obj2.__dict__.update({'cosine_distance': distance})
+                        obj2.save()
+
                 print "%s to %s: %s" % (keypair[0], keypair[1], distance)
 
     def _get_models(self, field, values_to_compare):
