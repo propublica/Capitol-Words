@@ -1,5 +1,5 @@
 from itertools import combinations
-from math import sqrt
+from math import sqrt, isnan
 from optparse import make_option
 from scipy.spatial.distance import cosine as cosine_distance
 
@@ -22,10 +22,13 @@ class Calculator(object):
                 self.ngram_map[model.ngram] = {key: model.tfidf}
 
     def calculate(self):
-        a = self.get_vector(self.keypair[0])
-        b = self.get_vector(self.keypair[1])
+        v1 = self.get_vector(self.keypair[0])
+        v2 = self.get_vector(self.keypair[1])
         # we store these as 1=congruent
-        return 1 - cosine_distance(a, b)
+        distance = 1 - cosine_distance(v1, v2)
+        if isnan(distance):
+            distance = 0
+        return distance
 
 
     # def cosine_distance(self, a, b):
