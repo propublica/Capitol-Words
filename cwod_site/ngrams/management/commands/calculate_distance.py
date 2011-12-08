@@ -5,7 +5,7 @@ from scipy.spatial.distance import cosine as cosine_distance
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections, transaction
-from django.template.filters import title
+from django.template.defaultfilters import title
 from ngrams.models import *
 
 class Calculator(object):
@@ -102,8 +102,8 @@ class Command(BaseCommand):
                 current_models = self._get_models(field, keypair)
                 calculator = Calculator(field, current_models, keypair)
                 distance = calculator.calculate()
-                obj1, created1 = get_distance_model(field).objects.get_or_create(a=keypair[0], 
-                                                                                 b=keypair[1], 
+                obj1, created1 = get_distance_model(field).objects.get_or_create(a=keypair[0],
+                                                                                 b=keypair[1],
                                                                                  defaults={
                                                                                      'cosine_distance': distance,
                                                                                      })
