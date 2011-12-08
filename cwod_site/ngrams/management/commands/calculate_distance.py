@@ -54,11 +54,16 @@ def get_model(field):
         'date': NgramsByDate,
         'month': NgramsByMonth,
         'state': NgramsByState,
-        'bioguide': NgramsByBioguide
+        'bioguide': NgramsByBioguide,
         }[field]
 
 def get_distance_model(field):
-    return "Distance%s" % title(field)
+    return {
+        'date': DistanceDate,
+        'month': DistanceMonth,
+        'state': DistanceState,
+        'bioguide': DistanceBioguide,
+        }[field]
 
 
 def get_field(field):
