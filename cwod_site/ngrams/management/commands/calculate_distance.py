@@ -144,10 +144,10 @@ class Command(BaseCommand):
 
     def _get_models(self, field, values_to_compare):
         if values_to_compare:
-            params = {'%s__in' % get_field(field): values_to_compare}
-            ngrams = get_model(field).objects.filter(**params)
+            params = {'%s__in' % get_field(field): values_to_compare, 'n': 1}
+            ngrams = get_model(field).objects.filter(**params).order_by('-tfidf')
         else:
-            ngrams = get_model(field).objects.all()
+            ngrams = get_model(field).objects.filter(n=1).order_by('-tfidf')
 
         return ngrams
 
