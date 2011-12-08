@@ -74,6 +74,14 @@ def get_field(field):
     except KeyError:
         return field
 
+def list_active_legislators_first():
+    query = 'select bioguide_id from bioguide_legislatorrole group by bioguide_id order by max(end_date) desc, bioguide_id'
+    from MySQLdb import Connection
+    cursor = Connection('localhost', 'capwords', 'capwords', 'capwords').cursor()
+    cursor.execute(query)
+    results = [x[0] for x in cursor.fetchall()]
+    return results
+
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
             make_option('--field',
@@ -93,14 +101,28 @@ class Command(BaseCommand):
         if not field:
             raise ValueError('You must specify a field! Options are: date, month, state, bioguide')
         values_to_compare = [value.strip() for value in options.get('values').split(',') if value]
-        cursor = connections['ngrams'].cursor()
-        query = 'SELECT DISTINCT %s from ngrams_ngramsby%s' % (get_field(field), field)
-        if values_to_compare:
-            keys = set(values_to_compare)
+
+        if field == 'bioguide':
+            cursor = connections['default'].cursor()
+            query = 'SELECT bioguide_id FROM bioguide_legislatorrole GROUP BY bioguide_id ORDER BY max(end_date) DESC, bioguide_id'
         else:
+            cursor = connections['ngrams'].cursor()
+            query = 'SELECT DISTINCT %s FROM ngrams_ngramsby%s' % (get_field(field), field)
+
+        if values_to_compare: #combinations of new values against all current values
+            keys1 = set(values_to_compare)
+            cursor.execute(query)
+            keys2 = set([str(key[0]) for key in cursor.fetchall() if key[0]])
+            keys = []
+            for a in keys1:
+                for b in keys2:
+                    if a != b:
+                        keys.append((a, b))
+            pairs = tuple(keys)
+        else: #combinations of all values against all other values
             cursor.execute(query)
             keys = set([str(key[0]) for key in cursor.fetchall() if key[0]])
-        pairs = combinations(keys, 2)
+            pairs = combinations(keys, 2)
 
         for keypair in pairs:
             with transaction.commit_on_success():
