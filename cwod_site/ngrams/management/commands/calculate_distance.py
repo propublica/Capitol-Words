@@ -14,7 +14,7 @@ class Calculator(object):
         self.keypair = keypair
         self.ngram_map = {}
         for model in models:
-            key = model.__dict__[get_field(self.field)]
+            key = str(model.__dict__[get_field(self.field)])
             try:
                 self.ngram_map[model.ngram][key] = model.tfidf
             except KeyError:
@@ -70,7 +70,7 @@ class Command(BaseCommand):
                 action='store',
                 dest='field',
                 default=None,
-                help='Field to calculate ngram tfidf for'),
+                help='Facet to calculate distance on'),
             make_option('--values',
                 action='store',
                 dest='values',
@@ -81,7 +81,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         field = options.get('field')
         if not field:
-            raise Exception('You must specify a field! Options are: date, month, state, bioguide')
+            raise ValueError('You must specify a field! Options are: date, month, state, bioguide')
         values_to_compare = [value.strip() for value in options.get('values').split(',') if value]
         cursor = connections['ngrams'].cursor()
         query = 'SELECT DISTINCT %s from ngrams_ngramsby%s' % (get_field(field), field)
