@@ -586,7 +586,7 @@ def calendar(request):
         if years.has_key(ky):
             years[ky][km][2] = True
 
-    years = sorted(years.items(), key=lambda x: int(x[0]))
+    years = sorted(years.items(), key=lambda x: int(x[0]) * -1)
 
     return render_to_response('cwod/calendar.html',
                               {'years': years,},
