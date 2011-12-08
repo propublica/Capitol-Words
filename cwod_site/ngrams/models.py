@@ -1,6 +1,10 @@
 from django.db import models
 from django.core.urlresolvers import reverse
+from django.contrib.localflavor.us.us_states import US_STATES as STATES_TUPLE
 
+from bioguide.models import Legislator
+
+STATES_DICT = dict(STATES_TUPLE)
 
 class Date(models.Model):
     date = models.DateField()
@@ -10,7 +14,6 @@ class Date(models.Model):
         return ('cwod_date_detail', [self.date.strftime('%Y'),
                                      self.date.strftime('%m'),
                                      self.date.strftime('%d'), ])
-
 
 class NgramsByState(models.Model):
     n = models.IntegerField()
@@ -152,12 +155,15 @@ class DistanceMonth(models.Model):
         db_table = 'distance_month'
 
     def __unicode__(self):
-        return self.b.strftime('%Y-%m-%d')
+        year = int(str(self.b)[0:4])
+        month = int(str(self.b)[4:6])
+        date = datetime.date(year, month, 1)
+        return self.b.strftime('%B %Y')
 
     @models.permalink
     def get_absolute_url(self):
         return ('cwod_month_detail', [str(self.b)[0:4],
-                                      str(self.b)[4:2], ])
+                                      str(self.b)[4:6], ])
 
 class DistanceState(models.Model):
     a = models.CharField(max_length=2, db_index=True)
@@ -169,7 +175,10 @@ class DistanceState(models.Model):
         db_table = 'distance_state'
 
     def __unicode__(self):
-        return self.b.strftime('%Y-%m-%d')
+        try:
+            return STATES_DICT[self.b]
+        except KeyError:
+            return self.b
 
     @models.permalink
     def get_absolute_url(self):
@@ -185,7 +194,11 @@ class DistanceBioguide(models.Model):
         db_table = 'distance_bioguide'
 
     def __unicode__(self):
-        return self.b.strftime('%Y-%m-%d')
+        try:
+            leg = Legislator.objects.get(bioguide_id=self.b)
+            return leg.__unicode__()
+        except Legislator.DoesNotExist:
+            return self.b
 
     @models.permalink
     def get_absolute_url(self):
