@@ -528,7 +528,7 @@
         url: url,
         data: {
           'phrase': term,
-          'sort': 'count',
+          'sort': 'relative',
           'per_page': 10,
           'start_date': cw.start_date,
           'end_date': cw.end_date,
@@ -660,7 +660,7 @@
         url: url,
         data: {
           'phrase': term,
-          'sort': 'count',
+          'sort': 'relative',
           'per_page': 10,
           'start_date': cw.start_date,
           'end_date': cw.end_date,
@@ -832,7 +832,7 @@
           }
         });
         return $('table#legislatorList tbody').find('img').error(function() {
-          return $(this).attr('src', '/media/img/no_leg_image.gif');
+          return $(this).attr('src', 'http://assets.sunlightfoundation.com/moc/default.png');
         }).end().imagesLoaded(function() {}).fadeIn('fast');
       };
       return $('table#legislatorList tbody').fadeOut('fast', buildTable);

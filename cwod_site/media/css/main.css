@@ -298,6 +298,7 @@ body.home #containerWrapper{background:url('../img/bg_home.jpg') center top repe
 .home #container{padding-right:0;width:950px;}
 #calendar #fullColumn{width:910px;padding-top:20px;}
 span.legImage{width:200px;display:block;}
+span.legImage img, img.legislatorImage{width:40px;}
 #about h4{color:#B99004;margin-top:30px;clear:both;}
 #about h5{margin-top:30px;clear:both;font-size:135%;}
 #about dl{margin-bottom:30px;}

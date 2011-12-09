@@ -39,7 +39,7 @@
       cw.populateTermDetailPage(termDetailTerm);
     }
     $('img').error(function() {
-      return $(this).attr('src', '/media/img/no_leg_image.gif');
+      return $(this).attr('src', 'http://assets.sunlightfoundation.com/moc/default.png');
     });
     $('#toggleSearchCompare').click(function(e) {
       e.preventDefault();
