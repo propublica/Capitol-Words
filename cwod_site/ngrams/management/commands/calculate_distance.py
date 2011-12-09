@@ -143,17 +143,21 @@ class Command(BaseCommand):
                 print "%s to %s: %s" % (keypair[0], keypair[1], distance)
 
     def _get_models(self, field, values_to_compare):
-        '''in most cases, gets the top 200 1-grams for each side of the comparison.
+        '''in most cases, gets the top 1000 (1|2)-grams for each side of the comparison.
            Otherwise gets all 1-grams. Limiting is meant to reduce noise.
            '''
         if values_to_compare and len(values_to_compare) is not 2:
             raise ValueError('_get_models takes 2 values!')
         if values_to_compare:
-            params1 = {get_field(field): values_to_compare[0], 'n': 1}
-            ngrams1 = get_model(field).objects.filter(**params1).order_by('-tfidf')[:200]
-            params2 = {get_field(field): values_to_compare[1], 'n': 1}
-            ngrams2 = get_model(field).objects.filter(**params2).order_by('-tfidf')[:200]
-            ngrams = list(chain(ngrams1, ngrams2))
+            params1a = {get_field(field): values_to_compare[0], 'n': 1}
+            ngrams1a = get_model(field).objects.filter(**params1a).order_by('-tfidf')[:1000]
+            params2a = {get_field(field): values_to_compare[0], 'n': 2}
+            ngrams2a = get_model(field).objects.filter(**params2a).order_by('-tfidf')[:1000]
+            params1b = {get_field(field): values_to_compare[1], 'n': 1}
+            ngrams1b = get_model(field).objects.filter(**params1b).order_by('-tfidf')[:1000]
+            params2b = {get_field(field): values_to_compare[1], 'n': 2}
+            ngrams2b = get_model(field).objects.filter(**params2b).order_by('-tfidf')[:1000]
+            ngrams = list(chain(ngrams1a, ngrams2a, ngrams1b, ngrams2b))
         else:
             ngrams = get_model(field).objects.filter(n=1).order_by('-tfidf')
 
