@@ -125,7 +125,7 @@ MEDIASYNC = {
 '''
 from local_settings import (MEDIASYNC_AWS_KEY, MEDIASYNC_AWS_SECRET,
                             MEDIASYNC_AWS_BUCKET, MEDIASYNC_AWS_PREFIX,
-                            MEDIA_VERSION)
+                            MEDIASYNC_SERVE_REMOTE, MEDIA_VERSION)
 
 MEDIASYNC = {
     'BACKEND': 'mediasync.backends.s3',
@@ -134,7 +134,7 @@ MEDIASYNC = {
     'AWS_BUCKET': MEDIASYNC_AWS_BUCKET,
     'AWS_PREFIX': MEDIASYNC_AWS_PREFIX,
     'MEDIA_URL': '/media/',
-    'SERVE_REMOTE': False,
+    'SERVE_REMOTE': MEDIASYNC_SERVE_REMOTE,
     'STATIC_ROOT': os.path.join(PROJECT_ROOT, 'cwod_site', 'media'),
     'PROCESSORS': (
             'mediasync.processors.slim.css_minifier',
