@@ -528,7 +528,7 @@
         url: url,
         data: {
           'phrase': term,
-          'sort': 'relative',
+          'sort': 'count',
           'per_page': 10,
           'start_date': cw.start_date,
           'end_date': cw.end_date,
@@ -660,7 +660,7 @@
         url: url,
         data: {
           'phrase': term,
-          'sort': 'relative',
+          'sort': 'count',
           'per_page': 10,
           'start_date': cw.start_date,
           'end_date': cw.end_date,
