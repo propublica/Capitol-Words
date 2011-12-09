@@ -32,6 +32,8 @@ TERRITORY_CHOICES = ('PR', 'GU', 'MP', 'AS')
 
 capitolwords = capitolwords(api_key=settings.SUNLIGHT_API_KEY, domain=settings.API_ROOT)
 
+congresses = LegislatorRole.objects.filter(congress__gte=104).values_list('congress', flat=True).distinct().order_by('-congress')
+
 # These are used in a regular expression so must be escaped.
 # From NLTK
 STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
@@ -227,8 +229,6 @@ def legislator_list(request):
             end_date__gte=datetime.date.today()
         ).order_by('last', 'first', 'chamber', 'party')
 
-    congresses = LegislatorRole.objects.filter(congress__gte=104).values_list('congress', flat=True).distinct().order_by('-congress')
-
     return render_to_response('cwod/legislator_list.html',
                               {'current_legislators': current_legislators,
                                #'past_legislators': past_legislators,
@@ -276,6 +276,7 @@ def legislator_detail(request, bioguide_id, slug=None):
 
     return render_to_response('cwod/legislator_detail.html',
                               {'legislator': legislator,
+                               'current_congress': congresses[0],
                                'similar_legislators': similar_legislators,
                                'entries': entries,
                                'ngrams': ngrams,

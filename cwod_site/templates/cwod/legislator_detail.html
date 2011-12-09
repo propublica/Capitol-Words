@@ -1,5 +1,5 @@
 {% extends "cwod/base.html" %}
-{% load capwords %}
+{% load humanize capwords %}
 
 {% block title %}{{ legislator.full_name }} | {{ block.super }}{% endblock title %}
 
@@ -19,7 +19,10 @@
                 <dd class="withBar"><a href="{% url cwod_state_detail state=legislator.state %}">{{ legislator.state|state_abbrev_to_full }}</a>{% ifequal legislator.honorific "Rep." %}, District {{ legislator.district }}{% endifequal %}</dd>
 
                 <dt>Chamber</dt>
-                <dd>{% ifequal legislator.honorific "Rep." %}House{% else %}Senate{% endifequal %}</dd>
+                <dd class="withBar">{% ifequal legislator.honorific "Rep." %}House{% else %}Senate{% endifequal %}</dd>
+
+                <dt>Last served</dt>
+                <dd>{% ifequal legislator.congress current_congress %}Currently in congress{% else %}Last served in the {{ legislator.congress|ordinal }} congress{% endifequal %}</dd>
             </dl>
         </div>
         {% include "cwod/partials/share_buttons.html" %}
