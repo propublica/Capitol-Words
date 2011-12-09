@@ -124,7 +124,8 @@ MEDIASYNC = {
 }
 '''
 from local_settings import (MEDIASYNC_AWS_KEY, MEDIASYNC_AWS_SECRET,
-                            MEDIASYNC_AWS_BUCKET, MEDIASYNC_AWS_PREFIX)
+                            MEDIASYNC_AWS_BUCKET, MEDIASYNC_AWS_PREFIX,
+                            MEDIA_VERSION)
 
 MEDIASYNC = {
     'BACKEND': 'mediasync.backends.s3',
@@ -137,7 +138,7 @@ MEDIASYNC = {
     'STATIC_ROOT': os.path.join(PROJECT_ROOT, 'cwod_site', 'media'),
     'PROCESSORS': (
             'mediasync.processors.slim.css_minifier',
-            #'mediasync.processors.closurecompiler.compile',
+            'mediasync.processors.closurecompiler.compile',
         ),
     'JOINED': {
             #'css/joined.css': ['css/main.css','css/jquery.ui/jquery.ui.all.css'],
@@ -154,9 +155,9 @@ MEDIASYNC = {
                              'js/jquery.imagesloaded.js',
                              'js/emphasis/emphasis.js',
                              'js/google-chart.js',
-                             'js/capitolwords.js',
-                             'js/annotations.js',
-                             'js/app.js',],
+                             'js/capitolwords.js?v=%s' % MEDIA_VERSION,
+                             'js/annotations.js?v=%s' % MEDIA_VERSION,
+                             'js/app.js?v=%s' % MEDIA_VERSION,],
             },
 
 }
