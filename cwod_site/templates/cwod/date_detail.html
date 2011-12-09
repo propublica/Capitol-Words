@@ -100,8 +100,9 @@
                         {% endfor %}
                     </div>
 
+                    {% comment %}
+                    {% if similar_dates %}
                     <div class="leftModule">
-                        {% if similar_dates %}
                         <div class="leftHeader">
                             <h4>Similar dates</h4>
                         </div>
@@ -116,8 +117,9 @@
                             {% endwith %}
                             {% endfor %}
                         </ol>
-                        {% endif %}
                     </div>
+                    {% endif %}
+                    {% endcomment %}
                 </div>
                 <div class="clear"></div>
             </div>
