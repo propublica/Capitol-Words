@@ -155,7 +155,7 @@ class Command(BaseCommand):
             ngrams2 = get_model(field).objects.filter(**params2).order_by('-tfidf')
             ngrams = list(chain(ngrams1, ngrams2))
         else:
-            ngrams = get_model(field).objects.filter(n=1).order_by('-count')
+            ngrams = get_model(field).objects.filter(n=1)
 
         return ngrams
 
