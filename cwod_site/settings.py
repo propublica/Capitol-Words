@@ -155,9 +155,9 @@ MEDIASYNC = {
                              'js/jquery.imagesloaded.js',
                              'js/emphasis/emphasis.js',
                              'js/google-chart.js',
-                             'js/capitolwords.js?v=%s' % MEDIA_VERSION,
-                             'js/annotations.js?v=%s' % MEDIA_VERSION,
-                             'js/app.js?v=%s' % MEDIA_VERSION,],
+                             'js/capitolwords.js',
+                             'js/annotations.js',
+                             'js/app.js',],
             },
 
 }
