@@ -168,12 +168,12 @@ def term_detail(request, term):
                                           labels='true')
 
     # Commonly said by these legislators
-    legislators = capitolwords.phrase_by_entity_type('legislator', phrase=term, sort='relative', per_page=10)
+    legislators = capitolwords.phrase_by_entity_type('legislator', phrase=term, sort='count', per_page=10)
     for legislator in legislators:
         legislator['legislator'] = LegislatorRole.objects.filter(bioguide_id=legislator['legislator']).order_by('-congress').select_related()[0]
 
     # Popularity by state
-    states = capitolwords.phrase_by_entity_type('state', phrase=term, sort='relative', per_page=10)
+    states = capitolwords.phrase_by_entity_type('state', phrase=term, sort='count', per_page=10)
 
     # Recent entries
     all_entries = capitolwords.text(phrase=term, bioguide_id="['' TO *]", sort='date desc,score desc', per_page=50)
