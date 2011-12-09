@@ -870,6 +870,7 @@ class LegislatorLookupHandler(BaseHandler):
                 'slug': legislator.slug(),
                 'honorific': legislator.honorific(),
                 'party': legislator.party,
+                'congress': legislator.congress,
                 }
         r = {'results': results}
         cache.set(path, r)
