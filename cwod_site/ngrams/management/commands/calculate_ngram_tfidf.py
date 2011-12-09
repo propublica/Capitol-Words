@@ -206,8 +206,8 @@ class Command(BaseCommand):
                 for n in range(1,6):
 
                     if (facet, n) in already:
-                        # recreate 'this' month, as calculated last week (we will run this weekly)
-                        if field == 'year_month' and facet == (datetime.datetime.today() - datetime.timedelta(7)).strftime('%Y%m'):
+                        # recreate 'this' month, as of yesterday
+                        if field == 'year_month' and facet == (datetime.datetime.today() - datetime.timedelta(1)).strftime('%Y%m'):
                             pass
                         # always recreate terms for speakers and states
                         elif field in ['speaker_bioguide', 'speaker_state']:
