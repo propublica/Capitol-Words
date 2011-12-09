@@ -320,7 +320,10 @@ ul.messages li.error{background:url("../img/bg_rightView.png") right top no-repe
 .annotation-wrap{text-decoration:none;display:block;clear:both;margin:0;padding:0;}
 .annotation{font-size:11px;z-index:99;line-height:13px;color:#2d2525;margin:-30px 0 0 -2px;position:absolute;display:none;background:url(../img/annotation_arrow.png) 2% 50% no-repeat;padding:0 0 0 8px;z-index:999}
 .annotation.flipped{background:url(../img/annotation_arrow_flipped.png) 98% 50% no-repeat;padding:0 8px 0 0;margin-left:4px;}
-.annotation .inner-annotation{background-color:rgba(255,255,255,0.95);*background-color:#f2f1ed;margin:0;width:160px;height:50px;padding:6px 4px 6px 12px;border-radius:4px;position:relative;box-shadow:0 0 6px rgba(0,0,0,0.35);}
+.annotation .inner-annotation{background-color:rgba(255,255,255,0.95);background-color:#f2f1ed;margin:0;width:160px;height:50px;padding:6px 4px 6px 12px;border-radius:4px;position:relative;box-shadow:0 0 6px rgba(0,0,0,0.35);}
+.ie6 .annotation .inner-annotation,
+.ie7 .annotation .inner-annotation,
+.ie8 .annotation .inner-annotation{background-color:#f2f1ed;}
 .annotation .inner-annotation p{margin-bottom:00.25em;}
 .ie6 .annotation .inner-annotation p,
 .ie7 .annotation .inner-annotation p,
