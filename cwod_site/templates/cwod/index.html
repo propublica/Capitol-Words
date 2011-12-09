@@ -111,7 +111,7 @@
             <div class="three thirdColumn" style="width: 285px;">
                 <div class="leftHeader">
                     <h4>Most Frequent Words</h4>
-                    <span class="tip"><a href="{{ entry.date_url }}">{{ recent_entries.0.date|date:"l, N j, Y" }}</a></span>
+                    <span class="tip"><a href="{{ recent_entries.0.date_url }}">{{ recent_entries.0.date|date:"l, N j, Y" }}</a></span>
                 </div>
                 <ol class="barChart">
                     {% for ngram in recent_top_unigrams.0.1|slice:"6" %}
