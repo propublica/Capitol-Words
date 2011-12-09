@@ -669,9 +669,10 @@ def encode_embed(request):
             post['end_date'] = "%s-%s-01" % (end[0:4], end[4:6])
         except KeyError:
             pass
-        print post['start_date']
-        print post['end_date']
         values = dict([(k,v) for k, v in post.items() if k in allowed_keys])
+        if values['extra']:
+            defaults.update(extra=values['extra'])
+            values.pop('extra')
         values.update(defaults=defaults)
         obj, created = Embed.objects.get_or_create(**values)
         values.pop('defaults')
