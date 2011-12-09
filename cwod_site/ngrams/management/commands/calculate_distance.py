@@ -149,13 +149,13 @@ class Command(BaseCommand):
         if values_to_compare and len(values_to_compare) is not 2:
             raise ValueError('_get_models takes 2 values!')
         if values_to_compare:
-            params1 = {get_field(field): values_to_compare[0], 'n': 1}
-            ngrams1 = get_model(field).objects.filter(**params1).order_by('-tfidf')[:200]
-            params2 = {get_field(field): values_to_compare[1], 'n': 1}
-            ngrams2 = get_model(field).objects.filter(**params2).order_by('-tfidf')[:200]
+            params1 = {get_field(field): values_to_compare[0]}
+            ngrams1 = get_model(field).objects.filter(**params1).order_by('-count')[:1000]
+            params2 = {get_field(field): values_to_compare[1]}
+            ngrams2 = get_model(field).objects.filter(**params2).order_by('-count')[:1000]
             ngrams = list(chain(ngrams1, ngrams2))
         else:
-            ngrams = get_model(field).objects.filter(n=1).order_by('-tfidf')
+            ngrams = get_model(field).objects.filter(n=1).order_by('-count')
 
         return ngrams
 
