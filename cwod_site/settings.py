@@ -138,7 +138,7 @@ MEDIASYNC = {
     'STATIC_ROOT': os.path.join(PROJECT_ROOT, 'cwod_site', 'media'),
     'PROCESSORS': (
             'mediasync.processors.slim.css_minifier',
-            'mediasync.processors.closurecompiler.compile',
+            # 'mediasync.processors.closurecompiler.compile',
         ),
     'JOINED': {
             #'css/joined.css': ['css/main.css','css/jquery.ui/jquery.ui.all.css'],
