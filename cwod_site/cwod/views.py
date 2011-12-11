@@ -54,7 +54,7 @@ STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
 
 PUNCTUATION = ['?', '!', '.', ',']
 
-@login_required
+
 def index(request):
     recent_entries = RecentEntry.objects.all()[:10]
 
@@ -64,7 +64,7 @@ def index(request):
 
     #return direct_to_template(request, template='index.html')
 
-@login_required
+
 def faster_term_detail(request, term):
     # For better URLs, replace spaces with underscores and strip trailing punctuation
     if re.search(r'\s', term) or re.search(r'[%s]$' % ''.join(PUNCTUATION), term):
@@ -106,7 +106,7 @@ def faster_term_detail(request, term):
                                'state_choices': US_STATES + US_TERRITORIES,
                               }, context_instance=RequestContext(request))
 
-@login_required
+
 def term_detail(request, term):
 
     # For better URLs, replace spaces with underscores & strip trailing punctuation
@@ -223,7 +223,7 @@ def congress_pagerange_detail(request, congress, session, pagerange):
     return
 
 
-@login_required
+
 def legislator_list(request):
     current_legislators = LegislatorRole.objects.filter(
             end_date__gte=datetime.date.today()
@@ -248,7 +248,7 @@ def legislator_lookup(bioguide_id):
 GRAM_NAMES = ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ]
 
 
-@login_required
+
 def legislator_detail(request, bioguide_id, slug=None):
     legislator = legislator_lookup(bioguide_id)
     if not legislator:
@@ -348,7 +348,7 @@ def get_similar_entities(entity_type, entity):
     return capitolwords._similar(entity_type=entity_type, entity_value=entity)
 
 
-@login_required
+
 def state_detail(request, state):
     state_name = dict(STATE_CHOICES + TERRITORY_CHOICES).get(state)
     if not state_name:
@@ -403,7 +403,7 @@ def state_detail(request, state):
              'bodies': bodies,
              }, context_instance=RequestContext(request))
 
-@login_required
+
 def submit_feedback(request):
     if request.POST:
         name = request.POST.get('feedback[name]')
@@ -432,7 +432,7 @@ def wordtree(request):
     return
 
 
-@login_required
+
 def date_detail(request, year, month, day):
     date = datetime.date(year=int(year), month=int(month), day=int(day))
     entries = entries_for_date(date)
@@ -543,7 +543,7 @@ def entry_detail(request, year, month, day, page_id, slug):
                                'similar_entries': similar_entries,
                                }, context_instance=RequestContext(request))
 
-@login_required
+
 def search(request):
     #return HttpResponse(request.GET.get('term', ''))
     term = request.GET.get('term', '')
@@ -551,7 +551,7 @@ def search(request):
     return HttpResponsePermanentRedirect(url)
 
 
-@login_required
+
 def term_compare(request):
     #pieces = request.path.split('/')[1:]
     return render_to_response('cwod/compare.html',
@@ -560,7 +560,7 @@ def term_compare(request):
 
 MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',]
 
-@login_required
+
 def calendar(request):
     raw_months = capitolwords._month_list()
     max_year = max(raw_months) / 100
@@ -593,7 +593,7 @@ def calendar(request):
                               {'years': years,},
                               context_instance=RequestContext(request))
 
-@login_required
+
 def month_detail(request, year, month):
     year_month = '%s%s' % (year, month)
     month_name = MONTH_NAMES[int(month)-1]
