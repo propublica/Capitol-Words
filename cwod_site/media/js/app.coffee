@@ -46,7 +46,7 @@ $(document).ready ->
 
     # replace broken images with a blank gif
     $('img').error ->
-        $(this).attr('src', 'http://assets.sunlightfoundation.com/moc/default.png')
+        $(this).attr('src', 'http://assets.sunlightfoundation.com/capitol-words/media/img/cwod_default.png')
 
     # toggle the 2-term search form
     $('#toggleSearchCompare').click (e) ->

@@ -39,7 +39,7 @@
       cw.populateTermDetailPage(termDetailTerm);
     }
     $('img').error(function() {
-      return $(this).attr('src', 'http://assets.sunlightfoundation.com/moc/default.png');
+      return $(this).attr('src', 'http://assets.sunlightfoundation.com/capitol-words/media/img/cwod_default.png');
     });
     $('#toggleSearchCompare').click(function(e) {
       e.preventDefault();

@@ -716,7 +716,7 @@ class window.CapitolWords
 
             $('table#legislatorList tbody')
                 .find('img').error ->
-                    $(this).attr('src', 'http://assets.sunlightfoundation.com/moc/default.png')
+                    $(this).attr('src', 'http://assets.sunlightfoundation.com/capitol-words/media/img/cwod_default.png')
                 .end()
                 .imagesLoaded(->).fadeIn 'fast'
 

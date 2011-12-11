@@ -832,7 +832,7 @@
           }
         });
         return $('table#legislatorList tbody').find('img').error(function() {
-          return $(this).attr('src', 'http://assets.sunlightfoundation.com/moc/default.png');
+          return $(this).attr('src', 'http://assets.sunlightfoundation.com/capitol-words/media/img/cwod_default.png');
         }).end().imagesLoaded(function() {}).fadeIn('fast');
       };
       return $('table#legislatorList tbody').fadeOut('fast', buildTable);
