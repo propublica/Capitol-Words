@@ -3,7 +3,7 @@
 {% load capwords %}
 {% load typogrify_tags %}
 
-
+{% block og_title %}{{ term }}{% endblock %}
 {% block title %}{{ term }} | {{ block.super }}{% endblock title %}
 
 {% block content %}
@@ -24,7 +24,7 @@
                         <select name="time">
                             <option value="time">Time Frame</option>
                         </select>
-                    </form>    
+                    </form>
                 </div>
             </div>
             <div id="ltColumn">
@@ -35,13 +35,13 @@
                     </div>
                     <form class="actionItem" action="" method="">
                         <ul class="partyBreakdown">
-                            <li><label><input class="radio" type="radio" name="word" />Overall</label></li> 
-                            <li><label><input class="radio" type="radio" name="word" />Party</label></li> 
+                            <li><label><input class="radio" type="radio" name="word" />Overall</label></li>
+                            <li><label><input class="radio" type="radio" name="word" />Party</label></li>
                         </ul>
                         <div class="clear"></div>
                     </form>
                     <div class="chart"></div>
-                </div> 
+                </div>
                 <div class="module">
                     <div class="rightHeader">
                         <h3>Frequency in Which Legislators Mention &#8220;War&#8221;</h3>
@@ -51,74 +51,74 @@
                         <li>
                             <span class="tagValue" style="width:100%;">
                                 <span class="tagPercent">100%</span>
-                                <span class="tagNumber"><a href="#">30</a></span> 
-                            </span> 
+                                <span class="tagNumber"><a href="#">30</a></span>
+                            </span>
                             <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                         </li>
                         <li>
                             <span class="tagValue" style="width:80%;">
                                 <span class="tagPercent">80%</span>
-                                <span class="tagNumber"><a href="#">30</a></span> 
-                            </span> 
+                                <span class="tagNumber"><a href="#">30</a></span>
+                            </span>
                             <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                         </li>
                         <li>
                             <span class="tagValue" style="width:80%;">
                                 <span class="tagPercent">80%</span>
-                                <span class="tagNumber"><a href="#">30</a></span> 
-                            </span> 
+                                <span class="tagNumber"><a href="#">30</a></span>
+                            </span>
                             <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                         </li>
                         <li>
                             <span class="tagValue" style="width:70%;">
                                 <span class="tagPercent">70%</span>
                                 <span class="tagNumber"><a href="#">30</a></span>
-                            </span> 
+                            </span>
                             <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                         </li>
                         <li>
                             <span class="tagValue" style="width:70%;">
                                 <span class="tagPercent">70%</span>
-                                <span class="tagNumber"><a href="#">30</a></span> 
-                            </span> 
+                                <span class="tagNumber"><a href="#">30</a></span>
+                            </span>
                             <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                         </li>
                         <li>
                             <span class="tagValue" style="width:60%;">
                                 <span class="tagPercent">60%</span>
-                                <span class="tagNumber"><a href="#">30</a></span> 
-                            </span> 
+                                <span class="tagNumber"><a href="#">30</a></span>
+                            </span>
                             <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                         </li>
                         <li>
                             <span class="tagValue" style="width:60%;">
                                 <span class="tagPercent">60%</span>
-                                <span class="tagNumber"><a href="#">30</a></span> 
-                            </span> 
+                                <span class="tagNumber"><a href="#">30</a></span>
+                            </span>
                             <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                         </li>
                         <li>
                             <span class="tagValue" style="width:50%;">
                                 <span class="tagPercent">50%</span>
                                 <span class="tagNumber"><a href="#">30</a></span>
-                            </span> 
+                            </span>
                             <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                         </li>
                         <li>
                             <span class="tagValue" style="width:50%;">
                                 <span class="tagPercent">50%</span>
-                                <span class="tagNumber"><a href="#">30</a></span> 
-                            </span> 
+                                <span class="tagNumber"><a href="#">30</a></span>
+                            </span>
                             <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                         </li>
                         <li>
                             <span class="tagValue" style="width:40%;">
                                 <span class="tagPercent">40%</span>
-                                <span class="tagNumber"><a href="#">30</a></span> 
-                            </span> 
+                                <span class="tagNumber"><a href="#">30</a></span>
+                            </span>
                             <span class="barChartTitle"><a href="#">Legislator Name</a></span>
                         </li>
-                    </ol>    
+                    </ol>
                 </div>
                 <div class="module">
                     <div class="rightHeader">
@@ -202,7 +202,7 @@
                         </tbody>
                     </table>
                 </div>
-            </div>  
+            </div>
             <div id="rtColumn">
                 <div class="leftModule">
                     <div class="leftHeader">
@@ -213,108 +213,108 @@
                         <h5>War</h5>
                         <ol class="barChart">
                             <li>
-                                <span class="tagValue" style="width:100%;">100%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:100%;">100%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:80%;">80%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:80%;">80%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:80%;">80%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:80%;">80%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:70%;">70%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:70%;">70%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:50%;">50%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:50%;">50%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:40%;">40%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:40%;">40%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:40%;">40%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:40%;">40%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:30%;">30%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:30%;">30%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:30%;">30%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:30%;">30%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:30%;">30%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:30%;">30%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
-                        </ol> 
-                    </div>   
+                        </ol>
+                    </div>
                     <div class="internalModule">
                         <h5>Peace</h5>
                         <ol class="barChart">
                             <li>
-                                <span class="tagValue" style="width:100%;">100%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:100%;">100%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:80%;">80%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:80%;">80%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:80%;">80%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:80%;">80%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:70%;">70%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:70%;">70%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:50%;">50%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:50%;">50%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:40%;">40%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:40%;">40%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:40%;">40%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:40%;">40%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:30%;">30%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:30%;">30%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:30%;">30%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:30%;">30%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                             <li>
-                                <span class="tagValue" style="width:30%;">30%</span> 
-                                <span class="tagNumber"><a href="#">30</a></span> 
+                                <span class="tagValue" style="width:30%;">30%</span>
+                                <span class="tagNumber"><a href="#">30</a></span>
                                 <span class="barChartTitle"><a href="#">State Name</a></span>
                             </li>
                         </ol>
@@ -327,7 +327,7 @@
                         <img src="images/placeholder_pie.png" style="border: 0;" width="257" height="126" alt="Placeholder Pie">
                     </div>
                 </div>
-            </div>    
+            </div>
             <div class="clear"></div>
         </div>
     </div>

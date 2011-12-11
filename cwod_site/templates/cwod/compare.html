@@ -4,7 +4,7 @@
 {% load typogrify_tags %}
 {% load media %}
 
-
+{% block og_title %}Compare words and phrases{% endblock %}
 {% block title %}Compare words and phrases | {{ block.super }}{% endblock title %}
 
 {% block content %}
@@ -32,7 +32,7 @@
             <div class="module">
                 <form name="termSelect" id="termSelect" class="normalForm">
                     <div class="termHolder">
-                        <label for="terma">Word/phrase</label> 
+                        <label for="terma">Word/phrase</label>
                         <input class="termCompare" type="text" id="terma" value="Word/phrase"/>
 
                         <div class="clear"></div>
@@ -53,7 +53,7 @@
                     </div>
 
                     <div class="termHolder">
-                        <label for="termb">Word/phrase</label> 
+                        <label for="termb">Word/phrase</label>
                         <input class="termCompare" type="text" id="termb" value="Word/phrase"/>
 
                         <div class="clear"></div>
@@ -74,7 +74,7 @@
 
                     </div>
                     <div class="termHolder">
-                        <label for="termc">Word/phrase</label> 
+                        <label for="termc">Word/phrase</label>
                         <input class="termCompare" type="text" id="termc" value="Word/phrase"/>
 
                         <div class="clear"></div>

@@ -2,6 +2,7 @@
 {% load media %}
 {% load capwords %}
 
+{% block og_title %}{{ state_name }}{% endblock %}
 {% block title %}{{ state_name }} | {{ block.super }}{% endblock title %}
 {% block content %}
             <div id="main">

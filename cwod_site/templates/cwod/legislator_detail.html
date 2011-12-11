@@ -1,6 +1,7 @@
 {% extends "cwod/base.html" %}
 {% load humanize capwords %}
 
+{% block og_title %}{{ legislator.full_name }}{% endblock %}
 {% block title %}{{ legislator.full_name }} | {{ block.super }}{% endblock title %}
 
 {% block content %}

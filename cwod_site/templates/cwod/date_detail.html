@@ -2,6 +2,7 @@
 {% load capwords %}
 {% load typogrify_tags %}
 
+{% block og_title %}{{ date|date:"F j, Y" }}{% endblock %}
 {% block title %}{{ date|date:"F j, Y" }} | {{ block.super }}{% endblock title %}
 
 {% block content %}
@@ -25,7 +26,7 @@
                 <div id="ltColumn">
                         {% for chamber, entry_list in entries %}
                             {% if entry_list %}
-							<div class="module">
+                            <div class="module">
                             <div class="rightHeader">
                                 <h3>Entries in the Congressional Record</h3>
                                 <h4 id="{{ chamber|slugify }}">{{ chamber }}</h4>
@@ -56,7 +57,7 @@
                                 {% endfor %}
                                 </tbody>
                             </table>
-	                    </div>
+                        </div>
                             {% endif %}
                         {% endfor %}
 

@@ -3,6 +3,7 @@
 {% load capwords %}
 {% load typogrify_tags %}
 
+{% block og_title %}{{ metadata.title|smart_title }}{% endblock %}
 {% block title %}{{ metadata.title|smart_title }} | {{ block.super }}{% endblock title %}
 
 {% block content %}
