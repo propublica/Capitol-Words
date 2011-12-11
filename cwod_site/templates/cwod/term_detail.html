@@ -4,11 +4,6 @@
 {% load typogrify_tags %}
 
 {% block head %}
-{% if needs_js %}
-<noscript>
-    <meta http-equiv="refresh" content="0;URL={{ no_js_uri|safe }}">
-</noscript>
-{% endif %}
 {{ block.super }}
 <script type="text/javascript">var termDetailTerm = "{{ term|urlencode|safe }}";</script>
 {% endblock head %}
@@ -17,7 +12,11 @@
 {% block title %}{{ term }} | {{ block.super }}{% endblock title %}
 
 {% block content %}
-
+            {% if needs_js %}
+            <noscript>
+                <meta http-equiv="refresh" content="0;URL={{ no_js_uri|safe }}">
+            </noscript>
+            {% endif %}
             <div id="main">
                 <div id="internalHead">
                     <h2 class="withButton">{{ term }}</h2>
