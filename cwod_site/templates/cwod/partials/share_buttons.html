@@ -1,11 +1,6 @@
 {# {% with 'http://'|add:request.META.HTTP_HOST|add:request.path|add:'?'|add:request.META.QUERY_STRING as url %} #}
 <div id="socialIcons">
     <a href="https://twitter.com/share" class="twitter-share-button" data-count="none">Tweet</a>
-    <iframe class="facebook-share-button"
-            src="//www.facebook.com/plugins/like.php?href&amp;send=false&amp;layout=button_count&amp;width=100&amp;show_faces=true&amp;action=like&amp;colorscheme=dark&amp;font=arial&amp;height=21"
-            scrolling="no"
-            frameborder="0"
-            style="border:none; overflow:hidden; width:86px; height:21px;"
-            allowTransparency="true"></iframe>
+    <div class="fb-like" data-send="false" data-layout="button_count" data-width="86" data-show-faces="false" data-colorscheme="dark" data-font="arial"></div>
 </div>
 {# {% endwith %} #}

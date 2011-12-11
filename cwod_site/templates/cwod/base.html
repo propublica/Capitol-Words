@@ -8,7 +8,7 @@
         {% block head %}
         <meta charset="utf-8">
         <meta name="description" content="Capitol Words explores the most popular words and phrases used by legislators in Washington. Search the data from 1996 to today by state, date or politician." />
-        <meta property="fb:admins" content="dandrinkard,scott.stadum" />
+        <meta property="fb:app_id" content="333821856644129" />
         <meta property="og:title" content="{% block og_title %}Capitol Words{% endblock %}" />
         <meta property="og:description" content="Capitol Words explores the most popular words and phrases used by legislators in Washington. Search the data from 1996 to today by state, date or politician." />
         <meta property="og:site_name" content="Capitol Words" />
@@ -34,6 +34,16 @@
     </head>
 
     <body class="{% block bodyclass %}{% endblock %}">
+        {% block fb_sdk %}
+        <div id="fb-root"></div>
+        <script>(function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=333821856644129";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));</script>
+        {% endblock fb_sdk %}
         <div id="containerWrapper">
         <div id="container">
             <header>
@@ -86,12 +96,7 @@
                     </ul>
                     <div class="footer-social-icons">
                         <a href="https://twitter.com/share" class="twitter-share-button" data-via="SunFoundation" data-text="Capitol Words: Dig up some data on the words our legislators use every day." data-url="http://capitolwords.org/">Tweet</a>
-                        <iframe class="facebook-share-button"
-                                src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fcapitolwords.org%2F&amp;send=false&amp;layout=button_count&amp;width=100&amp;show_faces=true&amp;action=like&amp;colorscheme=dark&amp;font=arial&amp;height=21"
-                                scrolling="no"
-                                frameborder="0"
-                                style="border:none; overflow:hidden; width:100px; height:21px;"
-                                allowTransparency="true"></iframe>
+                        <div class="fb-like" data-href="http://capitolwords.org/" data-send="false" data-layout="button_count" data-width="100" data-show-faces="false" data-colorscheme="dark" data-font="arial"></div>
                     </div>
                     <div class="clear"></div>
                 </nav>
