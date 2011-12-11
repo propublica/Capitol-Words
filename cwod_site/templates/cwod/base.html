@@ -8,12 +8,13 @@
         {% block head %}
 
         <meta charset="utf-8">
-        <meta name="description" content="Capitol Words explores the most popular words and phrases used by legislators in Washington. Search the data from 1996 to today by state, date or politician.">
+        <meta name="description" content="Capitol Words explores the most popular words and phrases used by legislators in Washington. Search the data from 1996 to today by state, date or politician." />
         <meta property="fb:admins" content="531654702629,10150277330827256" />
         <meta property="og:title" content="{% block og_title %}Capitol Words{% endblock %}" />
+        <meta property="og:description" content="Capitol Words explores the most popular words and phrases used by legislators in Washington. Search the data from 1996 to today by state, date or politician." />
         <meta property="og:site_name" content="Capitol Words" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="{% block og_url %}{% request.build_absolute_uri(request.get_host()) %}{% endblock %}"/>
+        <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}"/>
         <meta property="og:image" content="{% media_url %}/img/cwod_sharing.png" />
         <title>{% block title %}Capitol Words{% endblock title %}</title>
         <!--[if IE ]>{% css "styles/ie.css" %}<![endif]-->
