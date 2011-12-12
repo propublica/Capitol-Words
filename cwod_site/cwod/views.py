@@ -367,7 +367,7 @@ def state_detail(request, state):
 
     similar_states = get_similar_entities('state', state)
 
-    # legislators = LegislatorRole.objects.filter(state=state, end_date__gte=datetime.date.today()).order_by('last')
+    # legislators = LegislatorRole.objects.filter(state=state, end_date__gte=datetime.date.today())
     legislators = capitolwords.legislators(state=state, congress=112)
 
     def sort_districts(x, y):
