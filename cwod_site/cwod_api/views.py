@@ -845,7 +845,7 @@ class LegislatorLookupHandler(BaseHandler):
             if has_congress:
                 latest = max([legislator.end_date for legislator in legislator_qs])
             for legislator in legislator_qs:
-                if has_congress and (legislator.end_date < latest):
+                if has_congress and (legislator.end_date < latest - datetime.timedelta(10)):
                     continue
                 legislators.append({'name': unicode(legislator),
                                     'state': legislator.state,
