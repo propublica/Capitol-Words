@@ -118,7 +118,8 @@
         return pieces.push("" + id + "=" + val);
       });
       hash = pieces.join('&');
-      History.pushState({}, '', "/legislator?" + hash);
+      History.pushState({}, '', "/legislator/?" + hash);
+      window._gaq && _gaq.push(["_trackPageView", "/legislator/?" + hash]);
       return cw.legislatorSearch({});
     });
     $('#signUp').find('input[type=text]').bind('focus', function() {

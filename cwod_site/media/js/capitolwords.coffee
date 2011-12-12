@@ -664,6 +664,7 @@ class window.CapitolWords
 
         hash = $.param(hashParams)
         History.pushState {'slid': slid}, '', "?#{hash}"
+        window._gaq && _gaq.push ["_trackPageView", "/?#{hash}"]
 
     phrases: ->
         params = $('#termSelect').serialize()

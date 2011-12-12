@@ -790,9 +790,10 @@
         }
       });
       hash = $.param(hashParams);
-      return History.pushState({
+      History.pushState({
         'slid': slid
       }, '', "?" + hash);
+      return window._gaq && _gaq.push(["_trackPageView", "/?" + hash]);
     };
     CapitolWords.prototype.phrases = function() {
       var SAMPLE_PHRASES, params, phraseA, phraseB;
