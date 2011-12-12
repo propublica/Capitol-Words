@@ -828,6 +828,7 @@ class LegislatorLookupHandler(BaseHandler):
 
         bioguide_id = request.GET.get('bioguide_id', None)
         if not bioguide_id:
+            has_congress = request.GET.get('congress', False)
             is_third_party = False
             legislators = []
             allowed_params = ['chamber', 'party', 'congress', 'state', ]
@@ -841,7 +842,11 @@ class LegislatorLookupHandler(BaseHandler):
             if is_third_party:
                 legislator_qs = legislator_qs.exclude(party__iexact='d').exclude(party__iexact='r')
             legislator_qs = legislator_qs.order_by('last')
+            if has_congress:
+                latest = max([legislator.end_date for legislator in legislator_qs])
             for legislator in legislator_qs:
+                if has_congress and (legislator.end_date < latest):
+                    continue
                 legislators.append({'name': unicode(legislator),
                                     'state': legislator.state,
                                     'party': legislator.party,
