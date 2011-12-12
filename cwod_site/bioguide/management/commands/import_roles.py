@@ -30,7 +30,7 @@ class Command(BaseCommand):
             for role in roles:
                 print role
                 try:
-                    LegislatorRole.objects.create(
+                    LegislatorRole.objects.get_or_create(
                             bioguide_id=bioguide_id,
                             first=result['first_name'],
                             middle=result['middle_name'],

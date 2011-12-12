@@ -2,6 +2,7 @@ import csv
 import sys
 import urllib2
 
+from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
 
@@ -12,12 +13,20 @@ from BeautifulSoup import BeautifulSoup
 
 
 class Command(BaseCommand):
+    option_list = BaseCommand.option_list + (
+            make_option('--bioguide',
+                action='store',
+                dest='bioguide',
+                default=None,
+                help='Bioguide IDs to get roles for'),
+    )
+
     def handle(self, *args, **options):
 
         if args:
             congress = args[0]
         else:
-            congress = 111
+            congress = 112
 
         data = 'lastname=&firstname=&position=&state=&party=&congress=%s' % str(congress)
         url = 'http://bioguide.congress.gov/biosearch/biosearch1.asp'
@@ -54,6 +63,6 @@ class Command(BaseCommand):
                 print Exception, e
 
             try:
-                legislator = Legislator.objects.create(**data)
+                legislator, created = Legislator.objects.get_or_create(**data)
             except IntegrityError:
                 continue
