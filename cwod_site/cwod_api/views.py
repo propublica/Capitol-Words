@@ -241,12 +241,17 @@ class GenericHandler(BaseHandler):
 
         return self.format_for_return(data, *args, **kwargs)
 
-
 class PopularPhraseHandler(BaseHandler):
     """Most frequent phrases.
     """
     fields = ('ngram', 'count', 'tfidf', )
-    DEFAULT_PER_PAGE = 50
+    SORT_FIELDS = {
+        'count desc': '-count',
+        'count asc': 'count',
+        'tfidf desc': '-tfidf',
+        'tfidf asc': 'tfidf'
+    }
+    DEFAULT_PER_PAGE = 100
 
     def read(self, request, *args, **kwargs):
         allowed_entities = {
@@ -275,7 +280,7 @@ class PopularPhraseHandler(BaseHandler):
             return {'error': 'Invalid phrase length.', 'results': []}
 
         if n > 5:
-            return {'error': 'Invaid phrase length.', 'results': []}
+            return {'error': 'Invalid phrase length.', 'results': []}
 
         entity = request.GET.get('entity_type', '')
         if entity not in allowed_entities.keys():
@@ -283,22 +288,30 @@ class PopularPhraseHandler(BaseHandler):
 
         entity = allowed_entities[entity]
         val = request.GET.get('entity_value', '')
-        if not val:
-            return {'error': 'Invalud entity value.', 'results': []}
+        # if not val:
+        #     return {'error': 'Invalid entity value.', 'results': []}
+        sort = request.GET.get('sort', 'count desc')
+        if sort not in self.SORT_FIELDS.keys():
+            return {'error': 'Invalid sort field.', 'results': []}
 
         per_page, offset = self.get_pagination(request)
 
         model = entity['model']
         field = entity['field']
 
-        if field == 'date':
+        if field == 'date' and val:
             try:
                 dateparse(val)
             except ValueError:
                 return {'error': 'Invalid date.', 'results': []}
 
-        query = {field: val, 'n': n}
-        return model.objects.filter(**query)[offset:offset+per_page]
+        query = {'n': n}
+        if val:
+            query.update({field: val})
+        qset = model.objects.filter(**query)
+        if sort:
+            qset = qset.order_by(self.SORT_FIELDS[sort])
+        return qset[offset:offset+per_page]
 
 
     def get_pagination(self, request):
