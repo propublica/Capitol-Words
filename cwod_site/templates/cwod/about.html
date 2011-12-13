@@ -95,6 +95,10 @@
                 <dl>
                     <dt>apikey</dt>
                     <dd></dd>
+                    <dt>entity_type</dt>
+                    <dd>The facet to find top phrases for.</dd>
+                    <dt>entity_value</dt>
+                    <dd>The value of the facet.</dd>
                 </dl>
                 <div class="clear"></div>
 
@@ -103,6 +107,7 @@
                 <dl>
                     <dt>n</dt>
                         <dd>The size of phrase, in words, to search for (up to 5).</dd>
+                    {% comment %}
                     <dt>start_date
                         <dd>
                                 Limit results to those starting at the given date.
@@ -130,11 +135,18 @@
                         The value of the entity given in entity_type.
                         <span class="tip">If this argument is supplied, entity_type is required.</span>
                         </dd>
+                    {% endcomment %}
                     <dt>page</dt>
                         <dd>
                         The page of results to show.
                         <span class="tip">100 results are shown at a time. To get more than 100 results, use the page parameter.</span>
                         </dd>
+                    <dt>sort</dt>
+                        <dd>
+                        The metric and direction to sort by.
+                        <span class="tip">Options are tfidf (default) or count, desc or asc. Both options must be supplied if not using the default.</span>
+                        </dd>
+                    {% comment %}
                     <dt>stemmed</dt>
                         <dd>
                         Set as 'true' to use stemming in top-word list.
@@ -150,6 +162,7 @@
                             <li>extensions,</li>
                         </ul>
                     </dd>
+                    {% endcomment %}
                 </dl>
                 <div class="clear"></div>
 
