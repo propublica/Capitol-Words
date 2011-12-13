@@ -288,8 +288,8 @@ class PopularPhraseHandler(BaseHandler):
 
         entity = allowed_entities[entity]
         val = request.GET.get('entity_value', '')
-        # if not val:
-        #     return {'error': 'Invalid entity value.', 'results': []}
+        if not val:
+            return {'error': 'Invalid entity value.', 'results': []}
         sort = request.GET.get('sort', 'count desc')
         if sort not in self.SORT_FIELDS.keys():
             return {'error': 'Invalid sort field.', 'results': []}
