@@ -3,13 +3,6 @@
 {% block title %}Christmas | {{ block.super }}{% endblock %}
 {% block content %}
 
-<style type="text/css">
-    .christmasCard {
-        float: left;
-        width: 450px;
-        min-height: 350px;
-    }
-</style>
 
 <body id="about">
     <div id="main">
@@ -24,24 +17,17 @@
                 <p>Some of the e-cards come complete with the actual audio from the congressional members. Click on the ecards to view larger versions of them and to hear the quotes where available.</p>        
             </div>
             
-            <ul class="christmasCards">
+            {% include "cwod/partials/share_buttons.html" %}
+            <a href="{{card.image_url}}" class="lightbox"
+                {% if card.audio_url %}onclick="document.getElementById('{{card.slug}}-audio').play()" {% endif %}>
+                <img src="{{card.image_url}}" width="800px"/>
+            </a>
+            {% if card.audio_url %}
+            <audio id="{{card.slug}}-audio" preload="auto">
+                <source src="{{card.audio_url}}" type="audio/mpeg" />
+            </audio>
+            {% endif %}
 
-            {% for card in cards %}
-            <li class="christmasCard">
-                <a href="{{card.image_url}}" class="lightbox"
-                    {% if card.audio_url %}onclick="document.getElementById('{{card.slug}}-audio').play()" {% endif %}>
-                    <img src="{{card.image_url}}" width="400px"/>
-                </a>
-                {% if card.audio_url %}
-                <audio id="{{card.slug}}-audio" preload="auto">
-                    <source src="{{card.audio_url}}" type="audio/mpeg" />
-                </audio>
-                {% endif %}
-                {% include "cwod/partials/share_buttons.html" %}
-            </li>
-            {% endfor %}
-
-            </ul>
         </div>
         <div class="clear"></div>
 
