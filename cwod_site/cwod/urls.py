@@ -3,6 +3,7 @@ from django.conf import settings
 from django.views.generic.simple import direct_to_template
 
 from cwod.views import *
+from cwod import christmas_views
 
 
 urlpatterns = patterns('',
@@ -110,6 +111,14 @@ urlpatterns = patterns('',
             wordtree,
             {},
             name='cwod_wordtree'),
+            
+        url(r'^holidays/$',
+            christmas_views.all_cards,
+            name='cwod_christmas'),
+            
+        url(r'^holidays/(?P<card_slug>\w+)/?$',
+            christmas_views.single_card,
+            name='cwod_christmas_card'),
 
         url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 
