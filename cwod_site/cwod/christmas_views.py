@@ -25,7 +25,7 @@ CARD_LIST = [
         'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Wasserman%20Schultz%20-%20Image.jpg',
         'audio_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Wasserman%20Schultz%20-%20Audio.mp3',
         'email_url': 'http://organizing.sunlightfoundation.com/page/share/capitol-greetings-hanukkah',
-        'share_text': "",
+        'share_text': "Chanukah, the festival of lights, a celebration of justice... #CongressSez http://snlg.ht/vG7SPr via @sunfoundation",
     }, {
         'slug': 'defazio1',
         'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/DeFazio1%20-%20Image.jpg',
