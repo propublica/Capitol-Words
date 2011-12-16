@@ -1,0 +1,140 @@
+{% extends "cwod/base.html" %}
+{% block og_title %}Capitol Words Christmas{% endblock %}
+{% block title %}Christmas | {{ block.super }}{% endblock %}
+{% block content %}
+
+<style type="text/css">
+    .christmasCard {
+        float: left;
+        width: 450px;
+        min-height: 350px;
+    }
+</style>
+
+<body id="about">
+    <div id="main">
+        <div id="internalHead">
+                <h2>Capitol Greetings</h2>
+                <div class="clear"></div>
+        </div>
+
+        <div>
+            <div class="module">
+                <p>What do reindeer, Christmas trees, eggnog, and Yoda have in common? They’re all part of what our elected representatives have been saying around the holidays. Things get even crazier when their quotes are taken out of context and made into crafty, <a href="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/kennedyfinal1.jpg" class="lightbox">bizarre</a> holiday e-cards. Check out the ones we made using Sunlight’s Capitol Words, and share the e-cheer each year.</p>
+                <p>Some of the e-cards come complete with the actual audio from the congressional members. Click on the ecards to view larger versions of them and to hear the quotes where available.</p>        
+            </div>
+            
+            <ul class="christmasCards">
+
+            <li class='christmasCard'>
+                <a href="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/BurgessFinal1.jpg" class="lightbox"
+                    onclick="document.getElementById('burgess-audio').play()">
+                    <img src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/BurgessFinal1.jpg" width="400px"/>
+                </a>
+                <audio id="burgess-audio" preload="auto">
+                    <source src="http://assets.capitolwords.org.s3.amazonaws.com/christmas/Burgess%20-%20Tough%20sledding.wav" type="audio/mpeg" />
+                </audio>
+                {% include "cwod/partials/share_buttons.html" %}
+            </li>
+
+            <li class='christmasCard'>
+                <a href="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/DeFazioFinal1.1.jpg" class="lightbox"
+                    onclick="document.getElementById('defazio-audio').play()">
+                    <img src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/DeFazioFinal1.1.jpg" width="400px"/>
+                </a>
+                <audio id="defazio-audio" preload="auto">
+                    <source src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/DeFazio%20_%20Ho.wav" type="audio/mpeg" />
+                </audio>
+                {% include "cwod/partials/share_buttons.html" %}
+            </li>
+
+            <li class='christmasCard'>
+                <a href="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/EnglishFinal1.jpg" class="lightbox">
+                    <img src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/EnglishFinal1.jpg" width="400px"/>
+                </a>
+                {% include "cwod/partials/share_buttons.html" %}
+            </li>
+
+            <li class='christmasCard'>
+                <a href="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/CollinsFinal2.1.jpg" class="lightbox">
+                    <img src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/CollinsFinal2.1.jpg" width="400px"/>
+                </a>
+                {% include "cwod/partials/share_buttons.html" %}
+            </li>
+
+            <li class='christmasCard'>
+                <a href="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/SmithFinal1.jpg" class="lightbox"
+                    onclick="document.getElementById('smith-audio').play()">
+                    <img src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/SmithFinal1.jpg" width="400px"/>
+                </a>
+                <audio id="smith-audio" preload="auto">
+                    <source src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/Lamar%20Smith%20-%20Elves.wav" type="audio/mpeg" />
+                </audio>
+                {% include "cwod/partials/share_buttons.html" %}
+            </li>
+
+            <li class='christmasCard'>
+                <a href="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/McDermottFinal1.jpg" class="lightbox"
+                    onclick="document.getElementById('mcdermott-audio').play()">
+                    <img src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/McDermottFinal1.jpg" width="400px"/>
+                </a>
+                <audio id="mcdermott-audio" preload="auto">
+                    <source src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/McDermott%20-%20baby%20jesus.wav" type="audio/mpeg" />
+                </audio>
+                {% include "cwod/partials/share_buttons.html" %}
+            </li>
+
+            <li class='christmasCard'>
+                <a href="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/DorganFinal1.jpg" class="lightbox"
+                    onclick="document.getElementById('dorgan-audio').play()">
+                    <img src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/DorganFinal1.jpg" width="400px"/>
+                </a>
+                <audio id="dorgan-audio" preload="auto">
+                    <source src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/Dorgan%20-%20Eggnog.wav" type="audio/mpeg" />
+                </audio>
+                {% include "cwod/partials/share_buttons.html" %}
+            </li>
+
+            <li class='christmasCard'>
+                <a href="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/CollinsFinal1.1.jpg" class="lightbox">
+                    <img src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/CollinsFinal1.1.jpg" width="400px"/>
+                </a>
+                {% include "cwod/partials/share_buttons.html" %}
+            </li>
+
+            <li class='christmasCard'>
+                <a href="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/finaldefazio2.1.jpg" class="lightbox"
+                    onclick="document.getElementById('defazio-audio-2').play()">
+                    <img src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/finaldefazio2.1.jpg" width="400px"/>
+                </a>
+                <audio id="defazio-audio-2" preload="auto">
+                    <source src="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/DeFazio%20-%20Old%20St%20Nick.wav" type="audio/mpeg" />
+                </audio>
+                {% include "cwod/partials/share_buttons.html" %}
+            </li>
+
+            </ul>
+        </div>
+        <div class="clear"></div>
+
+    </div>
+
+        
+
+</body>
+{% endblock %}
+
+{% block javascript %}
+
+{{block.super}}
+
+<script type="text/javascript" src="/media/js/jquery.fancybox-1.3.4.js"></script>
+<link rel="stylesheet" href="/media/css/jquery.fancybox-1.3.4.css" type="text/css" media="screen" />
+<script type="text/javascript">
+    $(function() {
+    	$('a.lightbox').fancybox(); // Select all links with lightbox class
+    });
+</script>
+
+
+{% endblock javascript %}
