@@ -7,40 +7,50 @@ CARD_LIST = [
     {   
         'slug': 'burgess',
         'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Burgess%20-%20Image.jpg',
-        'audio_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Burgess%20-%20Audio.mp3'
+        'audio_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Burgess%20-%20Audio.mp3',
+        'email_url': 'http://organizing.sunlightfoundation.com/page/share/capitol-greetings-sledding',
     }, {
         'slug': 'collins1',
-        'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Collins1%20-%20Image.jpg'
+        'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Collins1%20-%20Image.jpg',
+        'email_url': 'http://organizing.sunlightfoundation.com/page/share/capitol-greetings-tree',
     }, {
         'slug': 'collins2',
-        'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Collins2%20-%20Image.jpg'
+        'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Collins2%20-%20Image.jpg',
+        'email_url': 'http://organizing.sunlightfoundation.com/page/share/capitol-greetings-benefits',
     }, {
         'slug': 'defazio1',
         'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/DeFazio1%20-%20Image.jpg',
         'audio_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/DeFazio1%20-%20Audio.mp3',
+        'email_url': 'http://organizing.sunlightfoundation.com/page/share/capitol-greetings-april-fools',
     }, {
         'slug': 'dorgan',
         'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Dorgan%20-%20Image.jpg',
         'audio_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Dorgan%20-%20Audio.mp3',
+        'email_url': 'http://organizing.sunlightfoundation.com/page/share/capitol-greetings-april-fools',
     }, {
         'slug': 'english',
         'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/English%20-%20Image.jpg',
+        'email_url': 'http://organizing.sunlightfoundation.com/page/share/capitol-greetings-reindeer',
     }, {
         'slug': 'mcdermott',
         'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/McDermott%20-%20Image.jpg',
-        'audio_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/McDermott%20-%20Audio.mp3'
+        'audio_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/McDermott%20-%20Audio.mp3',
+        'email_url': 'http://organizing.sunlightfoundation.com/page/share/capitol-greetings-darkness',
     }, {
         'slug': 'smith',
         'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Smith%20-%20Image.jpg',
-        'audio_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Smith%20-%20Audio.mp3'
+        'audio_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Smith%20-%20Audio.mp3',
+        'email_url': 'http://organizing.sunlightfoundation.com/page/share/capitol-greetings-elves',
     }, {
         'slug': 'defazio2',
         'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/DeFazio2%20-%20Image.jpg',
         'audio_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/DeFazio2%20-%20Audio.mp3',
+        'email_url': 'http://organizing.sunlightfoundation.com/page/share/capitol-greetings-benefits',
     }, {
         'slug': 'kennedy',
         'image_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Kennedy%20-%20Image.jpg',
         'audio_url': 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/Kennedy%20-%20Audio.mp3',
+        'email_url': 'http://organizing.sunlightfoundation.com/page/share/capitol-greetings-yoda',
     }
 ]
 

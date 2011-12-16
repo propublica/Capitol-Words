@@ -37,7 +37,11 @@
                     <source src="{{card.audio_url}}" type="audio/mpeg" />
                 </audio>
                 {% endif %}
-                {% include "cwod/partials/share_buttons.html" %}
+                <div id="socialIcons">
+                    {% if card.email_url %}<a href="{{card.email_url}}" target="_blank">Email this card...</a>{% endif %}
+                    <a href="https://twitter.com/share?text=hello" class="twitter-share-button" data-count="none">Tweet</a>
+                    <div class="fb-like" data-send="false" data-layout="button_count" data-width="86" data-show-faces="false" data-colorscheme="light" data-font="arial"></div>
+                </div>
             </li>
             {% endfor %}
 

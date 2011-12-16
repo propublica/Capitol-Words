@@ -17,7 +17,11 @@
                 <p>Some of the e-cards come complete with the actual audio from the congressional members. Click on the ecards to view larger versions of them and to hear the quotes where available.</p>        
             </div>
             
-            {% include "cwod/partials/share_buttons.html" %}
+            <div id="socialIcons">
+                {% if card.email_url %}<a href="{{card.email_url}}" target="_blank">Email this card...</a>{% endif %}
+                <a href="https://twitter.com/share?text=hello" class="twitter-share-button" data-count="none">Tweet</a>
+                <div class="fb-like" data-send="false" data-layout="button_count" data-width="86" data-show-faces="false" data-colorscheme="light" data-font="arial"></div>
+            </div>
             <a href="{{card.image_url}}" class="lightbox"
                 {% if card.audio_url %}onclick="document.getElementById('{{card.slug}}-audio').play()" {% endif %}>
                 <img src="{{card.image_url}}" width="800px"/>
