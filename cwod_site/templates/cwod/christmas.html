@@ -1,6 +1,6 @@
 {% extends "cwod/base.html" %}
-{% block og_title %}Capitol Words Christmas{% endblock %}
-{% block title %}Christmas | {{ block.super }}{% endblock %}
+{% block og_title %}Capitol Words Holiday Cards{% endblock %}
+{% block title %}Holiday Cards | {{ block.super }}{% endblock %}
 {% block content %}
 
 <style type="text/css">
@@ -23,8 +23,8 @@
 
         <div class="christmasCardWrapper">
             <div id="ltColumn" class="module">
-                <p>What do reindeer, Christmas trees, eggnog, and Yoda have in common? They’re all part of what our elected representatives have been saying around the holidays. Things get even crazier when their quotes are taken out of context and made into crafty, <a href="http://assets.sunlightfoundation.com.s3.amazonaws.com/files/Christmas11/kennedyfinal1.jpg" class="lightbox">bizarre</a> holiday e-cards. Check out the ones we made using Sunlight’s Capitol Words, and share the e-cheer each year.</p>
-                <p>Some of the e-cards come complete with the actual audio from the congressional members. Click on the ecards to view larger versions of them and to hear the quotes where available.</p>        
+                <p>What do reindeer, Christmas trees, eggnog and Hanukkah have in common? They’re all part of what our elected representatives have been saying around the holidays. Things get even crazier when their quotes are taken out of context and made into crafty, bizarre and occasionally touching holiday e-cards. Check out the ones we made using Capitol Words, and share the ones you like.</p>
+                <p>Some of the e-cards come complete with the actual audio from the congressional members. Click on the e-cards to view larger versions of them and to hear the quotes where available.</p>              
             </div>
             
             <ul class="christmasCards">
@@ -44,8 +44,8 @@
                     <li>
                         {% if card.email_url %}<a href="{{card.email_url}}" target="_blank">Email this card...</a>{% endif %}
                     </li>
-                    <li><a href="https://twitter.com/share?text=hello" class="twitter-share-button" data-count="none">Tweet</a></li>
-                    <li><div class="fb-like" data-send="false" data-layout="button_count" data-width="86" data-show-faces="false" data-colorscheme="light" data-font="arial"></div></li>
+                    <li><a href="https://twitter.com/share?counturl=http%3A//capitolwords.org/holidays/{{card.slug}}&url=''&text={{card.share_text|urlencode}}" class="twitter-share-button" data-count="none">Tweet</a></li>
+                    <li><div class="fb-like" data-href="http%3A//capitolwords.org/holidays/{{card.slug}}" data-send="false" data-layout="button_count" data-width="86" data-show-faces="false" data-colorscheme="light" data-font="arial"></div></li>
                 </ul>
                 <div class="clear"></div>
             </li>
