@@ -11,7 +11,7 @@
     }
     .christmasCardWrapper { margin-bottom: 80px; }
     .christmasCards #socialIcons li { float: left;}
-    
+
 </style>
 
 <body id="about">
@@ -24,9 +24,9 @@
         <div class="christmasCardWrapper">
             <div id="ltColumn" class="module">
                 <p>What do reindeer, Christmas trees, eggnog and Hanukkah have in common? They’re all part of what our elected representatives have been saying around the holidays. Things get even crazier when their quotes are taken out of context and made into crafty, bizarre and occasionally touching holiday e-cards. Check out the ones we made using Capitol Words, and share the ones you like.</p>
-                <p>Some of the e-cards come complete with the actual audio from the congressional members. Click on the e-cards to view larger versions of them and to hear the quotes where available.</p>              
+                <p>Some of the e-cards come complete with the actual audio from the congressional members. Click on the e-cards to view larger versions of them and to hear the quotes where available.</p>
             </div>
-            
+
             <ul class="christmasCards">
 
             {% for card in cards %}
@@ -57,7 +57,7 @@
         <div class="clear"></div>
     </div>
 
-        
+
 
 </body>
 {% endblock %}
@@ -65,14 +65,11 @@
 {% block javascript %}
 
 {{block.super}}
-
-<script type="text/javascript" src="/media/js/jquery.fancybox-1.3.4.js"></script>
-<link rel="stylesheet" href="/media/css/jquery.fancybox-1.3.4.css" type="text/css" media="screen" />
+{% css "css/jquery.fancybox-1.3.4.css" %}
+{% js "js/jquery.fancybox-1.3.4.js" %}
 <script type="text/javascript">
     $(function() {
-    	$('a.lightbox').fancybox(); // Select all links with lightbox class
+        $('a.lightbox').fancybox(); // Select all links with lightbox class
     });
 </script>
-
-
 {% endblock javascript %}
