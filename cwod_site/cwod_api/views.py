@@ -391,11 +391,11 @@ def tokenize(term):
   | (Mr\.|Dr\.|Mrs\.|Ms\.)                                  # Mr., Mrs., etc.
   | \d*\.\d+                                                # Numbers with decimal points.
   | \d\d?:\d\d                                              # Times.
-  | \$?[,\.0-9]+                                            # Numbers with thousands separators, (incl currency).
+  | \$?[,\.0-9]+\d                                          # Numbers with thousands separators, (incl currency).
   | (((a|A)|(p|P))\.(m|M)\.)                                # a.m., p.m., A.M., P.M.
   | \w+((-|')\w+)*                                          # Words with optional internal hyphens.
   | \$?\d+(\.\d+)?%?                                        # Currency and percentages.
-  | (?<=\b)\.\.\.(?=\b)                                      # Ellipses surrounded by word borders
+  | (?<=\b)\.\.\.(?=\b)                                     # Ellipses surrounded by word borders
   | [][.,;"'?():-_`]
     '''
     # Strip punctuation from this one; solr doesn't know about any of it
