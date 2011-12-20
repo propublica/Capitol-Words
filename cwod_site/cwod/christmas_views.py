@@ -88,12 +88,12 @@ CARDS = dict([(c['slug'], c) for c in CARD_LIST])
 
 
 def all_cards(request):
-    return render_to_response('cwod/christmas.html', {'cards': CARD_LIST})
+    return render_to_response('cwod/christmas.html', {'cards': CARD_LIST}, context_instance=RequestContext(request))
 
 
 def single_card(request, card_slug):
     if card_slug in CARDS:
-        return render_to_response('cwod/christmas_card.html', {'card': CARDS[card_slug]})
+        return render_to_response('cwod/christmas_card.html', {'card': CARDS[card_slug]}, context_instance=RequestContext(request))
     else:
         return redirect('cwod_christmas_card')
 

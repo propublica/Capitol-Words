@@ -111,11 +111,11 @@ urlpatterns = patterns('',
             wordtree,
             {},
             name='cwod_wordtree'),
-            
+
         url(r'^holidays/$',
             christmas_views.all_cards,
             name='cwod_christmas'),
-            
+
         url(r'^holidays/(?P<card_slug>\w+)/?$',
             christmas_views.single_card,
             name='cwod_christmas_card'),
