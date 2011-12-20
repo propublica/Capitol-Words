@@ -1,7 +1,6 @@
 from django.conf.urls.defaults import *
 from django.conf import settings
 from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
 
 from views import *
@@ -50,7 +49,7 @@ dates_in_month_handler = Resource(DatesInMonthHandler, authentication=authorizer
 urlpatterns = patterns('',
 
         url(r'^$',
-            login_required(direct_to_template),
+            direct_to_template,
             #'django.views.generic.simple.direct_to_template',
             {'template': 'api/index.html',
             },
