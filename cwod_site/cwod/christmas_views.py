@@ -1,8 +1,10 @@
-
+from django.http import HttpRequest
+from django.template import Node, RequestContext
 from django.shortcuts import render_to_response, redirect
 
-S3_PATH = 'http://assets.sunlightfoundation.com.s3.amazonaws.com/files/capitolwords/christmas-2011/'
+from mediasync.templatetags.media import BaseTagNode as mds_node
 
+S3_PATH = mds_node(Node()).get_media_url(RequestContext(HttpRequest())) + '/img/holidays/'
 
 CARD_LIST = [
     {
@@ -94,3 +96,4 @@ def single_card(request, card_slug):
         return render_to_response('cwod/christmas_card.html', {'card': CARDS[card_slug]})
     else:
         return redirect('cwod_christmas_card')
+
