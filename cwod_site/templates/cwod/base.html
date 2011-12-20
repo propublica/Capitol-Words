@@ -14,7 +14,7 @@
         <meta property="og:site_name" content="Capitol Words" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}"/>
-        <meta property="og:image" content="http://assets.sunlightfoundation.com/capitol-words/media/img/cwod_sharing.png" />
+        {% block og_image %}<meta property="og:image" content="http://assets.sunlightfoundation.com/capitol-words/media/img/cwod_sharing.png" />{% endblock og_image %}
         <title>{% block title %}Capitol Words{% endblock title %}</title>
         <!--[if IE ]>{% css "styles/ie.css" %}<![endif]-->
         <!--[if lt IE 9]>
