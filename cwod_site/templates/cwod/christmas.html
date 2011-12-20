@@ -1,6 +1,11 @@
 {% extends "cwod/base.html" %}
 {% load media %}
 {% block og_title %}Capitol Words Holiday Cards{% endblock %}
+{% block og_image %}
+    {% for card in cards %}
+        <meta property="og:image" content="{{ card.thumbnail_url }}"/>
+    {% endfor %}
+{% endblock og_image %}
 {% block title %}Holiday Cards | {{ block.super }}{% endblock %}
 {% block content %}
 
