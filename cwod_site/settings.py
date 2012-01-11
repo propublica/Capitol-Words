@@ -1,5 +1,8 @@
 # Django settings for api project.
 import os
+import sys
+
+from django.core.urlresolvers import resolve
 
 PROJECT_ROOT = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))
 
@@ -105,24 +108,13 @@ INSTALLED_APPS = (
     'jsonfield',
     # 'locksmith.hub',
     'locksmith.auth',
+    'locksmith.logparse',
     'gunicorn',
     'ngrams',
     'mediasync',
     'typogrify',
 )
 
-'''
-MEDIASYNC = {
-    'BACKEND': 'mediasync.backends.s3',
-    'AWS_KEY': MEDIASYNC_AWS_KEY,
-    'AWS_SECRET': MEDIASYNC_AWS_SECRET,
-    'AWS_BUCKET': MEDIASYNC_AWS_BUCKET,
-    'AWS_PREFIX': MEDIASYNC_AWS_PREFIX,
-    'MEDIA_URL': '/media/',
-    'SERVE_REMOTE': False,
-    'STATIC_ROOT': '/media/',
-}
-'''
 from local_settings import (MEDIASYNC_AWS_KEY, MEDIASYNC_AWS_SECRET,
                             MEDIASYNC_AWS_BUCKET, MEDIASYNC_AWS_PREFIX,
                             MEDIASYNC_SERVE_REMOTE, MEDIA_VERSION)
@@ -162,7 +154,17 @@ MEDIASYNC = {
 
 }
 
+def api_resolve(x):
+    match = resolve(x)
+    if hasattr(match.func, 'handler'):
+        # resolve piston resources
+        return match.func.handler.__class__.__name__
+    else:
+        return match.func
+
+LOCKSMITH_LOG_CUSTOM_TRANSFORM = api_resolve
+
 try:
     from local_settings import *
 except ImportError:
-    pass
+    sys.stderr.write("Unable to load local settings. Make sure local_settings.py exists and is free of errors.\n")
