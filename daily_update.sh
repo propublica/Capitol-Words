@@ -41,4 +41,4 @@ fi
 
 # Always run these
 source /projects/capwords/bin/activate
-/usr/bin/env/python /projects/capwords/src/Capitol-Words/cwod_site/manage.py apireportfromlogs
+/usr/bin/env python /projects/capwords/src/Capitol-Words/cwod_site/manage.py apireportfromlogs
