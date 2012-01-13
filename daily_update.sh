@@ -10,7 +10,7 @@ scraper_yesterday=`date -d '1 day ago' +'%d/%m/%Y'`
 /projects/capwords/bin/python /projects/capwords/src/Capitol-Words/scraper/scraper.py backto $scraper_yesterday
 
 # Ingest if congress was in session
-if [ ! -d /opt/data/raw/$yesterday ]; then
+if [ -d /opt/data/raw/$yesterday ]; then
 
   for i in `find /opt/data/raw/$yesterday -name '*PgH*.txt'`; do
       /projects/capwords/bin/python /projects/capwords/src/Capitol-Words/parser/parser.py $i;
@@ -32,10 +32,13 @@ if [ ! -d /opt/data/raw/$yesterday ]; then
 
   curl "http://ec2-184-72-184-231.compute-1.amazonaws.com:8983/solr/update?commit=true"
 
+  source /projects/capwords/bin/activate
+  /usr/bin/env python /projects/capwords/src/Capitol-Words/cwod_site/manage.py get_date_counts --date=$date_count_date
+  /usr/bin/env python /projects/capwords/src/Capitol-Words/cwod_site/manage.py calculate_ngram_tfidf --field=date
+  /usr/bin/env python /projects/capwords/src/Capitol-Words/cwod_site/manage.py cache_recent_entries
+
 fi
 
+# Always run these
 source /projects/capwords/bin/activate
-/usr/bin/env python /projects/capwords/src/Capitol-Words/cwod_site/manage.py get_date_counts --date=$date_count_date
-/usr/bin/env python /projects/capwords/src/Capitol-Words/cwod_site/manage.py calculate_ngram_tfidf --field=date
-/usr/bin/env python /projects/capwords/src/Capitol-Words/cwod_site/manage.py cache_recent_entries
 /usr/bin/env/python /projects/capwords/src/Capitol-Words/cwod_site/manage.py apireportfromlogs
