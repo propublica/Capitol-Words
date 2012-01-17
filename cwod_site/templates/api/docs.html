@@ -1,0 +1,17 @@
+{% extends "api/base.html" %}<!DOCTYPE html>
+{% load media markup %}
+
+{% block topbar_title %}Capitol Words API{% endblock %}
+{% block topbar_links %}
+    <li><a href="#standard-arguments">Standard arguments</a></li>
+    <li><a href="#dates.json">dates.json</a></li>
+    <li><a href="#phrases.json">phrases.json</a></li>
+    <li><a href="#phrases/entity.json">phrases/{entity}.json</a></li>
+    <li><a href="#text.json">text.json</a></li>
+{% endblock topbar_links %}
+
+{% block content %}
+    {% filter markdown %}
+    {% include "api/markdown/index.md" %}
+    {% endfilter %}
+{% endblock content %}

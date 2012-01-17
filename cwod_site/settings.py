@@ -105,6 +105,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.admin',
     'django.contrib.messages',
+    'django.contrib.markup',
     'cwod',
     'cwod_api',
     'bioguide',

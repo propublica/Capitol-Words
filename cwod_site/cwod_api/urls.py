@@ -51,7 +51,10 @@ urlpatterns = patterns('',
         url(r'^$',
             direct_to_template,
             #'django.views.generic.simple.direct_to_template',
-            {'template': 'api/index.html',
+            {'template': 'api/docs.html',
+             'extra_context': {
+                'page': 'index',
+                }
             },
             name='cwod_docs'),
 

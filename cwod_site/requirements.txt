@@ -17,6 +17,7 @@ httplib2==0.6.0
 ipython==0.10.1
 lxml==2.3beta1
 mimeparse==0.1.3
+markdown
 name-tools==0.1.2
 nltk==2.0b9
 numpy==1.5.1
