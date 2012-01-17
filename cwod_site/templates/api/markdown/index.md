@@ -367,8 +367,7 @@ No single argument is required to this endpoint; however, at least one of the te
 
 * Get a list of pieces of text by Republicans with the phrase "health care debate" in them:
 
-    `/text.json?phrase=health+care+debate&entity;_type=party&entity;_name=Republic
-an`
+    `/text.json?phrase=health+care+debate&party=R`
 
 ### Results
 
