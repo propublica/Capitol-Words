@@ -265,7 +265,9 @@ span.emHighlight{background-color:red !important;/*#fff0b3 !important;*/ color:#
 div.ngramMenu{margin-bottom:15px;}
 div.ngramMenu span{text-decoration:underline;cursor:pointer;color:#b99004;}
 div.ngramMenu span#selected{text-decoration:none;cursor:default;}
-#timeline{background:url('../img/chart_timeline_home.png') 0 0 no-repeat;margin-top:0;margin-bottom:10px;height:28px;width:890px;}
+#timeline{background:url('../img/chart_timeline_home.png') 0 0 no-repeat;margin:0;margin-bottom:10px;height:28px;width:890px;position:relative;list-style:none outside;}
+#timeline li.tick{list-style:none;display:block;float:left;color:#907b07;font-family:helvetica, arial, sans-serif;margin-top:1em;}
+#timeline li.last{position:absolute;right:0;}
 #slider-range.ui-widget-content{background-color:none;background:url('../img/slider_inactive.png') left center repeat-x;border:none;}
 #slider-range .ui-slider-range.ui-widget-header{background-color:none;background:url('../img/slider_active.png') left center repeat-x;}
 #slider-range .ui-state-default{background-color:none;background:url('../img/slider_handle.png') top center no-repeat;height:22px;border:none;width:21px;}

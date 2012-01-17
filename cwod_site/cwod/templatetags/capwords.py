@@ -26,6 +26,10 @@ def divided_by(n, d):
     except Exception, e:
         return 0
 
+@register.filter(name='subtract')
+def subtract(v, s):
+    return int(v) - int(s)
+
 @register.filter(name='to_list')
 def to_list(s):
     return list(s)

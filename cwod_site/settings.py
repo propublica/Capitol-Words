@@ -74,6 +74,8 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 EMAIL_BACKEND = "postmark.backends.PostmarkBackend"
 EMAIL_FROM = "contact@sunlightfoundation.com"
 
+START_YEAR = 1996
+
 ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
@@ -93,6 +95,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'cwod.context_processors.recent_top_unigrams',
     'cwod.context_processors.search_terms',
     'cwod.context_processors.frontend_apikey',
+    'cwod.context_processors.tickmarks',
 )
 
 INSTALLED_APPS = (

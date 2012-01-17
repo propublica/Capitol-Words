@@ -1,4 +1,8 @@
+import datetime
+
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from math import ceil
 from ngrams.models import NgramsByDate
 
 def recent_top_unigrams(request):
@@ -19,3 +23,26 @@ def frontend_apikey(request):
         return {'FRONTEND_API_KEY': settings.FRONTEND_API_KEY}
     except AttributeError:
         return {}
+
+def tickmarks(request):
+    start = settings.START_YEAR
+    end = datetime.date.today().year
+    years = range(start, int(end)+1)
+    skip_years = ceil(len(years) / 18.0)
+    ticks = [datetime.date(year, 1, 1) for i, year in enumerate(years) if not i % skip_years]
+
+    tickmarks = {
+        'chart_skip_years': skip_years,
+        'chart_years': years,
+        'chart_ticks': ticks,
+        'chart_ticks_remainder': 0,
+        }
+    this_year = datetime.date(years[-1], 1, 1)
+    if not ticks[-1] == this_year:
+        # pull out the next-to-last year if it's only one behind this year
+        if ticks[-1] + relativedelta(years=1) == this_year and skip_years > 1:
+            tickmarks['chart_ticks'].pop()
+            tickmarks.update(chart_ticks_remainder=1)
+        tickmarks.update(chart_anchor_year=this_year)
+
+    return tickmarks

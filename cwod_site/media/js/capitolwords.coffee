@@ -794,7 +794,10 @@ class window.CapitolWords
     readTermDetailPageHistory: ->
         # TODO: range does not properly update
         this.minMonth = "199601"
-        this.maxMonth = "201112"
+        max = new Date();
+        this.maxMonth = "#{max.getFullYear()}"
+        month = "#{max.getMonth() + 1}"
+        this.maxMonth += if month.length == 1 then "0#{month}" else "#{month}"
         if typeof History.getState().hash is 'undefined'
             return
         hash = History.getState().hash.split('?')[1]

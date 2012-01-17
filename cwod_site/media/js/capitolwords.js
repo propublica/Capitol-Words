@@ -909,9 +909,12 @@
       return this.legislatorSearch(data);
     };
     CapitolWords.prototype.readTermDetailPageHistory = function() {
-      var endYear, hash, k, piece, pieces, startYear, v, x, _i, _len;
+      var endYear, hash, k, max, month, piece, pieces, startYear, v, x, _i, _len;
       this.minMonth = "199601";
-      this.maxMonth = "201112";
+      max = new Date();
+      this.maxMonth = "" + (max.getFullYear());
+      month = "" + (max.getMonth() + 1);
+      this.maxMonth += month.length === 1 ? "0" + month : "" + month;
       if (typeof History.getState().hash === 'undefined') {
         return;
       }
