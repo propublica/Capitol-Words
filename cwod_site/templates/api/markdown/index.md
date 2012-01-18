@@ -105,21 +105,21 @@ Find the popularity of a phrase over a period of time. Standard arguments are su
 * Get a list of how many times the phrase "united states" appears in the
   Congressional Record on each day in the most recent Congress:
     
-    `dates.json?phrase=united+states`
+    `dates.json?phrase=united+states&apikey=<YOUR_KEY>`
 
 * Get a list of how many times the phrase "united states" was said by
   legislators from Virginia on each day of the most recent Congress:
     
-    `dates.json?phrase=united+states&entity_type=state&entity_value=VA`
+    `dates.json?phrase=united+states&entity_type=state&entity_value=VA&apikey=<YOUR_KEY>`
 
 * Get a list of how many times the phrase "united States" appears in the
   Congressional Record on each day between Jan. 1, 2010, and June 1, 2010:
     
-    `dates.json?phrase=united+states&start_date=2009-01-01&end_date=2009-06-01`
+    `dates.json?phrase=united+states&start_date=2009-01-01&end_date=2009-06-01&apikey=<YOUR_KEY>`
 
 * Get a list of how many times the phrase "united states" appears in the Congressional Record in each month between January and June, 2010:
     
-    `dates.json?phrase=united+states&start_date=2009-01-01&end_date=2009-04-30&granularity=month`
+    `dates.json?phrase=united+states&start_date=2009-01-01&end_date=2009-04-30&granularity=month&apikey=<YOUR_KEY>`
 
 ### Results
 
@@ -217,15 +217,15 @@ List the top phrases for a facet.
 
 * List the top words in July 2010 by count:
     
-    `/phrases.json?entity_type=month&entity_value=201007&sort=count+desc`
+    `/phrases.json?entity_type=month&entity_value=201007&sort=count+desc&apikey=<YOUR_KEY>`
 
 * List the top words for Nevada:
     
-    `/phrases.json?entity_type=state&entity_value=NV`
+    `/phrases.json?entity_type=state&entity_value=NV&apikey=<YOUR_KEY>`
 
 * List the top words for Barbara Lee:
     
-    `/phrases.json?entity_type=legislator&entity;_value=L000551`
+    `/phrases.json?entity_type=legislator&entity_value=L000551&apikey=<YOUR_KEY>`
 
 ### Results
 
@@ -295,11 +295,11 @@ phrase. Standard arguments are supported.
 
 * List the top 10 legislators for the phrase 'free market' by raw count:
     
-    `/phrases/legislator.json?phrase=free+market&sort=count&per_page=10`
+    `/phrases/legislator.json?phrase=free+market&sort=count&per_page=10&apikey=<YOUR_KEY>`
 
 * Find the chamber that says 'salary increase' the most:
     
-    `/phrases/chamber.json?phrase=salary+increase&sort=count`
+    `/phrases/chamber.json?phrase=salary+increase&sort=count&apikey=<YOUR_KEY>`
 
 ### Results
 
@@ -363,11 +363,11 @@ No single argument is required to this endpoint; however, at least one of the te
 
 * Get a list of pieces of text with the phrase "obama administration" in them:
     
-    `/text.json?phrase=obama+administration`
+    `/text.json?phrase=obama+administration&apikey=<YOUR_KEY>`
 
 * Get a list of pieces of text by Republicans with the phrase "health care debate" in them:
 
-    `/text.json?phrase=health+care+debate&party=R`
+    `/text.json?phrase=health+care+debate&party=R&apikey=<YOUR_KEY>`
 
 ### Results
 
