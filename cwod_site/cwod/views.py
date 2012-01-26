@@ -67,6 +67,7 @@ def index(request):
 
 def faster_term_detail(request, term):
     # For better URLs, replace spaces with underscores and strip trailing punctuation
+    term = term.strip('"\' ')
     if re.search(r'\s', term) or re.search(r'[%s]$' % ''.join(PUNCTUATION), term):
         term = re.sub(r'[%s]$' % ''.join(PUNCTUATION), '', term)
         term = re.sub(r'\s', '_', term.strip())
@@ -109,7 +110,9 @@ def faster_term_detail(request, term):
 
 def term_detail(request, term):
 
-    # For better URLs, replace spaces with underscores & strip trailing punctuation
+    # For better URLs, replace spaces with underscores & strip trailing punctuation,
+    # as well as bordering quotation marks
+    term = term.strip('"\' ')
     if re.search(r'\s', term) or re.search(r'[%s]$' % ''.join(PUNCTUATION), term):
         term = re.sub(r'[%s]$' % ''.join(PUNCTUATION), '', term)
         term = re.sub(r'\s', '_', term.strip())
