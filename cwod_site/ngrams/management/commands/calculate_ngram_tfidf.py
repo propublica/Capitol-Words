@@ -267,5 +267,6 @@ class Command(BaseCommand):
                             NgramsByState.objects.filter(state=facet, n=n, ngram=ngram).delete()
                             NgramsByState.objects.create(n=n,
                                                          state=facet,
+                                                         ngram=ngram,
                                                          tfidf=tfidf,
                                                          count=count)
