@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.views.generic.simple import direct_to_template
 
 from views import *
-
+import emitters
 
 #from mongo_views import *
 
