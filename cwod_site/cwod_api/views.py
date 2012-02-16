@@ -862,6 +862,9 @@ class LegislatorLookupHandler(BaseHandler):
                 if has_congress and legislator.congress == current_congress and (legislator.end_date < latest - datetime.timedelta(10)):
                     continue
                 legislators.append({'name': unicode(legislator),
+                                    'first': legislator.first,
+                                    'middle': legislator.middle,
+                                    'last': legislator.last,
                                     'state': legislator.state,
                                     'party': legislator.party,
                                     'chamber': legislator.chamber,
