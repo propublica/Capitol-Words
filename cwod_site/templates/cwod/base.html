@@ -243,8 +243,9 @@
                 "js/chartbeat.js");
                 document.body.appendChild(e);
             }
-            $(window).bind('load', function(){
+            $(window).bind('load.chartbeat', function(){
                 loadChartbeat();
+                $(window).unbind('load.chartbeat');
             });
         })(jQuery);
 
