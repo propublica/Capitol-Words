@@ -805,7 +805,8 @@ class FullTextSearchHandler(GenericHandler):
 
     def format_for_return(self, data, *args, **kwargs):
         num_found = data['response']['numFound']
-        results = [{'bioguide_id': x.get('speaker_bioguide'),
+        results = [{'id': x.get('id', None),
+                    'bioguide_id': x.get('speaker_bioguide'),
                     'date': re.sub(r'T\d\d\:\d\d:\d\dZ$', '', x['date']),
                     'speaking': x.get('speaking'),
                     'title': x.get('document_title', ''),
