@@ -109,7 +109,7 @@ class GenericHandler(BaseHandler):
             q.append("date:[%s TO %s]" % (self.as_solr_date(start), self.as_solr_date(end)))
 
         elif 'start_date' in request.GET or 'end_date' in request.GET:
-            defaults = (datetime.date(1996, 01, 01).strftime('%Y-%m-%d'),
+            defaults = (datetime.date(settings.START_YEAR, 01, 01).strftime('%Y-%m-%d'),
                         datetime.date.today().strftime('%Y-%m-%d'))
             start = dateparse(request.GET.get('start_date', defaults[0]))
             end = dateparse(request.GET.get('end_date', defaults[1]))
