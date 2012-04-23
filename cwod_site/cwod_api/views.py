@@ -465,7 +465,7 @@ class ChartHandler(GenericHandler):
                 return {'results': {'url': self._partyline(resultsets), }, }
 
             elif request.GET.get('compare') == 'true':
-                phrases = request.GET.get('phrases', '').split(',')[:5] # Max of 5 phrases
+                phrases = request.GET.get('phrases', '').split(',')[:5]  # Max of 5 phrases
                 parties = request.GET.get('parties', '').split(',')
                 states = request.GET.get('states', '').split(',')
                 #chambers = request.GET.get('chambers', '').split(',')
@@ -485,8 +485,8 @@ class ChartHandler(GenericHandler):
                 width = int(request.GET.get('width', 575))
                 height = int(request.GET.get('height', 300))
                 chart = SimpleLineChart(width, height)
-                chart.set_grid(0, 50, 2, 5) # Set gridlines
-                chart.fill_solid('bg', '00000000') # Make the background transparent
+                chart.set_grid(0, 50, 2, 5)  # Set gridlines
+                chart.fill_solid('bg', '00000000')  # Make the background transparent
                 chart.set_colours(colors)
                 maxcount = 0
 
@@ -499,7 +499,7 @@ class ChartHandler(GenericHandler):
                 # in the querystring, that will override any values
                 # set in 'phrases' or 'parties.')
                 for n, phrase in enumerate(phrases):
-                    chart.set_line_style(n, thickness=2) # Set line thickness
+                    chart.set_line_style(n, thickness=2)  # Set line thickness
 
                     if not phrase.strip():
                         continue
@@ -539,7 +539,7 @@ class ChartHandler(GenericHandler):
                         months = [x['month'] for x in results]
                         januaries = [x for x in months if x.endswith('01')]
                         january_indexes = [months.index(x) for x in januaries]
-                        january_percentages = [int((x/float(len(months)))*100) for x in january_indexes]
+                        january_percentages = [int((x / float(len(months))) * 100) for x in january_indexes]
                         index = chart.set_axis_labels(Axis.BOTTOM, [x[:4] for x in januaries[::2]])
                         chart.set_axis_positions(index, [x for x in january_percentages[::2]])
 
@@ -551,8 +551,8 @@ class ChartHandler(GenericHandler):
                 else:
                     label = int(maxcount)
 
-                index = chart.set_axis_labels(Axis.LEFT, [label,])
-                chart.set_axis_positions(index, [100,])
+                index = chart.set_axis_labels(Axis.LEFT, [label, ])
+                chart.set_axis_positions(index, [100, ])
 
                 # Always include a legend when comparing.
                 chart.set_legend(legend_items)
@@ -610,7 +610,7 @@ class ChartHandler(GenericHandler):
         if self.request.GET.get('labels', 'true') != 'false':
             chart.set_pie_labels(labels)
         chart.set_colours(colors)
-        chart.fill_solid('bg', '00000000') # Make the background transparent
+        chart.fill_solid('bg', '00000000')  # Make the background transparent
         if self.request.GET.get('output') == 'data':
             return (labels, counts)
         return chart.get_url()
@@ -629,16 +629,16 @@ class ChartHandler(GenericHandler):
         height = int(self.request.GET.get('height', 300))
         chart = SimpleLineChart(width, height, y_range=(0, max(counts)))
         chart.add_data(counts)
-        chart.set_line_style(0, thickness=2) # Set line thickness
-        chart.set_colours(['E0B300',])
-        chart.fill_solid('bg', '00000000') # Make the background transparent
-        chart.set_grid(0, 50, 2, 5) # Set gridlines
+        chart.set_line_style(0, thickness=2)  # Set line thickness
+        chart.set_colours(['E0B300', ])
+        chart.fill_solid('bg', '00000000')  # Make the background transparent
+        chart.set_grid(0, 50, 2, 5)  # Set gridlines
 
         if self.request.GET.get('granularity') == 'month':
             months = [x['month'] for x in results]
             januaries = [x for x in months if x.endswith('01')]
             january_indexes = [months.index(x) for x in januaries]
-            january_percentages = [int((x/float(len(months)))*100) for x in january_indexes]
+            january_percentages = [int((x / float(len(months))) * 100) for x in january_indexes]
             index = chart.set_axis_labels(Axis.BOTTOM, [x[:4] for x in januaries[::2]])
             chart.set_axis_positions(index, [x for x in january_percentages[::2]])
 
@@ -647,8 +647,8 @@ class ChartHandler(GenericHandler):
             label += '%'
         else:
             label = int(maxcount)
-        index = chart.set_axis_labels(Axis.LEFT, [label,])
-        chart.set_axis_positions(index, [100,])
+        index = chart.set_axis_labels(Axis.LEFT, [label, ])
+        chart.set_axis_positions(index, [100, ])
 
         if self.request.GET.get('legend', 'true') != 'false':
             chart.set_legend([self.request.GET.get('phrase'), ])
@@ -676,7 +676,7 @@ class ChartHandler(GenericHandler):
                 months = [x['month'] for x in results['results']]
                 januaries = [x for x in months if x.endswith('01')]
                 january_indexes = [months.index(x) for x in januaries]
-                january_percentages = [int((x/float(len(months)))*100) for x in january_indexes]
+                january_percentages = [int((x / float(len(months))) * 100) for x in january_indexes]
 
             #times = [x.get(granularity) for x in results['results']]
 
@@ -684,8 +684,8 @@ class ChartHandler(GenericHandler):
         height = int(self.request.GET.get('height', 318))
         chart = SimpleLineChart(width, height, y_range=(0, max(counts)))
 
-        chart.fill_solid('bg', '00000000') # Make the background transparent
-        chart.set_grid(0, 50, 2, 5) # Set gridlines
+        chart.fill_solid('bg', '00000000')  # Make the background transparent
+        chart.set_grid(0, 50, 2, 5)  # Set gridlines
 
         if granularity == 'month':
             index = chart.set_axis_labels(Axis.BOTTOM, [x[:4] for x in januaries[::2]])
@@ -695,12 +695,12 @@ class ChartHandler(GenericHandler):
             label = '%.4f' % maxcount
         else:
             label = int(maxcount)
-        index = chart.set_axis_labels(Axis.LEFT, [label,])
-        chart.set_axis_positions(index, [100,])
+        index = chart.set_axis_labels(Axis.LEFT, [label, ])
+        chart.set_axis_positions(index, [100, ])
 
         for n, counts in enumerate(allcounts):
             chart.add_data(counts)
-            chart.set_line_style(n, thickness=2) # Set line thickness
+            chart.set_line_style(n, thickness=2)  # Set line thickness
 
         colors = {'R': 'bb3110', 'D': '295e72', }
         chart_colors = []
@@ -785,9 +785,9 @@ class FullTextSearchHandler(GenericHandler):
             if 'title' in request.GET:
                 kwargs['q'].append('document_title:"%s"' % request.GET['title'])
         elif 'title' in request.GET:
-            kwargs['q'] = ['document_title:"%s"' % request.GET['title'],]
+            kwargs['q'] = ['document_title:"%s"' % request.GET['title'], ]
         else:
-            kwargs['q'] = ['*:*',]
+            kwargs['q'] = ['*:*', ]
             #sort = 'id asc'
 
         if request.GET.get('cr_pages') or request.GET.get('page_id'):
@@ -808,7 +808,7 @@ class FullTextSearchHandler(GenericHandler):
         results = [{'id': x.get('id'),
                     'bioguide_id': x.get('speaker_bioguide'),
                     'date': re.sub(r'T\d\d\:\d\d:\d\dZ$', '', x.get('date')),
-                    'speaking': re.sub(r'[ ]+', ' ', x.get('speaking')),
+                    'speaking': [re.sub(r'[ ]+', ' ', chunk) for chunk in x.get('speaking')],
                     'title': x.get('document_title', ''),
                     'origin_url': create_gpo_url(x.get('crdoc', '')),
                     'capitolwords_url': settings.CAPWORDS_ROOT +
@@ -828,7 +828,7 @@ class FullTextSearchHandler(GenericHandler):
                     'number': x.get('number'),
                     'order': int(x.get('id', 0).split('.chunk')[1])
                  }
-                 for x in data['response']['docs'] ]
+                 for x in data['response']['docs']]
         return {'num_found': num_found, 'results': results, }
 
 
@@ -996,6 +996,7 @@ class DocListHandler(BaseHandler):
                                         session=session
                                         ).order_by('date').values_list('date__month', flat=True).distinct()
 
+
 class DocDetailHandler(BaseHandler):
     fields = ('document_title', 'slug', 'chamber', 'page_id', 'date', 'congress', 'session',
                 ('legislators',
@@ -1064,6 +1065,7 @@ class MonthListHandler(GenericHandler):
     def read(self, request, *args, **kwargs):
         raw_months = Date.objects.extra(select={"month": 'EXTRACT(YEAR_MONTH FROM date)'}).values_list('month', flat=True).distinct()
         return raw_months
+
 
 class DatesInMonthHandler(GenericHandler):
     def read(self, request, *args, **kwargs):
