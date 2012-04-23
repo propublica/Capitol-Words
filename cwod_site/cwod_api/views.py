@@ -1,38 +1,36 @@
-from collections import defaultdict
-from operator import itemgetter
-from itertools import groupby
 import re
 import datetime
 import json
 import logging
 import urllib
 import urllib2
+import numpy
 
+from collections import defaultdict
+from operator import itemgetter
+from itertools import groupby
 from django.conf import settings
 from django.core.cache import cache
 from django.db.models import *
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.db import connections, DatabaseError
+from piston.handler import BaseHandler
+from piston.resource import Resource
+from dateutil.parser import parse as dateparse
+from dateutil.relativedelta import relativedelta
+from pygooglechart import SimpleLineChart, PieChart2D, Axis
+from smooth import smooth
 
 from bioguide.models import *
 from cwod_api.models import *
 from ngrams.models import *
-
-from piston.handler import BaseHandler
-from piston.resource import Resource
-
-from dateutil.parser import parse as dateparse
-from dateutil.relativedelta import relativedelta
-from pygooglechart import SimpleLineChart, PieChart2D, Axis
-import numpy
-
-from smooth import smooth
-
 from cwod.utils import get_entry_detail_url
+
 
 class GenericHandler(BaseHandler):
 
     DEFAULT_PER_PAGE = 50
+    MAX_PER_PAGE = 1000
 
     ENTITIES = {'state': 'speaker_state',
                 'party': 'speaker_party',
@@ -72,12 +70,11 @@ class GenericHandler(BaseHandler):
             per_page = int(request.GET.get('per_page', self.DEFAULT_PER_PAGE))
         except ValueError:
             per_page = self.DEFAULT_PER_PAGE
-        if per_page > self.DEFAULT_PER_PAGE:
-            per_page = self.DEFAULT_PER_PAGE
+        if per_page > self.MAX_PER_PAGE:
+            per_page = self.MAX_PER_PAGE
 
         offset = int(request.GET.get('page', 0)) * per_page
         return per_page, offset
-
 
     def read(self, request, *args, **kwargs):
         q = kwargs.get('q', [])
@@ -87,19 +84,18 @@ class GenericHandler(BaseHandler):
         for k, v in self.ENTITIES.iteritems():
 
             param_val = None
-            if k in request.GET and request.GET[k]: # Make sure value isn't blank
+            if k in request.GET and request.GET[k]:  # Make sure value isn't blank
                 param_val = request.GET[k]
             if k in kwargs and kwargs[k]:
                 param_val = kwargs[k]
 
             # this is hacky, but the right way to do it seems to require changing ENTITIES, which
             # I'm loathe to do without fully understanding how it's used
-            if k=='state' and param_val in ('OR', 'AND'): # not that it will ever be AND, but add reserved words as nec...
+            if k == 'state' and param_val in ('OR', 'AND'):  # not that it will ever be AND, but add reserved words as nec...
                 param_val = '"%s"' % param_val
 
             if param_val is not None:
                 q.append('%s:%s' % (v, param_val))
-
 
         if 'date' in request.GET:
             date = dateparse(request.GET['date'])
@@ -143,7 +139,7 @@ class GenericHandler(BaseHandler):
         if n not in range(1, 6):
             return error
 
-        facet_field = self.FIELDS[n-1]
+        facet_field = self.FIELDS[n - 1]
         #q.append('-document_title:"earmark declaration"')
 
         params = {'q': '(%s)' % ' AND '.join(q),
@@ -199,7 +195,7 @@ class GenericHandler(BaseHandler):
                         total = date_counts.get(int(i[granularity]), 0)
                     if show_percentages:
                         if total:
-                            i['percentage'] = (i['count'] / float(total))*100
+                            i['percentage'] = (i['count'] / float(total)) * 100
                         else:
                             i['percentage'] = 0
                     if show_totals or show_percentages or smoothing != 0:
@@ -211,7 +207,7 @@ class GenericHandler(BaseHandler):
                     i['raw_count'] = i['count']
                     i['count'] = smoothed[n]
                     if show_percentages:
-                        pct = (i['count'] / float(i['total']))*100
+                        pct = (i['count'] / float(i['total'])) * 100
                         if pct == numpy.inf:
                             continue
                         else:
@@ -234,7 +230,7 @@ class GenericHandler(BaseHandler):
                     #if row['raw_count'] > 0:
                     if row.get('raw_count', row.get('count')) > 0:
                         break
-                data = data[start:len(data)-stop]
+                data = data[start:len(data) - stop]
 
             return {'results': data, }
 
@@ -242,6 +238,7 @@ class GenericHandler(BaseHandler):
             data = json.loads(results)
 
         return self.format_for_return(data, *args, **kwargs)
+
 
 class PopularPhraseHandler(BaseHandler):
     """Most frequent phrases.
@@ -254,6 +251,7 @@ class PopularPhraseHandler(BaseHandler):
         'tfidf asc': 'tfidf'
     }
     DEFAULT_PER_PAGE = 100
+    MAX_PER_PAGE = 1000
 
     def read(self, request, *args, **kwargs):
         allowed_entities = {
@@ -313,16 +311,15 @@ class PopularPhraseHandler(BaseHandler):
         qset = model.objects.filter(**query)
         if sort:
             qset = qset.order_by(self.SORT_FIELDS[sort])
-        return qset[offset:offset+per_page]
-
+        return qset[offset:offset + per_page]
 
     def get_pagination(self, request):
         try:
             per_page = int(request.GET.get('per_page', self.DEFAULT_PER_PAGE))
         except ValueError:
             per_page = self.DEFAULT_PER_PAGE
-        if per_page > self.DEFAULT_PER_PAGE:
-            per_page = self.DEFAULT_PER_PAGE
+        if per_page > self.MAX_PER_PAGE:
+            per_page = self.MAX_PER_PAGE
 
         offset = int(request.GET.get('page', 0)) * per_page
         return per_page, offset
@@ -338,7 +335,7 @@ class PhraseByCategoryHandler(GenericHandler):
         phrase = ' '.join(tokenize(phrase))
         n = len(phrase.split())
         try:
-            field = self.FIELDS[n-1]
+            field = self.FIELDS[n - 1]
         except IndexError:
             return {'error': 'The value given for the "phrase" parameter is too long. A phrase of five words or fewer is required.', 'results': []}
 
@@ -373,7 +370,7 @@ class PhraseTreeHandler(GenericHandler):
         kwargs['params'] = {'facet.prefix': phrase, }
 
         pieces = request.GET['phrase'].split()
-        n = len(pieces)+1
+        n = len(pieces) + 1
         if n > 5:
             n = '5'
         else:
@@ -381,6 +378,7 @@ class PhraseTreeHandler(GenericHandler):
         kwargs['n'] = n
 
         return super(PhraseTreeHandler, self).read(request, *args, **kwargs)
+
 
 def tokenize(term):
     from nltk import regexp_tokenize
@@ -401,7 +399,7 @@ def tokenize(term):
   | [][.,;"'?():-_`]
     '''
     # Strip punctuation from this one; solr doesn't know about any of it
-    tokens = regexp_tokenize(term,regex)
+    tokens = regexp_tokenize(term, regex)
     # tokens = [re.sub(r'[.,?!]', '', token) for token in tokens]
     return tokens
 
@@ -420,7 +418,7 @@ class PhraseOverTimeHandler(GenericHandler):
         if n not in range(1, 6):
             return {'error': 'The value given for the parameter "n" is invalid. An integer between one and five is required.', 'results': [], }
 
-        field = self.FIELDS[n-1]
+        field = self.FIELDS[n - 1]
 
         if request.GET.get('stem') == 'true':
             from nltk.stem import PorterStemmer
@@ -809,8 +807,8 @@ class FullTextSearchHandler(GenericHandler):
         num_found = data['response']['numFound']
         results = [{'id': x.get('id'),
                     'bioguide_id': x.get('speaker_bioguide'),
-                    'date': re.sub(r'T\d\d\:\d\d:\d\dZ$', '', x['date']),
-                    'speaking': x.get('speaking'),
+                    'date': re.sub(r'T\d\d\:\d\d:\d\dZ$', '', x.get('date')),
+                    'speaking': re.sub(r'[ ]+', ' ', x.get('speaking')),
                     'title': x.get('document_title', ''),
                     'origin_url': create_gpo_url(x.get('crdoc', '')),
                     'capitolwords_url': settings.CAPWORDS_ROOT +
