@@ -808,7 +808,7 @@ class FullTextSearchHandler(GenericHandler):
         results = [{'id': x.get('id'),
                     'bioguide_id': x.get('speaker_bioguide'),
                     'date': re.sub(r'T\d\d\:\d\d:\d\dZ$', '', x.get('date')),
-                    'speaking': [re.sub(r'[ ]+', ' ', chunk) for chunk in x.get('speaking')],
+                    'speaking': [re.sub(r'[ ]+', ' ', chunk) for chunk in x.get('speaking', [])],
                     'title': x.get('document_title', ''),
                     'origin_url': create_gpo_url(x.get('crdoc', '')),
                     'capitolwords_url': settings.CAPWORDS_ROOT +
