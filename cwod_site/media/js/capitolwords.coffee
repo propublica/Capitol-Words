@@ -329,7 +329,7 @@ class window.CapitolWords
         fields =
             url: window.location.href
             chart_color: if $('#embedDark:checked').length then 2 else 1
-            title: window.document.title.split(' | ')[0]
+            title: $('#internalHead h2.withButton').text()
             img_src: ''
             by_party_img_src: ''
             overall_img_src: ''
