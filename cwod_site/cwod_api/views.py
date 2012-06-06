@@ -776,23 +776,22 @@ class FullTextSearchHandler(GenericHandler):
     def read(self, request, *args, **kwargs):
 
         per_page, offset = self.get_pagination(request)
-        sort = None
-        kwargs['params'] = {}
+        try:
+            kwargs['params']
+        except KeyError:
+            kwargs['params'] = {}
 
         if 'q' in request.GET:
             kwargs['q'] = ['speaking:%s' % request.GET['q'], ]
             kwargs['params']['q.op'] = 'AND'
-            sort = None
         elif 'phrase' in request.GET:
             kwargs['q'] = ['speaking:"%s"' % request.GET['phrase'], ]
-            sort = None
             if 'title' in request.GET:
                 kwargs['q'].append('document_title:"%s"' % request.GET['title'])
         elif 'title' in request.GET:
             kwargs['q'] = ['document_title:"%s"' % request.GET['title'], ]
         else:
             kwargs['q'] = ['*:*', ]
-            #sort = 'id asc'
 
         if request.GET.get('cr_pages') or request.GET.get('page_id'):
             per_page = '1000'
