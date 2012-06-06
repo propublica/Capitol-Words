@@ -781,6 +781,7 @@ class FullTextSearchHandler(GenericHandler):
 
         if 'q' in request.GET:
             kwargs['q'] = ['speaking:%s' % request.GET['q'], ]
+            kwargs['params']['q.op'] = 'AND'
             sort = None
         elif 'phrase' in request.GET:
             kwargs['q'] = ['speaking:"%s"' % request.GET['phrase'], ]
