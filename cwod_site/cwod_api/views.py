@@ -166,6 +166,8 @@ class GenericHandler(BaseHandler):
             elif granularity == 'year':
                 params['facet.field'] = 'year'
 
+        params['q'] = params['q'].encode('utf-8', 'ignore')
+
         url = 'http://%s:%s/solr/select?%s' % (settings.SOLR_SERVER,
                                                settings.SOLR_PORT,
                                                urllib.urlencode(params))
