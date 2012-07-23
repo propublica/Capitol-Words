@@ -83,7 +83,7 @@ input{padding:5px 8px;background:#e6e4e2 url('../img/bg_input.png') left bottom 
 .barChartTitle{z-index:2;position:relative;padding-left:10px;}
 .tagNumber{z-index:2;position:relative;float:right;display:block;padding-right:10px;}
 #rtColumn .barChart li{height:20px;line-height:18px;background-color:#453c3c;}
-#sfLogo{text-indent:-9999em;display:block;height:39px;width:127px;background:url('../img/logo_sunlight.png') 0 0 no-repeat;float:left;margin-right:85px;margin-top:10px;}
+#sfLogo{text-indent:-9999em;display:block;height:39px;width:130px;background:url('../img/logo_sunlight.png') 0 0 no-repeat;float:left;margin-right:65px;margin-top:11px;}
 #privacyPolicy{color:#84837b;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;line-height:18px;margin-top:15px;float:left;width:650px;}
 #popularPages{float:left;width:330px;padding:0 30px;}
 #popularWords{float:left;width:520px;padding:0 0 0 30px;background:url('../img/bg_vertBorder.jpg') left top repeat-y;}
