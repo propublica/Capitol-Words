@@ -1,6 +1,14 @@
-{# {% with 'http://'|add:request.META.HTTP_HOST|add:request.path|add:'?'|add:request.META.QUERY_STRING as url %} #}
+{% with 'http://'|add:request.META.HTTP_HOST|add:request.path|add:'?'|add:request.META.QUERY_STRING as url %}
+<div id="socialIcons" class="share-buttons"
+     data-gigya="auto"
+     data-services="twitter, facebook"
+     data-options="linkBack={{ url|urlencode:'' }}&amp;size=16&amp;showCounts=right"
+     data-twitter-options="via=sunfoundation">
+</div>
+{% comment %}
 <div id="socialIcons">
     <a href="https://twitter.com/share" class="twitter-share-button" data-count="none">Tweet</a>
     <div class="fb-like" data-send="false" data-layout="button_count" data-width="86" data-show-faces="false" data-colorscheme="light" data-font="arial"></div>
 </div>
-{# {% endwith %} #}
+{% endcomment %}
+{% endwith %}

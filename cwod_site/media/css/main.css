@@ -5,8 +5,9 @@ dl.tip{font-style:oblique;text-transform:lowercase;color:#746f6d;margin-top:5px;
 .fullButton{overflow:visible;background:#706363 url('../img/bg_button.png') left 3px repeat-x;border:1px solid #021017;-moz-border-radius:5px;-webkit-border-radius:5px;color:#fff;text-decoration:none;font-size:120%;padding:5px 30px;font-family:Georgia,"Times New Roman",Times,serif;}
 .fullButton:hover{background:#5a5050 url('../img/bg_button.png') left 3px repeat-x;color:#eae5e5;}
 .fullButton:visited{color:#ffffff;}
-#socialIcons{float:right;clear:right;margin-top:10px;}
-.footer-social-icons{float:right;background:#494141;margin-top:12px;}
+#socialIcons{float:right;clear:right;margin-top:10px;line-height:1;}
+#main #socialIcons img{border:none;}
+.footer-social-icons{float:right;background:#494141;margin-top:12px;line-height:1;}
 #socialIcons iframe,.footer-social-icons iframe, #socialIcons div.fb-like, .footer-social-icons div.fb-like{float:left;margin:0 0 0 15px;}
 #socialIcons div.fb-like iframe, .footer-social-icons div.fb-like iframe{float:none;margin:0}
 #containerWrapper{background:url('../img/bg.jpg') center top repeat-x;}

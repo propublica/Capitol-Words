@@ -98,9 +98,16 @@
                         <li><a href="{% url cwod_about %}">About</a></li>
                         <li><a href="{% url cwod_contact %}">Contact</a></li>
                     </ul>
-                    <div class="footer-social-icons">
-                        <a href="https://twitter.com/share" class="twitter-share-button" data-via="SunFoundation" data-text="Capitol Words: Dig up some data on the words our legislators use every day." data-url="http://capitolwords.org/">Tweet</a>
-                        <div class="fb-like" data-href="http://capitolwords.org/" data-send="false" data-layout="button_count" data-width="100" data-show-faces="false" data-colorscheme="light" data-font="arial"></div>
+                    <div class="footer-social-icons share-buttons"
+                         data-gigya="auto"
+                         data-services="twitter-tweet, facebook-like"
+                         data-options="linkBack=http%3A%2F%2Fcapitolwords.org%2F&amp;size=16&amp;showCounts=right"
+                         data-twitter-tweet-options="defaultText=Capitol%20Words%3A%20Dig%20up%20some%20data%20on%20the%20words%20our%20legislators%20use%20every%20day.&amp;via=sunfoundation"
+                         data-facebook-like-options="width=100&amp;colorscheme=light&amp;show-faces=false&amp;layout=button_count">
+                        {% comment %}
+                            <a href="https://twitter.com/share" class="twitter-share-button" data-via="SunFoundation" data-text="Capitol Words: Dig up some data on the words our legislators use every day." data-url="http://capitolwords.org/">Tweet</a>
+                            <div class="fb-like" data-href="http://capitolwords.org/" data-send="false" data-layout="button_count" data-width="100" data-show-faces="false" data-colorscheme="light" data-font="arial"></div>
+                        {% endcomment %}
                     </div>
                     <div class="clear"></div>
                 </nav>
@@ -202,7 +209,7 @@
         {% block javascript %}
 
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-
+        <script type="text/javascript" src="http://assets.sunlightfoundation.com.s3.amazonaws.com/site/4.0/scripts/gigya.min.js"></script>
         <script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="/media/js/history/scripts/compressed/json2.js"><\/script>'); }</script>
 
         {% js "js/joined.js" %}
