@@ -46,6 +46,9 @@ def date_parse(s):
     except:
         return ''
 
+@register.filter(name='rstrip')
+def template_rstrip(str, val):
+    return str.rstrip(val)
 
 @register.filter(name='smart_title')
 def smart_title(s):
