@@ -308,6 +308,8 @@ class PopularPhraseHandler(BaseHandler):
                 return {'error': 'Invalid date.', 'results': []}
 
         query = {'n': n}
+        if query['n'] == 0:
+            del query['n']
         if val:
             query.update({field: val})
         qset = model.objects.filter(**query)
