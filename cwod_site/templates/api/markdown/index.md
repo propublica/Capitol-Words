@@ -18,25 +18,25 @@ All endpoints below are relative to this page, the API root. So, to make a reque
 
 ## Standard arguments
 
-All of the endpoints pulling from Solr support a set of standard arguments, 
-all of which are optional. Endpoints with support for standard arguments will 
+All of the endpoints pulling from Solr support a set of standard arguments,
+all of which are optional. Endpoints with support for standard arguments will
 be flagged as such below.
 
 * `state`
-    
+
     Limit results to members of Congress from the given state.
-    
+
     Valid values: 2-letter state abbreviation, such as MD, VA, DC.
 
 * `party`
-    
+
     Limit results to members of Congress from the given party.
-    
+
     Valid values: R, D, I
 
 * `chamber`
 
-    The chamber to search. Default includes House, Senate and extensions of 
+    The chamber to search. Default includes House, Senate and extensions of
     remarks.
 
     Valid values:
@@ -75,27 +75,27 @@ Find the popularity of a phrase over a period of time. Standard arguments are su
 ### Optional arguments
 
 * `bioguide`
-    
+
     Limit results to the member of Congress with the given Bioguide ID.
 
 
 * `mincount`
-    
+
     Only return results where mentions are at or above the supplied threshold
 
 * `percentages`
-    
-    Include the percentage of mentions versus total words in the result 
+
+    Include the percentage of mentions versus total words in the result
     objects.
-    
+
     Valid values: true, **false** (default).
 
 * `granularity`
-    
+
     The length of time covered by each result.
-    
+
     Valid values:
-    
+
     * year
     * month
     * **day** (default)
@@ -104,27 +104,27 @@ Find the popularity of a phrase over a period of time. Standard arguments are su
 
 * Get a list of how many times the phrase "united states" appears in the
   Congressional Record on each day in the most recent Congress:
-    
+
     `dates.json?phrase=united+states&apikey=<YOUR_KEY>`
 
 * Get a list of how many times the phrase "united states" was said by
   legislators from Virginia on each day of the most recent Congress:
-    
+
     `dates.json?phrase=united+states&entity_type=state&entity_value=VA&apikey=<YOUR_KEY>`
 
 * Get a list of how many times the phrase "united States" appears in the
   Congressional Record on each day between Jan. 1, 2010, and June 1, 2010:
-    
+
     `dates.json?phrase=united+states&start_date=2009-01-01&end_date=2009-06-01&apikey=<YOUR_KEY>`
 
 * Get a list of how many times the phrase "united states" appears in the Congressional Record in each month between January and June, 2010:
-    
+
     `dates.json?phrase=united+states&start_date=2009-01-01&end_date=2009-04-30&granularity=month&apikey=<YOUR_KEY>`
 
 ### Results
 
 Returns a list of date objects with associated mention data
-    
+
     {
         "results": [
             {
@@ -170,20 +170,20 @@ List the top phrases for a facet.
 ### Required arguments
 
 * `entity_type `
-    
+
     The entity type to get top phrases for.
-    
+
     Valid values:
-    
+
     * date
     * month
     * state
     * legislator
 
 * `entity_value`
-    
+
     The value of the entity given in entity_type. Formats are as follows:
-    
+
     * **date:** 2011-11-09
     * **month:** 201111
     * **state:** NY
@@ -192,39 +192,39 @@ List the top phrases for a facet.
 ### Optional arguments
 
 * `n`
-    
+
     The size of phrase, in words, to search for (up to 5).
 
 * `page`
-    
+
     The page of results to show.
-    
+
     100 results are shown at a time. To get more than 100 results, use the
     page parameter.
 
 * `sort`
-    
+
     The metric and direction to sort by.
-    
+
     Valid values:
-    
-    * **tfidf** (default) 
+
+    * **tfidf** (default)
     * count
-    
+
     Both a metric and direction must be supplied, such as 'sort=count asc'
 
 ### Examples
 
 * List the top words in July 2010 by count:
-    
+
     `/phrases.json?entity_type=month&entity_value=201007&sort=count+desc&apikey=<YOUR_KEY>`
 
 * List the top words for Nevada:
-    
+
     `/phrases.json?entity_type=state&entity_value=NV&apikey=<YOUR_KEY>`
 
 * List the top words for Barbara Lee:
-    
+
     `/phrases.json?entity_type=legislator&entity_value=L000551&apikey=<YOUR_KEY>`
 
 ### Results
@@ -262,13 +262,13 @@ Returns a list of phrases with tf-idf and count data
 
 ## phrases/{entity}.json
 
-Get the top (legislator|state|party|bioguide\_id|volume|chamber)s for a 
+Get the top (legislator|state|party|bioguide\_id|volume|chamber)s for a
 phrase. Standard arguments are supported.
 
 ### Required arguments
 
 * `phrase`
-    
+
     The phrase to search for.
 
 ### Optional arguments
@@ -278,27 +278,27 @@ phrase. Standard arguments are supported.
     Only return results where mentions are at or above the supplied threshold
 
 * `per_page`
-    
+
     The number of results to return per page. The maximum is 50.
 
 * `page`
-    
+
     The page number to return.
 
 * `sort`
-    
+
     The metric on which to sort top results.
-    **Note: direction is not supported on this endpoint, results are always 
-    returned in descending order.**
+    **Note: Facet sorts in Solr are alphabetically ascending by facet or descending
+    by count. The only valid values you can provide are 'count' or {entity}.**
 
 ## Examples
 
 * List the top 10 legislators for the phrase 'free market' by raw count:
-    
+
     `/phrases/legislator.json?phrase=free+market&sort=count&per_page=10&apikey=<YOUR_KEY>`
 
 * Find the chamber that says 'salary increase' the most:
-    
+
     `/phrases/chamber.json?phrase=salary+increase&sort=count&apikey=<YOUR_KEY>`
 
 ### Results
@@ -338,31 +338,31 @@ No single argument is required to this endpoint; however, at least one of the te
 ### Text search arguments
 
 * `phrase`
-    
+
     A phrase to search the body of each CR document for.
 
 * `title`
-    
+
     A phrase to search the title of each CR document for.
 
 ### Optional arguments
 
 * `bioguide`
-    
+
     Limit results to the member of Congress with the given Bioguide ID.
 
 * `cr_pages`
-    
+
     The pages in the Congressional Record to search.
 
 * `page`
-    
+
     The page of results to show, 100 results are shown at a time.
 
 ### Examples
 
 * Get a list of pieces of text with the phrase "obama administration" in them:
-    
+
     `/text.json?phrase=obama+administration&apikey=<YOUR_KEY>`
 
 * Get a list of pieces of text by Republicans with the phrase "health care debate" in them:
@@ -373,7 +373,7 @@ No single argument is required to this endpoint; however, at least one of the te
 
 Returns a list of CR Documents and the total number found
 
-    
+
     {
         "num_found": 347,
         "results": [
