@@ -337,7 +337,7 @@ class PhraseByCategoryHandler(GenericHandler):
 
         valid_sort_params = ['count', 'true', 'false', kwargs.get('entity_type')]
         if not request.GET.get('sort', 'count') in valid_sort_params:
-            return {'error': 'Valid sort options for this endpoint are: %s. Sorting directions are not supported.' % valid_sort_params.join(', ')}
+            return {'error': 'Valid sort options for this endpoint are: %s. Sorting directions are not supported.' % ', '.join(valid_sort_params)}
 
         phrase = request.GET.get('phrase') or kwargs.get('phrase')
         phrase = ' '.join(tokenize(phrase))
