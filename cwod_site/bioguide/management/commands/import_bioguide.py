@@ -26,7 +26,7 @@ class Command(BaseCommand):
         if args:
             congress = args[0]
         else:
-            congress = 112
+            congress = 113
 
         data = 'lastname=&firstname=&position=&state=&party=&congress=%s' % str(congress)
         url = 'http://bioguide.congress.gov/biosearch/biosearch1.asp'
