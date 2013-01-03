@@ -9,7 +9,7 @@ Sunlight API discussion takes place at the [sunlightlabs-api-discuss google grou
 
 ### Endpoints
 
-All endpoints below are relative to this page, the API root. So, to make a request to the dates.json endpoint, you'd use the url `http://capitolwords.org/api/dates.json?apikey=<YOUR_KEY>`.
+All endpoints below are relative to this page, the API root. So, to make a request to the dates.json endpoint, you'd use the url `http://capitolwords.org/api/1/dates.json?apikey=<YOUR_KEY>`.
 
 
 <a id="standard-arguments"></a>
