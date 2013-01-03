@@ -7,7 +7,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 
-        (r'^api/$', redirect_to, {'url': '/api/1/'})
+        (r'^api/$', redirect_to, {'url': '/api/1/'}),
         (r'^api/', include('cwod_api.urls')),
         (r'^api/1/', include('cwod_api.urls')),
 
