@@ -779,8 +779,8 @@ class window.CapitolWords
 
     readLegislatorHistory: ->
         hash = History.getState().hash.split('?')[1]
-        data = {congress: 112}
-        $("#congress").val(112)
+        data = {congress: 113}
+        $("#congress").val(113)
         if hash
             pieces = hash.split '&'
             chamber = party = congress = state = undefined

@@ -945,9 +945,9 @@ Requires: jQuery, jQuery ui slider, underscore
       var chamber, congress, data, hash, party, pieces, state;
       hash = History.getState().hash.split('?')[1];
       data = {
-        congress: 112
+        congress: 113
       };
-      $("#congress").val(112);
+      $("#congress").val(113);
       if (hash) {
         pieces = hash.split('&');
         chamber = party = congress = state = void 0;
