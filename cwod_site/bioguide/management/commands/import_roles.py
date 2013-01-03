@@ -14,8 +14,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         bioguide_ids = Legislator.objects.order_by('bioguide_id').values_list('bioguide_id', flat=True).distinct()
         for bioguide_id in bioguide_ids:
-            if LegislatorRole.objects.filter(bioguide_id=bioguide_id).count() > 0:
-                continue
+            # if LegislatorRole.objects.filter(bioguide_id=bioguide_id).count() > 0:
+            #     continue
 
             url = 'http://api.nytimes.com/svc/politics/v3/us/legislative/congress/members/%s.json?api-key=%s' % (bioguide_id, settings.NYT_API_KEY)
             try:
