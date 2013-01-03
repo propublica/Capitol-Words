@@ -12,6 +12,10 @@ from bioguide.models import *
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
+        try:
+            congress = args[0]
+        except IndexError:
+            congress = None
         bioguide_ids = Legislator.objects.order_by('bioguide_id').values_list('bioguide_id', flat=True).distinct()
         for bioguide_id in bioguide_ids:
             # if LegislatorRole.objects.filter(bioguide_id=bioguide_id).count() > 0:
@@ -28,6 +32,8 @@ class Command(BaseCommand):
             result = data['results'][0]
             roles = result['roles']
             for role in roles:
+                if congress and int(role['congress']) != int(congress):
+                    continue
                 print role
                 try:
                     LegislatorRole.objects.get_or_create(
