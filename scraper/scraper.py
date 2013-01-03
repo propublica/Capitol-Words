@@ -14,7 +14,7 @@ class CRScraper(object):
         # use httplib so that we can retrieve the headers before retrieving the
         # body.
         self.domain = "www.gpo.gov"
-        self.path = "/fdsys/delivery/getpackage.action"
+        self.path = "/fdsys/pkg/"
         self.date = None
         self.datestring = None
         self.url = None
@@ -25,7 +25,7 @@ class CRScraper(object):
         save them to the filesystem.'''
         self.date = date
         self.datestring = date.strftime("%Y-%m-%d")
-        self.url = self.path + "?packageId=CREC-%s" % self.datestring
+        self.url = self.path + "CREC-%s.zip" % self.datestring
 
     def was_in_session(self):
         # check the response header to make sure the Record exists for this date.
