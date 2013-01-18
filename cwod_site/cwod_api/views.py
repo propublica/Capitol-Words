@@ -335,7 +335,7 @@ class PhraseByCategoryHandler(GenericHandler):
         if not 'phrase' in request.GET and not 'phrase' in kwargs:
             return {'error': 'A value for the "phrase" parameter is required.', 'results': []}
 
-        if request.GET.get('sort') is 'count desc':
+        if request.GET.get('sort') == 'count desc':
             # FIXME: Copy request.GET at the top of this code path so the GenericHandler doesn't care about it
             request.GET._mutable = True
             request.GET['sort'] = 'count'
