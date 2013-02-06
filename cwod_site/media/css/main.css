@@ -10,6 +10,7 @@ dl.tip{font-style:oblique;text-transform:lowercase;color:#746f6d;margin-top:5px;
 .footer-social-icons{float:right;background:#494141;margin-top:12px;line-height:1;}
 #socialIcons iframe,.footer-social-icons iframe, #socialIcons div.fb-like, .footer-social-icons div.fb-like{float:left;margin:0 0 0 15px;}
 #socialIcons div.fb-like iframe, .footer-social-icons div.fb-like iframe{float:none;margin:0}
+.share-buttons table a, #main .share-buttons table a {border:none;}
 #containerWrapper{background:url('../img/bg.jpg') center top repeat-x;}
 #container,#footerSunlight,footer nav,#footerContent{margin:0 auto;width:940px;padding:0 10px;}
 header{margin-bottom:40px;}
