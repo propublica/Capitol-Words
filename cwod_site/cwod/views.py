@@ -523,7 +523,7 @@ def entry_detail(request, year, month, day, page_id, slug):
     chunks = []
     page = 0
     while True:
-        response = capitolwords.text(date=date, page_id=page_id, sort='id asc', page=page)
+        response = capitolwords.text(date=date, page_id=page_id, sort='id asc', per_page=1000, page=page)
         chunks += response
         if len(response) < 1000:
             break

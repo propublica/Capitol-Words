@@ -807,9 +807,6 @@ class FullTextSearchHandler(GenericHandler):
         else:
             kwargs['q'] = ['*:*', ]
 
-        if request.GET.get('cr_pages') or request.GET.get('page_id'):
-            per_page = '1000'
-
         kwargs['params'].update(facet='false',
                                 rows=per_page,
                                 start=offset,
