@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capitol Words API</title>
+    
+    
+  <link rel="shortcut icon" type="image/ico" href="http://s3.amazonaws.com/assets.sunlightfoundation.com/brisket/1.0/images/favicon.ico">
+  <link rel="stylesheet" type="text/css" href="documentup.css">
+  <script type="text/javascript" src="//use.typekit.net/egj6wnp.js"></script>
+  <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+</head>
+  <body><div id="container">
+  <div id="nav">
+    
+      <div id="header">
+        <a href="index.html" id="logo">Capitol Words API</a>
+      </div>
+    
+    <ul id="sections">
+      
+        <li>
+          <a href="#getting-started">Getting started</a>
+          
+            <ul>
+              
+                <li>
+                  <a href="#getting-started/discussion-bugs">Discussion &amp; Bugs</a>
+                </li>
+              
+                <li>
+                  <a href="#getting-started/root-uri">Root URI</a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+        <li>
+          <a href="#standard-arguments">Standard arguments</a>
+          
+        </li>
+      
+        <li>
+          <a href="#methods">Methods</a>
+          
+            <ul>
+              
+                <li>
+                  <a href="#methods/dates-json">dates.json</a>
+                </li>
+              
+                <li>
+                  <a href="#methods/phrases-json">phrases.json</a>
+                </li>
+              
+                <li>
+                  <a href="#methods/phrases-entity-json">phrases/:entity.json</a>
+                </li>
+              
+                <li>
+                  <a href="#methods/text-json">text.json</a>
+                </li>
+              
+            </ul>
+          
+        </li>
+      
+    </ul>
+    
+    
+      <div class="extra twitter">
+        <iframe allowtransparency="true" frameborder="0" scrolling="no" style="width:162px; height:20px;" src="https://platform.twitter.com/widgets/follow_button.html?screen_name=sunlightlabs&show_count=false"></iframe></div><div class="thanks">powered by <a href="http://documentup.com">DocumentUp</a></div>
+    
+  </div>
+  <div id="content">
+    
+    <h1>Capitol Words API</h1>
+<p>This documentation is for Version 1 of the Capitol Words API.<br>Version 1 is currently the only version, and is actively maintained.
+
+</p>
+<h2 id='getting-started'>Getting started</h2 id='getting-started'>
+<p>Listed below are the public methods currently supported by the Capitol
+Words API. All requests must be signed with a valid Sunlight labs API
+key. You can register for one here:
+</p>
+<p><a href="http://services.sunlightlabs.com/accounts/register">http://services.sunlightlabs.com/accounts/register</a>
+
+</p>
+<h3 id='getting-started/discussion-bugs'>Discussion &amp; Bugs</h3 id='getting-started/discussion-bugs'>
+<p>Sunlight API discussion takes place at the
+<a href="https://groups.google.com/forum/#!forum/sunlightlabs-api-discuss">sunlightlabs-api-discuss google group</a>.
+You can ask questions there, as well as alert the maintainers of bugs.
+If you have specific issues with the Capitol Words API, you can open a
+ticket directly at
+<a href="http://github.com/sunlightlabs/Capitol-Words/issues">github</a>.
+
+</p>
+<h3 id='getting-started/root-uri'>Root URI</h3 id='getting-started/root-uri'>
+<p>All endpoints below are relative to the API root:
+
+</p>
+<pre><code><span class="label">http:</span>//capitolwords<span class="preprocessor">.org</span>/api/<span class="number">1</span></code></pre>
+<p>So, to make a request to the dates.json endpoint, you&#39;d use a url that
+looks like this:
+
+</p>
+<pre><code>http://capitolwords.org/api/1/dates.json?apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<hr>
+<h2 id='standard-arguments'>Standard arguments</h2 id='standard-arguments'>
+<p>All of the endpoints pulling from Solr support a set of standard arguments,
+all of which are optional. Endpoints with support for standard arguments will
+be flagged as such below.
+
+</p>
+<ul>
+<li><p><code>state</code></p>
+<p>  Limit results to members of Congress from the given state.</p>
+<p>  Valid values: 2-letter state abbreviation, such as MD, VA, DC.</p>
+</li>
+<li><p><code>party</code></p>
+<p>  Limit results to members of Congress from the given party.</p>
+<p>  Valid values: R, D, I</p>
+</li>
+<li><p><code>chamber</code></p>
+<p>  The chamber to search. Default includes House, Senate and extensions of
+  remarks.</p>
+<p>  Valid values:</p>
+<ul>
+<li>house</li>
+<li>senate</li>
+<li>extensions</li>
+</ul>
+</li>
+<li><p><code>date</code></p>
+<p>  Show results for only the given date.</p>
+</li>
+<li><p><code>start_date</code></p>
+<p>  Limit results to those on or after the given date.</p>
+</li>
+<li><p><code>end_date</code></p>
+<p>  Limit results to those on or before the given date.</p>
+</li>
+</ul>
+<hr>
+<h2 id='methods'>Methods</h2 id='methods'>
+<h3 id='methods/dates-json'>dates.json</h3 id='methods/dates-json'>
+<p>Find the popularity of a phrase over a period of time. Standard arguments are supported.
+
+</p>
+<h4>Required arguments</h4>
+<ul>
+<li><p><code>phrase</code></p>
+<p>  The phrase to search for.</p>
+</li>
+</ul>
+<h4>Optional arguments</h4>
+<ul>
+<li><p><code>bioguide</code></p>
+<p>  Limit results to the member of Congress with the given Bioguide ID.</p>
+</li>
+</ul>
+<ul>
+<li><p><code>mincount</code></p>
+<p>  Only return results where mentions are at or above the supplied threshold</p>
+</li>
+<li><p><code>percentages</code></p>
+<p>  Include the percentage of mentions versus total words in the result
+  objects.</p>
+<p>  Valid values: true, <strong>false</strong> (default).</p>
+</li>
+<li><p><code>granularity</code></p>
+<p>  The length of time covered by each result.</p>
+<p>  Valid values:</p>
+<ul>
+<li>year</li>
+<li>month</li>
+<li><strong>day</strong> (default)</li>
+</ul>
+</li>
+</ul>
+<h4>Examples</h4>
+<p>Get a list of how many times the phrase &quot;united states&quot; appears in the
+Congressional Record on each day in the most recent Congress:
+
+</p>
+<pre><code>dates.json?phrase=united+states&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<p>Get a list of how many times the phrase &quot;united states&quot; was said by
+legislators from Virginia on each day of the most recent Congress:
+
+</p>
+<pre><code>dates.json?phrase=united+states&amp;entity_type=state&amp;entity_value=VA&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<p>Get a list of how many times the phrase &quot;united States&quot; appears in the
+Congressional Record on each day between Jan. 1, 2010, and June 1, 2010:
+
+</p>
+<pre><code>dates.json?phrase=united+states&amp;start_date=2009-01-01&amp;end_date=2009-06-01&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<p>Get a list of how many times the phrase &quot;united states&quot; appears in the
+Congressional Record in each month between January and June, 2010:
+
+</p>
+<pre><code>dates.json?phrase=united+states&amp;start_date=2009-01-01&amp;end_date=2009-04-30&amp;granularity=month&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<h4>Response</h4>
+<p>Returns a list of date objects with associated mention data.
+
+</p>
+<pre><code>{
+    "<span class="attribute">results</span>": <span class="value">[
+        {
+            "<span class="attribute">count</span>": <span class="value"><span class="number">14.0</span></span>,
+            "<span class="attribute">percentage</span>": <span class="value"><span class="number">0.058309037900874633</span></span>,
+            "<span class="attribute">total</span>": <span class="value"><span class="number">24010</span></span>,
+            "<span class="attribute">day</span>": <span class="value"><span class="string">"1996-01-02"</span></span>,
+            "<span class="attribute">raw_count</span>": <span class="value"><span class="number">14.0</span>
+        </span>},
+        {
+            "<span class="attribute">count</span>": <span class="value"><span class="number">122.0</span></span>,
+            "<span class="attribute">percentage</span>": <span class="value"><span class="number">0.067791336044986786</span></span>,
+            "<span class="attribute">total</span>": <span class="value"><span class="number">179964</span></span>,
+            "<span class="attribute">day</span>": <span class="value"><span class="string">"1996-01-04"</span></span>,
+            "<span class="attribute">raw_count</span>": <span class="value"><span class="number">122.0</span>
+        </span>},
+        {
+            "<span class="attribute">count</span>": <span class="value"><span class="number">198.0</span></span>,
+            "<span class="attribute">percentage</span>": <span class="value"><span class="number">0.13499693188791165</span></span>,
+            "<span class="attribute">total</span>": <span class="value"><span class="number">146670</span></span>,
+            "<span class="attribute">day</span>": <span class="value"><span class="string">"1996-01-05"</span></span>,
+            "<span class="attribute">raw_count</span>": <span class="value"><span class="number">198.0</span>
+        </span>},
+        {
+            "<span class="attribute">count</span>": <span class="value"><span class="number">1.0</span></span>,
+            "<span class="attribute">percentage</span>": <span class="value"><span class="number">0.098135426889106966</span></span>,
+            "<span class="attribute">total</span>": <span class="value"><span class="number">1019</span></span>,
+            "<span class="attribute">day</span>": <span class="value"><span class="string">"1996-01-08"</span></span>,
+            "<span class="attribute">raw_count</span>": <span class="value"><span class="number">1.0</span>
+        </span>},
+        ...snip...
+    ]
+</span>}</code></pre>
+<hr>
+<h3 id='methods/phrases-json'>phrases.json</h3 id='methods/phrases-json'>
+<p>List the top phrases for a facet.
+
+</p>
+<h4>Required arguments</h4>
+<ul>
+<li><p><code>entity_type </code></p>
+<p>  The entity type to get top phrases for.</p>
+<p>  Valid values:</p>
+<ul>
+<li>date</li>
+<li>month</li>
+<li>state</li>
+<li>legislator</li>
+</ul>
+</li>
+<li><p><code>entity_value</code></p>
+<p>  The value of the entity given in entity_type. Formats are as follows:</p>
+<ul>
+<li><strong>date:</strong> 2011-11-09</li>
+<li><strong>month:</strong> 201111</li>
+<li><strong>state:</strong> NY</li>
+<li><strong>legislator (bioguide):</strong> L000551</li>
+</ul>
+</li>
+</ul>
+<h4>Optional arguments</h4>
+<ul>
+<li><p><code>n</code></p>
+<p>  The size of phrase, in words, to search for (up to 5).</p>
+</li>
+<li><p><code>page</code></p>
+<p>  The page of results to show.</p>
+<p>  100 results are shown at a time. To get more than 100 results, use the
+  page parameter.</p>
+</li>
+<li><p><code>sort</code></p>
+<p>  The metric and direction to sort by.</p>
+<p>  Valid values:</p>
+<ul>
+<li><strong>tfidf</strong> (default)</li>
+<li><p>count</p>
+<p>Both a metric and direction must be supplied, such as &#39;sort=count asc&#39;</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4>Examples</h4>
+<p>List the top words in July 2010 by count:
+
+</p>
+<pre><code>/phrases.json?entity_type=month&amp;entity_value=201007&amp;sort=count+desc&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<p>List the top words for Nevada:
+
+</p>
+<pre><code>/phrases.json?entity_type=state&amp;entity_value=NV&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<p>List the top words for Barbara Lee:
+
+</p>
+<pre><code>/phrases.json?entity_type=legislator&amp;entity_value=L000551&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<h4>Response</h4>
+<p>Returns a list of phrases with tf-idf and count data.
+
+</p>
+<pre><code>[
+    {
+        "<span class="attribute">tfidf</span>": <span class="value"><span class="number">3.8596557124800003e-05</span></span>,
+        "<span class="attribute">count</span>": <span class="value"><span class="number">5373</span></span>,
+        "<span class="attribute">ngram</span>": <span class="value"><span class="string">"people"</span>
+    </span>},
+    {
+        "<span class="attribute">tfidf</span>": <span class="value"><span class="number">1.30267768302e-05</span></span>,
+        "<span class="attribute">count</span>": <span class="value"><span class="number">3637</span></span>,
+        "<span class="attribute">ngram</span>": <span class="value"><span class="string">"one"</span>
+    </span>},
+    {
+        "<span class="attribute">tfidf</span>": <span class="value"><span class="number">2.52066478599e-05</span></span>,
+        "<span class="attribute">count</span>": <span class="value"><span class="number">3509</span></span>,
+        "<span class="attribute">ngram</span>": <span class="value"><span class="string">"jobs"</span>
+    </span>},
+    {
+        "<span class="attribute">tfidf</span>": <span class="value"><span class="number">1.17409333103e-05</span></span>,
+        "<span class="attribute">count</span>": <span class="value"><span class="number">3278</span></span>,
+        "<span class="attribute">ngram</span>": <span class="value"><span class="string">"american"</span>
+    </span>},
+    ...snip...
+]</code></pre>
+<hr>
+<h3 id='methods/phrases-entity-json'>phrases/:entity.json</h3 id='methods/phrases-entity-json'>
+<p>Get the top (legislator|state|party|bioguide_id|volume|chamber)s for a
+phrase. Standard arguments are supported.
+
+</p>
+<h4>Required arguments</h4>
+<ul>
+<li><p><code>phrase</code></p>
+<p>  The phrase to search for.</p>
+</li>
+</ul>
+<h4>Optional arguments</h4>
+<ul>
+<li><p><code>mincount</code></p>
+<p>  Only return results where mentions are at or above the supplied threshold</p>
+</li>
+<li><p><code>per_page</code></p>
+<p>  The number of results to return per page. The maximum is 50.</p>
+</li>
+<li><p><code>page</code></p>
+<p>  The page number to return.</p>
+</li>
+<li><p><code>sort</code></p>
+<p>  The metric on which to sort top results.
+  <strong>Note: Facet sorts in Solr are alphabetically ascending by facet or descending
+  by count. The only valid values you can provide are &#39;count&#39; or :entity.</strong></p>
+</li>
+</ul>
+<h4>Examples</h4>
+<p>List the top 10 legislators for the phrase &#39;free market&#39; by raw count:
+
+</p>
+<pre><code>/phrases/legislator.json?phrase=free+market&amp;sort=count&amp;per_page=10&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<p>Find the chamber that says &#39;salary increase&#39; the most:
+
+</p>
+<pre><code>/phrases/chamber.json?phrase=salary+increase&amp;sort=count&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<h4>Response</h4>
+<p>Returns a list of <em>entity</em> objects with associated count data.
+
+</p>
+<pre><code>{
+    "<span class="attribute">results</span>": <span class="value">[
+        {
+            "<span class="attribute">count</span>": <span class="value"><span class="number">41.0</span></span>,
+            "<span class="attribute">chamber</span>": <span class="value"><span class="string">"House"</span>
+        </span>},
+        {
+            "<span class="attribute">count</span>": <span class="value"><span class="number">35.0</span></span>,
+            "<span class="attribute">chamber</span>": <span class="value"><span class="string">"Senate"</span>
+        </span>},
+        {
+            "<span class="attribute">count</span>": <span class="value"><span class="number">9.0</span></span>,
+            "<span class="attribute">chamber</span>": <span class="value"><span class="string">"Extensions"</span>
+        </span>}
+    ]
+</span>}</code></pre>
+<hr>
+<h3 id='methods/text-json'>text.json</h3 id='methods/text-json'>
+<p>Full-text search. Standard arguments are supported
+
+</p>
+<h4>Required arguments</h4>
+<p>No single argument is required to this endpoint; however, at least one
+of the text search arguments should be supplied.
+
+</p>
+<h4>Text search arguments</h4>
+<ul>
+<li><p><code>phrase</code></p>
+<p>  A phrase to search the body of each CR document for.</p>
+</li>
+<li><p><code>title</code></p>
+<p>  A phrase to search the title of each CR document for.</p>
+</li>
+</ul>
+<h4>Optional arguments</h4>
+<ul>
+<li><p><code>bioguide</code></p>
+<p>  Limit results to the member of Congress with the given Bioguide ID.</p>
+</li>
+<li><p><code>cr_pages</code></p>
+<p>  The pages in the Congressional Record to search.</p>
+</li>
+<li><p><code>page</code></p>
+<p>  The page of results to show, 100 results are shown at a time.</p>
+</li>
+</ul>
+<h4>Examples</h4>
+<p>Get a list of pieces of text with the phrase &quot;obama administration&quot; in them:
+
+</p>
+<pre><code>/text.json?phrase=obama+administration&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<p>Get a list of pieces of text by Republicans with the phrase &quot;health
+care debate&quot; in them:
+
+</p>
+<pre><code>/text.json?phrase=health+care+debate&amp;party=R&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<h4>Response</h4>
+<p>Returns a list of CR Documents and the total number found.
+
+
+</p>
+<pre><code>{
+    "<span class="attribute">num_found</span>": <span class="value"><span class="number">347</span></span>,
+    "<span class="attribute">results</span>": <span class="value">[
+        {
+            "<span class="attribute">speaker_state</span>": <span class="value"><span class="string">"NC"</span></span>,
+            "<span class="attribute">speaker_first</span>": <span class="value"><span class="string">"Virginia"</span></span>,
+            "<span class="attribute">congress</span>": <span class="value"><span class="number">111</span></span>,
+            "<span class="attribute">title</span>": <span class="value"><span class="string">"CULTIVATING AMERICAN ENERGY RESOURCES"</span></span>,
+            "<span class="attribute">origin_url</span>": <span class="value"><span class="string">"http://origin.www.gpo.gov/fdsys/pkg/CREC-2009-07-30/html/CREC-2009-07-30-pt1-PgH9197.htm"</span></span>,
+            "<span class="attribute">number</span>": <span class="value"><span class="number">117</span></span>,
+            "<span class="attribute">pages</span>": <span class="value"><span class="string">"H9197-H9203"</span></span>,
+            "<span class="attribute">volume</span>": <span class="value"><span class="number">155</span></span>,
+            "<span class="attribute">chamber</span>": <span class="value"><span class="string">"House"</span></span>,
+            "<span class="attribute">session</span>": <span class="value"><span class="number">1</span></span>,
+            "<span class="attribute">speaking</span>": <span class="value">[
+                <span class="string">"Well, I think that this is a great segue to talk about the other subject that we wanted to talk about tonight, which is health care, and what is happening with the health care debate."</span>
+            ]</span>,
+            "<span class="attribute">capitolwords_url</span>": <span class="value"><span class="string">"http://capitolwords.org/date/2009/07/30/H9197_cultivating-american-energy-resources/"</span></span>,
+            "<span class="attribute">speaker_party</span>": <span class="value"><span class="string">"R"</span></span>,
+            "<span class="attribute">date</span>": <span class="value"><span class="string">"2009-07-30"</span></span>,
+            "<span class="attribute">bills</span>": <span class="value"><span class="literal">null</span></span>,
+            "<span class="attribute">bioguide_id</span>": <span class="value"><span class="string">"F000450"</span></span>,
+            "<span class="attribute">order</span>": <span class="value"><span class="number">14</span></span>,
+            "<span class="attribute">speaker_last</span>": <span class="value"><span class="string">"Foxx"</span></span>,
+            "<span class="attribute">speaker_raw</span>": <span class="value"><span class="string">"ms. foxx"</span>
+        </span>},
+        ...snip...
+    ]
+</span>}</code></pre>
+
+  </div>
+</div>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', '']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</body>
+</html>
