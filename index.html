@@ -50,19 +50,19 @@
             <ul>
               
                 <li>
-                  <a href="#methods/dates-json">dates.json</a>
+                  <a href="#methods/phrase-time-series">Phrase Time Series</a>
                 </li>
               
                 <li>
-                  <a href="#methods/phrases-json">phrases.json</a>
+                  <a href="#methods/top-phrases-by-entity">Top Phrases by Entity</a>
                 </li>
               
                 <li>
-                  <a href="#methods/phrases-entity-json">phrases/:entity.json</a>
+                  <a href="#methods/top-entities-by-phrase">Top Entities by Phrase</a>
                 </li>
               
                 <li>
-                  <a href="#methods/text-json">text.json</a>
+                  <a href="#methods/text-search">Text Search</a>
                 </li>
               
             </ul>
@@ -147,7 +147,8 @@ be flagged as such below.
 </ul>
 <hr>
 <h2 id='methods'>Methods</h2 id='methods'>
-<h3 id='methods/dates-json'>dates.json</h3 id='methods/dates-json'>
+<h3 id='methods/phrase-time-series'>Phrase Time Series</h3 id='methods/phrase-time-series'>
+<pre><code>/dates<span class="variable">.json</span></code></pre>
 <p>Find the popularity of a phrase over a period of time. Standard arguments are supported.
 
 </p>
@@ -241,13 +242,14 @@ Congressional Record in each month between January and June, 2010:
     ]
 </span>}</code></pre>
 <hr>
-<h3 id='methods/phrases-json'>phrases.json</h3 id='methods/phrases-json'>
+<h3 id='methods/top-phrases-by-entity'>Top Phrases by Entity</h3 id='methods/top-phrases-by-entity'>
+<pre><code>/phrases<span class="variable">.json</span></code></pre>
 <p>List the top phrases for a facet.
 
 </p>
 <h4>Required arguments</h4>
 <ul>
-<li><p><code>entity_type </code></p>
+<li><p><code>entity_type</code></p>
 <p>  The entity type to get top phrases for.</p>
 <p>  Valid values:</p>
 <ul>
@@ -329,7 +331,8 @@ Congressional Record in each month between January and June, 2010:
     ...snip...
 ]</code></pre>
 <hr>
-<h3 id='methods/phrases-entity-json'>phrases/:entity.json</h3 id='methods/phrases-entity-json'>
+<h3 id='methods/top-entities-by-phrase'>Top Entities by Phrase</h3 id='methods/top-entities-by-phrase'>
+<pre><code>/phrases/:entity<span class="variable">.json</span></code></pre>
 <p>Get the top (legislator|state|party|bioguide_id|volume|chamber)s for a
 phrase. Standard arguments are supported.
 
@@ -387,7 +390,8 @@ phrase. Standard arguments are supported.
     ]
 </span>}</code></pre>
 <hr>
-<h3 id='methods/text-json'>text.json</h3 id='methods/text-json'>
+<h3 id='methods/text-search'>Text Search</h3 id='methods/text-search'>
+<pre><code>/text<span class="variable">.json</span></code></pre>
 <p>Full-text search. Standard arguments are supported
 
 </p>
@@ -467,7 +471,7 @@ care debate&quot; in them:
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', '']);
+  _gaq.push(['_setAccount', 'UA-1265484-1']);
   _gaq.push(['_trackPageview']);
 
   (function() {

@@ -78,7 +78,9 @@ be flagged as such below.
 
 ## Methods
 
-### dates.json
+### Phrase Time Series
+
+    /dates.json
 
 Find the popularity of a phrase over a period of time. Standard arguments are supported.
 
@@ -179,13 +181,15 @@ Returns a list of date objects with associated mention data.
 
 ---
 
-### phrases.json
+### Top Phrases by Entity
+
+    /phrases.json
 
 List the top phrases for a facet.
 
 #### Required arguments
 
-* `entity_type `
+* `entity_type`
 
     The entity type to get top phrases for.
 
@@ -273,7 +277,9 @@ Returns a list of phrases with tf-idf and count data.
 
 ---
 
-### phrases/:entity.json
+### Top Entities by Phrase
+
+    /phrases/:entity.json
 
 Get the top (legislator|state|party|bioguide\_id|volume|chamber)s for a
 phrase. Standard arguments are supported.
@@ -338,7 +344,9 @@ Returns a list of _entity_ objects with associated count data.
 
 ---
 
-### text.json
+### Text Search
+
+    /text.json
 
 Full-text search. Standard arguments are supported
 
