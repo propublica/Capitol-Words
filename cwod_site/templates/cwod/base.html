@@ -16,6 +16,7 @@
         <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}"/>
         {% block og_image %}<meta property="og:image" content="http://assets.sunlightfoundation.com/capitol-words/media/img/cwod_sharing.png" />{% endblock og_image %}
         <title>{% block title %}Capitol Words{% endblock title %}</title>
+        <link rel="shortcut icon" href="{% media_url %}/img/favicon.ico">
         <!--[if IE ]>{% css "styles/ie.css" %}<![endif]-->
         <!--[if lt IE 9]>
         <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
