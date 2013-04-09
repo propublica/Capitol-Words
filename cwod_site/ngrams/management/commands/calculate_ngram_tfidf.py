@@ -257,7 +257,7 @@ class Command(BaseCommand):
                                                          tfidf=tfidf,
                                                          count=count)
                         if field == 'speaker_bioguide':
-                            NgramsByMonth.objects.filter(bioguide_id=facet, n=n, ngram=ngram).delete()
+                            NgramsByBioguide.objects.filter(bioguide_id=facet, n=n, ngram=ngram).delete()
                             NgramsByBioguide.objects.create(n=n,
                                                             bioguide_id=facet,
                                                             ngram=ngram,
