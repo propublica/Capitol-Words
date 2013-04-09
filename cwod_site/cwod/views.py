@@ -32,8 +32,6 @@ TERRITORY_CHOICES = ('PR', 'GU', 'MP', 'AS')
 
 capitolwords = capitolwords(api_key=settings.SUNLIGHT_API_KEY, domain=settings.API_ROOT)
 
-congresses = LegislatorRole.objects.filter(congress__gte=104).values_list('congress', flat=True).distinct().order_by('-congress')
-
 # These are used in a regular expression so must be escaped.
 # From NLTK
 STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
@@ -50,9 +48,17 @@ STOPWORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
              'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each',
              'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own',
              'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don',
-             'should', 'now', '\.', '\?', '\!' ]
+             'should', 'now', '\.', '\?', '\!', ]
 
 PUNCTUATION = ['?', '!', '.', ',']
+
+
+def get_congresses():
+    return LegislatorRole.objects.filter(congress__gte=104).values_list('congress', flat=True).distinct().order_by('-congress')
+
+
+def get_current_congress():
+    return get_congresses()[0]
 
 
 def index(request):
@@ -60,7 +66,7 @@ def index(request):
 
     return render_to_response('cwod/index.html',
                               {'recent_entries': recent_entries,
-                              }, context_instance=RequestContext(request))
+                               }, context_instance=RequestContext(request))
 
     #return direct_to_template(request, template='index.html')
 
@@ -105,7 +111,7 @@ def faster_term_detail(request, term):
                                'needs_js': True,
                                'no_js_uri': no_js_uri,
                                'state_choices': US_STATES + US_TERRITORIES,
-                              }, context_instance=RequestContext(request))
+                               }, context_instance=RequestContext(request))
 
 
 def term_detail(request, term):
@@ -143,14 +149,14 @@ def term_detail(request, term):
     if party or state or bioguide_id:
         try:
             custom_timeline_url = capitolwords.timeline(**{'phrase': term,
-                                                         'granularity': 'month',
-                                                         'percentages': 'true',
-                                                         'mincount': 0,
-                                                         'party': party,
-                                                         'state': state,
-                                                         'bioguide_id': bioguide_id,
-                                                         'stem': stem,
-                                                         })
+                                                           'granularity': 'month',
+                                                           'percentages': 'true',
+                                                           'mincount': 0,
+                                                           'party': party,
+                                                           'state': state,
+                                                           'bioguide_id': bioguide_id,
+                                                           'stem': stem,
+                                                           })
         except ApiError:
             custom_timeline_url = 'error'
 
@@ -207,7 +213,7 @@ def term_detail(request, term):
                                'entries': entries,
                                'search': request.GET.get('search') == '1',
                                'state_choices': US_STATES + US_TERRITORIES,
-                              }, context_instance=RequestContext(request))
+                               }, context_instance=RequestContext(request))
 
 
 def congress_list(request):
@@ -226,7 +232,6 @@ def congress_pagerange_detail(request, congress, session, pagerange):
     return
 
 
-
 def legislator_list(request):
     current_legislators = LegislatorRole.objects.filter(
             end_date__gte=datetime.date.today()
@@ -235,10 +240,9 @@ def legislator_list(request):
     return render_to_response('cwod/legislator_list.html',
                               {'current_legislators': current_legislators,
                                #'past_legislators': past_legislators,
-                               'congresses': congresses,
+                               'congresses': get_congresses(),
                                'state_choices': US_STATES + US_TERRITORIES,
-                              }, context_instance=RequestContext(request))
-
+                               }, context_instance=RequestContext(request))
 
 
 def legislator_lookup(bioguide_id):
@@ -249,7 +253,6 @@ def legislator_lookup(bioguide_id):
     return legislator
 
 GRAM_NAMES = ['unigrams', 'bigrams', 'trigrams', 'quadgrams', 'pentagrams', ]
-
 
 
 def legislator_detail(request, bioguide_id, slug=None):
@@ -279,7 +282,7 @@ def legislator_detail(request, bioguide_id, slug=None):
 
     return render_to_response('cwod/legislator_detail.html',
                               {'legislator': legislator,
-                               'current_congress': congresses[0],
+                               'current_congress': get_current_congress(),
                                'similar_legislators': similar_legislators,
                                'entries': entries,
                                'ngrams': ngrams,
@@ -371,7 +374,7 @@ def state_detail(request, state):
     similar_states = get_similar_entities('state', state)
 
     # legislators = LegislatorRole.objects.filter(state=state, end_date__gte=datetime.date.today())
-    legislators = capitolwords.legislators(state=state, congress=112)
+    legislators = capitolwords.legislators(state=state, congress=get_current_congress())
 
     def sort_districts(x, y):
         try:
