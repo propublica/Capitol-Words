@@ -273,6 +273,10 @@ class PopularPhraseHandler(BaseHandler):
                     'model': NgramsByMonth,
                     'field': 'month',
                     },
+                'year': {
+                    'model': NgramsByYear,
+                    'field': 'year',
+                    },
                 }
 
         n = request.GET.get('n', 1)
