@@ -185,7 +185,7 @@ class Command(BaseCommand):
             else:
                 facets = calculator.list_facets()
         elif field == 'year':
-            already = set([(x.month, int(x.n)) for x in NgramsByYear.objects.raw('select * from ngrams_ngramsbyyear group by year, n')])
+            already = set([(x.year, int(x.n)) for x in NgramsByYear.objects.raw('select * from ngrams_ngramsbyyear group by year, n')])
             if field_values:
                 facets = [int(facet.strip()) for facet in field_values.split(',')]
             else:
