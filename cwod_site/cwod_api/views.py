@@ -1056,9 +1056,15 @@ class SimilarEntityHandler(GenericHandler):
                               'state',
                               'year', ]
 
+        if not entity_type in valid_entity_types:
+            return {'error': 'entity_type must be one of: %s' % ', '.join(valid_entity_types)}
+
         cursor = connections['ngrams'].cursor()
-        cursor.execute("SELECT b, cosine_distance FROM distance_%s WHERE a = %%s AND cosine_distance != 1 ORDER BY cosine_distance DESC" % entity_type, [entity_value, ])
-        return {'results': [dict(zip([entity_type, 'distance', ], x)) for x in cursor.fetchall()]}
+        cursor.execute("SELECT b, cosine_distance FROM distance_%s WHERE a = %%s AND cosine_distance != 1 AND cosine_distance != 0 ORDER BY cosine_distance DESC" % entity_type, [entity_value, ])
+        try:
+            return {'results': [dict(zip([entity_type, 'distance', ], x)) for x in cursor.fetchall()]}
+        except:
+            return {'results': []}
 
 
 def create_gpo_url(crdoc):
