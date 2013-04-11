@@ -184,6 +184,12 @@ class Command(BaseCommand):
                 facets = [int(facet.strip()) for facet in field_values.split(',')]
             else:
                 facets = calculator.list_facets()
+        elif field == 'year':
+            already = set([(x.month, int(x.n)) for x in NgramsByYear.objects.raw('select * from ngrams_ngramsbyyear group by year, n')])
+            if field_values:
+                facets = [int(facet.strip()) for facet in field_values.split(',')]
+            else:
+                facets = calculator.list_facets()
         elif field == 'date':
             already = []
             if field_values:
@@ -208,6 +214,9 @@ class Command(BaseCommand):
                     if (facet, n) in already:
                         # recreate 'this' month, as of yesterday
                         if field == 'year_month' and facet == (datetime.datetime.today() - datetime.timedelta(1)).strftime('%Y%m'):
+                            pass
+                        # recreate 'this' year, as of yesterday
+                        elif field == 'year' and facet == (datetime.datetime.today() - datetime.timedelta(1)).strftime('%Y'):
                             pass
                         # always recreate terms for speakers and states
                         elif field in ['speaker_bioguide', 'speaker_state']:
@@ -256,6 +265,13 @@ class Command(BaseCommand):
                                                          ngram=ngram,
                                                          tfidf=tfidf,
                                                          count=count)
+                        if field == 'year':
+                            NgramsByYear.objects.filter(year=facet, n=n, ngram=ngram).delete()
+                            NgramsByYear.objects.create(n=n,
+                                                        year=facet,
+                                                        ngram=ngram,
+                                                        tfidf=tfidf,
+                                                        count=count)
                         if field == 'speaker_bioguide':
                             NgramsByBioguide.objects.filter(bioguide_id=facet, n=n, ngram=ngram).delete()
                             NgramsByBioguide.objects.create(n=n,

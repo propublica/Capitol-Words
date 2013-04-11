@@ -111,6 +111,28 @@ class NgramsByMonth(models.Model):
         return (self.tfidf / top) * 100
 
 
+class NgramsByYear(models.Model):
+    n = models.IntegerField()
+    year = models.CharField(max_length=4)
+    ngram = models.CharField(max_length=255)
+    tfidf = models.FloatField()
+    count = models.IntegerField()
+
+    class Meta:
+        ordering = ['-tfidf', '-count', ]
+
+    def __unicode__(self):
+        return self.ngram
+
+    def pct(self):
+        top = NgramsByYear.objects.filter(year=self.year).values_list('tfidf', flat=True)[0]
+        return (self.tfidf / top) * 100
+
+    def ngram_pct(self):
+        top = NgramsByYear.objects.filter(year=self.year, n=self.n).values_list('tfidf', flat=True)[0]
+        return (self.tfidf / top) * 100
+
+
 class TopUnigrams(models.Model):
     rank = models.IntegerField()
     ngram = models.CharField(max_length=255)
