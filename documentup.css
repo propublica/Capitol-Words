@@ -215,6 +215,9 @@ a:hover {
   color: #444;
   font-size: 16px;
 }
+#nav #sections > li > ul > li > a {
+  color: #1E7275;
+}
 #nav #sections ul {
   margin-bottom: 15px;
 }
