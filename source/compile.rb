@@ -70,11 +70,15 @@ files.each do |filename|
   # add in our own header (custom styles)
   content.sub! /<link.*?<\/head>/im, "#{header}\n</head>"
 
+  content.sub! "<body><div id=\"container\">", "<body><div class=\"sf-header\"><div class=\"container\"><a class=\"sf-logo\" href=\"http://www.sunlightfoundation.com\">Sunlight Foundation</a></div></div><div id=\"container\">"
+
   # add in our own footer (Google Analytics)
   content.sub! "</body>", "#{footer}\n</body>"
 
   # link the main header to the index page
-  content.sub! "<a href=\"#\" id=\"logo\">", "<a href=\"index.html\" id=\"logo\">"
+  content.sub! "<a href=\"#\" id=\"logo\">", "<h1><a href=\"index.html\" id=\"logo\">"
+
+  content.sub! "</div><ul id=\"sections\">", "</h1></div><ul id=\"sections\">"
 
   # custom title for non-index pages
   if filename != "index"

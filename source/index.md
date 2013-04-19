@@ -1,7 +1,5 @@
-# Capitol Words API
 
-This documentation is for Version 1 of the Capitol Words API.  
-Version 1 is currently the only version, and is actively maintained.
+This documentation is for Version 1 of the Capitol Words API. Version 1 is currently the only version, and is actively maintained.
 
 ## Getting started
 
