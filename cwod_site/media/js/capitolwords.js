@@ -494,8 +494,8 @@ Requires: jQuery, jQuery ui slider, underscore
           termb: termb,
           statea: $('#stateA').val(),
           stateb: $('#stateB').val(),
-          partya: $('input[name=partya]').val(),
-          partyb: $('input[name=partyb]').val(),
+          partya: $('input[name=partya][checked=checked]').val(),
+          partyb: $('input[name=partyb][checked=checked]').val(),
           dataurls: cw.getDataUrlsForImage($(this))
         };
       });
