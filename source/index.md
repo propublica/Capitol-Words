@@ -375,7 +375,7 @@ of the text search arguments should be supplied.
 
 * `page`
 
-    The page of results to show, 100 results are shown at a time.
+    The page of results to show, 50 results are shown at a time.
 
 #### Examples
 
