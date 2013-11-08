@@ -35,7 +35,32 @@
         {% endblock head %}
     </head>
 
-    <body class="{% block bodyclass %}{% endblock %}">
+    <body class="{% block bodyclass %}{% endblock %} reveal-banner">
+        {% css "css/donorbanner.css" %}
+        <div id="donor_banner" class="minimize-donorbanner donorbanner_2">
+            <div class="donorcontainer">
+                <div class="bubble">
+                    <button value="play" href="" class="notnow toggleButton">Not now</button>
+                </div>
+                <a class="sf_logo" href="http://sunlightfoundation.com">Sunlight Foundation</a>
+                <p class="because quote">
+                    &ldquo;Sunlight was one of the first organizations to really engage the technology community around improving government, and the organization has continued to inspire and leverage people with these critical skills in this important task. They are the leaders in a movement that matters.&rdquo;
+                    <span class="attribution">&mdash; <em>Jen Pahlka</em>, Founder of Code for America</span>
+                </p>
+                <div class="donationplea">
+                    <h2>
+                        <span class="line1">We depend </span>
+                        <span class="line2">on the generosity</span>
+                        <span class="line3">of our supporters</span>
+                    </h2>
+                    <p>
+                        <em>Become part of the open gov movement.</em>
+                        </br>Donate to the Sunlight Foundation today!
+                    </p>
+                    <a class="btn" href="http://sunlightfoundation.com/join/">Donate</a>
+                </div>
+            </div>
+        </div>
         {% block fb_sdk %}
         {% comment %}
         <div id="fb-root"></div>
@@ -237,6 +262,7 @@
 
         {% js "js/capwords-new.js" %}
         {% endcomment %}
+        {% js "js/donorbanner.js" %}
 
         {% endblock javascript %}
 
