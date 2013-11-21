@@ -29,9 +29,9 @@ class Command(BaseCommand):
                 print 'URL NOT FOUND FOR: %s' % bioguide_id
                 print
                 continue
-            except e:
+            except Exception, e:
                 print
-                print "CAUGHT ERROR: %s" % bioguide_id
+                print "CAUGHT ERROR FOR %s: %s" % (bioguide_id, e)
                 print
                 continue
             result = data['results'][0]
