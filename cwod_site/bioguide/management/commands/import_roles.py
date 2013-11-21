@@ -29,6 +29,11 @@ class Command(BaseCommand):
                 print 'URL NOT FOUND FOR: %s' % bioguide_id
                 print
                 continue
+            except e:
+                print
+                print "CAUGHT ERROR: %s" % bioguide_id
+                print
+                continue
             result = data['results'][0]
             roles = result['roles']
             for role in roles:
