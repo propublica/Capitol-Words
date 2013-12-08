@@ -1,4 +1,3 @@
-
 This documentation is for Version 1 of the Capitol Words API. Version 1 is currently the only version, and is actively maintained.
 
 ## Getting started
@@ -376,6 +375,25 @@ of the text search arguments should be supplied.
 * `page`
 
     The page of results to show, 50 results are shown at a time.
+    
+* `sort`
+
+    The value on which to sort the results. Options for this endpoint are:
+    
+    - speaker_state
+    - congress
+    - title
+    - number
+    - volume
+    - chamber
+    - session
+    - id
+    - speaker_party
+    - date
+    - bioguide_id
+    - pages
+    
+    Coupled with a direction, `asc` or `desc`. An example to sort by true chronological order and chamber (`id` works for this purpose) would be `id desc`.
 
 #### Examples
 
