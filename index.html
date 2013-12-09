@@ -78,43 +78,30 @@
   </div>
   <div id="content">
     
-    <p>This documentation is for Version 1 of the Capitol Words API. Version 1 is currently the only version, and is actively maintained.
-
-</p>
+    <p>This documentation is for Version 1 of the Capitol Words API. Version 1 is currently the only version, and is actively maintained.</p>
 <h2 id='getting-started'>Getting started</h2 id='getting-started'>
 <p>Listed below are the public methods currently supported by the Capitol
 Words API. All requests must be signed with a valid Sunlight labs API
 key. You can register for one here:
-</p>
-<p><a href="http://services.sunlightlabs.com/accounts/register">http://services.sunlightlabs.com/accounts/register</a>
-
-</p>
+<a href="http://services.sunlightlabs.com/accounts/register">http://services.sunlightlabs.com/accounts/register</a></p>
 <h3 id='getting-started/discussion-bugs'>Discussion &amp; Bugs</h3 id='getting-started/discussion-bugs'>
 <p>Sunlight API discussion takes place at the
 <a href="https://groups.google.com/forum/#!forum/sunlightlabs-api-discuss">sunlightlabs-api-discuss google group</a>.
 You can ask questions there, as well as alert the maintainers of bugs.
 If you have specific issues with the Capitol Words API, you can open a
 ticket directly at
-<a href="http://github.com/sunlightlabs/Capitol-Words/issues">github</a>.
-
-</p>
+<a href="http://github.com/sunlightlabs/Capitol-Words/issues">github</a>.</p>
 <h3 id='getting-started/root-uri'>Root URI</h3 id='getting-started/root-uri'>
-<p>All endpoints below are relative to the API root:
-
-</p>
-<pre><code><span class="label">http:</span>//capitolwords<span class="preprocessor">.org</span>/api/<span class="number">1</span></code></pre>
+<p>All endpoints below are relative to the API root:</p>
+<pre><code><span class="symbol">http:</span>/<span class="regexp">/capitolwords.org/api</span><span class="regexp">/1</code></pre>
 <p>So, to make a request to the dates.json endpoint, you&#39;d use a url that
-looks like this:
-
-</p>
-<pre><code>http://capitolwords.org/api/1/dates.json?apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+looks like this:</p>
+<pre><code><span class="symbol">http:</span>/<span class="regexp">/capitolwords.org/api</span><span class="regexp">/1/dates</span>.json<span class="number">?a</span>pikey=&lt;<span class="constant">YOUR_KEY</span>&gt;</code></pre>
 <hr>
 <h2 id='standard-arguments'>Standard arguments</h2 id='standard-arguments'>
 <p>All of the endpoints pulling from Solr support a set of standard arguments,
 all of which are optional. Endpoints with support for standard arguments will
-be flagged as such below.
-
-</p>
+be flagged as such below.</p>
 <ul>
 <li><p><code>state</code></p>
 <p>  Limit results to members of Congress from the given state.</p>
@@ -147,10 +134,8 @@ be flagged as such below.
 <hr>
 <h2 id='methods'>Methods</h2 id='methods'>
 <h3 id='methods/phrase-time-series'>Phrase Time Series</h3 id='methods/phrase-time-series'>
-<pre><code>/dates<span class="variable">.json</span></code></pre>
-<p>Find the popularity of a phrase over a period of time. Standard arguments are supported.
-
-</p>
+<pre><code>/<span class="filename">dates.json</code></pre>
+<p>Find the popularity of a phrase over a period of time. Standard arguments are supported.</p>
 <h4>Required arguments</h4>
 <ul>
 <li><p><code>phrase</code></p>
@@ -184,29 +169,19 @@ be flagged as such below.
 </ul>
 <h4>Examples</h4>
 <p>Get a list of how many times the phrase &quot;united states&quot; appears in the
-Congressional Record on each day in the most recent Congress:
-
-</p>
-<pre><code>dates.json?phrase=united+states&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+Congressional Record on each day in the most recent Congress:</p>
+<pre><code>dates.json?phrase=united+states&amp;apikey=<span class="xml"><span class="tag">&lt;<span class="title">YOUR_KEY</span>&gt;</span></span></code></pre>
 <p>Get a list of how many times the phrase &quot;united states&quot; was said by
-legislators from Virginia on each day of the most recent Congress:
-
-</p>
-<pre><code>dates.json?phrase=united+states&amp;entity_type=state&amp;entity_value=VA&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+legislators from Virginia on each day of the most recent Congress:</p>
+<pre><code>dates.json?phrase=united+states&amp;entity_type=state&amp;entity_value=VA&amp;apikey=<span class="xml"><span class="tag">&lt;<span class="title">YOUR_KEY</span>&gt;</span></span></code></pre>
 <p>Get a list of how many times the phrase &quot;united States&quot; appears in the
-Congressional Record on each day between Jan. 1, 2010, and June 1, 2010:
-
-</p>
-<pre><code>dates.json?phrase=united+states&amp;start_date=2009-01-01&amp;end_date=2009-06-01&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+Congressional Record on each day between Jan. 1, 2010, and June 1, 2010:</p>
+<pre><code>dates.json?phrase=united+states&amp;start_date=<span class="number">2009</span>-<span class="number">01</span>-<span class="number">01</span>&amp;end_date=<span class="number">2009</span>-<span class="number">06</span>-<span class="number">01</span>&amp;apikey=<span class="xml"><span class="tag">&lt;<span class="title">YOUR_KEY</span>&gt;</span></span></code></pre>
 <p>Get a list of how many times the phrase &quot;united states&quot; appears in the
-Congressional Record in each month between January and June, 2010:
-
-</p>
-<pre><code>dates.json?phrase=united+states&amp;start_date=2009-01-01&amp;end_date=2009-04-30&amp;granularity=month&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+Congressional Record in each month between January and June, 2010:</p>
+<pre><code>dates.json?phrase=united+states&amp;start_date=<span class="number">2009</span>-<span class="number">01</span>-<span class="number">01</span>&amp;end_date=<span class="number">2009</span>-<span class="number">04</span>-<span class="number">30</span>&amp;granularity=month&amp;apikey=<span class="xml"><span class="tag">&lt;<span class="title">YOUR_KEY</span>&gt;</span></span></code></pre>
 <h4>Response</h4>
-<p>Returns a list of date objects with associated mention data.
-
-</p>
+<p>Returns a list of date objects with associated mention data.</p>
 <pre><code>{
     "<span class="attribute">results</span>": <span class="value">[
         {
@@ -215,37 +190,35 @@ Congressional Record in each month between January and June, 2010:
             "<span class="attribute">total</span>": <span class="value"><span class="number">24010</span></span>,
             "<span class="attribute">day</span>": <span class="value"><span class="string">"1996-01-02"</span></span>,
             "<span class="attribute">raw_count</span>": <span class="value"><span class="number">14.0</span>
-        </span>},
+        }</span>,
         {
             "<span class="attribute">count</span>": <span class="value"><span class="number">122.0</span></span>,
             "<span class="attribute">percentage</span>": <span class="value"><span class="number">0.067791336044986786</span></span>,
             "<span class="attribute">total</span>": <span class="value"><span class="number">179964</span></span>,
             "<span class="attribute">day</span>": <span class="value"><span class="string">"1996-01-04"</span></span>,
             "<span class="attribute">raw_count</span>": <span class="value"><span class="number">122.0</span>
-        </span>},
+        }</span>,
         {
             "<span class="attribute">count</span>": <span class="value"><span class="number">198.0</span></span>,
             "<span class="attribute">percentage</span>": <span class="value"><span class="number">0.13499693188791165</span></span>,
             "<span class="attribute">total</span>": <span class="value"><span class="number">146670</span></span>,
             "<span class="attribute">day</span>": <span class="value"><span class="string">"1996-01-05"</span></span>,
             "<span class="attribute">raw_count</span>": <span class="value"><span class="number">198.0</span>
-        </span>},
+        }</span>,
         {
             "<span class="attribute">count</span>": <span class="value"><span class="number">1.0</span></span>,
             "<span class="attribute">percentage</span>": <span class="value"><span class="number">0.098135426889106966</span></span>,
             "<span class="attribute">total</span>": <span class="value"><span class="number">1019</span></span>,
             "<span class="attribute">day</span>": <span class="value"><span class="string">"1996-01-08"</span></span>,
             "<span class="attribute">raw_count</span>": <span class="value"><span class="number">1.0</span>
-        </span>},
+        }</span>,
         ...snip...
     ]
-</span>}</code></pre>
+}</span></code></pre>
 <hr>
 <h3 id='methods/top-phrases-by-entity'>Top Phrases by Entity</h3 id='methods/top-phrases-by-entity'>
-<pre><code>/phrases<span class="variable">.json</span></code></pre>
-<p>List the top phrases for a facet.
-
-</p>
+<pre><code>/<span class="filename">phrases.json</code></pre>
+<p>List the top phrases for a facet.</p>
 <h4>Required arguments</h4>
 <ul>
 <li><p><code>entity_type</code></p>
@@ -290,52 +263,42 @@ Congressional Record in each month between January and June, 2010:
 </li>
 </ul>
 <h4>Examples</h4>
-<p>List the top words in July 2010 by count:
-
-</p>
-<pre><code>/phrases.json?entity_type=month&amp;entity_value=201007&amp;sort=count+desc&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
-<p>List the top words for Nevada:
-
-</p>
-<pre><code>/phrases.json?entity_type=state&amp;entity_value=NV&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
-<p>List the top words for Barbara Lee:
-
-</p>
-<pre><code>/phrases.json?entity_type=legislator&amp;entity_value=L000551&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<p>List the top words in July 2010 by count:</p>
+<pre><code>/phrases.json?entity_type=month&amp;entity_value=<span class="number">201007</span>&amp;sort=count+desc&amp;apikey=<span class="xml"><span class="tag">&lt;<span class="title">YOUR_KEY</span>&gt;</span></span></code></pre>
+<p>List the top words for Nevada:</p>
+<pre><code>/phrases.json?entity_type=state&amp;entity_value=NV&amp;apikey=<span class="xml"><span class="tag">&lt;<span class="title">YOUR_KEY</span>&gt;</span></span></code></pre>
+<p>List the top words for Barbara Lee:</p>
+<pre><code>/phrases.json?entity_type=legislator&amp;entity_value=L000551&amp;apikey=<span class="xml"><span class="tag">&lt;<span class="title">YOUR_KEY</span>&gt;</span></span></code></pre>
 <h4>Response</h4>
-<p>Returns a list of phrases with tf-idf and count data.
-
-</p>
+<p>Returns a list of phrases with tf-idf and count data.</p>
 <pre><code>[
     {
         "<span class="attribute">tfidf</span>": <span class="value"><span class="number">3.8596557124800003e-05</span></span>,
         "<span class="attribute">count</span>": <span class="value"><span class="number">5373</span></span>,
         "<span class="attribute">ngram</span>": <span class="value"><span class="string">"people"</span>
-    </span>},
+    }</span>,
     {
         "<span class="attribute">tfidf</span>": <span class="value"><span class="number">1.30267768302e-05</span></span>,
         "<span class="attribute">count</span>": <span class="value"><span class="number">3637</span></span>,
         "<span class="attribute">ngram</span>": <span class="value"><span class="string">"one"</span>
-    </span>},
+    }</span>,
     {
         "<span class="attribute">tfidf</span>": <span class="value"><span class="number">2.52066478599e-05</span></span>,
         "<span class="attribute">count</span>": <span class="value"><span class="number">3509</span></span>,
         "<span class="attribute">ngram</span>": <span class="value"><span class="string">"jobs"</span>
-    </span>},
+    }</span>,
     {
         "<span class="attribute">tfidf</span>": <span class="value"><span class="number">1.17409333103e-05</span></span>,
         "<span class="attribute">count</span>": <span class="value"><span class="number">3278</span></span>,
         "<span class="attribute">ngram</span>": <span class="value"><span class="string">"american"</span>
-    </span>},
+    }</span>,
     ...snip...
 ]</code></pre>
 <hr>
 <h3 id='methods/top-entities-by-phrase'>Top Entities by Phrase</h3 id='methods/top-entities-by-phrase'>
-<pre><code>/phrases/:entity<span class="variable">.json</span></code></pre>
+<pre><code>/phrases/<span class="symbol">:entity</span>.json</code></pre>
 <p>Get the top (legislator|state|party|bioguide_id|volume|chamber)s for a
-phrase. Standard arguments are supported.
-
-</p>
+phrase. Standard arguments are supported.</p>
 <h4>Required arguments</h4>
 <ul>
 <li><p><code>phrase</code></p>
@@ -360,45 +323,35 @@ phrase. Standard arguments are supported.
 </li>
 </ul>
 <h4>Examples</h4>
-<p>List the top 10 legislators for the phrase &#39;free market&#39; by raw count:
-
-</p>
-<pre><code>/phrases/legislator.json?phrase=free+market&amp;sort=count&amp;per_page=10&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
-<p>Find the chamber that says &#39;salary increase&#39; the most:
-
-</p>
-<pre><code>/phrases/chamber.json?phrase=salary+increase&amp;sort=count&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<p>List the top 10 legislators for the phrase &#39;free market&#39; by raw count:</p>
+<pre><code>/phrases/legislator.json?phrase=free+market&amp;sort=count&amp;per_page=<span class="number">10</span>&amp;apikey=<span class="xml"><span class="tag">&lt;<span class="title">YOUR_KEY</span>&gt;</span></span></code></pre>
+<p>Find the chamber that says &#39;salary increase&#39; the most:</p>
+<pre><code>/phrases/chamber.json?phrase=salary+increase&amp;sort=count&amp;apikey=<span class="xml"><span class="tag">&lt;<span class="title">YOUR_KEY</span>&gt;</span></span></code></pre>
 <h4>Response</h4>
-<p>Returns a list of <em>entity</em> objects with associated count data.
-
-</p>
+<p>Returns a list of <em>entity</em> objects with associated count data.</p>
 <pre><code>{
     "<span class="attribute">results</span>": <span class="value">[
         {
             "<span class="attribute">count</span>": <span class="value"><span class="number">41.0</span></span>,
             "<span class="attribute">chamber</span>": <span class="value"><span class="string">"House"</span>
-        </span>},
+        }</span>,
         {
             "<span class="attribute">count</span>": <span class="value"><span class="number">35.0</span></span>,
             "<span class="attribute">chamber</span>": <span class="value"><span class="string">"Senate"</span>
-        </span>},
+        }</span>,
         {
             "<span class="attribute">count</span>": <span class="value"><span class="number">9.0</span></span>,
             "<span class="attribute">chamber</span>": <span class="value"><span class="string">"Extensions"</span>
-        </span>}
+        }</span>
     ]
-</span>}</code></pre>
+}</span></code></pre>
 <hr>
 <h3 id='methods/text-search'>Text Search</h3 id='methods/text-search'>
-<pre><code>/text<span class="variable">.json</span></code></pre>
-<p>Full-text search. Standard arguments are supported
-
-</p>
+<pre><code>/<span class="filename">text.json</code></pre>
+<p>Full-text search. Standard arguments are supported</p>
 <h4>Required arguments</h4>
 <p>No single argument is required to this endpoint; however, at least one
-of the text search arguments should be supplied.
-
-</p>
+of the text search arguments should be supplied.</p>
 <h4>Text search arguments</h4>
 <ul>
 <li><p><code>phrase</code></p>
@@ -419,22 +372,34 @@ of the text search arguments should be supplied.
 <li><p><code>page</code></p>
 <p>  The page of results to show, 50 results are shown at a time.</p>
 </li>
+<li><p><code>sort</code></p>
+<p>  The value on which to sort the results. Options for this endpoint are:</p>
+<ul>
+<li>speaker_state</li>
+<li>congress</li>
+<li>title</li>
+<li>number</li>
+<li>volume</li>
+<li>chamber</li>
+<li>session</li>
+<li>id</li>
+<li>speaker_party</li>
+<li>date</li>
+<li>bioguide_id</li>
+<li><p>pages</p>
+<p>Coupled with a direction, <code>asc</code> or <code>desc</code>. An example to sort by true chronological order and chamber (<code>id</code> works for this purpose) would be <code>id desc</code>.</p>
+</li>
+</ul>
+</li>
 </ul>
 <h4>Examples</h4>
-<p>Get a list of pieces of text with the phrase &quot;obama administration&quot; in them:
-
-</p>
-<pre><code>/text.json?phrase=obama+administration&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+<p>Get a list of pieces of text with the phrase &quot;obama administration&quot; in them:</p>
+<pre><code>/text.json?phrase=obama+administration&amp;apikey=<span class="xml"><span class="tag">&lt;<span class="title">YOUR_KEY</span>&gt;</span></span></code></pre>
 <p>Get a list of pieces of text by Republicans with the phrase &quot;health
-care debate&quot; in them:
-
-</p>
-<pre><code>/text.json?phrase=health+care+debate&amp;party=R&amp;apikey=<span class="tag">&lt;<span class="title">YOUR_KEY</span>></span></code></pre>
+care debate&quot; in them:</p>
+<pre><code>/text.json?phrase=health+care+debate&amp;party=R&amp;apikey=<span class="xml"><span class="tag">&lt;<span class="title">YOUR_KEY</span>&gt;</span></span></code></pre>
 <h4>Response</h4>
-<p>Returns a list of CR Documents and the total number found.
-
-
-</p>
+<p>Returns a list of CR Documents and the total number found.</p>
 <pre><code>{
     "<span class="attribute">num_found</span>": <span class="value"><span class="number">347</span></span>,
     "<span class="attribute">results</span>": <span class="value">[
@@ -460,17 +425,18 @@ care debate&quot; in them:
             "<span class="attribute">order</span>": <span class="value"><span class="number">14</span></span>,
             "<span class="attribute">speaker_last</span>": <span class="value"><span class="string">"Foxx"</span></span>,
             "<span class="attribute">speaker_raw</span>": <span class="value"><span class="string">"ms. foxx"</span>
-        </span>},
+        }</span>,
         ...snip...
     ]
-</span>}</code></pre>
+}</span></code></pre>
 
   </div>
 </div>
+
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', '']);
+  _gaq.push(['_setAccount', 'UA-1265484-18']);
   _gaq.push(['_trackPageview']);
 
   (function() {
