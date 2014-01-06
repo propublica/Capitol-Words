@@ -74,7 +74,7 @@ Find the popularity of a phrase over a period of time. Standard arguments are su
 
 ### Optional arguments
 
-* `bioguide`
+* `bioguide_id`
 
     Limit results to the member of Congress with the given Bioguide ID.
 
@@ -187,7 +187,7 @@ List the top phrases for a facet.
     * **date:** 2011-11-09
     * **month:** 201111
     * **state:** NY
-    * **legislator (bioguide):** L000551
+    * **legislator (bioguide id):** L000551
 
 ### Optional arguments
 
@@ -347,7 +347,7 @@ No single argument is required to this endpoint; however, at least one of the te
 
 ### Optional arguments
 
-* `bioguide`
+* `bioguide_id`
 
     Limit results to the member of Congress with the given Bioguide ID.
 
