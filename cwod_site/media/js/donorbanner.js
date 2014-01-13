@@ -78,8 +78,185 @@
         }
     };
 
+    Banner.ab = [
+        // A
+        {
+            quote: false,
+            bottom: -288,
+            html: "Sunlight Foundation is a nonpartisan nonprofit organization. We depend on the generosity of our supporters to continue our work. Help us double down on our efforts to ensure government is open and accountable.",
+            urls: {
+                sf: "ES4WiEhrlKe%2f9j9OGXCNodMmdQoOrgASmlaFEr0uTpcxt4jU6Ma%2fOg%3d%3d",
+                ie: "ES4WiEhrlKe%2f9j9OGXCNof38UsvW3kOnbcu2kq1k1UeLBWZdw6EaWA%3d%3d",
+                staffers: "ES4WiEhrlKe%2f9j9OGXCNocVXIAgloWOqMcGt2LJ9uXxkhzVDuIABvw%3d%3d",
+                capitol_words: "ES4WiEhrlKe%2f9j9OGXCNoYdS88QuItcf17fGeXpa37S7Di3iCqLaYg%3d%3d",
+                politwoops: "ES4WiEhrlKe%2f9j9OGXCNoS2csdmdnrp6ArrSuDBxiiGrXWloo%2f6mYg%3d%3d",
+                party_time: "ES4WiEhrlKe%2f9j9OGXCNof3kv6PXngP719vXVDasLnJY0lK5P8asNw%3d%3d",
+                open_states: "ES4WiEhrlKe%2f9j9OGXCNoQTfY0m6GK4WTCd2rvv9qknPXVVWd0UFjg%3d%3d",
+                docket_wrench: "ES4WiEhrlKe%2f9j9OGXCNocEdR3dwL1upGgHfXQRbt9LmOK1ZAy5TLQ%3d%3d"
+            }
+        },
+
+        // B
+        {
+            quote: false,
+            bottom: -288,
+            html: "Sunlight Foundation is a nonpartisan nonprofit organization. It is thanks to your support that we can continue fighting for government transparency. Help us double down on our efforts to ensure government is open and accountable.",
+            urls: {
+                sf: "ES4WiEhrlKfWo%2fvH%2fdIKWxB1hxm18rj5KzPHUHQTCHIEnapdW%2f%2bfVQ%3d%3d",
+                ie: "ES4WiEhrlKfWo%2fvH%2fdIKW03%2ficCkzziGX17Nb%2bDL2Et%2bVwWe0BEE9Q%3d%3d",
+                staffers: "ES4WiEhrlKfWo%2fvH%2fdIKW4jbEN7%2b5xv6tCxzC%2bmE3doYWyLeNC40%2bQ%3d%3d",
+                capitol_words: "ES4WiEhrlKfWo%2fvH%2fdIKWw9RcnDLfIQbjAO9PDgwWADTV9J5xtIj1Q%3d%3d",
+                politwoops: "ES4WiEhrlKfWo%2fvH%2fdIKW8IFqxBfKqm9GkNCN1D13AsTDn9PAUa2Kw%3d%3d",
+                party_time: "ES4WiEhrlKfWo%2fvH%2fdIKW0O84xzsQPdmcP8hjdpP7IDAsQ2q3V7Ltg%3d%3d",
+                open_states: "ES4WiEhrlKfWo%2fvH%2fdIKWyy6Yu%2byDsWdjsZJPa9Fk3QaXrlBwDm7ZA%3d%3d",
+                docket_wrench: "ES4WiEhrlKfWo%2fvH%2fdIKW%2b8xRMAClZzl3aiELyIMCPPzyV%2bzP2kBog%3d%3d"
+            }
+        },
+
+        // C
+        {
+            quote: false,
+            bottom: -288,
+            html: "Sunlight produces dozens of tools to help you connect with government, track political influence and even power websites of your own. Now, we need your help to continue maintaining and improving our open gov tools.",
+            urls: {
+                sf: "ES4WiEhrlKcv4AqxZW817QuA4EJ8PHJ8%2bcFMCJwI9loDVHGkAfz0mA%3d%3d",
+                ie: "ES4WiEhrlKcv4AqxZW817YbJy89J%2f7f8FRD9fGb8QkhqVujAm5sTNw%3d%3d",
+                staffers: "ES4WiEhrlKcv4AqxZW817XjU371Zwwsxbf6ns9U2qHYkNhBu7zx07w%3d%3d",
+                capitol_words: "ES4WiEhrlKcv4AqxZW817ZaUlO5GHlq%2fEPYSiXjKmaJNJ%2bNi9zqf%2bg%3d%3d",
+                politwoops: "ES4WiEhrlKcv4AqxZW817UHg3k7XGFtmIedcydnzas%2bIs6nhzq%2fi5Q%3d%3d",
+                party_time: "ES4WiEhrlKcv4AqxZW817fELBRpeAFwoUsmccTfUEt5XHamHdduECw%3d%3d",
+                open_states: "ES4WiEhrlKcv4AqxZW817cmeY1X0EcwdV8Dbik%2fxJqklw9%2fINM1GMQ%3d%3d",
+                docket_wrench: "ES4WiEhrlKcv4AqxZW817XC5zC57iJd9SS2OJE8uW7y8CtNYBKHOVQ%3d%3d"
+            }
+        },
+
+        // D
+        {
+            quote: false,
+            bottom: -288,
+            html: "For more than seven years, Sunlight has supported the tools you use to keep government open and accountable. Now, we need your help to continue maintaining and improving our open gov tools.",
+            urls: {
+                sf: "ES4WiEhrlKfHGG%2bMqKRtBQFMy%2fHN6HeroDXRWhJYh3YzDNvmu45Mbw%3d%3d",
+                ie: "ES4WiEhrlKfHGG%2bMqKRtBeHzWJhoNpw1SHgV%2fbnLqng%2bQuvKvh3JRQ%3d%3d",
+                staffers: "ES4WiEhrlKfHGG%2bMqKRtBYU9AZGvuLwEbDhbmJFtTFnkjfuuoBvlfw%3d%3d",
+                capitol_words: "ES4WiEhrlKfHGG%2bMqKRtBUHKNlQiTm1L1t%2fAZtdIDifarpB1r5ZOiQ%3d%3d",
+                politwoops: "ES4WiEhrlKfHGG%2bMqKRtBQ5K1%2fhDAG6vyp0P6ErJ9n8b%2bFjS%2bnZukQ%3d%3d",
+                party_time: "ES4WiEhrlKfHGG%2bMqKRtBen922i%2fYHhJj1JEtdW1hF8P2gtHH3Fm%2fg%3d%3d",
+                open_states: "ES4WiEhrlKfHGG%2bMqKRtBcdM60Z3vPVNUfDqDo1BZEv20bP6C0C3Iw%3d%3d",
+                docket_wrench: "ES4WiEhrlKfHGG%2bMqKRtBVKtb14vSnMU5dPs%2fCEKztH9TZDfWZiuzA%3d%3d"
+            }
+        },
+
+        // E
+        {
+            quote: true,
+            bottom: -288,
+            html: "&ldquo;TurboVote got its start through Sunlight. Not only did they provide our first grant, they served as our fiscal sponsor and guided us in the initial structuring and building of our organization. We couldn't have gotten off the ground without them.&rdquo; <span class=\"attribution\">&mdash; <em>Seth Flaxman, TurboVote</em></span>",
+            urls: {
+                sf: "ES4WiEhrlKfiBxc3Kpg8cYRz2%2bRR%2f1fzLYu6pb7u65ZqNZbZieRkFg%3d%3d",
+                ie: "ES4WiEhrlKfiBxc3Kpg8cfHj7Aebd6qH9LNcUSj633k83FgeurrtcQ%3d%3d",
+                staffers: "ES4WiEhrlKfiBxc3Kpg8cWDlfqDH1uxY5GzS5yL%2bUQ1NCDg8WJMkzw%3d%3d",
+                capitol_words: "ES4WiEhrlKfiBxc3Kpg8ce6YeCbWSMeQaQE3hAEXcsYfk%2fIGzT5K1g%3d%3d",
+                politwoops: "ES4WiEhrlKfiBxc3Kpg8cWec3Th0pAGlo%2fQVClQngfMsYk%2bKWxuq0w%3d%3d",
+                party_time: "ES4WiEhrlKfiBxc3Kpg8caGUCsN%2bZHf6YEjh93orBwwHoGnkTtSnkg%3d%3d",
+                open_states: "ES4WiEhrlKfiBxc3Kpg8cSoqdq3HMdqJCp1bFf10GIejjsNc9W6rcQ%3d%3d",
+                docket_wrench: "ES4WiEhrlKfiBxc3Kpg8cSeVmriKsVfjkNbyzSZnHB%2bi%2fEDOfmO2FQ%3d%3d"
+            }
+        },
+
+        // F
+        {
+            quote: true,
+            bottom: -288,
+            html: "&ldquo;I came to Sunlight because I believe technology is incredibly powerful and government is incredibly important. I don't think there's any better place for working to bring the two together.&rdquo; <span class=\"attribution\">&mdash; <em>Tom Lee, Director of Sunlight Labs</em></span>",
+            urls: {
+                sf: "ES4WiEhrlKdDXjRIAQuDVNDReMFLMcETTNSqPh2aPnJJfwJooSR4oQ%3d%3d",
+                ie: "ES4WiEhrlKdDXjRIAQuDVMJKNCEZQctzkjD5GBZJ7VfCiWJS8KbKFQ%3d%3d",
+                staffers: "ES4WiEhrlKdDXjRIAQuDVMuhVE%2f0VX25PmDKP4qWmwPhPUnnPC6r5w%3d%3d",
+                capitol_words: "ES4WiEhrlKdDXjRIAQuDVLmIAHZlEp16be5Qmh5Hggspi8RZIjuzLg%3d%3d",
+                politwoops: "ES4WiEhrlKdDXjRIAQuDVCfxOZR0J0x3nF%2fBimKx4D2gKuWLu%2bT%2bTQ%3d%3d",
+                party_time: "ES4WiEhrlKdDXjRIAQuDVPoBVZzDImnRdKYZWksI0pDcke46DDHpNg%3d%3d",
+                open_states: "ES4WiEhrlKdDXjRIAQuDVFRJyBUQ36TPvO6zVffwBy8XoaAY7ICiUA%3d%3d",
+                docket_wrench: "ES4WiEhrlKdDXjRIAQuDVDDbD3qYmbsmplBi%2fBJTF5X3a68ujD8F0w%3d%3d"
+            }
+        },
+
+        // G
+        {
+            quote: true,
+            bottom: -296,
+            html: "&ldquo;Sunlight was one of the first organizations to really engage the technology community around improving government, and the organization has continued to inspire and leverage people with these critical skills in this important task. They are the leaders in a movement that matters.&rdquo; <span class=\"attribution\">&mdash; <em>Jen Pahlka, Founder of Code for America</em></span>",
+            urls: {
+                sf: "ES4WiEhrlKfGvWU2dfGp3eWO79ir6PwlHnibLmScIoFaYIOveDlleA%3d%3d",
+                ie: "ES4WiEhrlKfGvWU2dfGp3Zbzsqph%2bGUtjX3zjy2%2bILW2PHhJUKUC0g%3d%3d",
+                staffers: "ES4WiEhrlKfGvWU2dfGp3fLoCreho%2f7dwq1OECAps8HQqsz%2f9m5DRA%3d%3d",
+                capitol_words: "ES4WiEhrlKfGvWU2dfGp3Y%2frdMS0Qx6UqbbQn1Svr3LllHNEGrCTuw%3d%3d",
+                politwoops: "ES4WiEhrlKfGvWU2dfGp3R7JJHsqOyOeP5JQj%2fxiRMMsjikamB4p2Q%3d%3d",
+                party_time: "ES4WiEhrlKfGvWU2dfGp3V3b6yfnZ4UlFeMxRQmtbWDedwubWbR%2fHA%3d%3d",
+                open_states: "ES4WiEhrlKfGvWU2dfGp3YvzZnTOP6hbAlgKiBcRQWZ50WkjVeIpuw%3d%3d",
+                docket_wrench: "ES4WiEhrlKfGvWU2dfGp3ZEkRrkhFGTTmNTBVOedFQAYOJKJNuBxRg%3d%3d"
+            }
+        },
+
+        // H
+        {
+            quote: true,
+            bottom: -296,
+            html: "&ldquo;Since I began working at Sunlight six years ago, I've seen us evolve from a small non-profit working to expose money in politics to a global leader in the transparency movement. I'm thrilled to be working everyday to help define accountability and create a more open, inclusive democracy.&rdquo; <span class=\"attribution\">&mdash; <em>John Wonderlich, Sunlight Foundation Policy Director</em></span>",
+            urls: {
+                sf: "ES4WiEhrlKfJPbNqTm4u93n2EKLmptx%2bXuXhGUhShTkMQxiJ934IDg%3d%3d",
+                ie: "ES4WiEhrlKfJPbNqTm4u99TMzAAb%2fw22gmRZo%2btPIP1F5bfvt8SeEg%3d%3d",
+                staffers: "ES4WiEhrlKfJPbNqTm4u9%2fRdaO2x4KdNAAioCGZChq%2bCU5oj%2f7Balw%3d%3d",
+                capitol_words: "ES4WiEhrlKfJPbNqTm4u9%2fNo%2feShXRMNT658paou%2bCg1cud1cy%2frXg%3d%3d",
+                politwoops: "ES4WiEhrlKfJPbNqTm4u92wcYDlYpBhwEkV7hT4QKDxgiCMsH2hW4w%3d%3d",
+                party_time: "ES4WiEhrlKfJPbNqTm4u93LXjTO8fi7nYCtxHhbSdf5nQlWCkA5kLw%3d%3d",
+                open_states: "ES4WiEhrlKfJPbNqTm4u9%2bOpUJXwEn9FaNSf3AeopvapdHZsh0K%2brg%3d%3d",
+                docket_wrench: "ES4WiEhrlKfJPbNqTm4u9%2f%2b6uk2bgIknIr7m77ZLNvdxSWKbsy6Syg%3d%3d"
+            }
+        },
+
+        // I
+        {
+            quote: true,
+            bottom: -288,
+            html: "&ldquo;The Sunlight Foundation exists to seize the potential that technology offers to hold government accountable. Open and accessible data in the hands of citizens are key to that.&rdquo; <span class=\"attribution\">&mdash; <em>Ellen Miller, Co-Founder and Executive Director of the Sunlight Foundation</em></span>",
+            urls: {
+                sf: "ES4WiEhrlKcrHsC%2bG4xM%2fIpHYocnOuJGPqa%2fNUMT2%2fmkDvGXBgk28g%3d%3d",
+                ie: "ES4WiEhrlKcrHsC%2bG4xM%2fP7qWUrWPfFnMgShofpe4jDVGot57NPwNA%3d%3d",
+                staffers: "ES4WiEhrlKcrHsC%2bG4xM%2fJLtbIXcrupQgQhaW1WxAtG6uXfv2e1JPA%3d%3d",
+                capitol_words: "ES4WiEhrlKcrHsC%2bG4xM%2fObwYT85cAhLI4hxs1wVSUDF8Ha1w26B4Q%3d%3d",
+                politwoops: "ES4WiEhrlKcrHsC%2bG4xM%2fFS5KOb8TrRQNgySODlnPMc4YXyYBjCeFQ%3d%3d",
+                party_time: "ES4WiEhrlKcrHsC%2bG4xM%2fHr6sONflyVB5uYb5v4HZ3m9NoZ0RZPqCw%3d%3d",
+                open_states: "ES4WiEhrlKcrHsC%2bG4xM%2fKytDEZ3It4B%2fY7l9Qy6SPAxrAHsNsJScg%3d%3d",
+                docket_wrench: "ES4WiEhrlKcrHsC%2bG4xM%2fFqbmuVWq8PXgPkp0ms1cLF5muRhipIMtA%3d%3d"
+            }
+        }
+    ];
+
+    window.abSwap = function(site) {
+        var test = Banner.ab[Math.floor(Math.random() * Banner.ab.length)];
+        var $p = $("#donor_banner p.because");
+
+        if (test.quote)
+            $p.addClass("quote")
+        else
+            $p.removeClass("quote");
+
+        $p.html(test.html);
+
+        var $bubble = $("#donor_banner .bubble");
+        $bubble.css("bottom", "" + test.bottom + "px");
+
+        var url = test.urls[site];
+        var base = "https://services.myngp.com/ngponlineservices/contribution.aspx?X=";
+        $("#donor_banner a.btn").attr("href", base + url);
+    }
+
     $(document).ready(function() {
         var banner = new Banner($('html'));
+
+        // HEY: change this to your site code, as seen in the above object
+        abSwap('capitol_words');
     });
 
 })(jQuery);
