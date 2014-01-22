@@ -91,11 +91,11 @@ def sunlight_lookup(lastname, state=None):
     js = json.loads(fp.read())
     if (len(js['response']['results'])) > 0:
         results = js['response']['results']
-    else: 
+    else:
         return None
 
     # if state information was passed in, use it to verify that this is the
-    # right legislator. otherwise, just take the best (0th) match. 
+    # right legislator. otherwise, just take the best (0th) match.
     legislator = None
     if not abbr(state):
         legislator = results[0]['result']['legislator']
@@ -106,7 +106,7 @@ def sunlight_lookup(lastname, state=None):
                 continue
             else:
                 print 'matched!'
-                legislator = result['result']['legislator'] 
+                legislator = result['result']['legislator']
                 return legislator
 
 def bioguide_lookup(lastname, year, position=None, state=None):
@@ -152,7 +152,7 @@ def db_bioguide_lookup(lastname, congress, chamber, date, state=None):
     import MySQLdb
     cursor = MySQLdb.Connection(*DB_PARAMS, use_unicode=True).cursor()
 
-    query = """SELECT 
+    query = """SELECT
                         bioguide_id AS bioguide,
                         first       AS firstname,
                         middle      AS middlename,
@@ -179,7 +179,7 @@ def db_bioguide_lookup(lastname, congress, chamber, date, state=None):
         args.append(abbr(state).upper())
 
     cursor.execute(query, args)
-    fields = ['bioguide', 'firstname', 'middlename', 'lastname', 'party', 
+    fields = ['bioguide', 'firstname', 'middlename', 'lastname', 'party',
                 'title', 'state', 'district', ]
     cursor.execute(query, args)
     return [dict(zip(fields, x)) for x in cursor.fetchall()]
@@ -194,7 +194,7 @@ def _db_bioguide_lookup(lastname, congress, position, state=None):
                              state AS state,
                              first AS firstname,
                              CONCAT(last, ' ', suffix) AS lastname
-                        FROM bioguide_legislator 
+                        FROM bioguide_legislator
                                             WHERE LOWER(last) = %s
                                             AND   congress = %s"""
 
@@ -236,7 +236,7 @@ def fallback_bioguide_lookup(name, congress, position):
             if '|'.join(row[1:]) == '|'.join([name, congress, position, ]):
                 cursor.execute("""SELECT bioguide_id, party, state, first, last
                                         FROM bioguide_legislator
-                                        WHERE bioguide_id = %s 
+                                        WHERE bioguide_id = %s
                                               AND congress = %s
                                         LIMIT 1""", [row[0], congress, ])
                 fields = ['bioguide', 'party', 'state', 'firstname', 'lastname', ]

@@ -50,19 +50,27 @@ class Command(BaseCommand):
                 birth_death, position, party, state, congress = [x.renderContents() for x in cells[1:]]
                 congress = congress.split('<br />')[0]
 
+                # data = {'bioguide_id': bioguide_id,
+                #         'birth_death': birth_death,
+                #         'position': position,
+                #         'party': party,
+                #         'state': state,
+                #         'congress': congress, }
+
                 data = {'bioguide_id': bioguide_id,
-                        'birth_death': birth_death,
-                        'position': position,
-                        'party': party,
-                        'state': state,
                         'congress': congress, }
 
-                data['prefix'], data['first'], data['last'], data['suffix'] = name_tools.split(name)
+                defaults = {'birth_death': birth_death,
+                            'position': position,
+                            'party': party,
+                            'state': state, }
+
+                defaults['prefix'], defaults['first'], defaults['last'], defaults['suffix'] = name_tools.split(name)
                 print data
             except Exception, e:
                 print Exception, e
 
             try:
-                legislator, created = Legislator.objects.get_or_create(**data)
+                legislator, created = Legislator.objects.get_or_create(**data, defaults=defaults)
             except IntegrityError:
                 continue

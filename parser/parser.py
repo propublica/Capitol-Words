@@ -165,6 +165,7 @@ class CRParser(object):
     re_newpage =            r'\[\[Page \w+\]\]'
     re_timestamp =          r'{time}\s\d{4}'
     re_underscore =         r'\s+_+\s+'
+    re_underscore_sep =     r'\s{33}_{6}$'
     # a new speaker might either be a legislator's name, or a reference to the role of president of presiding officer.
     re_newspeaker =         r'^(<bullet> |  )(?P<name>(%s|(((Mr)|(Ms)|(Mrs))\. [-A-Za-z ]+( of [A-Z][a-z]+)?))|((The ((VICE|ACTING|Acting) )?(PRESIDENT|SPEAKER|CHAIR(MAN)?)( pro tempore)?)|(The PRESIDING OFFICER)|(The CLERK)|(The CHIEF JUSTICE)|(The VICE PRESIDENT)|(Mr\. Counsel [A-Z]+))( \([A-Za-z.\- ]+\))?)\.'
 
@@ -236,6 +237,7 @@ class CRParser(object):
     # which, in the right context, we take to indicate a recorder comment.
     re_recorder_fuzzy =     (r'^\s+(?P<start>'
                              + r'(Pending:)'
+                             + r'|(By M(r|s|rs)\. .* \(for .*)'
                              #+ r'|()'
                             + r').*')
 
@@ -297,7 +299,6 @@ class CRParser(object):
         #self.rawlines = fp.readlines()
 
         # Remove internal page numbers and timestamps
-        f = StringIO()
         content = open(abspath).read()
         content = re.sub(r'\n?\n?\[\[Page.*?\]\]\n?', ' ', content)
         #content = re.sub(r'\n\n +\{time\} +\d+\n', '', content)
@@ -329,7 +330,6 @@ class CRParser(object):
 
         # output
         self.xml = ['<CRDoc>', ]
-
 
     def spaces_indented(self, theline):
         ''' returns the number of spaces by which the line is indented. '''
@@ -402,7 +402,8 @@ class CRParser(object):
             self.members.append(data)
         #print '|'.join([x['name'].replace('.', '\.') for x in self.members])
         #print self.re_newspeaker
-        self.re_newspeaker = self.re_newspeaker % '|'.join([x['name'].replace('.', '\.') for x in self.members])
+        ## re_newspeaker does not have any format strings in it...
+        # self.re_newspeaker = self.re_newspeaker % '|'.join([x['name'].replace('.', '\.') for x in self.members])
 
         self.referenced_by = []
         for related_item in item.xpath('relatedItem'):
@@ -465,9 +466,12 @@ class CRParser(object):
         # function.
         return theline
 
-    def get_line(self, offset=0):
-        if self.currentline+offset > len(self.rawlines)-1:
+    def get_line(self, offset=0, **kwargs):
+        raw = kwargs.get('raw', False)
+        if self.currentline+offset > len(self.rawlines)-1 or self.currentline+offset < 0:
             return None
+        if raw:
+            return self.rawlines[self.currentline+offset]
         return self.clean_line(self.rawlines[self.currentline+offset])
 
     def is_special_title(self, title):
@@ -548,7 +552,7 @@ class CRParser(object):
         new_speaker = re.search(self.re_newspeaker, theline)
         if new_speaker:
             name = new_speaker.group('name')
-            self.current_speaker = name # XXX TODO this should be a unique ID
+            self.current_speaker = name  # XXX TODO this should be a unique ID
         return self.current_speaker
 
     def check_bullet(self, theline):
@@ -617,7 +621,7 @@ class CRParser(object):
                     # comment.
                     if self.current_speaker == 'recorder':
                         annotator.register_tag_open(self.re_speaking, '<recorder>', group='start')
-                        self.recorder=True
+                        self.recorder = True
                     else:
                         annotator.register_tag_open(self.re_speaking, '<speaking name="%s">' % self.current_speaker, group='start')
 
@@ -649,8 +653,11 @@ class CRParser(object):
                 #  this specific set of states usually means we're somewhere
                 #  unrecognized, and can without these caveats can end up with
                 #  stray </speaking> tags.
-                elif (self.current_speaker == 'recorder' and self.inlongquote == False and self.inrollcall == False
-                    and self.recorder == False and self.inquote == False and self.intitle == False):
+                elif (self.current_speaker == 'recorder' and not (self.inlongquote or
+                                                                  self.inrollcall or
+                                                                  self.recorder or
+                                                                  self.inquote or
+                                                                  self.intitle)):
                     print "UNRECOGNIZED STATE (but that's ok): %s" % theline
                 else:
                     annotator.register_tag_close(self.re_endofline, '</speaking>')
@@ -688,7 +695,6 @@ class CRParser(object):
             return True
         else:
             return False
-
 
     def validate(self):
         ''' validate the xml in the file, checking for mismatched tags and
@@ -796,7 +802,7 @@ class CRParser(object):
                 # if it's a long quote but we're already IN a long quote, then
                 # we don't want to mark the beginning again, so suppress the
                 # new paragraph state.
-                if self.inlongquote == True:
+                if self.inlongquote is True:
                     self.new_paragraph = False
                 self.inlongquote = True
             else:
@@ -805,19 +811,20 @@ class CRParser(object):
                 # re_recroder_fuzzy looks for terms that indicate a
                 # continuation of a recorder comment only if the recorder was
                 # already speaking, but not otherwise.
-                if re.search(self.re_recorderstart, theline) or (self.current_speaker == 'recorder'
-                    and re.search(self.re_recorder_fuzzy, theline)):
+                if (re.search(self.re_recorderstart, theline)
+                    or (self.current_speaker == 'recorder'
+                        and re.search(self.re_recorder_fuzzy, theline))):
                     self.recorder = True
                     self.current_speaker = 'recorder'
                 else:
                     self.set_speaker(theline)
-                    if self.current_speaker == None and self.document_first_line:
+                    if self.current_speaker is None and self.document_first_line:
                         self.document_first_line = False
                         self.recorder = True
                         self.current_speaker = 'recorder'
 
         elif re.search(self.re_rollcall, theline):
-            self.inrollcall=True
+            self.inrollcall = True
             self.intitle = False
             self.new_paragraph = False
 
@@ -864,7 +871,7 @@ class CRParser(object):
             return
 
         if (not self.recorder and not self.inlongquote
-            and not self.intitle and not self.current_speaker):
+                and not self.intitle and not self.current_speaker):
             #return
             # this is a wierd state we shouldn't be in
             #print ''.join(self.rawlines)
@@ -909,12 +916,12 @@ class CRParser(object):
             self.error_flag = True
             raise AlignmentError(message)
 
-        line_above = self.rawlines[self.currentline -1].strip()
-        two_lines_above = self.rawlines[self.currentline -2].strip()
+        line_above = self.rawlines[self.currentline - 1].strip()
+        two_lines_above = self.rawlines[self.currentline - 2].strip()
         empty = ""
 
         if (self.spaces_indented(theline) == self.LONGQUOTE_INDENT and
-            line_above == empty and two_lines_above.endswith('--')):
+                line_above == empty and two_lines_above.endswith('--')):
             return True
         else:
             return False
@@ -1034,9 +1041,10 @@ class CRParser(object):
 
         return False
 
-
     def is_new_paragraph(self, theline):
         if theline.startswith('<bullet>'):
+            return True
+        if re.search(self.re_underscore_sep, self.get_line(-1, raw=True)):
             return True
         if self.spaces_indented(theline) in self.LONGQUOTE_NEW_PARA_INDENT:
             return True
@@ -1055,6 +1063,7 @@ class CRParser(object):
         fp.close()
         print "saved file %s to disk" % saveas
 
+
 def usage():
     print ''
     print 'Usage:'
@@ -1068,12 +1077,14 @@ def usage():
     print ''
     sys.exit()
 
+
 def initialize_logfile():
     ''' returns a filelike object'''
     if not os.path.exists(os.path.join(CWOD_HOME, LOG_DIR)):
         os.mkdir(os.path.join(CWOD_HOME, LOG_DIR))
     logfile = open(os.path.join(CWOD_HOME, LOG_DIR, 'parser.log'), 'a')
     return logfile
+
 
 def parse_directory(path, interactive=False):
     logfile = initialize_logfile()
@@ -1146,11 +1157,11 @@ if __name__ == '__main__':
         print path
         if len(sys.argv) == 3 and sys.argv[2] == 'interactive':
             interactive = True
-        else: interactive = False
+        else:
+            interactive = False
 
         if not os.path.exists(path):
             print 'no records exist for that date. try a different date.'
             usage()
 
         parse_directory(path, interactive)
-

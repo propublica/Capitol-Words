@@ -241,7 +241,7 @@ class Command(BaseCommand):
                             #diversity = calculator.get_date_diversity(facet, n, ngram)
                             ngrams.append((ngram, tfidf, count))
                         except:
-                            #print 'ERROR'
+                            print 'ERROR calculating tfidf: %s (%s)' % (ngram, count)
                             continue
 
                     ngrams.sort(key=itemgetter(1), reverse=True)

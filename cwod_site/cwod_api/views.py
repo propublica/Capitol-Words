@@ -425,14 +425,15 @@ def tokenize(term):
 class PhraseOverTimeHandler(GenericHandler):
 
     def read(self, request, *args, **kwargs):
-        phrase = request.GET.get('phrase') or kwargs.get('phrase')
-        if not phrase:
+        phrase = request.GET.get('phrase', '') or kwargs.get('phrase')
+        all_unigrams = request.GET.get('all')
+        if not phrase and not all_unigrams:
             return {'error': 'A value for the "phrase" parameter is required.', 'results': []}
         tokens = tokenize(phrase)
         phrase = ' '.join(tokens)
-        if not phrase:
+        if not phrase and not all_unigrams:
             return {'error': 'A value for the "phrase" parameter is required.', 'results': []}
-        n = len(tokens)
+        n = len(tokens) or 1
         if n not in range(1, 6):
             return {'error': 'The value given for the parameter "n" is invalid. An integer between one and five is required.', 'results': [], }
 
@@ -445,6 +446,8 @@ class PhraseOverTimeHandler(GenericHandler):
             # print stemmed
             kwargs['q'] = ['stemmed_%s:"%s"' % (field, stemmed), ]
 
+        elif all_unigrams:
+            kwargs['q'] = ['unigrams:["" TO *]', ]
         else:
             kwargs['q'] = ['%s:"%s"' % (field, phrase.lower()), ]
 

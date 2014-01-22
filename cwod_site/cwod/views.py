@@ -54,7 +54,7 @@ PUNCTUATION = ['?', '!', '.', ',']
 
 
 def get_congresses():
-    return LegislatorRole.objects.filter(congress__gte=104).values_list('congress', flat=True).distinct().order_by('-congress')
+    return Legislator.objects.filter(congress__gte=104).values_list('congress', flat=True).distinct().order_by('-congress')
 
 
 def get_current_congress():
