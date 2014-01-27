@@ -440,8 +440,11 @@ def wordtree(request):
 
 
 def date_detail(request, year, month, day):
+    kwargs = {}
+    if request.GET.get('bioguide_id'):
+        kwargs['bioguide_id'] = request.GET['bioguide_id']
     date = datetime.date(year=int(year), month=int(month), day=int(day))
-    entries = entries_for_date(date)
+    entries = entries_for_date(date, **kwargs)
     print entries
     if not entries:
         raise Http404
@@ -473,14 +476,14 @@ def get_similar_dates(date):
     return [x[0] for x in cursor.fetchall()]
 
 
-def entries_for_date(date):
+def entries_for_date(date, **kwargs):
     page = 0
     chambers = {'Extensions': defaultdict(set),
                 'House': defaultdict(set),
                 'Senate': defaultdict(set)}
     has_entries = False
     while True:
-        response = capitolwords.text(date=date, sort='id desc', page=page)
+        response = capitolwords.text(date=date, sort='id desc', page=page, **kwargs)
 
         if response and not has_entries:
             has_entries = True
