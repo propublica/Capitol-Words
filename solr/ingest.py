@@ -20,6 +20,7 @@ import nltk
 
 from django.template.defaultfilters import slugify
 
+SOLR_DOC_PATH = ''
 
 def make_ngrams(xml, filename):
     text = re.findall(r'<field name="speaking">(.*?)<\/field>', xml, re.S)
@@ -385,7 +386,7 @@ class SolrDoc(object):
 
     def post(self, payload):
         """ Add a document to index """
-        con = HTTPConnection('ec2-184-72-184-231.compute-1.amazonaws.com:8983')
+        con = HTTPConnection('localhost:8983')
         con.putrequest('POST', '/solr/update/')
         con.putheader('content-length', str(len(payload)))
         con.putheader('content-type', 'text/xml; charset=UTF-8')
