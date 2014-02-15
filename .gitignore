@@ -2,7 +2,9 @@
 *.pyc
 *.pyo
 *~
+data
 settings.py
 !cwod_site/settings.py
 local_settings.py
 .DS_Store
+cwod_site/venv

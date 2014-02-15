@@ -379,6 +379,7 @@ class CRParser(object):
 
         try:
             pagenums = re.search(r'(Pg.*)', granule).groups()[0]
+            if pagenums.find("Pgnull") != -1: raise AttributeError
         except AttributeError, IndexError:
             print '%s does not contain any page numbers' % granule
             return
