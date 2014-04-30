@@ -1,9 +1,9 @@
 {% load media %}<!DOCTYPE html>
-<!--[if lt IE 7 ]>             <html lang="en" class="no-js ie6" xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xmlns:fb="https://www.facebook.com/2008/fbml"> <![endif]-->
-<!--[if IE 7 ]>                <html lang="en" class="no-js ie7" xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xmlns:fb="https://www.facebook.com/2008/fbml"> <![endif]-->
-<!--[if IE 8 ]>                <html lang="en" class="no-js ie8" xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xmlns:fb="https://www.facebook.com/2008/fbml"> <![endif]-->
-<!--[if IE 9 ]>                <html lang="en" class="no-js ie9" xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xmlns:fb="https://www.facebook.com/2008/fbml"> <![endif]-->
-<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js" xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xmlns:fb="https://www.facebook.com/2008/fbml"> <!--<![endif]-->
+<!--[if lt IE 7 ]>             <html lang="en" class="no-js ie6 bb_wrapper" xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xmlns:fb="https://www.facebook.com/2008/fbml"> <![endif]-->
+<!--[if IE 7 ]>                <html lang="en" class="no-js ie7 bb_wrapper" xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xmlns:fb="https://www.facebook.com/2008/fbml"> <![endif]-->
+<!--[if IE 8 ]>                <html lang="en" class="no-js ie8 bb_wrapper" xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xmlns:fb="https://www.facebook.com/2008/fbml"> <![endif]-->
+<!--[if IE 9 ]>                <html lang="en" class="no-js ie9 bb_wrapper" xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xmlns:fb="https://www.facebook.com/2008/fbml"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js bb_wrapper" xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xmlns:fb="https://www.facebook.com/2008/fbml"> <!--<![endif]-->
     <head>
         {% block head %}
         <meta charset="utf-8">
@@ -33,6 +33,10 @@
 
         <!--[if IE 7]>{% css "css/buggy_7.css" %}<![endif]-->
         {% endblock head %}
+
+        <link rel="stylesheet" href="https://sunlight-cdn.s3.amazonaws.com/brandingbar/0.3/css/brandingbar.css">
+        <link rel="stylesheet" href="https://sunlight-cdn.s3.amazonaws.com/sf-icons/0.2/css/sf-icons.css">
+
     </head>
 
     <body class="{% block bodyclass %}{% endblock %} reveal-banner">
@@ -49,6 +53,7 @@
         }(document, 'script', 'facebook-jssdk'));</script>
         {% endcomment %}
         {% endblock fb_sdk %}
+        <div class="branding-bar" data-bb-brandingbar="true" data-bb-property-id="sunlightlabs-awesome"></div>
         <div id="containerWrapper">
         <div id="container">
             <header>
@@ -58,6 +63,8 @@
                         {#<li><a href="#">Parties</a></li>#}
                         <li><a href="{% url cwod_legislator_list %}">Legislators</a></li>
                         <li><a href="{% url cwod_calendar %}">Calendar</a></li>
+                        <li><a href="{% url cwod_about %}">About</a></li>
+                        <li><a href="http://sunlightfoundation.com/join">Get Involved</a></li>
                     </ul>
                     {% comment %}
                     <a class="featured" href="/holidays/"><img src="{% media_url %}/img/capwords_holidayplug.png" alt="Holiday greetings" /></a>
@@ -213,7 +220,7 @@
         {% block javascript %}
 
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-        <script type="text/javascript" src="http://assets.sunlightfoundation.com.s3.amazonaws.com/social/scripts/simple-socialite-pack.min.js"></script>
+        <script type="text/javascript" src="http://sunlight-cdn.s3.amazonaws.com/simple-socialite/0.1/simple-socialite-pack.min.js.gz"></script>
         <script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="/media/js/history/scripts/compressed/json2.js"><\/script>'); }</script>
 
         {% js "js/joined.js" %}
@@ -260,6 +267,7 @@
         })(jQuery);
 
         </script>
+        <script src="https://sunlight-cdn.s3.amazonaws.com/brandingbar/0.3/js/brandingbar.min.js.gz"></script>
 
     </body>
 </html>
