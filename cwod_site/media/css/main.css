@@ -1795,8 +1795,6 @@ ul.messages li.error {
 	margin: 0 auto;
 }
 .bb_wrapper .branding-bar_sunlight-logo {
-	background: rgba(0, 0, 0, 0) url('http://assets.politicalpartytime.org/1.0/images/sunlight-logo.png') no-repeat 50% 50%;
-	background-size: 160px 30px;
 }
 .bb_wrapper .branding-bar a {
 	color: #aaa;
