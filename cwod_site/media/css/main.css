@@ -289,11 +289,15 @@ dl.tip {
 	margin-top: 6px;
 	line-height: 1;
 }
+.footer-social-icons.share-buttons .sficon-twitter, .footer-social-icons.share-buttons .sficon-facebook, .footer-social-icons.share-buttons .sficon-google-plus{
+	font-size: 20px;
+}
 .footer-social-icons .socialite .counter {
-	padding: 4px 7px;
+	padding: 2px 7px;
 }
 .footer-social-icons .socialite .counter:before {
-	top: 9px;
+	top: 7px;
+	height: 5px;
 }
 #socialIcons iframe, .footer-social-icons iframe, #socialIcons div.fb-like, .footer-social-icons div.fb-like {
 	float: left;
@@ -324,6 +328,9 @@ dl.tip {
 	border: none;
 	text-decoration: underline;
 	color: #B99003;
+}
+.share-buttons a span {
+
 }
 .share-buttons .sficon-twitter{
 	color: rgb(0, 172, 237);
@@ -1498,10 +1505,12 @@ div.ngramMenu span#selected {
 }
 #compareGraphic .share-container {
 	background: url('../img/bg_secondTitle_alt.png') 0 0 repeat;
-	top: 51px;
-	right: -10px;
-	position: absolute;
 	padding: 10px 20px 0 10px;
+	margin: 0 auto;
+	float: right;
+	margin-right: -30px;
+	margin-bottom: -30px;
+	margin-top: 10px;
 }
 #compareGraphic .share-buttons .socialite-instance {
 	margin-bottom: 8px;
@@ -1589,9 +1598,8 @@ li.embedDark, li.embedLight {
 	border: 1px solid #021017;
 }
 #compareGraphic #embed a {
-	margin-top: 0;
 	margin-bottom: 5px;
-	margin-top: -10px;
+	margin-top: 0;
 }
 #compareGraphic .embedContainer {
 	margin-left: -243px;
