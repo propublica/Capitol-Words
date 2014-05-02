@@ -286,9 +286,14 @@ dl.tip {
 }
 .footer-social-icons {
 	float: right;
-	background: #494141;
-	margin-top: 12px;
+	margin-top: 6px;
 	line-height: 1;
+}
+.footer-social-icons .socialite .counter {
+	padding: 4px 7px;
+}
+.footer-social-icons .socialite .counter:before {
+	top: 9px;
 }
 #socialIcons iframe, .footer-social-icons iframe, #socialIcons div.fb-like, .footer-social-icons div.fb-like {
 	float: left;
@@ -327,7 +332,7 @@ dl.tip {
 	margin-right: 5px
 }
 .share-buttons .sficon-facebook{
-	color: rgb(59, 89, 152);
+	color: rgb(73, 111, 190);
 	font-size: 24px;
 	vertical-align: middle;
 	margin-right: 5px
