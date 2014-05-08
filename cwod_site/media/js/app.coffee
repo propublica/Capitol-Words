@@ -172,7 +172,16 @@ $(document).ready ->
         if t.is ':visible'
             t.slideUp()
         else
+            $('#share_hp').find('.share-container').hide()
             cw.getEmbedCode t
+
+    $('#share_hp>a').bind 'click', (e) ->
+        e.preventDefault()
+        tgt = $(this).parent().find('.share-container')
+        opts = tgt.find('.share-buttons').attr('data-options').replace(/linkBack\=[^&]*/, "linkBack=#{encodeURIComponent(window.location.href)}")
+        tgt.find('.share-buttons').attr('data-options', opts).trigger('hpshare')
+        tgt.slideToggle()
+        $('.embedContainer').hide()
 
     $('#customizeEmbed input').change ->
         cw.getEmbedCode $('.embedContainer')

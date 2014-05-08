@@ -286,7 +286,7 @@ dl.tip {
 }
 .footer-social-icons {
 	float: right;
-	margin-top: 6px;
+	margin-top: 8px;
 	line-height: 1;
 }
 .footer-social-icons.share-buttons .sficon-twitter, .footer-social-icons.share-buttons .sficon-facebook, .footer-social-icons.share-buttons .sficon-google-plus{
@@ -1548,8 +1548,11 @@ div.ngramMenu span#selected {
 	height: 28px;
 	width: 572px;
 }
-#embed {
+#embed, #share_hp {
 	float: right;
+}
+#share_hp {
+	margin-right: 30px;
 }
 #embed a, #embed span {
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -1563,7 +1566,7 @@ div.ngramMenu span#selected {
 .withAction h3 {
 	float: left;
 }
-.embedContainer {
+.embedContainer, #share_hp .share-container {
 	background: url('../img/bg_secondTitle.png') 0 0 repeat;
 	position: absolute;
 	width: 294px;
@@ -1572,6 +1575,12 @@ div.ngramMenu span#selected {
 	margin-top: 20px;
 	padding: 13px;
 	display: none;
+}
+#share_hp .share-container {
+	text-align:center;
+}
+#share_hp .share-container #socialIcons {
+	margin: 10px auto 0;
 }
 .embedContainer form {
 	margin-bottom: 0;
