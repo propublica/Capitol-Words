@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 ''' A set of functions that give specific views into the solr documents,
 returning nicely formatted statistics.  '''
