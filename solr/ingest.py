@@ -12,7 +12,12 @@ from xml.sax.saxutils import escape, unescape
 from xml.parsers.expat import ExpatError
 import sys, os, re
 from lib import bioguide_lookup, db_bioguide_lookup, fallback_bioguide_lookup
+
+import site
+ROOT = os.path.dirname(os.path.realpath(__file__))
+site.addsitedir(os.path.join(ROOT, "../"))
 from settings import *
+
 import datetime
 
 import lxml.etree
