@@ -12,20 +12,27 @@ Setup:
 * create symlinks to settings.py from each of solr/, scraper/ and parser/
 
 * tell solr where to find the schema file. eg, if using running the dev
-* environment in apache-solr-1.4.1/example/, it will uses schema.xml in the
-* directory /apache-solr-1.4.1/example/solr/conf. same is true for the
-* stopwords file. so set up symlinks to he real things, optionally backing up
-* the originals as .example. 
+* environment in solr-4.9.0/example/, it will uses schema.xml in the
+* directory solr-4.9.0/example/solr/conf. same is true for the
+* stopwords file. so set up symlinks to the real things, optionally backing up
+* the originals as .example.
 
-cd apache-solr-1.4.1/example/solr/conf
-mv schema.{,example.}xml
-mv stopwords.{,example.}txt
-ln -s /home/cwod/capitolwords/src/solr/schema.xml schema.xml
-ln -s /home/cwod/capitolwords/src/solr/stopwords.txt stopwords.txt
+```
+# assuming solr will be downloaded to the same directory as capitolwords
+wget http://apache.claz.org/lucene/solr/4.9.0/solr-4.9.0.tgz
+tar -xvf solr-4.9.0.tgz
+rm solr-4.9.0.tgz
 
-Startup
+mv solr-4.9.0/example/solr/collection1/conf/schema.{,example.}xml
+mv solr-4.9.0/example/solr/collection1/conf/stopwords.{,example.}txt
+ln -s `pwd`/solr/schema.xml solr-4.9.0/example/solr/collection1/conf/schema.xml
+ln -s `pwd`/solr/stopwords.txt solr-4.9.0/example/solr/collection1/conf/stopwords.txt
+```
+
+Startup:
 * start up solr. in a dev environment this looks like:
-  cd $SOLR_DIR/example
-  java -jar start.jar (uses jetty)
 
-
+```
+cd solr-4.9.0/example
+java -jar start.jar
+```
