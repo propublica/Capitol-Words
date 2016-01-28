@@ -29,7 +29,7 @@ class CRScraper(object):
 
     def was_in_session(self):
         # check the response header to make sure the Record exists for this date.
-        conn = httplib.HTTPConnection(self.domain, timeout=25)
+        conn = httplib.HTTPSConnection(self.domain, timeout=25)
         conn.request("HEAD", self.url)
         # the connection can be a little dodgy, let it try connecting a few
         # times if needed.
