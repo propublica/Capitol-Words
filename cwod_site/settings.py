@@ -51,7 +51,7 @@ ADMIN_MEDIA_PREFIX = os.path.join(PROJECT_ROOT, 'cwod_site', 'media')
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -79,6 +79,7 @@ START_YEAR = 1996
 ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
+    os.path.join(PROJECT_ROOT, 'cwod_site', 'templates')
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -172,3 +173,4 @@ try:
     from local_settings import *
 except ImportError:
     sys.stderr.write("Unable to load local settings. Make sure local_settings.py exists and is free of errors.\n")
+
