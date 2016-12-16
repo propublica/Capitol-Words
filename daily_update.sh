@@ -9,25 +9,25 @@ scraper_yesterday=`date -d '1 day ago' +'%d/%m/%Y'`
 # Scrape yesterday's record
 $CAPWORDS_VENV/bin/python $CAPWORDS_HOME/scraper/scraper.py backto $scraper_yesterday
 
-source $CAPWORDS_ENV/bin/activate
+source $CAPWORDS_VENV/bin/activate
 
 # Ingest if congress was in session
 if [ -d /opt/data/raw/$yesterday ]; then
 
   for i in `find /opt/data/raw/$yesterday -name '*PgH*.txt'`; do
-      $CAPWORDS_ENV/bin/python $CAPWORDS_HOME/parser/parser.py $i;
+      $CAPWORDS_VENV/bin/python $CAPWORDS_HOME/parser/parser.py $i;
   done
 
   for i in `find /opt/data/raw/$yesterday -name '*PgS*.txt'`; do
-      $CAPWORDS_ENV/bin/python $CAPWORDS_HOME/parser/parser.py $i;
+      $CAPWORDS_VENV/bin/python $CAPWORDS_HOME/parser/parser.py $i;
   done
 
   for i in `find /opt/data/raw/$yesterday -name '*PgE*.txt'`; do
-      $CAPWORDS_ENV/bin/python $CAPWORDS_HOME/parser/parser.py $i;
+      $CAPWORDS_VENV/bin/python $CAPWORDS_HOME/parser/parser.py $i;
   done
 
   for i in `find /opt/data/xml/$yesterday -mtime -1 -name '*.xml'`; do
-      $CAPWORDS_ENV/bin/python $CAPWORDS_HOME/solr/ingest.py $i --solrdocs-only;
+      $CAPWORDS_VENV/bin/python $CAPWORDS_HOME/solr/ingest.py $i --solrdocs-only;
   done
 
   find /opt/data/solrdocs/$yesterday -mtime -1 -name '*.xml' -exec curl -d @{} $CAPWORDS_SOLR_URL/update -H "Content-Type: text/xml" \;
