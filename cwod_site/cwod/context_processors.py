@@ -18,9 +18,13 @@ def search_terms(request):
         'termB': request.GET.get('termb'),
         }
 
-def frontend_apikey(request):
+def frontend(request):
     try:
-        return {'FRONTEND_API_KEY': settings.FRONTEND_API_KEY}
+        return {
+            'FRONTEND_API_KEY': settings.API_KEY,
+            'BASE_URL': settings.BASE_URL,
+            'API_ROOT': settings.API_ROOT,
+        }
     except AttributeError:
         return {}
 

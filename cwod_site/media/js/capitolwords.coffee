@@ -85,7 +85,7 @@ class window.CapitolWords
 
 
     addLegislatorToChart: (result, maxcount, div, callback) ->
-        url = 'http://capitolwords.org/api/legislators.json'
+        url = "#{window.cwod_apiroot}/legislators.json"
         bioguide_id = result['legislator']
         pct = (result['count'] / maxcount) * 100
         $.ajax
@@ -222,7 +222,7 @@ class window.CapitolWords
     customizeChart: ->
         party = $('#partySelect').val()
         state = $('#stateSelect').val()
-        url = 'http://capitolwords.org/api/chart/timeline.json'
+        url = "#{window.cwod_apiroot}/chart/timeline.json"
         $.ajax
             dataType: 'jsonp'
             url: url
@@ -259,7 +259,7 @@ class window.CapitolWords
                     return decodeURIComponent cookieContent
 
     getCREntries: (term) ->
-        url = 'http://capitolwords.org/api/text.json'
+        url = "#{window.cwod_apiroot}/text.json"
         cw = this
         data =
             'phrase': term
@@ -366,9 +366,9 @@ class window.CapitolWords
             type: 'POST'
             url: '/embed/'
             data: fields
-            enctype: 'miltipart/form-data'
+            enctype: 'multipart/form-data'
             success: (url) ->
-                full_url = "http://capitolwords.org#{url}"
+                full_url = "#{window.cwod_baseurl}#{url}"
                 script = """<script type="text/javascript" src="#{full_url}"></script>"""
                 container.find('textarea').val script
 
@@ -383,7 +383,7 @@ class window.CapitolWords
             'mincount': 0
             'apikey': window.cwod_apikey
 
-        url = 'http://capitolwords.org/api/dates.json'
+        url = '#{window.cwod_apiroot}/dates.json'
         cw = this
 
         requestedUrl = "#{url}?#{$.param(data)}"
@@ -415,7 +415,7 @@ class window.CapitolWords
         }
 
     getLegislatorPopularity: (term, div) ->
-        url = 'http://capitolwords.org/api/phrases/legislator.json'
+        url = '#{window.cwod_apiroot}/phrases/legislator.json'
         cw = this
         $.ajax
             dataType: 'jsonp'
@@ -476,7 +476,7 @@ class window.CapitolWords
             'mincount': 0,
         }
 
-        url = 'http://capitolwords.org/api/dates.json'
+        url = '#{window.cwod_apiroot}/dates.json'
         cw = this
 
         partyData = []
@@ -518,7 +518,7 @@ class window.CapitolWords
     getPartyPieChart: (term, div, width, height, callback) ->
         width = '' if _(width).isUndefined()
         height = '' if _(width).isUndefined()
-        url = 'http://capitolwords.org/api/chart/pie.json'
+        url = '#{window.cwod_apiroot}/chart/pie.json'
         cw = this
         $.ajax
             dataType: 'jsonp'
@@ -545,7 +545,7 @@ class window.CapitolWords
                         )
 
     getStatePopularity: (term, div) ->
-        url = 'http://capitolwords.org/api/phrases/state.json'
+        url = '#{window.cwod_apiroot}/phrases/state.json'
         cw = this
         $.ajax
             dataType: 'jsonp'
@@ -609,7 +609,7 @@ class window.CapitolWords
             apikey: window.cwod_apikey
         $.ajax
             dataType: 'jsonp'
-            url: 'http://capitolwords.org/api/legislators.json'
+            url: '#{window.cwod_apiroot}/legislators.json'
             data: data
             success: (data) ->
                 cw.populateLegislatorList data['results']
@@ -930,8 +930,8 @@ class window.CapitolWords
         cw.spinner && cw.spinner.stop && cw.spinner.stop()
         cw.spinner = new Spinner(opts).spin target
 
-        url = 'http://capitolwords.org/api/dates.json'
-        breakdownUrl = 'http://capitolwords.org/api/chart/pie.json'
+        url = '#{window.cwod_apiroot}/dates.json'
+        breakdownUrl = '#{window.cwod_apiroot}/chart/pie.json'
         requestedUrls = []
 
         [phraseA, phraseB] = cw.phrases()
