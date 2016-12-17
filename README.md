@@ -26,4 +26,5 @@ Setup:
 * I have replaced all hard-coded config options I can find with shell vars. It should be relatively simple for either a developer installing locally or someone setting up a Docker-powered version to supply these variables as part of their setup process.
 * More remains to be done -- I don't understand the various remote APIs very well and there are still a few hard-coded URLs I have not yet fully replaced.
 * We need to load the existing Solr data files into a Solr service at version 3.6 or earlier and make sure it still works. Once that's done, we can figure out how to upgrade over time while not losing that data.
+* I omitted a test version of a Docker Compose file that I used to boot up services (since I don't have the data to test them anyway) but I would recommend `harisekhon/solr:3.6` for a Solr image and `mysql:5.5` for a database image. (I stuck with an old version of MySQL for "just in case" reasons.)
 
