@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns
 from django.contrib import admin
 from django.views.generic.simple import redirect_to
 

@@ -1,8 +1,10 @@
 #!/usr/bin/python
 
 '''
-The main loop for Capitol Words, run daily. 
-Run the script once a day at (say) 3am, to retrieve the previous day's files. 
+DEPRECATED:
+The main loop for Capitol Words, formerly run daily.
+Replaced by update scripts listed in prod-crontab.
+Run the script once a day at (say) 3am, to retrieve the previous day's files.
 '''
 
 import datetime
@@ -13,7 +15,7 @@ from solr.ingest import solr_ingest_dir
 
 def run(date):
     # if congress was not in sessio or if there was a connection problem,
-    # run_scraper will return None. 
+    # run_scraper will return None.
     raw_files = run_scraper(date)
     if raw_files:
         xml_dir = parse_directory(raw_files)
@@ -27,7 +29,7 @@ if __name__ == '__main__':
     run(yesterday)
 
     # now check the scraper log to see if any previous files had errors, and if so,
-    # try to get them again. 
+    # try to get them again.
     scraper_log = open(SCRAPER_LOG)
     scraper_lines = scraper_log.readlines()
     for line in scraper_lines:

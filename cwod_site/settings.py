@@ -1,6 +1,8 @@
 # Django settings for api project.
 import os
 import sys
+import json
+import base64
 
 from django.core.urlresolvers import resolve
 
@@ -51,7 +53,7 @@ ADMIN_MEDIA_PREFIX = os.path.join(PROJECT_ROOT, 'cwod_site', 'media')
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -79,6 +81,7 @@ START_YEAR = 1996
 ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
+    os.path.join(PROJECT_ROOT, 'cwod_site', 'templates')
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -94,7 +97,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'cwod.context_processors.recent_top_unigrams',
     'cwod.context_processors.search_terms',
-    'cwod.context_processors.frontend_apikey',
+    'cwod.context_processors.frontend',
     'cwod.context_processors.tickmarks',
 )
 
@@ -158,6 +161,27 @@ MEDIASYNC = {
 
 }
 
+# Sunlight Labs api key
+API_KEY = os.environ.get("CAPWORDS_APIKEY")
+SUNLIGHT_API_KEY = API_KEY
+BASE_URL = os.environ.get("CAPWORDS_BASEURL")
+API_ROOT = os.environ.get("CAPWORDS_BASEURL") + "/api"
+CWOD_HOME = os.environ.get("CAPWORDS_HOME")
+TMP_DIR = os.environ.get("CAPWORDS_TMP")
+LOG_DIR = os.environ.get("CAPWORDS_LOGS")
+
+# how far back in time does the system check for congressional record
+# documents? dd/mm/yyyy format.
+OLDEST_DATE = '01/06/2010'
+# where should the scraper log the files it's downloaded?
+SCRAPER_LOG = os.path.join(LOG_DIR, 'scraper.log')
+# what domain and port are solr listening on?
+SOLR_DOMAIN = os.environ.get("CAPWORDS_SOLR_URL")
+
+db_serialized = os.environ.get("CAPWORDS_DATABASE")
+if db_serialized:
+    DATABASES = json.loads(base64.b64decode(db_serialized).decode('utf-8'))
+
 def api_resolve(x):
     match = resolve(x)
     if hasattr(match.func, 'handler'):
@@ -172,3 +196,4 @@ try:
     from local_settings import *
 except ImportError:
     sys.stderr.write("Unable to load local settings. Make sure local_settings.py exists and is free of errors.\n")
+
