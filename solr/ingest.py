@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 ''' Takes XML-annotated CR documents and turns them into solr documents. The
 primary difference is that solr expects fields to be in a different format, and
