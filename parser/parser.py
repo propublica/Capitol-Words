@@ -6,6 +6,10 @@ import re, datetime, os, sys
 from cStringIO import StringIO
 import urllib2
 from xml.sax.saxutils import escape, unescape
+
+import site
+ROOT = os.path.dirname(os.path.realpath(__file__))
+site.addsitedir(os.path.join(ROOT, "../"))
 from settings import CWOD_HOME, LOG_DIR
 
 import lxml.etree

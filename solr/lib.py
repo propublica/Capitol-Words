@@ -2,6 +2,9 @@
 
 ''' useful supporting functions '''
 
+import os, site
+ROOT = os.path.dirname(os.path.realpath(__file__))
+site.addsitedir(os.path.join(ROOT, "../"))
 from settings import API_KEY, DB_PATH, BIOGUIDE_LOOKUP_PATH, DB_PARAMS
 
 from BeautifulSoup import BeautifulSoup

@@ -5,7 +5,12 @@ returning nicely formatted statistics.  '''
 
 import datetime
 import urllib, urllib2, sys, os
+
+import site
+ROOT = os.path.dirname(os.path.realpath(__file__))
+site.addsitedir(os.path.join(ROOT, "../"))
 import settings
+
 try:
     import json
 except:

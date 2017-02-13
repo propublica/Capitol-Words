@@ -2,12 +2,15 @@
 
 import urllib, urllib2, os, datetime, re, sys, httplib, zipfile
 import time
-from settings import *
 try:
     import json
 except:
     import simplejson as json
 
+import site
+ROOT = os.path.dirname(os.path.realpath(__file__))
+site.addsitedir(os.path.join(ROOT, "../"))
+from settings import *
 
 class CRScraper(object):
     def __init__(self):
