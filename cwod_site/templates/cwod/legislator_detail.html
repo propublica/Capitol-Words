@@ -7,7 +7,7 @@
 {% block content %}
 <div id="main">
     <div id="internalHead">
-        <img class="legislatorImage" alt="legislator photo" src="{% legislator_thumbnail legislator.bioguide_id 40x50 %}" />
+        <img class="legislatorImage" alt="legislator photo" src="{% legislator_thumbnail legislator.bioguide_id 40x50 %}" width="40" height="50"/>
         <div id="legislatorDetail">
             <h2 class="withButton">{{ legislator.full_name }}</h2>
             <a class="editResults" href="{% url cwod_legislator_list %}">Select a Different Legislator</a>
