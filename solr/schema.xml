@@ -177,7 +177,18 @@
 
  <fields>
 
+   <field name="slug" type="string" indexed="true" stored="true" required="true" /> 
+   <field name="congress" type="string" indexed="true" stored="true" required="true" /> 
+   <field name="session" type="string" indexed="true" stored="true" required="true" /> 
+   <field name="bill" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+
+   <field name="year" type="string" indexed="true" stored="true" required="true" /> 
+   <field name="month" type="string" indexed="true" stored="true" required="true" /> 
+   <field name="day" type="string" indexed="true" stored="true" required="true" /> 
+   <field name="year_month" type="string" indexed="true" stored="true" required="true" /> 
+
    <field name="id" type="string" indexed="true" stored="true" required="true" /> 
+   <field name="page_id" type="string" indexed="true" stored="true" required="true" /> 
    <field name="crdoc" type="string" indexed="true" stored="true" required="true" /> 
    <field name="volume" type="int" indexed="true" stored="true" required="true" /> 
    <field name="number" type="int" indexed="true" stored="true" required="true" /> 
@@ -192,7 +203,10 @@
    <field name="speaker_party" type="string" indexed="true" stored="true" required="false" /> 
    <field name="speaker_bioguide" type="string" indexed="true" stored="true" required="false" /> 
    <field name="speaker_firstname" type="string" indexed="true" stored="true" required="false" /> 
+   <field name="speaker_middlename" type="string" indexed="true" stored="true" required="false" /> 
    <field name="speaker_lastname" type="string" indexed="true" stored="true" required="false" /> 
+   <field name="speaker_title" type="string" indexed="true" stored="true" required="false" /> 
+   <field name="speaker_district" type="string" indexed="true" stored="true" required="false" /> 
      <!-- the dummy field has the same value in every document, and is used
         to anchor searches when we want to facet on "all" since wildcard
         searches for * are not allowed in solr -->
@@ -228,6 +242,7 @@
      <!--   A timestamp field with a default value of "NOW" to indicate when
         each document was indexed.  -->
     <field name="ingestdate" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
+    <field name="_version_" type="long" indexed="true" stored="true"/>
    
 </fields>
 
@@ -246,8 +261,10 @@
         is added to the index.  It's used either to index the same field differently,
         or to add multiple fields to the same field for easier/faster searching.  -->
 <copyField source="speaker_firstname" dest="speaker"/>
+<copyField source="speaker_middlename" dest="speaker"/>
 <copyField source="speaker_lastname" dest="speaker"/>
 <copyField source="speaker_bioguide" dest="speaker"/>
+<copyField source="speaker_title" dest="speaker"/>
 <copyField source="speaking" dest="text"/>
 <copyField source="quote" dest="text"/>
 <copyField source="unigrams" dest="unigrams_stemmed"/>
