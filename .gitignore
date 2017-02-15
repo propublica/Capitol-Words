@@ -5,3 +5,5 @@
 !cwod_site/settings.py
 local_settings.py
 .DS_Store
+host/.vagrant
+
