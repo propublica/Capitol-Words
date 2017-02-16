@@ -15,7 +15,7 @@ TEMPLATE_DIRS = (
 	os.path.dirname(os.path.realpath(__file__)) + '/templates/'
 )
 
-NYT_API_KEY = ''
+PROPUBLICA_API_KEY = ''
 
 MEDIASYNC_AWS_KEY = ''
 MEDIASYNC_AWS_SECRET = ''
