@@ -106,7 +106,11 @@ Vagrant.configure(2) do |config|
      cp local_settings.example.py local_settings.py
      echo "source /usr/local/bin/virtualenvwrapper.sh" >> ~/.bashrc
      echo "export CAPWORDS_BASEURL=http://localhost:8000" >> ~/.bashrc
-     echo "export CAPWORDS_LOGS=/tmp/caplogs" >> ~/.bashrc
-     echo "export CAPWORDS_SOLR_URL=http://localhost:8080" >> ~/.bashrc
+     echo "export CAPWORDS_HOME=/cwod" >> ~/.bashrc
+     echo "export CAPWORDS_VENV=~/.virtualenvs/capitolwords/" >> ~/.bashrc
+     echo "export CAPWORDS_TMP=/tmp" >> ~/.bashrc
+     echo "export CAPWORDS_LOGS=logs" >> ~/.bashrc
+     echo "export CAPWORDS_SOLR_URL=http://localhost:8080/solr" >> ~/.bashrc
+     echo "export CAPWORDS_SUNLIGHT_APIKEY=foobar" >> ~/.bashrc
   SHELL
 end
