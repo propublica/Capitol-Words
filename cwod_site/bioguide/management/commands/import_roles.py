@@ -1,12 +1,12 @@
 import time
 
 import requests
-
 from django.core.management.base import BaseCommand
 from django.db.utils import IntegrityError
 from django.conf import settings
 
-from cwod_site.bioguide.models import Legislator, LegislatorRole
+from cwod_site.bioguide.models import Legislator
+from cwod_site.bioguide.models import LegislatorRole
 
 class Command(BaseCommand):
 
@@ -61,6 +61,6 @@ class Command(BaseCommand):
                 except IntegrityError:
                     continue
 
-            time.sleep(0.1)
+            time.sleep(0.5)
 
         s.close()
