@@ -2,7 +2,7 @@
 
 {% load capwords %}
 {% load typogrify_tags %}
-{% load media %}
+
 
 {% block og_title %}Capitol Words: Dig up some data on the words our legislators use every day.{% endblock %}
 {% block og_url %}http://{{ request.get_host }}{% endblock %}
@@ -13,7 +13,7 @@
         Dig up some data on the <em>words</em> our <em>legislators</em> use every day.
     </div>
     <div id="splash_image">
-        <img src="{% media_url %}/img/bubble.png" width="180" height="179" alt="Bubble">
+        <img src="/media/img/bubble.png" width="180" height="179" alt="Bubble">
     </div>
 </div>
 {% endblock splash %}
@@ -31,12 +31,12 @@
                           <li class="embedDark">
                               <input class="radio" type="radio" checked name="toggle" id="embedDark"/>
                               <label for="embedDark">Dark</label>
-                              <img src="../../media/img/embed_dark.jpg" width="90" height="38" alt="Embed Dark">
+                              <img src="/media/img/embed_dark.jpg" width="90" height="38" alt="Embed Dark">
                           </li>
                           <li class="embedLight">
                               <input class="radio" type="radio" name="toggle" id="embedLight"/>
                               <label for="embedLight">Light</label>
-                              <img src="../../media/img/embed_light.jpg" width="90" height="38" alt="Embed Light">
+                              <img src="/media/img/embed_light.jpg" width="90" height="38" alt="Embed Light">
                           </li>
                           <li class="embedCode">
                               <label for="embedCode">Embed Code</label>

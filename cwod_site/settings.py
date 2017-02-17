@@ -118,7 +118,7 @@ INSTALLED_APPS = (
     'locksmith.logparse',
     'gunicorn',
     'ngrams',
-    'mediasync',
+    #'mediasync',
     'typogrify',
 )
 
@@ -127,7 +127,7 @@ from local_settings import (MEDIASYNC_AWS_KEY, MEDIASYNC_AWS_SECRET,
                             MEDIASYNC_SERVE_REMOTE, MEDIA_VERSION)
 
 MEDIASYNC = {
-    'BACKEND': 'mediasync.backends.s3',
+    'BACKEND': 'mediasync.backends.dummy', # changed from s3 to get it to work for now
     'AWS_KEY': MEDIASYNC_AWS_KEY,
     'AWS_SECRET': MEDIASYNC_AWS_SECRET,
     'AWS_BUCKET': MEDIASYNC_AWS_BUCKET,
@@ -196,4 +196,3 @@ try:
     from local_settings import *
 except ImportError:
     sys.stderr.write("Unable to load local settings. Make sure local_settings.py exists and is free of errors.\n")
-
