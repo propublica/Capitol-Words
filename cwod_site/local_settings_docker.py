@@ -15,7 +15,8 @@ TEMPLATE_DIRS = (
 	os.path.dirname(os.path.realpath(__file__)) + '/templates/'
 )
 
-NYT_API_KEY = ''
+PROPUBLICA_API_KEY = ''
+SUNLIGHT_API_KEY = ""
 
 MEDIASYNC_AWS_KEY = ''
 MEDIASYNC_AWS_SECRET = ''
@@ -24,7 +25,6 @@ MEDIASYNC_AWS_PREFIX = ''
 MEDIASYNC_SERVE_REMOTE = False
 MEDIA_VERSION = ''
 
-SUNLIGHT_API_KEY = ""
 API_ROOT = "capitolwords.org/api"
 
 USE_LOCKSMITH = False
