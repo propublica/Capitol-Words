@@ -110,6 +110,7 @@ Vagrant.configure(2) do |config|
      echo "export CAPWORDS_VENV=~/.virtualenvs/capitolwords/" >> ~/.bashrc
      echo "export CAPWORDS_TMP=/tmp" >> ~/.bashrc
      echo "export CAPWORDS_LOGS=logs" >> ~/.bashrc
+     echo "export SOLR_DOC_PATH=solr_docs" >> ~/.bashrc
      echo "export CAPWORDS_SOLR_URL=http://localhost:8080/solr" >> ~/.bashrc
      echo "export CAPWORDS_SUNLIGHT_APIKEY=foobar" >> ~/.bashrc
   SHELL
