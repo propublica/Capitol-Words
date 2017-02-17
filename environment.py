@@ -43,6 +43,6 @@ DB_PARAMS = {
     'user': settings.DATABASES['default']['USER'],
     'passwd': settings.DATABASES['default']['PASSWORD'],
     'db': settings.DATABASES['default']['NAME'],
-    'port': settings.DATABASES['default']['PORT'],
+    'port': int(settings.DATABASES['default']['PORT']),
 }
 
