@@ -101,6 +101,7 @@ Vagrant.configure(2) do |config|
      source /usr/local/bin/virtualenvwrapper.sh
      mkvirtualenv capitolwords
      workon capitolwords
+     add2virtualenv /cwod
      cd /cwod/cwod_site
      pip install -r requirements.txt
      cp local_settings.example.py local_settings.py
@@ -113,5 +114,6 @@ Vagrant.configure(2) do |config|
      echo "export SOLR_DOC_PATH=solr_docs" >> ~/.bashrc
      echo "export CAPWORDS_SOLR_URL=http://localhost:8080/solr" >> ~/.bashrc
      echo "export CAPWORDS_SUNLIGHT_APIKEY=foobar" >> ~/.bashrc
+     echo "export DJANGO_SETTINGS_MODULE=cwod_site.settings" >> ~/.bashrc
   SHELL
 end
