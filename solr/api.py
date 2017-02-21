@@ -4,16 +4,22 @@
 returning nicely formatted statistics.  '''
 
 import datetime
-import urllib, urllib2, sys, os
-import settings
+import os
+import re
+import urllib
+import urllib2
+
 try:
     import json
-except:
+except ImportError:
     import simplejson as json
 
 from dateutil.parser import parse as dateparse
 
-from lib import volume_lookup
+from environment import OLDEST_DATE
+from environment import SOLR_DOMAIN
+
+from solr.lib import volume_lookup
 
 
 # return dicts of dates and frequency counts, plus links back to the raw ascii
@@ -28,7 +34,7 @@ def as_solr_date(datestring):
 
 def encode_and_retrieve(args):
     ''' encode the args and retrieve the solr response.'''
-    base_url = os.path.join(settings.SOLR_DOMAIN, 'solr/select?')
+    base_url = os.path.join(SOLR_DOMAIN, 'solr/select?')
     data = urllib.urlencode(args)
     full_url = base_url+data
     print full_url
@@ -118,7 +124,7 @@ def phrase_over_time(*args, **kwargs):
     if 'start_date' in kwargs and 'end_date' in kwargs:
         start, end = re.findall(r'\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ', args.get('q', ''))
     else:
-        start = as_solr_date(settings.OLDEST_DATE)
+        start = as_solr_date(OLDEST_DATE)
         end = 'NOW/DAY+1DAY'
 
     granularity = {'year': '+1YEARS',

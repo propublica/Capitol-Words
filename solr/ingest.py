@@ -6,19 +6,24 @@ the coarseness of its retrieval ability is limited to documents, so for example,
 if you want to limit a search result to a specific speaker, then you may only
 have one speaker per solr document.'''
 
-from httplib import HTTPConnection
-import xml.dom.minidom as xml
-from xml.sax.saxutils import escape, unescape
-from xml.parsers.expat import ExpatError
-import sys, os, re
-from lib import bioguide_lookup, db_bioguide_lookup, fallback_bioguide_lookup
-from settings import *
 import datetime
+import os
+import re
+import sys
+import xml.dom.minidom as xml
+from httplib import HTTPConnection
+from xml.sax.saxutils import escape
+from xml.sax.saxutils import unescape
 
 import lxml.etree
 import nltk
-
 from django.template.defaultfilters import slugify
+
+from environment import CWOD_HOME
+from environment import LOG_DIR
+from environment import SOLR_DOC_PATH
+from lib import db_bioguide_lookup
+from lib import fallback_bioguide_lookup
 
 
 def make_ngrams(xml, filename):

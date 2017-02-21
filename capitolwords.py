@@ -8,7 +8,7 @@ Run the script once a day at (say) 3am, to retrieve the previous day's files.
 '''
 
 import datetime
-from settings import *
+from environment import SCRAPER_LOG
 from scraper.scraper import run_scraper
 from parser.parser import parse_directory
 from solr.ingest import solr_ingest_dir

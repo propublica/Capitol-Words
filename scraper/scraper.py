@@ -1,12 +1,24 @@
 #!/usr/bin/python
 
-import urllib, urllib2, os, datetime, re, sys, httplib, zipfile
+import datetime
+import httplib
+import os
+import re
+import sys
 import time
-from settings import *
+import urllib
+import zipfile
+
 try:
     import json
 except:
     import simplejson as json
+
+from environment import CWOD_HOME
+from environment import LOG_DIR
+from environment import OLDEST_DATE
+from environment import SCRAPER_LOG
+from environment import TMP_DIR
 
 
 class CRScraper(object):
@@ -184,7 +196,7 @@ Several ways to invoke the scraper:
 
 0. "./scraper.py" will display this message (and do nothing)
 
-1. "./scraper.py all" will go back in time retrieving all daily congressional records until the date specified as OLDEST_DATE in settings.py. You probably want to use this with caution, but it can be useful during initial setup.
+1. "./scraper.py all" will go back in time retrieving all daily congressional records until the date specified as OLDEST_DATE in environment.py. You probably want to use this with caution, but it can be useful during initial setup.
 
 2. "./scraper.py backto dd/mm/yyyy" will retrieve congressional records back to the date given.
 
