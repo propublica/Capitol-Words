@@ -2,17 +2,21 @@
 
 ''' Parse the plain text version of congressional record documents and mark them up with xml.'''
 
-import re, datetime, os, sys
-from cStringIO import StringIO
+import datetime
+import os
+import re
+import sys
 import urllib2
-from xml.sax.saxutils import escape, unescape
-from settings import CWOD_HOME, LOG_DIR
+from cStringIO import StringIO
+from xml.sax.saxutils import escape
 
 import lxml.etree
 
+from environment import CWOD_HOME
+from environment import LOG_DIR
+
 
 MONTHS = [datetime.date(2010, x, 1).strftime('%B') for x in range(1,13)]
-
 DEBUG = False
 
 

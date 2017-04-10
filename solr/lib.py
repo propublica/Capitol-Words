@@ -2,15 +2,19 @@
 
 ''' useful supporting functions '''
 
-from settings import API_KEY, DB_PATH, BIOGUIDE_LOOKUP_PATH, DB_PARAMS
-
-from BeautifulSoup import BeautifulSoup
-import urllib2, urllib, re
+import re
+import urllib
+import urllib2
 
 try:
     import json
-except:
+except ImportError:
     import simplejson as json
+
+from environment import API_KEY
+from environment import DB_PARAMS
+from environment import BIOGUIDE_LOOKUP_PATH
+from environment import DB_PATH
 
 
 def abbr(longname):
@@ -150,7 +154,7 @@ def bioguide_lookup(lastname, year, position=None, state=None):
 
 def db_bioguide_lookup(lastname, congress, chamber, date, state=None):
     import MySQLdb
-    cursor = MySQLdb.Connection(*DB_PARAMS, use_unicode=True).cursor()
+    cursor = MySQLdb.Connection(use_unicode=True, **DB_PARAMS).cursor()
 
     query = """SELECT 
                         bioguide_id AS bioguide,
@@ -187,7 +191,7 @@ def db_bioguide_lookup(lastname, congress, chamber, date, state=None):
 
 def _db_bioguide_lookup(lastname, congress, position, state=None):
     import MySQLdb
-    cursor = MySQLdb.Connection(*DB_PARAMS).cursor()
+    cursor = MySQLdb.Connection(**DB_PARAMS).cursor()
 
     query = """SELECT bioguide_id AS bioguide,
                              party AS party,
@@ -229,7 +233,7 @@ def fallback_bioguide_lookup(name, congress, position):
     """
     import csv
     import MySQLdb
-    cursor = MySQLdb.Connection(*DB_PARAMS, use_unicode=True).cursor()
+    cursor = MySQLdb.Connection(use_unicode=True, **DB_PARAMS).cursor()
 
     with open(BIOGUIDE_LOOKUP_PATH, 'r') as fh:
         for row in csv.reader(fh, delimiter='|'):

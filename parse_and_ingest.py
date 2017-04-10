@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
-import datetime, sys
-from settings import *
-from scraper.scraper import run_scraper
+import sys
 from parser.parser import parse_directory
 from solr.ingest import solr_ingest_dir
 

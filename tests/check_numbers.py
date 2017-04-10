@@ -1,5 +1,4 @@
-from collections import defaultdict
-from settings import *
+
 import glob
 import json
 import os
@@ -7,6 +6,9 @@ import re
 import unittest
 import urllib
 import urllib2
+from collections import defaultdict
+
+from environment import CWOD_HOME
 
 class TestSolrNumbers(unittest.TestCase):
 

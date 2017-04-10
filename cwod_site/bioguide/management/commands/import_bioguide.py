@@ -6,7 +6,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
 
-from bioguide.models import Legislator
+from cwod_site.bioguide.models import Legislator
 
 import name_tools
 from BeautifulSoup import BeautifulSoup
