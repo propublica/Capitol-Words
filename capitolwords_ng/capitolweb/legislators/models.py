@@ -25,7 +25,7 @@ class CongressPerson(models.Model):
 
 
 class Term(models.Model):
-    person = models.ForeignKey(CongressPerson, on_delete=models.CASCADE)
+    person = models.ForeignKey(CongressPerson, on_delete=models.CASCADE, related_name='terms')
     type = models.CharField(max_length=1, choices=(('sen', "Senate"), ('rep', 'House')))
     start_date = models.DateField()
     end_date = models.DateField()
@@ -45,7 +45,7 @@ class Term(models.Model):
 
 
 class ExternalId(models.Model):
-    person = models.ForeignKey(CongressPerson, on_delete=models.CASCADE)
+    person = models.ForeignKey(CongressPerson, on_delete=models.CASCADE, related_name='external_ids')
     type = models.CharField(max_length=50)
     value = models.CharField(max_length=50)
 
