@@ -9,6 +9,7 @@ from datetime import datetime
 from datetime import timedelta
 
 import elasticsearch
+import boto3
 
 from cli import setup_logger
 from cli import add_logging_options
@@ -19,24 +20,6 @@ from parsers.crec import CRECParser
 PARSERS = {
     'crec': CRECParser,
 }
-
-
-class OutputDestinationError(Exception):
-    pass
-
-
-def get_es_conn(es_host):
-    parsed_url = urlparse.urlparse(es_url)
-    es_host = parsed_url.netloc
-    index = parsed_url.path.strip('/')
-    if not es_host or not index:
-        raise OutputDestinationError(
-            'Could not extract host and index from {0}'.format(es_url)
-        )
-    logging.info('Connecting to Elasticsearch host "{0}" index "{1}".'.format(
-        es_host, index
-    ))
-    return elasticsearch.Elasticsearch([es_host])
 
 
 if __name__ == '__main__':
@@ -65,8 +48,10 @@ if __name__ == '__main__':
 
     if args.source_path.startswith('s3://'):
         s3 = boto3.client('s3')
-        parsed_url = urlparse.urlparse(es_url)
-        obj = s3.get_object(Bucket=parsed_url.netloc, Key=parsed_url.path)
+        parsed_url = urlparse.urlparse(args.source_path)
+        path = parsed_url.path.strip('/')
+        print('Retrieving object with key "{0}.'.format(path))
+        obj = s3.get_object(Bucket=parsed_url.netloc, Key=path)
         input_stream = obj['Body']
     else:
         input_stream = open(args.source_path)

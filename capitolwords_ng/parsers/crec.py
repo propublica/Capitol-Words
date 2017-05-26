@@ -19,6 +19,12 @@ DEFAULT_XPATHS =  {
 }
 
 
+CREC_BUCKET = 'capitol-words-data'
+
+
+CREC_PREFIX_TEMPLATE = 'crec/%Y/%m/%d/crec'
+
+
 def xpath_parse(root, paths, namespaces):
     """Takes an lxml ROOT or element corresponding to the mods.xml doc and
     produces, yanks out useful info, and returns it as a dict.
