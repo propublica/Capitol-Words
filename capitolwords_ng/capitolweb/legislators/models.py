@@ -1,5 +1,5 @@
 from django.db import models
-
+from datetime import date
 
 class State(models.Model):
     def __str__(self):
@@ -23,10 +23,16 @@ class CongressPerson(models.Model):
     gender = models.CharField(max_length=1, choices=(('M', "Male"), ('F', 'Female')))
     religion = models.CharField(max_length=30)
 
+    class Meta:
+        ordering = ('official_full',)
+
 
 class Term(models.Model):
+    def __str__(self):
+        return "{} - {}".format(self.state, self.type)
+
     person = models.ForeignKey(CongressPerson, on_delete=models.CASCADE, related_name='terms')
-    type = models.CharField(max_length=1, choices=(('sen', "Senate"), ('rep', 'House')))
+    type = models.CharField(max_length=3, choices=(('sen', "Senate"), ('rep', 'House')))
     start_date = models.DateField()
     end_date = models.DateField()
     state = models.ForeignKey(State)
@@ -43,11 +49,20 @@ class Term(models.Model):
     rss_url = models.URLField
     url = models.URLField()
 
+    class Meta:
+        ordering = ('start_date',)
+
 
 class ExternalId(models.Model):
     person = models.ForeignKey(CongressPerson, on_delete=models.CASCADE, related_name='external_ids')
     type = models.CharField(max_length=50)
     value = models.CharField(max_length=50)
 
+
+def get_current_legislators(state=None):
+    terms = Term.objects.filter(start_date__lte=date.today(), end_date__gte=date.today())
+    if state:
+        terms = Term.objects.filter(start_date__lte=date.today(), end_date__gte=date.today(), state=state)
+    return [term.person for term in terms]
 
 

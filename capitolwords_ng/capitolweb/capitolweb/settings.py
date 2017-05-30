@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'legislators',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -136,6 +137,10 @@ LOGGING = {
     },
     'loggers': {
         'cwapi.views': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'legislators.views': {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
