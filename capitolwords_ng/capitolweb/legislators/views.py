@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .models import CongressPerson, get_current_legislators
+from .models import CongressPerson, ExternalId, get_current_legislators
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import api_view
 import logging
@@ -22,6 +22,14 @@ def find_by_id(request, person_id):
 
     people = CongressPerson.objects.prefetch_related('terms').get(pk=person_id)
     serializer = CongressPersonSerializer(people)
+    return JsonResponse(serializer.data, safe=False)
+
+
+@api_view(['GET'])
+def find_by_bioguide_id(request, bioguide_id):
+    logger.info("Request: {}".format(bioguide_id))
+    ref = ExternalId.objects.filter(type='bioguide', value=bioguide_id)[0]
+    serializer = CongressPersonSerializer(ref.person)
     return JsonResponse(serializer.data, safe=False)
 
 
