@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 @api_view(['GET'])
 def search_by_params(request):
-    """
+    """    
     Search by query params
     supports the following ?term=val
     - id - the db id
