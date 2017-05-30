@@ -46,21 +46,21 @@ def get_title(title):
 
 def search_by_speaker(request, name):
     query = get_speaker(name)
-    response = execute_search(query, '-date')
+    response = execute_search(query, '-date_issued')
     if response.success():
         return JsonResponse(response.to_dict())
 
 
 def search_by_title(request, title):
     query = get_title(title)
-    response = execute_search(query, '-date')
+    response = execute_search(query, '-date_issued')
     if response.success():
         return JsonResponse(response.to_dict())
 
 
 def search_by_params(request):
     logger.debug("search_by_params")
-    search = make_search().sort('-date')
+    search = make_search().sort('-date_issued')
     params = request.GET
     queries = []
     for f in QUERIES:

@@ -20,5 +20,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^cwapi/', include('cwapi.urls'),),
     url(r'^legislators/', include('legislators.urls'),),
-    url(r'^/', include('www.urls')),
+    url(r'^', include('www.urls')),
 ]

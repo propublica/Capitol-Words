@@ -15,7 +15,7 @@ import os
 # CAPITOL WORDS CONFIGS
 
 ES_URL = 'es://capitolwords.chartbeat.net:80'
-ES_CW_INDEX = 'wes-test'
+ES_CW_INDEX = 'will-test'
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
