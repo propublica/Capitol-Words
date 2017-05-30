@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Q
+
 from datetime import date
 
 class State(models.Model):
@@ -60,9 +62,12 @@ class ExternalId(models.Model):
 
 
 def get_current_legislators(state=None):
-    terms = Term.objects.filter(start_date__lte=date.today(), end_date__gte=date.today())
     if state:
-        terms = Term.objects.filter(start_date__lte=date.today(), end_date__gte=date.today(), state=state)
-    return [term.person for term in terms]
+        people = CongressPerson.objects.filter(
+            Q(terms__start_date__lte=date.today(), terms__end_date__gte=date.today(), terms__state=state))
+    else:
+        people = CongressPerson.objects.filter(
+            Q(terms__start_date__lte=date.today(), terms__end_date__gte=date.today()))
+    return people
 
 
