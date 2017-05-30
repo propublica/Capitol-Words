@@ -32,6 +32,7 @@ class CongressPersonShortSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CongressPerson
-        fields = ('id', 'first_name', 'middle_name', 'last_name', 'suffix', 'official_full', 'terms')
+        fields = ('id', 'first_name', 'middle_name', 'last_name', 'suffix', 'official_full', 'birthday',
+                  'gender', 'religion', 'terms')
 
 
