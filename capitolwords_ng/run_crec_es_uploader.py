@@ -72,13 +72,16 @@ if __name__ == '__main__':
                     Key=dt.strftime(MODS_KEY_TEMPLATE)
                 )
             except Exception as e:
-                logging.info('Could not find mods file for {0}.'.format(dt))
+                print('Could not find mods file for {0}.'.format(dt))
                 response = None
             if response is not None and response.get('Body'):
                 input_stream = response['Body']
-                records += parser.parse_mods_file(input_stream)
+                new_records = parser.parse_mods_file(input_stream)
+                print('Found {0} new records.'.format(len(new_records)))
+                records += new_records
             dt += timedelta(days=1)
     if args.to_stdout:
+        print('Using stdout:')
         for r in records:
             print(r)
     else:
@@ -88,4 +91,4 @@ if __name__ == '__main__':
         es_conn = elasticsearch.Elasticsearch([es_host])
         for r in records:
             es_conn.index(index=index, doc_type='crec', id=r['ID'], body=r)
-    logging.info('Extracted {0} records.'.format(len(records)))
+    print('Extracted {0} records.'.format(len(records)))
