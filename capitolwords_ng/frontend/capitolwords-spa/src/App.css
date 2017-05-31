@@ -1,0 +1,7 @@
+.App-container {
+  margin: 0 auto;
+  padding: 32px 0;
+  width: 960px;
+  min-height: 100%;
+  // background-color: #eee;
+}

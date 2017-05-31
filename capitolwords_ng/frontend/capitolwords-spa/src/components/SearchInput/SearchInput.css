@@ -1,0 +1,9 @@
+.SearchInput-input {
+  font-size: 16px;
+  line-height: 24px;
+  padding: 16px;
+  min-width: 320px;
+  border: none;
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+}

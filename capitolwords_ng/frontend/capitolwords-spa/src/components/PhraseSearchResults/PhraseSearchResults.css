@@ -1,0 +1,23 @@
+.PhraseSearchResults-container {
+  padding: 32px;
+}
+
+.PhraseSearchResults-list {
+  list-style: none;
+  padding: 0;
+  margin: 32px 0 0 0;
+}
+
+.PhraseSearchResults-item {
+  margin: 16px 0;
+  display: flex;
+  flex-direction: row;
+}
+
+.PhraseSearchResults-item-id, .PhraseSearchResults-item-title {
+ // font-size: 14px;
+}
+
+.PhraseSearchResults-item-id {
+  flex: 0 0 320px;
+}
