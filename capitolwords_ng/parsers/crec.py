@@ -182,25 +182,28 @@ def get_named_entity_frequencies(named_entities):
     named_entity_frequencies = Counter(processed_nes)
     return named_entity_frequencies
 
-def process_named_entity(named_entity, marks='!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}~'):
+def process_named_entity(named_entity, marks='!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}~',
+                         beginning_marks='!"#$%&\'()*+,-/.:;<=>?@[\\]^_`{|}~ ',
+                         trailing_marks=None):
     """
     Processes named entity by removing punctuations and at the end camel cases it.
 
     Args:
         named_entity (str)
         marks (str)
+        beginning_marks (str)
 
     Returns:
         str
     """
     # TODO. replace the line below with commented line after textacy incorporates marks
     # named_entity = textacy.preprocess.remove_punct(named_entity, marks=marks)
-    named_entity = remove_punct(named_entity, marks=marks)
+    named_entity = remove_punct(named_entity, marks=marks, beginning_marks=beginning_marks)
     named_entity = camel_case(named_entity)
 
     return named_entity if named_entity else None
 
-def remove_punct(text, marks=None):
+def remove_punct(text, marks=None, beginning_marks=None, trailing_marks=None):
     """
     Remove punctuation from ``text`` by replacing all instances of ``marks``
     with an empty string.
@@ -212,6 +215,10 @@ def remove_punct(text, marks=None):
     Returns:
         str
     """
+    if beginning_marks:
+        text = re.sub('^[{}]+'.format(re.escape(beginning_marks)), '', text, flags=re.UNICODE)
+    if trailing_marks:
+        text = re.sub('$[{}]+'.format(re.escape(trailing_marks)), '', text, flags=re.UNICODE)
     if marks:
         return re.sub('[{}]+'.format(re.escape(marks)), '', text, flags=re.UNICODE)
     else:
@@ -300,13 +307,13 @@ class CRECParser(object):
             failed_retrievals = []
             try:
                 response = self.s3.get_object(Bucket=self.bucket, Key=s3_key)
-                record['content'] = response['Body'].read()
+                record['content'] = response['Body'].read().decode('utf-8')
             except Exception as e:
                 failed_retrievals.append(s3_key)
 
         if len(failed_retrievals) > 0:
             logging.error(
-                'Failed to rerieve {0}/{1} crec docs.'.format(
+                'Failed to retieve {0}/{1} crec docs.'.format(
                     len(failed_retrievals), len(records)
                 )
             )
@@ -316,8 +323,6 @@ class CRECParser(object):
             logging.info('All crec retrievals succeeded.')
 
         for record in records:
-            record['named_entities'] = None
-            record['noun_chunks'] = None    
             if (record['ID'].split('-')[-1].startswith('PgD') or
                 record['ID'].split('-')[-2].startswith('PgD') or
                 record['content'] is None or
@@ -325,17 +330,19 @@ class CRECParser(object):
                 # dont process daily digests
                 continue
 
-            text = preprocess(record['content'].decode('utf-8'))            
+            text = preprocess(record['content'])
             textacy_text = textacy.Doc(self.nlp(text))
             named_entities = get_named_entities(textacy_text)
             if any(named_entities):
                 named_entity_types = get_named_entity_types(named_entities)
                 named_entity_freqs = get_named_entity_frequencies(named_entities)
-                record['named_entities'] = [
+                # for ne in sorted(named_entity_freqs, key=named_entity_freqs.get, reverse=True):
+                #     record['|'.join([ne, named_entity_types[ne]])] = named_entity_freqs[ne]
+                record['named_entities'] = str([
                     ('|'.join([ne, named_entity_types[ne]]), named_entity_freqs[ne])
-                    for ne in sorted(named_entity_freqs, key=named_entity_freqs.get, reverse=True)]
+                    for ne in sorted(named_entity_freqs, key=named_entity_freqs.get, reverse=True)])
 
-            phrases = get_noun_chunks(textacy_text.spacy_doc)
-            # Filter noun chunks
+        #     phrases = get_noun_chunks(textacy_text.spacy_doc)
+        #     # Filter noun chunks
 
         return records
