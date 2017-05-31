@@ -4,7 +4,7 @@ import os
 import json
 import logging
 import argparse
-import urlparse
+import urllib.parse as urlparse
 from datetime import datetime
 from datetime import timedelta
 

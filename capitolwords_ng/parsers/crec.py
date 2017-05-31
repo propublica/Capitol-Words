@@ -253,7 +253,7 @@ def camel_case(entity, force=False):
         _entity = " ".join([w.title() if w.isupper() else w for w in _entity.split()])
     else:
         _entity = " ".join([w.title() if not w.isupper() else w for w in _entity.split()])
-    return unicode(_entity)
+    return _entity
 
 
 class CRECParser(object):
@@ -318,8 +318,8 @@ class CRECParser(object):
                 # dont process daily digests
                 continue
 
-            text = preprocess(record['content'])            
-            textacy_text = textacy.Doc(self.nlp(unicode(text)))
+            text = preprocess(record['content'].decode('utf-8'))            
+            textacy_text = textacy.Doc(self.nlp(text))
             named_entities = get_named_entities(textacy_text)
             if any(named_entities):
                 named_entity_types = get_named_entity_types(named_entities)
