@@ -86,13 +86,13 @@ if __name__ == '__main__':
                 input_stream = response['Body']
                 new_records = parser.parse_mods_file(input_stream)
                 print('Found {0} new records.'.format(len(new_records)))
-            if args.to_stdout:
-                print('Using stdout:')
-                for r in new_records:
-                    print(r)
-            else:
-                for r in new_records:
-                    es_conn.index(
-                        index=index, doc_type='crec', id=r['ID'], body=r
-                    )
+                if args.to_stdout:
+                    print('Using stdout:')
+                    for r in new_records:
+                        print(r)
+                else:
+                    for r in new_records:
+                        es_conn.index(
+                            index=index, doc_type='crec', id=r['ID'], body=r
+                        )
             dt += timedelta(days=1)
