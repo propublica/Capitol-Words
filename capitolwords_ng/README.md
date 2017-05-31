@@ -2,7 +2,16 @@
 
 This will ultimately replace the top level codebase. Developed by [Chartbeat](https://www.chartbeat.com) Engineers during hackweeks!
 
-## Setup
+
+## The API
+
+The API is built on Django and it's broken into 2 apps:
+
+    * cwapi - document search with elastic search
+    * legislators - database of congress people
+
+
+### Setup
 
 To set up the API do the following:
 
@@ -13,14 +22,7 @@ To set up the API do the following:
     python manage.py runserver
 
 
-## The API
-
-The API is built on Django and it's broken into 2 apps: 
-
-    * cwapi - document search with elastic search
-    * legislators - database of congress people
- 
-## cwapi
+### cwapi
 
 The seach API is backed by elastic search and uses [elasticsearch-dsl-py](https://github.com/elastic/elasticsearch-dsl-py)
 
@@ -44,7 +46,7 @@ The `multi` endpoint allows for full text search of documents combined with titl
 
 Currently all of these endpoints return an elastic search document as json.
 
-## legislators api
+### legislators api
 
 The legislators are pulled from the [unitedstates/congress-legislators](https://github.com/unitedstates/congress-legislators) project and stored in the database.
 
@@ -75,3 +77,30 @@ Endpoints:
 
 The record returned includes Term objects for every term served by the Congress Person along with bio data and ids to other databases and services.
 
+## Data Pipeline
+
+There are two stages to getting CREC content and metadata into Elasticsearch, the scraper and the elasticsearch uploader.
+
+### scraper
+
+All CREC docs for a given day are available as a zip file from gpo.gov. Metadata for these docs is available in a single xml file, `mods.xml`.
+
+The scraper takes a date range and pulls in each zip ands mods.xml files for every day in that range (days when congress was not in session are ignored).
+
+Example usage:
+
+```
+python run_scraper.py --start_dt=2016-01-01 --end_dt=2017-01-01 --s3_bucket=mybukkit --data_type=crec
+```
+
+This will stage all data for 2016 in the provided s3 bucket under the `capitolwords/` prefix. The rest of the key includes year, month and day, e.g.: `s3://mybukkit/crec/2017/01/03/crec/CREC-2017-01-03-pt1-PgD1.htm`.
+
+### elasticsearch uploader
+
+Right now, the uploader only supports CREC data. It takes a path to a mods.xml file on local disk or in S3. The modx.xml file contains metadata for each CREC document for that day. The uploader iterates through every one of those entries and reads in the corresponding CREC file from S3. The content of that file is stored along with the relevant metadata from the mods.xml in an elasticsearch document.
+
+Example usage:
+
+```
+python run_es_uploader.py --source_path=s3://mybuckkit/crec/1994/01/25/mods/mods.xml --data_type=crec --es_url=es://<YOUR_ES_HOST>:80/<YOUR_INDEX>
+```
