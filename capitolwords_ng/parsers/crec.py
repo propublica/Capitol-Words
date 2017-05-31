@@ -59,6 +59,13 @@ def xpath_parse(root, paths, namespaces):
 
 def preprocess(text):
     """
+    Preprocess crec text file to filter out html tags and suprfluous parts!
+
+    Args:
+        text (str)
+
+    Returns:
+        str
     """
     pattern = re.compile('[A-Z!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ ]{10,}')
     index = re.search(pattern, text).start()
@@ -132,7 +139,7 @@ def get_named_entities(doc, exclude_types=NUMERIC_NE_TYPES, drop_determiners=Tru
                                                          drop_determiners=drop_determiners))
 
     named_entities = [remove_trailing_tokens(ent) for ent in named_entities]
-    named_entities = [ne for ne in named_entities if ne is not None]
+    named_entities = [ne for ne in named_entities if ne is not None and len(ne.text) > 1]
     return named_entities
 
 def get_named_entity_types(named_entities):

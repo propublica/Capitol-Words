@@ -66,6 +66,7 @@ if __name__ == '__main__':
         s3 = boto3.client('s3')
         dt = args.start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
         while dt < args.end_dt:
+            print('Processing files for {0}.'.format(dt))
             try:
                 response = s3.get_object(
                     Bucket=args.source_bucket,
