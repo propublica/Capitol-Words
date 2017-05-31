@@ -128,11 +128,11 @@ def get_named_entities(doc, exclude_types=NUMERIC_NE_TYPES, drop_determiners=Tru
     Returns:
         list of :class:`spacy.Span()`
     """
-    named_entities = list(textacy.extract.named_entities(doc,
-                                                         exclude_types=exclude_types,
+    named_entities = list(textacy.extract.named_entities(doc, exclude_types=exclude_types,
                                                          drop_determiners=drop_determiners))
 
     named_entities = [remove_trailing_tokens(ent) for ent in named_entities]
+    named_entities = [ne for ne in named_entities if ne is not None]
     return named_entities
 
 def get_named_entity_types(named_entities):
@@ -250,25 +250,23 @@ class CRECParser(object):
             logging.info('All crec retrievals succeeded.')
 
         for record in records:
-            if (record['ID'].split('-')[-1].startswith('PgD') or record['ID'].split('-')[-2].startswith('PgD')):
+            record['named_entities'] = None
+            record['noun_chunks'] = None    
+            if (record['ID'].split('-')[-1].startswith('PgD') or record['ID'].split('-')[-2].startswith('PgD')) or record['content'] is None:
                 # dont process daily digests
-                record['named_entities'] = None
-                record['noun_chunks'] = None
                 continue
 
             text = record['content']
             text = preprocess(text)            
             textacy_text = textacy.Doc(self.nlp(unicode(text)))
             named_entities = get_named_entities(textacy_text)
-            named_entity_types = get_named_entity_types(named_entities)
-            named_entity_freqs = Counter([camel_case(ne.text) for ne in named_entities])
-
-            record['named_entities'] = [
-                ('|'.join([ne, named_entity_types[ne]]), named_entity_freqs[ne]) 
-                for ne in sorted(named_entity_freqs, key=named_entity_freqs.get, reverse=True)]
-
+            if all(named_entities):
+                named_entity_types = get_named_entity_types(named_entities)
+                named_entity_freqs = Counter([camel_case(ne.text) for ne in named_entities])
+                record['named_entities'] = [
+                    ('|'.join([ne, named_entity_types[ne]]), named_entity_freqs[ne]) 
+                    for ne in sorted(named_entity_freqs, key=named_entity_freqs.get, reverse=True)]
             phrases = get_noun_chunks(textacy_text.spacy_doc)
             # Filter noun chunks
-            record['noun_chunks'] = None
 
         return records
