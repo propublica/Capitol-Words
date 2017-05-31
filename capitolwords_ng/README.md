@@ -2,6 +2,17 @@
 
 This will ultimately replace the top level codebase. Developed by [Chartbeat](https://www.chartbeat.com) Engineers during hackweeks!
 
+## Setup
+
+To set up the API do the following:
+
+    cd Capitol-Words/capitolwords_ng/capitolweb
+    python manage.py migrate
+    python manage.py loadcongress
+    python manage.py createsuperuser (if you want to use the admin tool to browse)
+    python manage.py runserver
+
+
 ## The API
 
 The API is built on Django and it's broken into 2 apps: 
