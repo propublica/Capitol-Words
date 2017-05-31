@@ -65,13 +65,7 @@ if __name__ == '__main__':
     else:
         s3 = boto3.client('s3')
         dt = args.start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-        if args.es_url:
-            parsed_es_url = urlparse.urlparse(args.es_url)
-            es_host = parsed_es_url.netloc
-            index = parsed_es_url.path.strip('/')
-            es_conn = elasticsearch.Elasticsearch([es_host])
         while dt < args.end_dt:
-            print(dt)
             try:
                 response = s3.get_object(
                     Bucket=args.source_bucket,
@@ -82,11 +76,8 @@ if __name__ == '__main__':
                 response = None
             if response is not None and response.get('Body'):
                 input_stream = response['Body']
-                records = parser.parse_mods_file(input_stream)
-                for r in records:
-                    es_conn.index(index=index, doc_type='crec', id=r['ID'], body=r)
+                records += parser.parse_mods_file(input_stream)
             dt += timedelta(days=1)
-
     if args.to_stdout:
         for r in records:
             print(r)
