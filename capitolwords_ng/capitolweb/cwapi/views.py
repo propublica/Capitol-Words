@@ -43,7 +43,7 @@ def get_title(title):
 
 
 def get_content(content):
-    return Match(content=content)
+    return Q('match', content={'query': content, 'operator': 'and'})
 
 
 @api_view(['GET'])
@@ -77,7 +77,16 @@ def search_by_title(request, title):
 @api_view(['GET'])
 def search_by_params(request):
     """
-    Search by arbitrary params
+    Search by arbitrary params which can be combined
+    
+    title - search on the title field
+    speaker - individual speakers
+    content - search for text matches in the content add &highlight=<number> to include contextual
+              matches of the given fragment size in the result (default is 200)
+    
+    Example: 
+        http://127.0.0.1:8000/cwapi/search/multi/?speaker=schumer&content=trump&highlight=1000
+    
     :param request: 
     :return: 
     """
@@ -90,7 +99,14 @@ def search_by_params(request):
             queries.append(globals()[QUERIES[f]](params[f]))
     logger.info("queries? %s " % queries)
     q = Q('bool', must=queries)
-    response = search.query(q).execute()
+
+    if 'highlight' in params and 'content' in params:
+        frag_size = params.get('highlight')
+        if not frag_size.isnumeric():
+            frag_size = 200
+        response = search.highlight('content', fragment_size=frag_size).query(q).execute()
+    else:
+        response = search.query(q).execute()
     if response.success():
         return JsonResponse(response.to_dict())
     return JsonResponse("Found nothing")
