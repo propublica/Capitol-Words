@@ -58,13 +58,20 @@ if __name__ == '__main__':
     parser = CRECParser(
         bucket=args.source_bucket,
     )
-    records = []
     if args.file_path:
         input_stream = open(args.source_path)
         records = parser.parse_mods_file(input_stream)
+        print('Using stdout:')
+        for r in records:
+            print(r)
     else:
         s3 = boto3.client('s3')
         dt = args.start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
+        if args.es_url:
+            parsed_es_url = urlparse.urlparse(args.es_url)
+            es_host = parsed_es_url.netloc
+            index = parsed_es_url.path.strip('/')
+            es_conn = elasticsearch.Elasticsearch([es_host])
         while dt < args.end_dt:
             print('Processing files for {0}.'.format(dt))
             try:
@@ -79,17 +86,13 @@ if __name__ == '__main__':
                 input_stream = response['Body']
                 new_records = parser.parse_mods_file(input_stream)
                 print('Found {0} new records.'.format(len(new_records)))
-                records += new_records
+            if args.to_stdout:
+                print('Using stdout:')
+                for r in new_records:
+                    print(r)
+            else:
+                for r in new_records:
+                    es_conn.index(
+                        index=index, doc_type='crec', id=r['ID'], body=r
+                    )
             dt += timedelta(days=1)
-    if args.to_stdout:
-        print('Using stdout:')
-        for r in records:
-            print(r)
-    else:
-        parsed_es_url = urlparse.urlparse(args.es_url)
-        es_host = parsed_es_url.netloc
-        index = parsed_es_url.path.strip('/')
-        es_conn = elasticsearch.Elasticsearch([es_host])
-        for r in records:
-            es_conn.index(index=index, doc_type='crec', id=r['ID'], body=r)
-    print('Extracted {0} records.'.format(len(records)))
