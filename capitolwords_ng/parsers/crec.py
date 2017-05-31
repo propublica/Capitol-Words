@@ -147,12 +147,71 @@ def get_named_entity_types(named_entities):
     """
     named_entity_types = defaultdict(list)
     for ne in named_entities:
-        named_entity_types[camel_case(ne.text)].append(ne.label_)
+        processed_ne = process_named_entity(ne.text)
+        if processed_ne is not None:
+            named_entity_types[processed_ne].append(ne.label_)
 
     for ne in named_entity_types.keys():
         most_common_type = Counter([_type for _type in named_entity_types[ne] if _type]).most_common(1)
         named_entity_types[ne] = most_common_type[0][0] if any(most_common_type) else ''
     return named_entity_types
+
+def get_named_entity_frequencies(named_entities):
+    """
+    Given a list of named entities, calculate occurrences.
+
+    Args:
+        named_entities (list of :class:`spacy.Span()`)
+
+    Returns:
+        dict
+    """
+    processed_nes = []
+    for ne in named_entities:
+        processed_ne = process_named_entity(ne.text)
+        if processed_ne is not None:
+            processed_nes.append(processed_ne)
+
+    named_entity_frequencies = Counter(processed_nes)
+    return named_entity_frequencies
+
+def process_named_entity(named_entity, marks='!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}~'):
+    """
+    Processes named entity by removing punctuations and at the end camel cases it.
+
+    Args:
+        named_entity (str)
+        marks (str)
+
+    Returns:
+        str
+    """
+    # TODO. replace the line below with commented line after textacy incorporates marks
+    # named_entity = textacy.preprocess.remove_punct(named_entity, marks=marks)
+    named_entity = remove_punct(named_entity, marks=marks)
+    named_entity = camel_case(named_entity)
+
+    return named_entity if named_entity else None
+
+def remove_punct(text, marks=None):
+    """
+    Remove punctuation from ``text`` by replacing all instances of ``marks``
+    with an empty string.
+    Args:
+        text (str): raw text
+        marks (str): If specified, remove only the characters in this string,
+            e.g. ``marks=',;:'`` removes commas, semi-colons, and colons.
+            Otherwise, all punctuation marks are removed.
+    Returns:
+        str
+    """
+    if marks:
+        return re.sub('[{}]+'.format(re.escape(marks)), '', text, flags=re.UNICODE)
+    else:
+        if isinstance(text, unicode_):
+            return text.translate(PUNCT_TRANSLATE_UNICODE)
+        else:
+            return text.translate(None, PUNCT_TRANSLATE_BYTES)
 
 def get_noun_chunks(doc, exclude_types=NUMERIC_NE_TYPES, drop_determiners=True):
     """
@@ -252,20 +311,23 @@ class CRECParser(object):
         for record in records:
             record['named_entities'] = None
             record['noun_chunks'] = None    
-            if (record['ID'].split('-')[-1].startswith('PgD') or record['ID'].split('-')[-2].startswith('PgD')) or record['content'] is None:
+            if (record['ID'].split('-')[-1].startswith('PgD') or
+                record['ID'].split('-')[-2].startswith('PgD') or
+                record['content'] is None or
+                'content' not in record.keys()):
                 # dont process daily digests
                 continue
 
-            text = record['content']
-            text = preprocess(text)            
+            text = preprocess(record['content'])            
             textacy_text = textacy.Doc(self.nlp(unicode(text)))
             named_entities = get_named_entities(textacy_text)
-            if all(named_entities):
+            if any(named_entities):
                 named_entity_types = get_named_entity_types(named_entities)
-                named_entity_freqs = Counter([camel_case(ne.text) for ne in named_entities])
+                named_entity_freqs = get_named_entity_frequencies(named_entities)
                 record['named_entities'] = [
-                    ('|'.join([ne, named_entity_types[ne]]), named_entity_freqs[ne]) 
+                    ('|'.join([ne, named_entity_types[ne]]), named_entity_freqs[ne])
                     for ne in sorted(named_entity_freqs, key=named_entity_freqs.get, reverse=True)]
+
             phrases = get_noun_chunks(textacy_text.spacy_doc)
             # Filter noun chunks
 
