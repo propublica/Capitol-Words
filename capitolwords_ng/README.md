@@ -1,4 +1,4 @@
-#Capitol Words NG - The Upgrade
+# Capitol Words NG - The Upgrade
 
 This will ultimately replace the top level codebase. Developed by [Chartbeat](https://www.chartbeat.com) Engineers during hackweeks!
 
