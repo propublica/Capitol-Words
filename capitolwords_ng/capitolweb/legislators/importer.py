@@ -17,6 +17,7 @@ def load_legislators_current():
     with open(file, 'r') as f:
         return yaml.load(f)
 
+
 def load_legislators_past():
     """
     Loads the legislators-current.yaml

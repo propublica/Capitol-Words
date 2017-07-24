@@ -15,23 +15,16 @@ class State(models.Model):
 class CongressPerson(models.Model):
     def __str__(self):
         return self.official_full
-
-    first_name = models.CharField(max_length=25)
-    middle_name = models.CharField(max_length=25)
-    last_name = models.CharField(max_length=25)
+    bioguide_id = models.CharField(max_length=7, primary_key=True)
+    first = models.CharField(max_length=25)
+    middle = models.CharField(max_length=25)
+    last = models.CharField(max_length=25)
     suffix = models.CharField(max_length=5)
     nickname = models.CharField(max_length=25)
-    official_full = models.CharField(max_length=50, unique=True)
-    birthday = models.DateField()
+    official_full = models.CharField(max_length=50)
+    birthday = models.DateField(default=date(1776, 7, 4))
     gender = models.CharField(max_length=1, choices=(('M', "Male"), ('F', 'Female')))
     religion = models.CharField(max_length=30)
-
-    @property
-    def bioguide_id(self):
-        try:
-            return self.external_ids.get(type='bioguide').value
-        except Exception:
-            return ""
 
     @property
     def image_lg(self):
@@ -63,9 +56,9 @@ class Term(models.Model):
     office = models.TextField()
     phone = models.CharField(max_length=20)
     fax = models.CharField(max_length=20)
-    contact_form = models.URLField()
-    rss_url = models.URLField
-    url = models.URLField()
+    contact_form = models.URLField(blank=True, null=True)
+    rss_url = models.URLField(blank=True, null=True)
+    url = models.URLField(blank=True, null=True)
 
     class Meta:
         ordering = ('start_date',)

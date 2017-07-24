@@ -9,6 +9,7 @@ date_format = '%Y-%m-%d'
 
 
 def make_person(bio, name):
+
     person = CongressPerson(first_name=name['first'], last_name=name['last'])
 
     if 'official_full' in name:
@@ -31,36 +32,35 @@ def make_person(bio, name):
 
 
 def make_term(person, term):
+    defaults = {}
     state = State.objects.get(short=term['state'])
     start = datetime.strptime(term['start'], date_format)
     end = datetime.strptime(term['end'], date_format)
-    t = Term(person=person, state=state, type=term['type'], party=term['party'],
-             start_date=start, end_date=end)
-    if 'class' in term:
-        t.election_class = term['class']
-
-    for p in ['state_rank', 'district', 'caucus', 'address', 'office', 'phone', 'fax', 'contact_form', 'rss_url', 'url']:
+    for p in ['party', 'state_rank', 'district', 'caucus', 'address', 'office', 'phone', 'fax',
+              'contact_form', 'rss_url', 'url']:
         if p in term:
-            t.__setattr__(p, term[p])
-    t.save()
-    return t
+            defaults[p] = term[p]
+    if 'class' in term:
+        defaults['election_class'] = term['class']
+
+    obj, created = person.terms.update_or_create(
+        state=state, start_date=start, end_date=end, type=term['type'], defaults=defaults)
 
 
 def load_data(data, out):
     for rep in data:
-        try:
-            if 'official_full' in rep['name']:
-                CongressPerson.objects.get(official_full= rep['name']['official_full'])
-        except CongressPerson.DoesNotExist:
-            bio = rep['bio']
-            ids = rep['id']
-            name = rep['name']
-            terms = rep['terms']
-            person = make_person(bio, name)
-            for k, v in ids.items():
-                ExternalId(person=person, type=k, value=v).save()
-            for term in terms:
-                make_term(person, term)
+        defaults = {}
+        defaults.update(rep['name'])
+        defaults.update(rep['bio'])
+        print(rep['name'])
+        obj, created = CongressPerson.objects.update_or_create(
+            bioguide_id=rep['id']['bioguide'],
+            defaults=defaults,
+        )
+        for k, v in rep['id'].items():
+            obj.external_ids.update_or_create(type=k, value=v)
+        for term in rep['terms']:
+            make_term(obj, term)
 
 
 class Command(BaseCommand):
