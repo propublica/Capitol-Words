@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'legislators',
     'rest_framework',
+    'rest_framework_swagger',
 ]
 
 MIDDLEWARE = [
