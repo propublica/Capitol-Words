@@ -54,7 +54,7 @@ Endpoints:
 
     /legislators/search
     /legislators/person/<bioguide_id>
-    /legislators/current?<state>
+    /legislators/current?state=<state 2 letter code>
 
  `person` allows lookup by the bioguide id
  `current` returns all of the current legislators with an optional 2 letter state code

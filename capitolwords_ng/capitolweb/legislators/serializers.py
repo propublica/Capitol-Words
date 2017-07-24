@@ -24,7 +24,7 @@ class CongressPersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = CongressPerson
         fields = ('id', 'first_name', 'middle_name', 'last_name', 'suffix', 'nickname', 'official_full', 'birthday',
-                  'gender', 'religion', 'terms', 'external_ids')
+                  'gender', 'religion', 'terms', 'external_ids', 'image_lg', 'image_sm', 'bioguide_id')
 
 
 class CongressPersonShortSerializer(serializers.ModelSerializer):
@@ -33,6 +33,6 @@ class CongressPersonShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = CongressPerson
         fields = ('id', 'first_name', 'middle_name', 'last_name', 'suffix', 'official_full', 'birthday',
-                  'gender', 'religion', 'terms')
+                  'gender', 'religion', 'terms', 'image_lg', 'image_sm', 'bioguide_id' )
 
 

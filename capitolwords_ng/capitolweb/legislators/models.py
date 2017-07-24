@@ -3,6 +3,7 @@ from django.db.models import Q
 
 from datetime import date
 
+
 class State(models.Model):
     def __str__(self):
         return self.name
@@ -24,6 +25,21 @@ class CongressPerson(models.Model):
     birthday = models.DateField()
     gender = models.CharField(max_length=1, choices=(('M', "Male"), ('F', 'Female')))
     religion = models.CharField(max_length=30)
+
+    @property
+    def bioguide_id(self):
+        try:
+            return self.external_ids.get(type='bioguide').value
+        except Exception:
+            return ""
+
+    @property
+    def image_lg(self):
+        return "https://theunitedstates.io/images/congress/450x550/{}.jpg".format(self.bioguide_id)
+
+    @property
+    def image_sm(self):
+        return "https://theunitedstates.io/images/congress/225x275/{}.jpg".format(self.bioguide_id)
 
     class Meta:
         ordering = ('official_full',)
