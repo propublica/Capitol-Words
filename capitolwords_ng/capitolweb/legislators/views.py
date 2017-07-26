@@ -32,25 +32,33 @@ def search_by_params(request):
 
     params = request.query_params
 
-    # See if we're going with all or just current
-
-    if 'current' in params:
-        people = get_current_legislators()
-    else:
-        people = CongressPerson.objects
-
     # if we have an id, just return it
     if 'id' in params:
         logger.info("search by id")
         return find_by_id(request, params.get('id'))
 
+    # See if we're going with all or just current
+    if 'current' in params:
+        people = get_current_legislators()
+    else:
+        people = CongressPerson.objects
+    if 'state' in params:
+        logger.info("search by state")
+        people = people.filter(terms__state=params.get('state'))
+    if 'party' in params:
+        logger.info("search by party")
+        people = people.filter(terms__party=params.get('party'))
+    if 'term_type' in params:
+        logger.info("search by term_type")
+        if params.get('term_type') in ['sen', 'rep']:
+            people = people.filter(terms__type=params.get('term_type'))
     if 'name' in params:
-        logger.info("search by name")
+        logger.info("search by name: " + params.get('name'))
         people = people.filter(official_full=params.get('name'))
 
     if 'last_name' in params:
         logger.info("search by last_name")
-        people = people.filter(last_name=params.get('last_name'))
+        people = people.filter(last=params.get('last_name'))
 
     if 'gender' in params:
         logger.info("search by gender")
@@ -98,9 +106,8 @@ def list_current(request):
     :param request: optional - state=<2 letter state code>
     :return: A list of CongressPeople
     """
-    logger.info("Request: {}".format(request.query_params.get('foo')))
     params = request.query_params
     state = params.get('state', None)
-    people = get_current_legislators(state=state)
+    people = get_current_legislators()
     serializer = CongressPersonSerializer(people, many=True)
     return JsonResponse(serializer.data, safe=False)

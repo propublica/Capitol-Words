@@ -1,6 +1,4 @@
 from django.db import models
-from django.db.models import Q
-
 from datetime import date
 
 
@@ -70,13 +68,15 @@ class ExternalId(models.Model):
     value = models.CharField(max_length=50)
 
 
-def get_current_legislators(state=None):
-    if state:
-        people = CongressPerson.objects.filter(
-            Q(terms__start_date__lte=date.today(), terms__end_date__gte=date.today(), terms__state=state))
-    else:
-        people = CongressPerson.objects.filter(
-            Q(terms__start_date__lte=date.today(), terms__end_date__gte=date.today()))
-    return people
+def get_current_legislators():
+    """
+    Filter legislators based on terms
+    :param state: 2 letter code for state
+    :param party: full name of a party
+    :param term_type: 'sen' or 'rep' for senate or house
+    :return:
+    """
+    results = CongressPerson.objects.filter(terms__start_date__lte=date.today(), terms__end_date__gte=date.today())
+    return results
 
 

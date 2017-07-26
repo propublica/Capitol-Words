@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.http import JsonResponse
 from elasticsearch_dsl import Search
-from elasticsearch_dsl.query import Match, Q
+from elasticsearch_dsl.query import Match, Q, Range
 from elasticsearch_dsl.connections import connections
 from rest_framework.decorators import api_view
 
@@ -54,6 +54,10 @@ def get_content(content):
 
 def get_entity(entity):
     return Match(named_entities={"query": entity, "operator": "and"})
+
+
+def get_date_range(start, end="now/d"):
+    return Range(date_issued={"gte": start, "lte": end})
 
 
 @api_view(['GET'])
@@ -111,11 +115,13 @@ def search_by_params(request):
     content - search for text matches in the content add &highlight=<number> to include contextual
               matches of the given fragment size in the result (default is 200)
     entity - named entities
+    start_date / end_date in form 2017-01-04, inclusive. end_date defaults to today.
     
     Example:
         http://localhost:8000/cwapi/search/multi/?title=Budget&entity=social%20security&entity=senate&speaker=sanders
-        http://127.0.0.1:8000/cwapi/search/multi/?speaker=schumer&content=trump&highlight=1000
-    
+        http://localhost:8000/cwapi/search/multi/?speaker=schumer&content=trump&highlight=1000
+        http://localhost:8000/cwapi/search/multi/?title=Budget&speaker=sanders&start_date=2016-01-11&end_date=2017-01-04
+
     :param request: 
     :return: 
     """
@@ -127,7 +133,11 @@ def search_by_params(request):
         if f in params:
             for r in params.getlist(f):
                 queries.append(globals()[QUERIES[f]](r))
-
+    if 'start_date' in params:
+        if 'end_date' in params:
+            queries.append(get_date_range(params.get('start_date'), params.get('end_date')))
+        else:
+            queries.append(get_date_range(params.get('start_date')))
     logger.info("queries? %s " % queries)
     q = Q('bool', must=queries)
 
