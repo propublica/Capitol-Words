@@ -17,6 +17,7 @@ QUERIES = {
     'title': 'get_title',
     'speaker': 'get_speaker',
     'content': 'get_content',
+    'entity': 'get_entity'
 }
 
 
@@ -35,15 +36,19 @@ def execute_search(query, sorting=None):
 
 
 def get_speaker(name):
-    return Match(speakers=name)
+    return Match(speakers={"query": name, "operator": "and"})
 
 
 def get_title(title):
-    return Match(title=title)
+    return Match(title={"query": title, "type": "phrase"})
 
 
 def get_content(content):
     return Q('match', content={'query': content, 'operator': 'and'})
+
+
+def get_entity(entity):
+    return Match(named_entities={"query": entity, "operator": "and"})
 
 
 @api_view(['GET'])
@@ -75,28 +80,49 @@ def search_by_title(request, title):
 
 
 @api_view(['GET'])
+def search_by_entities(request):
+    """
+    Search by title of a document
+    entities are specified in the query param 'entity'
+    :param request:
+    :return: list of results sorted by date_issued
+    """
+    terms = request.GET.getlist('entity')
+    queries = [get_entity(e) for e in terms]
+    logger.info("queries? %s " % queries)
+    q = Q('bool', must=queries)
+    response = execute_search(q, '-date_issued')
+    if response.success():
+        return JsonResponse(response.to_dict())
+
+
+@api_view(['GET'])
 def search_by_params(request):
     """
-    Search by arbitrary params which can be combined
+    Search by arbitrary params which can be combined and can also be lists
     
     title - search on the title field
     speaker - individual speakers
     content - search for text matches in the content add &highlight=<number> to include contextual
               matches of the given fragment size in the result (default is 200)
+    entity - named entities
     
-    Example: 
+    Example:
+        http://localhost:8000/cwapi/search/multi/?title=Budget&entity=social%20security&entity=senate&speaker=sanders
         http://127.0.0.1:8000/cwapi/search/multi/?speaker=schumer&content=trump&highlight=1000
     
     :param request: 
     :return: 
     """
     logger.debug("search_by_params")
+    params = request.GET
     search = make_search().sort('-date_issued')
-    params = request.query_params
     queries = []
     for f in QUERIES:
         if f in params:
-            queries.append(globals()[QUERIES[f]](params[f]))
+            for r in params.getlist(f):
+                queries.append(globals()[QUERIES[f]](r))
+
     logger.info("queries? %s " % queries)
     q = Q('bool', must=queries)
 
