@@ -230,39 +230,27 @@ def get_named_entity_frequencies(named_entities):
     named_entity_frequencies = Counter(processed_nes)
     return named_entity_frequencies
 
-def get_noun_chunks(doc, drop_determiners=True):
+def get_noun_chunk_frequencies(doc, drop_determiners=True):
     """
-    Extract ordered list of noun chunks from a spacy doc and
+    Extract ordered list of noun chunks and their frequencies from a spacy doc and
     optionally filter by the types and frequencies.
     
     Args:
         doc (:class:`spacy.Doc()`)
-        exclude_types (list)
         drop_determiners (bool)
     
     Returns:
-        list of :class:`spacy.Span()`
+        list of tuples
     """
+    noun_chunks = [nc for nc
+                   in textacy.extract.noun_chunks(doc, drop_determiners=drop_determiners)]
 
-    import pdb; pdb.set_trace()
-    noun_chunks = doc.noun_chunks
-    if any(exclude_types):
-        noun_chunks = [
-            nc for nc in noun_chunks
-            if not any([n.ent_type_ in exclude_types for n in nc])
-        ]
-    if drop_determiners:
-        noun_chunks = [nc if nc[0].pos != DET else nc[1:] for nc in noun_chunks]
+    # Filter blacklisted words and drop noun chunks that include pronouns (these are too specific)
+    processed_noun_chunks = [nc.text for nc in noun_chunks if '-PRON-' not in nc.lemma_]
+    processed_noun_chunks = [nc.title() for nc in processed_noun_chunks if ' HON ' not in nc]
 
-    return list(noun_chunks)
+    ncs_freqs = Counter(processed_noun_chunks).most_common()
 
+    return ncs_freqs
 
-
-
-    named_entities = [nc 
-                      for nc
-                      in textacy.extract.noun_chunks(doc, drop_determiners=drop_determiners)]
-
-    named_entities = [remove_trailing_tokens(ent) for ent in named_entities]
-    named_entities = [ne for ne in named_entities if ne is not None and len(ne.text) > 1]
-    processed_named_entities = process_named_entity(named_entities)
+    # record keys by entity types, and break docs w multiple speakers to sub docs.

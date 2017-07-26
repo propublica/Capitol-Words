@@ -127,9 +127,6 @@ class CRECParser(object):
                     for ne in sorted(named_entity_freqs, key=named_entity_freqs.get, reverse=True)])
             
             # Extract noun phrases & their frequencies
-            noun_chunks = get_noun_chunks(textacy_text)
-            import pdb; pdb.set_trace()
-        #     phrases = get_noun_chunks(textacy_text.spacy_doc)
-        #     # Filter noun chunks
+            record['noun_chunks'] = get_noun_chunk_frequencies(textacy_text)
 
         return records
