@@ -4,13 +4,12 @@ import logging
 from datetime import datetime
 
 import boto3
-import re
 from lxml import etree
 
 import spacy
 import textacy
 
-import text_utils
+from parsers.text_utils import *
 
 
 DEFAULT_XML_NS = {'ns': 'http://www.loc.gov/mods/v3'}
@@ -28,13 +27,8 @@ DEFAULT_XPATHS =  {
 }
 
 
-CREC_BUCKET = 'capitol-words-data'
-
-
 CREC_PREFIX_TEMPLATE = 'crec/%Y/%m/%d/crec'
 CREC_KEY_TEMPLATE = '{prefix}/{id}.htm'
-
-VERB_TAGS = ['BES', 'HVS', 'VB', 'VBD', 'VBN', 'VBP', 'VBZ', 'MD']
 
 
 def xpath_parse(root, paths, namespaces):
@@ -111,23 +105,30 @@ class CRECParser(object):
         for record in records:
             if (record['ID'].split('-')[-1].startswith('PgD') or
                 record['ID'].split('-')[-2].startswith('PgD') or
+                record['ID'].split('-')[-1].startswith('FrontMatter') or
                 record['content'] is None or
                 'content' not in record.keys()):
-                # dont process daily digests
+                # dont process daily digests or front matters or pages with no content
                 continue
 
             text = preprocess(record['content'])
             textacy_text = textacy.Doc(self.nlp(text))
+            
+            # Extract named entities and their types & frequencies
             named_entities = get_named_entities(textacy_text)
+            record['named_entities'] = ''
             if any(named_entities):
                 named_entity_types = get_named_entity_types(named_entities)
                 named_entity_freqs = get_named_entity_frequencies(named_entities)
-                # for ne in sorted(named_entity_freqs, key=named_entity_freqs.get, reverse=True):
-                #     record['|'.join([ne, named_entity_types[ne]])] = named_entity_freqs[ne]
                 record['named_entities'] = str([
+                    ('|'.join([ne.title(), named_entity_types[ne]]), named_entity_freqs[ne])
+                    if named_entity_types[ne]=='PERSON' else 
                     ('|'.join([ne, named_entity_types[ne]]), named_entity_freqs[ne])
                     for ne in sorted(named_entity_freqs, key=named_entity_freqs.get, reverse=True)])
-
+            
+            # Extract noun phrases & their frequencies
+            noun_chunks = get_noun_chunks(textacy_text)
+            import pdb; pdb.set_trace()
         #     phrases = get_noun_chunks(textacy_text.spacy_doc)
         #     # Filter noun chunks
 

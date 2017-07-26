@@ -21,13 +21,14 @@ MODS_KEY_TEMPLATE = 'crec/%Y/%m/%d/mods/mods.xml'
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=20,)
     parser = argparse.ArgumentParser()
     add_logging_options(parser)
     output_option_group = parser.add_mutually_exclusive_group(required=True)
     output_option_group.add_argument(
         '--to_stdout',
         help='If true, will not upload to es and instead print to stdout.',
-        action='store_true'
+        default=True,
     )
     output_option_group.add_argument(
         '--es_url',
@@ -48,12 +49,11 @@ if __name__ == '__main__':
     parser.add_argument(
         '--source_bucket',
         help='Location of crec data.',
+        default = 'capitol-words-data',
     )
     args = parser.parse_args()
+    parser = CRECParser(bucket=args.source_bucket,)
 
-    parser = CRECParser(
-        bucket=args.source_bucket,
-    )
     s3 = boto3.client('s3')
     dt = args.start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
     if args.es_url:
@@ -62,26 +62,24 @@ if __name__ == '__main__':
         index = parsed_es_url.path.strip('/')
         es_conn = elasticsearch.Elasticsearch([es_host])
     while dt < args.end_dt:
-        print('Processing files for {0}.'.format(dt))
+        logging.info('Processing files for {0}.'.format(dt))
         try:
             response = s3.get_object(
                 Bucket=args.source_bucket,
-                Key=dt.strftime(MODS_KEY_TEMPLATE)
-            )
+                Key=dt.strftime(MODS_KEY_TEMPLATE))
         except Exception as e:
-            print('Could not find mods file for {0}.'.format(dt))
+            logging.info('Could not find mods file for {0}.'.format(dt))
             response = None
         if response is not None and response.get('Body'):
             input_stream = response['Body']
             new_records = parser.parse_mods_file(input_stream)
-            print('Found {0} new records.'.format(len(new_records)))
+            logging.info('Found {0} new records.'.format(len(new_records)))
             if args.to_stdout:
-                print('Using stdout:')
+                logging.info('Using stdout:')
                 for r in new_records:
-                    print(r)
+                    logging.info(r)
             else:
                 for r in new_records:
-                    es_conn.index(
-                        index=index, doc_type='crec', id=r['ID'], body=r
-                    )
+                    es_conn.index(index=index, doc_type='crec', id=r['ID'], body=r)
+
         dt += timedelta(days=1)
