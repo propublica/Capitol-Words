@@ -174,9 +174,7 @@ def count_of_term_in_content(request, term):
     :param term: term whose occurances we are counting
     :return: number of occurances of the term in content
     """
-    time_period = 'month'
-    if 'time_period' in request.query_params:
-        time_period = request.query_params.get('time_period')
+    time_period = request.query_params.get('time_period', 'month')
 
     query = get_content(term)
     search = make_search()
@@ -186,8 +184,8 @@ def count_of_term_in_content(request, term):
 
     delta = TIME_PERIODS[time_period]
     today = datetime.datetime.today()
-    start_date = today + datetime.timedelta(starting_delta - delta)
-    end_date = today + datetime.timedelta(starting_delta)
+    start_date = today + datetime.timedelta(days=starting_delta - delta)
+    end_date = today + datetime.timedelta(days=starting_delta)
 
     # gte: Greater or Equal, lte: Better than 4G? JK Less than or Equal
     date_filter = {'range':{'date_issued':{'gte': start_date, 'lte':end_date}}}
