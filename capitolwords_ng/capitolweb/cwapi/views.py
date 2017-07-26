@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 connections.create_connection(hosts=[settings.ES_URL], timeout=20)
 
+# This maps the query parameters to factory methods for the queries
 QUERIES = {
     'title': 'get_title',
     'speaker': 'get_speaker',
@@ -25,10 +26,14 @@ def make_search():
     return Search(index=settings.ES_CW_INDEX)
 
 
-def execute_search(query, sorting=None):
-    search = make_search()
-    if sorting:
-        search = search.sort(sorting)
+def execute_search(query, sorting='-date_issued'):
+    """
+    Runs a search with basic handling for sorting
+    :param query: the query to execute
+    :param sorting: the type of sorting, i.e. -dateIssued
+    :return: results or False
+    """
+    search = make_search().sort(sorting)
     results = search.query(query).execute()
     if results.success():
         return results
@@ -60,7 +65,7 @@ def search_by_speaker(request, name):
     :return: list sorted by date_issued
     """
     query = get_speaker(name)
-    response = execute_search(query, '-date_issued')
+    response = execute_search(query)
     if response.success():
         return JsonResponse(response.to_dict())
 
@@ -74,7 +79,7 @@ def search_by_title(request, title):
     :return: list of results sorted by date_issued
     """
     query = get_title(title)
-    response = execute_search(query, '-date_issued')
+    response = execute_search(query)
     if response.success():
         return JsonResponse(response.to_dict())
 
@@ -91,7 +96,7 @@ def search_by_entities(request):
     queries = [get_entity(e) for e in terms]
     logger.info("queries? %s " % queries)
     q = Q('bool', must=queries)
-    response = execute_search(q, '-date_issued')
+    response = execute_search(q)
     if response.success():
         return JsonResponse(response.to_dict())
 
