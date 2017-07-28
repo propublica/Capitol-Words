@@ -17,6 +17,12 @@ ENTITY_BLACKLIST = ['Hon', 'Jr', 'Memory', 'Speaker', 'Thereupon', 'Sr', 'Tribut
                     'HON', 'JR', 'SR', 'Madam', 'Dear Madam', 'Sincerely', 'Speaker Pro Tempore',
                     'Adjournment']
 
+ENTITY_TRAILING_BLACKLIST = (' On', ' Sine Die Adjournment')
+
+NOUN_CHUNK_BLACKLIST = [' hon ',  'sine die adjournment']
+
+NOUN_CHUNK_LEMMA_BLACKLIST = ['-PRON-']
+
 def preprocess(text):
     """
     Preprocess crec text file to filter out html tags and suprfluous parts!
@@ -69,18 +75,23 @@ def remove_trailing_tokens(entity, verb=True, adposition=True, conjunction=True,
         # remove trailing verbs like don't and won't as well.
         if entity and len(entity) > 1:
             if entity[-1].tag_ == 'RB' and any(entity[-2].tag_ == v for v in VERB_TAGS):
+                logging.info('Removing trailing verb from named entity: %s', entity)
                 entity = entity[:-2]
     if entity and adposition:
         if entity[-1].tag_ == 'IN':
+            logging.info('Removing trailing conjunction from named entity: %s', entity)
             entity = entity[:-1]
     if entity and conjunction:
         if entity[-1].tag_ == 'CC':
+            logging.info('Removing trailing conjunction from named entity: %s', entity)
             entity = entity[:-1]
     if entity and determiner:
         if entity[-1].tag_ == 'DT':
+            logging.info('Removing determiner from named entity: %s', entity)
             entity = entity[:-1]
     if entity and possessive_ending:
         if entity[-1].tag_ == 'POS':
+            logging.info('Removing possessive ending from named entity: %s', entity)
             entity = entity[:-1]
     if entity:
         return entity
@@ -179,12 +190,14 @@ def process_named_entity(named_entities, marks='!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}
         ne = remove_punct(ne, marks=marks, beginning_marks=beginning_marks)
         ne = camel_case(ne, force=True)
         if ne is not None and ne.title() not in ENTITY_BLACKLIST:
-            if ne.endswith((' On', ' Sine Die Adjournment')):
+            if ne.endswith(ENTITY_TRAILING_BLACKLIST):
                 # For sentences that look like `IN HONOR OF JEIRAN ON HIS 100TH BIRTHDAY`,
                 # named entity is `JEIRAN ON` as `ON` is ascribed the wrong NNP pos tag instead
                 # of CC pos tag, so we need to manually strip the extra `ON`. All caps sentences
                 # are tough to parse.
-                ne = re.split(r" On$| Sine Die Adjournment$", ne)[0]
+                logging.info('Removing trailing blacklisted tokens from entity: %s', ne)
+                pattern = r' ' + '|'.join([i + '$' for i in ENTITY_TRAILING_BLACKLIST])
+                ne = re.split(pattern, ne)[0]
             processed_named_entities.append((named_entity, ne))
     
     return processed_named_entities
@@ -192,7 +205,8 @@ def process_named_entity(named_entities, marks='!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}
 def get_named_entity_types(named_entities):
     """
     Given a list of named entities, extract their types. If one named entity is attributed
-    different types, pick the most common type.
+    different types, pick the most common type. Existing named entity types are listed here:
+    https://spacy.io/docs/usage/entity-recognition#entity-types
 
     Args:
         named_entities (list of tuple of (:class:`spacy.Span()`, str))
@@ -201,15 +215,22 @@ def get_named_entity_types(named_entities):
         dict
     """
     named_entity_types = defaultdict(list)
-    for named_entity in named_entities:
-        ne, processed_ne = named_entity
+    for ne, processed_ne in named_entities:
         if processed_ne is not None:
             named_entity_types[processed_ne].append(ne.label_)
 
+    # Determine the most common entity type per entity and go with that.
     for ne in named_entity_types.keys():
-        most_common_type = Counter([_type for _type in named_entity_types[ne] if _type]).most_common(1)
+        most_common_type = Counter(
+            [_type for _type in named_entity_types[ne] if _type]).most_common(1)
         named_entity_types[ne] = most_common_type[0][0] if any(most_common_type) else ''
-    return named_entity_types
+
+    # Reverse the mapping to {named_entity_type: named_entity}
+    named_entity_types_ = defaultdict(list)
+    for ne, _type in named_entity_types.items():
+        named_entity_types_[_type].append(ne)
+
+    return named_entity_types_
 
 def get_named_entity_frequencies(named_entities):
     """
@@ -222,35 +243,51 @@ def get_named_entity_frequencies(named_entities):
         dict
     """
     processed_nes = []
-    for named_entity in named_entities:
-        _, processed_ne = named_entity
+    for _, processed_ne in named_entities:
         if processed_ne is not None:
             processed_nes.append(processed_ne)
 
     named_entity_frequencies = Counter(processed_nes)
     return named_entity_frequencies
 
-def get_noun_chunk_frequencies(doc, drop_determiners=True):
+def get_noun_chunks(doc, drop_determiners=True):
     """
-    Extract ordered list of noun chunks and their frequencies from a spacy doc and
-    optionally filter by the types and frequencies.
+    Extract ordered list of noun chunks from a spacy doc and optionally filter by the types.
     
     Args:
         doc (:class:`spacy.Doc()`)
         drop_determiners (bool)
     
     Returns:
-        list of tuples
+        list
     """
     noun_chunks = [nc for nc
                    in textacy.extract.noun_chunks(doc, drop_determiners=drop_determiners)]
 
     # Filter blacklisted words and drop noun chunks that include pronouns (these are too specific)
-    processed_noun_chunks = [nc.text for nc in noun_chunks if '-PRON-' not in nc.lemma_]
-    processed_noun_chunks = [nc.title() for nc in processed_noun_chunks if ' HON ' not in nc]
+    processed_noun_chunks = []
+    for nc in noun_chunks:
+        is_blacklisted = any(b in nc.text.lower() for b in NOUN_CHUNK_BLACKLIST) or any(b in nc.lemma_ for b in NOUN_CHUNK_LEMMA_BLACKLIST)
+        if not is_blacklisted:
+            processed_noun_chunks.append(nc.text.title())
+        else:
+            logging.info('Removing blacklisted noun chunks: %s', nc)
 
-    ncs_freqs = Counter(processed_noun_chunks).most_common()
+    return processed_noun_chunks
 
-    return ncs_freqs
+def named_entity_dedupe(noun_chunks, named_entities):
+    """
+    Some of the noun chunks are naturally named entities. Exclude these from the noun chunks.
 
-    # record keys by entity types, and break docs w multiple speakers to sub docs.
+    Args:
+        noun_chunks (list)
+        named_entities (list)
+
+    Returns:
+        list
+    """
+    noun_chunks_ = [nc.lower() for nc in noun_chunks]
+    named_entities_ = [ne.lower() for ne in named_entities]
+    deduped_uniques = set(noun_chunks_) - set(named_entities_)
+    noun_chunks_ = [nc for nc in noun_chunks_ if nc in deduped_uniques]
+    return noun_chunks_

@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import logging
 from datetime import datetime
+from collections import Counter
 
 import boto3
 from lxml import etree
@@ -9,7 +10,7 @@ from lxml import etree
 import spacy
 import textacy
 
-from parsers.text_utils import *
+import parsers.text_utils as text_utils
 
 
 DEFAULT_XML_NS = {'ns': 'http://www.loc.gov/mods/v3'}
@@ -104,29 +105,45 @@ class CRECParser(object):
 
         for record in records:
             if (record['ID'].split('-')[-1].startswith('PgD') or
-                record['ID'].split('-')[-2].startswith('PgD') or
-                record['ID'].split('-')[-1].startswith('FrontMatter') or
-                record['content'] is None or
-                'content' not in record.keys()):
-                # dont process daily digests or front matters or pages with no content
+                record['ID'].split('-')[-2].startswith('PgD')):
+                # dont process daily digests
+                logging.info('Not processing Daily Digest %s', record['ID'])
                 continue
 
-            text = preprocess(record['content'])
+            elif record['ID'].split('-')[-1].startswith('FrontMatter'):
+                # dont process front matters or pages with no content
+                logging.info('Not processing Front Matter %s', record['ID'])
+                continue
+
+            elif (record['content'] is None or 'content' not in record.keys()):
+                # dont process fpages with no content
+                logging.info('Not processing %s. No content found.', record['ID'])
+                continue
+
+            text = text_utils.preprocess(record['content'])
             textacy_text = textacy.Doc(self.nlp(text))
             
             # Extract named entities and their types & frequencies
-            named_entities = get_named_entities(textacy_text)
-            record['named_entities'] = ''
+            named_entities = text_utils.get_named_entities(textacy_text)
             if any(named_entities):
-                named_entity_types = get_named_entity_types(named_entities)
-                named_entity_freqs = get_named_entity_frequencies(named_entities)
-                record['named_entities'] = str([
-                    ('|'.join([ne.title(), named_entity_types[ne]]), named_entity_freqs[ne])
-                    if named_entity_types[ne]=='PERSON' else 
-                    ('|'.join([ne, named_entity_types[ne]]), named_entity_freqs[ne])
-                    for ne in sorted(named_entity_freqs, key=named_entity_freqs.get, reverse=True)])
-            
+                named_entity_types = text_utils.get_named_entity_types(named_entities)
+                named_entity_freqs = text_utils.get_named_entity_frequencies(named_entities)
+                
+                for type_ in named_entity_types.keys():
+                    ne_type = 'named_entities_' + type_
+                    nes = []
+                    if type_ == 'PERSON':
+                        nes = [(ne.title(), named_entity_freqs[ne])
+                               for ne in named_entity_types[type_]]
+                    else:
+                        nes = [(ne, named_entity_freqs[ne])
+                               for ne in named_entity_types[type_]]
+                    nes.sort(key=lambda x: x[1], reverse=True)
+                    record[ne_type] = str(nes)
+                
             # Extract noun phrases & their frequencies
-            record['noun_chunks'] = get_noun_chunk_frequencies(textacy_text)
+            noun_chunks = text_utils.get_noun_chunks(textacy_text)
+            noun_chunks = text_utils.named_entity_dedupe(noun_chunks, named_entity_freqs.keys())
+            record['noun_chunks'] = str(Counter(noun_chunks).most_common())
 
         return records
