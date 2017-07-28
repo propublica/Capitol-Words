@@ -161,8 +161,6 @@ def search_by_params(request):
 def count_term_in_range(term, start_date, end_date):
     query = get_content(term)
     search = make_search()
-
-    # gte: Greater or Equal, lte: Better than 4G? JK Less than or Equal
     date_filter = {
         'range': {'date_issued': {'gte': start_date, 'lte': end_date}}
     }
