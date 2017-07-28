@@ -269,7 +269,8 @@ def get_noun_chunks(doc, drop_determiners=True):
     for nc in noun_chunks:
         is_blacklisted = any(b in nc.text.lower() for b in NOUN_CHUNK_BLACKLIST) or any(b in nc.lemma_ for b in NOUN_CHUNK_LEMMA_BLACKLIST)
         if not is_blacklisted:
-            processed_noun_chunks.append(nc.text.title())
+            nc = remove_punct(nc.text, marks='!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}~')
+            processed_noun_chunks.append(nc.title())
         else:
             logging.info('Removing blacklisted noun chunks: %s', nc)
 
