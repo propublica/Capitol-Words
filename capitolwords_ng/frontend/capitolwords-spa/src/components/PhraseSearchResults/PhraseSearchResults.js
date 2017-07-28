@@ -25,7 +25,7 @@ class PhraseSearchResults extends Component {
     return (
       <li className="PhraseSearchResults-item" key={item._id}>
         <div className="PhraseSearchResults-item-id">{ item._source.ID }</div>
-        <div className="PhraseSearchResults-item-title">{ item._source.title }</div>
+        <a href={ item._source.html_url } className="PhraseSearchResults-item-title">{ item._source.title }</a>
       </li>
     );
   }
