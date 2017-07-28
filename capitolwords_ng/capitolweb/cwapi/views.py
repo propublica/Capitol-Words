@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+import logging
+from collections import defaultdict
+from datetime import datetime
+from datetime import timedelta
 
 from django.conf import settings
 from django.http import JsonResponse
@@ -6,13 +10,13 @@ from elasticsearch_dsl import Search
 from elasticsearch_dsl.query import Match, Q, Range
 from elasticsearch_dsl.connections import connections
 from rest_framework.decorators import api_view
-import datetime
 
-import logging
 
 logger = logging.getLogger(__name__)
 
+
 connections.create_connection(hosts=[settings.ES_URL], timeout=20)
+
 
 # This maps the query parameters to factory methods for the queries
 QUERIES = {
@@ -20,12 +24,6 @@ QUERIES = {
     'speaker': 'get_speaker',
     'content': 'get_content',
     'entity': 'get_entity'
-}
-
-TIME_PERIODS = {
-    'day': 1,
-    'week': 7,
-    'month': 30,
 }
 
 
@@ -80,6 +78,7 @@ def search_by_speaker(request, name):
     if response.success():
         return JsonResponse(response.to_dict())
 
+
 @api_view(['GET'])
 def search_by_title(request, title):
     """
@@ -109,6 +108,7 @@ def search_by_entities(request):
     response = execute_search(q)
     if response.success():
         return JsonResponse(response.to_dict())
+
 
 @api_view(['GET'])
 def search_by_params(request):
@@ -157,6 +157,25 @@ def search_by_params(request):
         return JsonResponse(response.to_dict())
     return JsonResponse("Found nothing")
 
+
+def count_term_in_range(term, start_date, end_date):
+    print(start_date)
+    print(end_date)
+    query = get_content(term)
+    search = make_search()
+
+    # gte: Greater or Equal, lte: Better than 4G? JK Less than or Equal
+    date_filter = {
+        'range': {'date_issued': {'gte': start_date, 'lte': end_date}}
+    }
+    docs = search.query(query).filter(date_filter).execute()
+    print(len(docs))
+    grouped_by_day = defaultdict(int)
+    for doc in docs:
+        grouped_by_day[doc.date_issued] += 1
+    return grouped_by_day
+
+
 @api_view(['GET'])
 def count_of_term_in_content(request, term):
     """
@@ -174,34 +193,36 @@ def count_of_term_in_content(request, term):
     :param term: term whose occurances we are counting
     :return: number of occurances of the term in content
     """
-    time_period = request.query_params.get('time_period', 'month')
+    days_ago = request.query_params.get('days_ago', 30)
 
-    query = get_content(term)
-    search = make_search()
+    start_date = datetime.utcnow() - timedelta(days=days_ago)
+    end_date = datetime.utcnow()
+    start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_date.replace(hour=0, minute=0, second=0, microsecond=0)
 
-    # Make this 0 or just remove when we have more recent data
-    starting_delta = -365
+    # TODO: remove when we have more recent data
+    start_date -= timedelta(days=150)
+    end_date -= timedelta(days=150)
 
-    delta = TIME_PERIODS[time_period]
-    today = datetime.datetime.today()
-    start_date = today + datetime.timedelta(days=starting_delta - delta)
-    end_date = today + datetime.timedelta(days=starting_delta)
+    current_period = count_term_in_range(term, start_date, end_date)
+    prev_start_date = start_date - timedelta(days=days_ago)
+    prev_end_date = end_date - timedelta(days=days_ago)
+    prev_period = count_term_in_range(term, prev_start_date, prev_end_date)
 
-    # gte: Greater or Equal, lte: Better than 4G? JK Less than or Equal
-    date_filter = {'range':{'date_issued':{'gte': start_date, 'lte':end_date}}}
-    count = search.query(query).filter(date_filter).count()
-
-    previous_period_start_date = start_date + datetime.timedelta(days=-delta)
-    previous_period_end_date = end_date + datetime.timedelta(days=-delta)
-    previous_period_date_filter = {'range':{'date_issued':{'gte': previous_period_start_date, 'lte':previous_period_end_date}}}
-    previous_period_count = search.query(query).filter(previous_period_date_filter).count()
+    current_period_total = sum([v for k, v in current_period.items()])
+    prev_period_total = sum([v for k, v in prev_period.items()])
 
     return JsonResponse(
         {
             'term': term,
-            'count': count,
-            'previous_period_count': previous_period_count,
-            'time_period': time_period,
+            'current_period': {
+                'daily_breakdown': current_period,
+                'total_count': current_period_total,
+            },
+            'previous_period': {
+                'daily_breakdown': prev_period,
+                'total_count': prev_period_total,
+            },
             'start_date': start_date,
             'end_date': end_date,
         }
