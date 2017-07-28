@@ -159,8 +159,6 @@ def search_by_params(request):
 
 
 def count_term_in_range(term, start_date, end_date):
-    print(start_date)
-    print(end_date)
     query = get_content(term)
     search = make_search()
 
@@ -169,7 +167,6 @@ def count_term_in_range(term, start_date, end_date):
         'range': {'date_issued': {'gte': start_date, 'lte': end_date}}
     }
     docs = search.query(query).filter(date_filter).execute()
-    print(len(docs))
     grouped_by_day = defaultdict(int)
     for doc in docs:
         grouped_by_day[doc.date_issued] += 1
