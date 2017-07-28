@@ -191,10 +191,16 @@ def count_of_term_in_content(request, term):
     date_filter = {'range':{'date_issued':{'gte': start_date, 'lte':end_date}}}
     count = search.query(query).filter(date_filter).count()
 
+    previous_period_start_date = start_date + datetime.timedelta(days=-delta)
+    previous_period_end_date = end_date + datetime.timedelta(days=-delta)
+    previous_period_date_filter = {'range':{'date_issued':{'gte': previous_period_start_date, 'lte':previous_period_end_date}}}
+    previous_period_count = search.query(query).filter(previous_period_date_filter).count()
+
     return JsonResponse(
         {
             'term': term,
             'count': count,
+            'previous_period_count': previous_period_count,
             'time_period': time_period,
             'start_date': start_date,
             'end_date': end_date,
