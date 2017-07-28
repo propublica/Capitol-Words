@@ -4,10 +4,24 @@ import logging
 
 from collections import defaultdict
 from collections import Counter
+import re
 
 import textacy
 from textacy.constants import NUMERIC_NE_TYPES
 from spacy.parts_of_speech import DET
+
+
+VERB_TAGS = ['BES', 'HVS', 'VB', 'VBD', 'VBN', 'VBP', 'VBZ', 'MD']
+
+ENTITY_BLACKLIST = ['Hon', 'Jr', 'Memory', 'Speaker', 'Thereupon', 'Sr', 'Tribute To Dr', 'REP',
+                    'HON', 'JR', 'SR', 'Madam', 'Dear Madam', 'Sincerely', 'Speaker Pro Tempore',
+                    'Adjournment']
+
+ENTITY_TRAILING_BLACKLIST = (' On', ' Sine Die Adjournment')
+
+NOUN_CHUNK_BLACKLIST = [' hon ',  'sine die adjournment']
+
+NOUN_CHUNK_LEMMA_BLACKLIST = ['-PRON-']
 
 def preprocess(text):
     """
@@ -26,10 +40,13 @@ def preprocess(text):
     text = re.sub('HON\.', 'HON', text)
     text = re.sub('_{3,}', '\n', text)
     text = re.sub('<[^<]+?>', '', text)
+    text = re.sub('\n{3,}', '. ', text).strip()
     text = re.sub('\n', ' ', text).strip()
-    text = re.sub(' {3,}', '. ', text).strip()
+    text = re.sub(' {3,}', ' ', text).strip()
     text = re.sub('\s{2,}', ' ', text).strip()
     text = re.sub('\.{2,}', '.', text).strip()
+    text = re.sub('[\. \. ]{2,}', '. ', text).strip()
+    text = re.sub('[\. \.]{2,}', '. ', text).strip()
     text = re.sub('\. of', ' of', text)
     text = re.sub('\. in', ' in', text)
     return text
@@ -58,103 +75,28 @@ def remove_trailing_tokens(entity, verb=True, adposition=True, conjunction=True,
         # remove trailing verbs like don't and won't as well.
         if entity and len(entity) > 1:
             if entity[-1].tag_ == 'RB' and any(entity[-2].tag_ == v for v in VERB_TAGS):
+                logging.info('Removing trailing verb from named entity: %s', entity)
                 entity = entity[:-2]
     if entity and adposition:
         if entity[-1].tag_ == 'IN':
+            logging.info('Removing trailing conjunction from named entity: %s', entity)
             entity = entity[:-1]
     if entity and conjunction:
         if entity[-1].tag_ == 'CC':
+            logging.info('Removing trailing conjunction from named entity: %s', entity)
             entity = entity[:-1]
     if entity and determiner:
         if entity[-1].tag_ == 'DT':
+            logging.info('Removing determiner from named entity: %s', entity)
             entity = entity[:-1]
     if entity and possessive_ending:
         if entity[-1].tag_ == 'POS':
+            logging.info('Removing possessive ending from named entity: %s', entity)
             entity = entity[:-1]
     if entity:
         return entity
     else:
         return None
-
-def get_named_entities(doc, exclude_types=NUMERIC_NE_TYPES, drop_determiners=True):
-    """
-    Given a spacy doc, extract named entities and remove unwanted trailing tokens.
-
-    Args:
-        doc (:class:`spacy.Doc()`)
-        exclude_types (list)
-        drop_determiners (bool)
-
-    Returns:
-        list of :class:`spacy.Span()`
-    """
-    named_entities = list(textacy.extract.named_entities(doc, exclude_types=exclude_types,
-                                                         drop_determiners=drop_determiners))
-
-    named_entities = [remove_trailing_tokens(ent) for ent in named_entities]
-    named_entities = [ne for ne in named_entities if ne is not None and len(ne.text) > 1]
-    return named_entities
-
-def get_named_entity_types(named_entities):
-    """
-    Given a list of named entities, extract their types.
-
-    Args:
-        named_entities (list of :class:`spacy.Span()`)
-
-    Returns:
-        dict
-    """
-    named_entity_types = defaultdict(list)
-    for ne in named_entities:
-        processed_ne = process_named_entity(ne.text)
-        if processed_ne is not None:
-            named_entity_types[processed_ne].append(ne.label_)
-
-    for ne in named_entity_types.keys():
-        most_common_type = Counter([_type for _type in named_entity_types[ne] if _type]).most_common(1)
-        named_entity_types[ne] = most_common_type[0][0] if any(most_common_type) else ''
-    return named_entity_types
-
-def get_named_entity_frequencies(named_entities):
-    """
-    Given a list of named entities, calculate occurrences.
-
-    Args:
-        named_entities (list of :class:`spacy.Span()`)
-
-    Returns:
-        dict
-    """
-    processed_nes = []
-    for ne in named_entities:
-        processed_ne = process_named_entity(ne.text)
-        if processed_ne is not None:
-            processed_nes.append(processed_ne)
-
-    named_entity_frequencies = Counter(processed_nes)
-    return named_entity_frequencies
-
-def process_named_entity(named_entity, marks='!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}~',
-                         beginning_marks='!"#$%&\'()*+,-/.:;<=>?@[\\]^_`{|}~ ',
-                         trailing_marks=None):
-    """
-    Processes named entity by removing punctuations and at the end camel cases it.
-
-    Args:
-        named_entity (str)
-        marks (str)
-        beginning_marks (str)
-
-    Returns:
-        str
-    """
-    # TODO. replace the line below with commented line after textacy incorporates marks
-    # named_entity = textacy.preprocess.remove_punct(named_entity, marks=marks)
-    named_entity = remove_punct(named_entity, marks=marks, beginning_marks=beginning_marks)
-    named_entity = camel_case(named_entity)
-
-    return named_entity if named_entity else None
 
 def remove_punct(text, marks=None, beginning_marks=None, trailing_marks=None):
     """
@@ -180,30 +122,6 @@ def remove_punct(text, marks=None, beginning_marks=None, trailing_marks=None):
         else:
             return text.translate(None, PUNCT_TRANSLATE_BYTES)
 
-def get_noun_chunks(doc, exclude_types=NUMERIC_NE_TYPES, drop_determiners=True):
-    """
-    Extract ordered list of noun chunks from a spacy-parsed doc,
-    optionally filtering by the entity types and frequencies.
-    
-    Args:
-        doc (:class:`spacy.Doc()`)
-        exclude_types (list)
-        drop_determiners (bool)
-    
-    Returns:
-        list of :class:`spacy.Span()`
-    """
-    noun_chunks = doc.noun_chunks
-    if any(exclude_types):
-        noun_chunks = [
-            nc for nc in noun_chunks
-            if not any([n.ent_type_ in exclude_types for n in nc])
-        ]
-    if drop_determiners:
-        noun_chunks = [nc if nc[0].pos != DET else nc[1:] for nc in noun_chunks]
-
-    return list(noun_chunks)
-
 def camel_case(entity, force=False):
     """
     Camel-cases all words in entity except when a word is all capital letters.
@@ -217,7 +135,160 @@ def camel_case(entity, force=False):
     """
     _entity = str(entity)
     if force:
-        _entity = " ".join([w.title() if w.isupper() else w for w in _entity.split()])
+        if len(_entity.split()) > 1:
+            _entity = " ".join([w.title() for w in _entity.split()])
+        else:
+            # If a word is shorter than 4 characters and all caps, it is not titled. This lets
+            # us preserve all caps for words like `WBUR` or `NPR`.
+            _entity = _entity.title() if len(_entity) > 4 else _entity
     else:
-        _entity = " ".join([w.title() if not w.isupper() else w for w in _entity.split()])
+        _entity = " ".join([w.title() if not w.isupper() else w
+                            for w in _entity.split()])
     return _entity
+
+def get_named_entities(doc, exclude_types=NUMERIC_NE_TYPES, drop_determiners=True):
+    """
+    Given a spacy doc, extract named entities and remove unwanted trailing tokens.
+
+    Args:
+        doc (:class:`spacy.Doc()`)
+        exclude_types (list)
+        drop_determiners (bool)
+
+    Returns:
+        list of tuple (:class:`spacy.Span()`, str)
+    """
+    named_entities = list(textacy.extract.named_entities(doc, exclude_types=exclude_types,
+                                                         drop_determiners=drop_determiners))
+
+    named_entities = [remove_trailing_tokens(ent) for ent in named_entities]
+    named_entities = [ne for ne in named_entities if ne is not None and len(ne.text) > 1]
+    processed_named_entities = process_named_entity(named_entities)
+
+    return processed_named_entities
+
+def process_named_entity(named_entities, marks='!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}~',
+                         beginning_marks='!"#$%&\'()*+,-/.:;<=>?@[\\]^_`{|}~ ',
+                         trailing_marks=None):
+    """
+    Processes named entity by removing punctuations and at the end camel cases it.
+
+    Args:
+        named_entities (list of :class:`spacy.Doc()`)
+        marks (str)
+        beginning_marks (str)
+        trailing_marks (str)
+
+    Returns:
+        str
+    """
+    processed_named_entities = []
+    for named_entity in named_entities:
+        ne = named_entity.text
+        # TODO. replace the line below with the commented line after textacy incorporates marks
+        # named_entity = textacy.preprocess.remove_punct(named_entity, marks=marks)
+        ne = remove_punct(ne, marks=marks, beginning_marks=beginning_marks)
+        ne = camel_case(ne, force=True)
+        if ne is not None and ne.title() not in ENTITY_BLACKLIST:
+            if ne.endswith(ENTITY_TRAILING_BLACKLIST):
+                # For sentences that look like `IN HONOR OF JEIRAN ON HIS 100TH BIRTHDAY`,
+                # named entity is `JEIRAN ON` as `ON` is ascribed the wrong NNP pos tag instead
+                # of CC pos tag, so we need to manually strip the extra `ON`. All caps sentences
+                # are tough to parse.
+                logging.info('Removing trailing blacklisted tokens from entity: %s', ne)
+                pattern = r' ' + '|'.join([i + '$' for i in ENTITY_TRAILING_BLACKLIST])
+                ne = re.split(pattern, ne)[0]
+            processed_named_entities.append((named_entity, ne))
+    
+    return processed_named_entities
+
+def get_named_entity_types(named_entities):
+    """
+    Given a list of named entities, extract their types. If one named entity is attributed
+    different types, pick the most common type. Existing named entity types are listed here:
+    https://spacy.io/docs/usage/entity-recognition#entity-types
+
+    Args:
+        named_entities (list of tuple of (:class:`spacy.Span()`, str))
+
+    Returns:
+        dict
+    """
+    named_entity_types = defaultdict(list)
+    for ne, processed_ne in named_entities:
+        if processed_ne is not None:
+            named_entity_types[processed_ne].append(ne.label_)
+
+    # Determine the most common entity type per entity and go with that.
+    for ne in named_entity_types.keys():
+        most_common_type = Counter(
+            [_type for _type in named_entity_types[ne] if _type]).most_common(1)
+        named_entity_types[ne] = most_common_type[0][0] if any(most_common_type) else ''
+
+    # Reverse the mapping to {named_entity_type: named_entity}
+    named_entity_types_ = defaultdict(list)
+    for ne, _type in named_entity_types.items():
+        named_entity_types_[_type].append(ne)
+
+    return named_entity_types_
+
+def get_named_entity_frequencies(named_entities):
+    """
+    Given a list of named entities, calculate occurrences.
+
+    Args:
+        named_entities (list of tuple of (:class:`spacy.Span()`, str))
+
+    Returns:
+        dict
+    """
+    processed_nes = []
+    for _, processed_ne in named_entities:
+        if processed_ne is not None:
+            processed_nes.append(processed_ne)
+
+    named_entity_frequencies = Counter(processed_nes)
+    return named_entity_frequencies
+
+def get_noun_chunks(doc, drop_determiners=True):
+    """
+    Extract ordered list of noun chunks from a spacy doc and optionally filter by the types.
+    
+    Args:
+        doc (:class:`spacy.Doc()`)
+        drop_determiners (bool)
+    
+    Returns:
+        list
+    """
+    noun_chunks = [nc for nc
+                   in textacy.extract.noun_chunks(doc, drop_determiners=drop_determiners)]
+
+    # Filter blacklisted words and drop noun chunks that include pronouns (these are too specific)
+    processed_noun_chunks = []
+    for nc in noun_chunks:
+        is_blacklisted = any(b in nc.text.lower() for b in NOUN_CHUNK_BLACKLIST) or any(b in nc.lemma_ for b in NOUN_CHUNK_LEMMA_BLACKLIST)
+        if not is_blacklisted:
+            nc = remove_punct(nc.text, marks='!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}~')
+            processed_noun_chunks.append(nc.title())
+        else:
+            logging.info('Removing blacklisted noun chunks: %s', nc)
+
+    return processed_noun_chunks
+
+def named_entity_dedupe(noun_chunks, named_entities):
+    """
+    Some of the noun chunks are naturally named entities. Exclude these from the noun chunks.
+
+    Args:
+        noun_chunks (list)
+        named_entities (list)
+
+    Returns:
+        list
+    """
+    noun_chunks_ = [nc.lower() for nc in noun_chunks]
+    named_entities_ = [ne.lower() for ne in named_entities]
+    deduped_uniques = set(noun_chunks_) - set(named_entities_)
+    noun_chunks_ = [nc for nc in noun_chunks_ if nc in deduped_uniques]
+    return noun_chunks_

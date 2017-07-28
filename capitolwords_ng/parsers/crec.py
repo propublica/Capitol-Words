@@ -2,15 +2,15 @@ from __future__ import print_function
 
 import logging
 from datetime import datetime
+from collections import Counter
 
 import boto3
-import re
 from lxml import etree
 
 import spacy
 import textacy
 
-import text_utils
+import parsers.text_utils as text_utils
 
 
 DEFAULT_XML_NS = {'ns': 'http://www.loc.gov/mods/v3'}
@@ -28,13 +28,8 @@ DEFAULT_XPATHS =  {
 }
 
 
-CREC_BUCKET = 'capitol-words-data'
-
-
 CREC_PREFIX_TEMPLATE = 'crec/%Y/%m/%d/crec'
 CREC_KEY_TEMPLATE = '{prefix}/{id}.htm'
-
-VERB_TAGS = ['BES', 'HVS', 'VB', 'VBD', 'VBN', 'VBP', 'VBZ', 'MD']
 
 
 def xpath_parse(root, paths, namespaces):
@@ -110,25 +105,45 @@ class CRECParser(object):
 
         for record in records:
             if (record['ID'].split('-')[-1].startswith('PgD') or
-                record['ID'].split('-')[-2].startswith('PgD') or
-                record['content'] is None or
-                'content' not in record.keys()):
+                record['ID'].split('-')[-2].startswith('PgD')):
                 # dont process daily digests
+                logging.info('Not processing Daily Digest %s', record['ID'])
                 continue
 
-            text = preprocess(record['content'])
-            textacy_text = textacy.Doc(self.nlp(text))
-            named_entities = get_named_entities(textacy_text)
-            if any(named_entities):
-                named_entity_types = get_named_entity_types(named_entities)
-                named_entity_freqs = get_named_entity_frequencies(named_entities)
-                # for ne in sorted(named_entity_freqs, key=named_entity_freqs.get, reverse=True):
-                #     record['|'.join([ne, named_entity_types[ne]])] = named_entity_freqs[ne]
-                record['named_entities'] = str([
-                    ('|'.join([ne, named_entity_types[ne]]), named_entity_freqs[ne])
-                    for ne in sorted(named_entity_freqs, key=named_entity_freqs.get, reverse=True)])
+            elif record['ID'].split('-')[-1].startswith('FrontMatter'):
+                # dont process front matters or pages with no content
+                logging.info('Not processing Front Matter %s', record['ID'])
+                continue
 
-        #     phrases = get_noun_chunks(textacy_text.spacy_doc)
-        #     # Filter noun chunks
+            elif (record['content'] is None or 'content' not in record.keys()):
+                # dont process fpages with no content
+                logging.info('Not processing %s. No content found.', record['ID'])
+                continue
+
+            text = text_utils.preprocess(record['content'])
+            textacy_text = textacy.Doc(self.nlp(text))
+            
+            # Extract named entities and their types & frequencies
+            named_entities = text_utils.get_named_entities(textacy_text)
+            if any(named_entities):
+                named_entity_types = text_utils.get_named_entity_types(named_entities)
+                named_entity_freqs = text_utils.get_named_entity_frequencies(named_entities)
+                
+                for type_ in named_entity_types.keys():
+                    ne_type = 'named_entities_' + type_
+                    nes = []
+                    if type_ == 'PERSON':
+                        nes = [(ne.title(), named_entity_freqs[ne])
+                               for ne in named_entity_types[type_]]
+                    else:
+                        nes = [(ne, named_entity_freqs[ne])
+                               for ne in named_entity_types[type_]]
+                    nes.sort(key=lambda x: x[1], reverse=True)
+                    record[ne_type] = str(nes)
+                
+            # Extract noun phrases & their frequencies
+            noun_chunks = text_utils.get_noun_chunks(textacy_text)
+            noun_chunks = text_utils.named_entity_dedupe(noun_chunks, named_entity_freqs.keys())
+            record['noun_chunks'] = str(Counter(noun_chunks).most_common())
 
         return records
