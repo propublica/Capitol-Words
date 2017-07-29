@@ -20,6 +20,9 @@ ES_CW_INDEX = 'will-test'
 DEV_FRONTEND = True
 DEV_FRONTEND_SPA_BASE_URL = 'http://localhost:3000'
 
+CREC_STAGING_S3_BUCKET = 'capitol-words-data'
+CREC_STAGING_S3_KEY_PREFIX = 'crec'
+CREC_STAGING_FOLDER = '/tmp'
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -49,6 +52,9 @@ INSTALLED_APPS = [
     'legislators',
     'rest_framework',
     'rest_framework_swagger',
+    'django_celery_beat',
+    'django_celery_results',
+    'workers',
 ]
 
 MIDDLEWARE = [
@@ -150,3 +156,10 @@ LOGGING = {
         },
     },
 }
+
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost//'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
