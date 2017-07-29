@@ -9,6 +9,7 @@ from datetime import datetime
 from datetime import timedelta
 
 import elasticsearch
+import botocore
 import boto3
 
 from cli import setup_logger
@@ -49,12 +50,12 @@ if __name__ == '__main__':
     parser.add_argument(
         '--source_bucket',
         help='Location of crec data.',
-        default = 'capitol-words-data',
+        default='capitol-words-data',
     )
     args = parser.parse_args()
     parser = CRECParser(bucket=args.source_bucket,)
 
-    s3 = boto3.client('s3')
+    s3 = boto3.resource('s3')
     dt = args.start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
     if args.es_url:
         parsed_es_url = urlparse.urlparse(args.es_url)
@@ -64,10 +65,11 @@ if __name__ == '__main__':
     while dt < args.end_dt:
         logging.info('Processing files for {0}.'.format(dt))
         try:
-            response = s3.get_object(
-                Bucket=args.source_bucket,
-                Key=dt.strftime(MODS_KEY_TEMPLATE))
-        except Exception as e:
+            response = s3.Object(
+                args.source_bucket,
+                dt.strftime(MODS_KEY_TEMPLATE)
+            ).get()
+        except botocore.exceptions.ClientError as e:
             logging.info('Could not find mods file for {0}.'.format(dt))
             response = None
         if response is not None and response.get('Body'):

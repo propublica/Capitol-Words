@@ -104,6 +104,7 @@ class CRECParser(object):
             logging.info('All crec retrievals succeeded.')
 
         for record in records:
+            print(record)
             if (record['ID'].split('-')[-1].startswith('PgD') or
                 record['ID'].split('-')[-2].startswith('PgD')):
                 # dont process daily digests
@@ -115,7 +116,7 @@ class CRECParser(object):
                 logging.info('Not processing Front Matter %s', record['ID'])
                 continue
 
-            elif (record['content'] is None or 'content' not in record.keys()):
+            elif (record.get('content') is None or 'content' not in record.keys()):
                 # dont process fpages with no content
                 logging.info('Not processing %s. No content found.', record['ID'])
                 continue
