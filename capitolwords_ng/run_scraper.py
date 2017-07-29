@@ -21,12 +21,7 @@ from datetime import timedelta
 from cli import setup_logger
 from cli import add_logging_options
 from cli import CMD_LINE_DATE_FORMAT
-from scrapers.crec import CRECScraper
-
-
-SCRAPERS = {
-    'crec': CRECScraper,
-}
+from capitolweb.workers.crec import CRECScraper
 
 
 if __name__ == '__main__':
@@ -58,11 +53,6 @@ if __name__ == '__main__':
         help='Directory to write the zip and extracted files to.',
         default='/tmp'
     )
-    parser.add_argument(
-        '--data_type',
-        help='Data type to retrieve data for.',
-        choices=SCRAPERS.keys(),
-    )
     add_logging_options(parser)
     args = parser.parse_args()
     setup_logger(args.loglevel)
@@ -70,7 +60,7 @@ if __name__ == '__main__':
     if not os.path.exists(args.download_dir):
         os.makedirs(args.download_dir)
 
-    scraper = SCRAPERS[args.data_type](
+    scraper = CRECScraper(
         args.download_dir,
         args.s3_bucket,
         args.s3_prefix
