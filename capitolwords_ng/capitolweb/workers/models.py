@@ -1,3 +1,9 @@
 from django.db import models
 
-# Create your models here.
+
+class CRECScraperResult(models.Model):
+
+    date = models.DateField()
+    success = models.BooleanField()
+    message = models.TextField()
+    num_crec_files_uploaded = models.IntegerField(default=0)

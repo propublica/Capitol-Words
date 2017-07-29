@@ -159,37 +159,46 @@ class CRECScraper(object):
     def scrape_files_for_date(self, date):
         zip_path = self.download_crec_zip(date)
         mods_path = self.download_mods_xml(date)
-        if zip_path is None:
-            message = 'No zip found for date {0}.'.format(date)
+        result = {
+            'success': False,
+            'date': date,
+            'num_crec_files_uploaded': 0,
+        }
+        if zip_path is None or mods_path is None:
+            message = 'No zip or mods file found for date {0}.'.format(date)
             logging.info(message)
-            return {'success': True, 'message': message}
-        if mods_path is None:
-            message = 'No mods.xml found for date {0}'.format(date)
-            logging.info(message)
-            return {'success': True, 'message': message}
-        logging.info(
-            'Extracting html files from zip to {0}'.format(self.download_dir)
-        )
-        html_file_paths = self.extract_html_files(zip_path)
-        try:
-            s3_key = self.upload_to_s3(mods_path, 'mods', date)
-        except ClientError as e:
-            message = 'Error uploading file {0}, exiting'.format(mods_path, e)
-            logging.exception(message)
-            return {'success': False, 'message': message}
-        logging.info('Uploading {0} html files...'.format(len(html_file_paths)))
-        for file_path in html_file_paths:
+            result['message'] = message
+            result['success'] = True
+            return result
+        else:
+            logging.info(
+                'Extracting html files from zip to {0}'.format(self.download_dir)
+            )
+            html_file_paths = self.extract_html_files(zip_path)
             try:
-                s3_key = self.upload_to_s3(file_path, 'crec', date)
+                s3_key = self.upload_to_s3(mods_path, 'mods', date)
             except ClientError as e:
                 message = 'Error uploading file {0}, exiting'.format(mods_path, e)
                 logging.exception(message)
-                return {'success': False, 'message': message}
-        logging.info('Uploads finished.')
-        return {
-            'success': True,
-            'message': '{0} crec html files uploaded.'.format(len(html_file_paths))
-        }
+                result['message'] = message
+                return result
+            logging.info('Uploading {0} html files...'.format(len(html_file_paths)))
+            for i, file_path in enumerate(html_file_paths):
+                try:
+                    s3_key = self.upload_to_s3(file_path, 'crec', date)
+                except ClientError as e:
+                    message = 'Error uploading file {0}, exiting'.format(mods_path, e)
+                    logging.exception(message)
+                    result['message'] = message
+                    result['num_crec_files_uploaded'] = i
+                    return result
+            logging.info('Uploads finished.')
+            result['message'] = '{0} crec html files uploaded.'.format(
+                len(html_file_paths)
+            )
+            result['num_crec_files_uploaded'] = len(html_file_paths)
+            result['success'] = True
+        return result
 
     def scrape_files_in_range(self, start_dt, end_dt=None):
         results = []
@@ -204,3 +213,4 @@ class CRECScraper(object):
             result = self.scrape_files_for_date(dt)
             results.append(result)
             dt += timedelta(days=1)
+        return results

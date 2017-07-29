@@ -5,6 +5,7 @@ from celery import shared_task
 
 from django.conf import settings
 from workers.crec import CRECScraper
+from workers.models import CRECScraperResult
 
 
 @shared_task
@@ -25,4 +26,11 @@ def scrape_crecs(start_dt_str=None, end_dt_str=None):
         settings.CREC_STAGING_S3_KEY_PREFIX,
     )
     results = scraper.scrape_files_in_range(start_dt, end_dt)
+    for result in results:
+        orm_result = CRECScraperResult.objects.create(
+            date=result['date'],
+            message=result['message'],
+            success=result['success'],
+            num_crec_files_uploaded=result['num_crec_files_uploaded'],
+        )
     return results
