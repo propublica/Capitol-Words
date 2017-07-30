@@ -16,3 +16,4 @@ django-rest-swagger==2.1.2
 DateTime==4.2
 celery==4.1.0
 django_celery_beat==1.0.1
+django_celery_results==1.0.1
