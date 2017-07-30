@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'django_celery_beat',
     'django_celery_results',
+    'django_extensions',
     'workers',
 ]
 
