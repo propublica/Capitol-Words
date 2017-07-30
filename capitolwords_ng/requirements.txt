@@ -14,3 +14,4 @@ spacy==1.8.2
 textacy==0.3.4
 django-rest-swagger==2.1.2
 DateTime==4.2
+celery==4.1.0
