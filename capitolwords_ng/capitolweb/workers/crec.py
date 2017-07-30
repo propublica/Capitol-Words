@@ -1,9 +1,5 @@
 """Stages unpacked html files from a daily zip of congressional
 records retrieved from gpo.gov.
-
-Attributes:
-    DEFAULT_LOG_FORMAT (:obj:`str`): A template string for log lines.
-    LOGLEVELS (:obj:`dict`): A lookup of loglevel name to the loglevel code.
 """
 
 import os
