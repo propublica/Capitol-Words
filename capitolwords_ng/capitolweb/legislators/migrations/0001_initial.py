@@ -7,6 +7,89 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
+
+states = {
+        'AK': 'Alaska',
+        'AL': 'Alabama',
+        'AR': 'Arkansas',
+        'AS': 'American Samoa',
+        'AZ': 'Arizona',
+        'CA': 'California',
+        'CO': 'Colorado',
+        'CT': 'Connecticut',
+        'DC': 'District of Columbia',
+        'DE': 'Delaware',
+        'FL': 'Florida',
+        'GA': 'Georgia',
+        'GU': 'Guam',
+        'HI': 'Hawaii',
+        'IA': 'Iowa',
+        'ID': 'Idaho',
+        'IL': 'Illinois',
+        'IN': 'Indiana',
+        'KS': 'Kansas',
+        'KY': 'Kentucky',
+        'LA': 'Louisiana',
+        'MA': 'Massachusetts',
+        'MD': 'Maryland',
+        'ME': 'Maine',
+        'MI': 'Michigan',
+        'MN': 'Minnesota',
+        'MO': 'Missouri',
+        'MP': 'Northern Mariana Islands',
+        'MS': 'Mississippi',
+        'MT': 'Montana',
+        'NA': 'National',
+        'NC': 'North Carolina',
+        'ND': 'North Dakota',
+        'NE': 'Nebraska',
+        'NH': 'New Hampshire',
+        'NJ': 'New Jersey',
+        'NM': 'New Mexico',
+        'NV': 'Nevada',
+        'NY': 'New York',
+        'OH': 'Ohio',
+        'OK': 'Oklahoma',
+        'OR': 'Oregon',
+        'PA': 'Pennsylvania',
+        'PR': 'Puerto Rico',
+        'RI': 'Rhode Island',
+        'SC': 'South Carolina',
+        'SD': 'South Dakota',
+        'TN': 'Tennessee',
+        'TX': 'Texas',
+        'UT': 'Utah',
+        'VA': 'Virginia',
+        'VI': 'Virgin Islands',
+        'VT': 'Vermont',
+        'WA': 'Washington',
+        'WI': 'Wisconsin',
+        'WV': 'West Virginia',
+        'WY': 'Wyoming',
+        'OL': 'Orleans',
+        'DK': 'Dakota',
+        'PI': 'Philippine Islands'
+}
+
+
+def create_states(apps, schema_editor):
+    # We get the model from the versioned app registry;
+    # if we directly import it, it'll be the wrong version
+    State = apps.get_model("legislators", "State")
+    db_alias = schema_editor.connection.alias
+    state_objs = [State(name=v, short=k) for k, v in states.items()]
+    State.objects.using(db_alias).bulk_create(state_objs)
+
+
+def delete_states(apps, schema_editor):
+    # forwards_func() creates two Country instances,
+    # so reverse_func() should delete them.
+    State = apps.get_model("legislators", "State")
+    db_alias = schema_editor.connection.alias
+    for k, v in states.items():
+        State.objects.using(db_alias).filter(name=v, short=k).delete()
+
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -49,6 +132,10 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=25, unique=True)),
             ],
         ),
+        migrations.RunPython(
+            code=create_states,
+            reverse_code=delete_states,
+        ),
         migrations.CreateModel(
             name='Term',
             fields=[
@@ -69,8 +156,8 @@ class Migration(migrations.Migration):
                 ('rss_url', models.URLField(blank=True, null=True)),
                 ('url', models.URLField(blank=True, null=True)),
                 ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='terms', to='legislators.CongressPerson')),
-                ('state', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='legislators.State')),
-            ],
+                ('state', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='legislators.State')),],
+
             options={
                 'ordering': ('start_date',),
             },
