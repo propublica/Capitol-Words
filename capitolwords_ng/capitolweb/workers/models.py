@@ -28,7 +28,7 @@ class CRECParserResult(models.Model):
             outcome = 'failed'
         date_str = self.date.strftime('%Y-%m-%d')
         return 'CREC Issued Date: {0}, S3 key: {1}, parsing {2}: {3}'.format(
-            date_str, crec_s3_key, outcome, self.message
+            date_str, self.crec_s3_key, outcome, self.message
         )
 
     date = models.DateField()

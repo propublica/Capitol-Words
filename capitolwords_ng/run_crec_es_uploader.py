@@ -54,7 +54,7 @@ if __name__ == '__main__':
         default='capitol-words-data',
     )
     args = parser.parse_args()
-    parser = CRECParser(bucket=args.source_bucket,)
+    crec_parser = CRECParser(bucket=args.source_bucket,)
 
     if args.to_stdout:
         sys.exit(1)
@@ -79,7 +79,7 @@ if __name__ == '__main__':
         if response is not None and response.get('Body'):
             try:
                 input_stream = response['Body']
-                new_records = parser.parse_mods_file(input_stream)
+                new_records = crec_parser.parse_mods_file(input_stream)
                 logging.info('Found {0} new records.'.format(len(new_records)))
                 if args.to_stdout:
                     logging.info('Using stdout:')

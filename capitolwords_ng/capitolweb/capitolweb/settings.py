@@ -23,6 +23,8 @@ DEV_FRONTEND_SPA_BASE_URL = 'http://localhost:3000'
 CREC_STAGING_S3_BUCKET = 'capitol-words-data'
 CREC_STAGING_S3_KEY_PREFIX = 'crec'
 CREC_STAGING_FOLDER = '/tmp'
+CREC_ELASTICSEARCH_URL = 'es://capitolwords.chartbeat.net:80/crec'
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

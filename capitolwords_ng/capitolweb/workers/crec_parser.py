@@ -5,12 +5,11 @@ from datetime import datetime
 from collections import Counter
 
 import boto3
-from lxml import etree
-
 import spacy
 import textacy
+from lxml import etree
 
-import parsers.text_utils as text_utils
+import workers.text_utils as text_utils
 
 
 DEFAULT_XML_NS = {'ns': 'http://www.loc.gov/mods/v3'}
@@ -64,6 +63,7 @@ class CRECParser(object):
         self.nlp = spacy.load('en')
 
     def parse_mods_file(self, mods_file):
+        logging.info('Parsing mods file...')
         doc = etree.parse(mods_file)
         constituents = doc.xpath(
             '//ns:relatedItem[@type="constituent"]',
@@ -85,6 +85,7 @@ class CRECParser(object):
                 prefix=prefix,
                 id=record['ID'].strip('id-')
             )
+            record['s3_key'] = s3_key
             failed_retrievals = []
             try:
                 response = self.s3.get_object(Bucket=self.bucket, Key=s3_key)
