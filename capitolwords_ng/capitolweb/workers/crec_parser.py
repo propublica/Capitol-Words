@@ -104,7 +104,6 @@ class CRECParser(object):
             logging.info('All crec retrievals succeeded.')
 
         for record in records:
-            print(record)
             if (record['ID'].split('-')[-1].startswith('PgD') or
                 record['ID'].split('-')[-2].startswith('PgD')):
                 # dont process daily digests
@@ -123,13 +122,13 @@ class CRECParser(object):
 
             text = text_utils.preprocess(record['content'])
             textacy_text = textacy.Doc(self.nlp(text))
-            
+
             # Extract named entities and their types & frequencies
             named_entities = text_utils.get_named_entities(textacy_text)
             if any(named_entities):
                 named_entity_types = text_utils.get_named_entity_types(named_entities)
                 named_entity_freqs = text_utils.get_named_entity_frequencies(named_entities)
-                
+
                 for type_ in named_entity_types.keys():
                     ne_type = 'named_entities_' + type_
                     nes = []
@@ -141,7 +140,7 @@ class CRECParser(object):
                                for ne in named_entity_types[type_]]
                     nes.sort(key=lambda x: x[1], reverse=True)
                     record[ne_type] = str(nes)
-                
+
             # Extract noun phrases & their frequencies
             noun_chunks = text_utils.get_noun_chunks(textacy_text)
             noun_chunks = text_utils.named_entity_dedupe(noun_chunks, named_entity_freqs.keys())

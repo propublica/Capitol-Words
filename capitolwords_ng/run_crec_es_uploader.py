@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import os
+import sys
 import json
 import logging
 import argparse
@@ -15,7 +16,7 @@ import boto3
 from cli import setup_logger
 from cli import add_logging_options
 from cli import CMD_LINE_DATE_FORMAT
-from parsers.crec import CRECParser
+from capitolweb.workers.crec_parser import CRECParser
 
 
 MODS_KEY_TEMPLATE = 'crec/%Y/%m/%d/mods/mods.xml'
@@ -29,7 +30,7 @@ if __name__ == '__main__':
     output_option_group.add_argument(
         '--to_stdout',
         help='If true, will not upload to es and instead print to stdout.',
-        default=True,
+        default=False,
     )
     output_option_group.add_argument(
         '--es_url',
@@ -55,6 +56,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     parser = CRECParser(bucket=args.source_bucket,)
 
+    if args.to_stdout:
+        sys.exit(1)
+
     s3 = boto3.resource('s3')
     dt = args.start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
     if args.es_url:
@@ -73,15 +77,17 @@ if __name__ == '__main__':
             logging.info('Could not find mods file for {0}.'.format(dt))
             response = None
         if response is not None and response.get('Body'):
-            input_stream = response['Body']
-            new_records = parser.parse_mods_file(input_stream)
-            logging.info('Found {0} new records.'.format(len(new_records)))
-            if args.to_stdout:
-                logging.info('Using stdout:')
-                for r in new_records:
-                    logging.info(r)
-            else:
-                for r in new_records:
-                    es_conn.index(index=index, doc_type='crec', id=r['ID'], body=r)
-
+            try:
+                input_stream = response['Body']
+                new_records = parser.parse_mods_file(input_stream)
+                logging.info('Found {0} new records.'.format(len(new_records)))
+                if args.to_stdout:
+                    logging.info('Using stdout:')
+                    for r in new_records:
+                        logging.info(r)
+                else:
+                    for r in new_records:
+                        es_conn.index(index=index, doc_type='crec', id=r['ID'], body=r)
+            except Exception as e:
+                logging.exception('Error processing data for {0}.'.format(dt.strftime('%Y-%m-%d')))
         dt += timedelta(days=1)

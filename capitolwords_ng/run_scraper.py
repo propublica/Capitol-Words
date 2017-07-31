@@ -21,7 +21,7 @@ from datetime import timedelta
 from cli import setup_logger
 from cli import add_logging_options
 from cli import CMD_LINE_DATE_FORMAT
-from capitolweb.workers.crec import CRECScraper
+from capitolweb.workers.crec_scraper import CRECScraper
 
 
 if __name__ == '__main__':
