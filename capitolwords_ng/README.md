@@ -118,3 +118,25 @@ Example usage:
 ```
 python run_es_uploader.py --source_path=s3://mybuckkit/crec/1994/01/25/mods/mods.xml --data_type=crec --es_url=es://<YOUR_ES_HOST>:80/<YOUR_INDEX>
 ```
+
+## Workers
+
+The instructions above cover how to use the scraper and parser/es uploader via python scripts, but they can also be scheduled as crons via the django admin ui.
+
+The actual scheduling and configuration is pretty self-explanatory, but for things to actually execute you'll need to be running 2 celery processes, one for the scheduler and one for the workers themselves:
+
+```
+celery -A capitolweb beat -l debug -S django
+```
+
+and
+
+```
+celery -A capitolweb worker -l info
+```
+
+You may also need to run a migration for the admin ui:
+
+```
+python manage.py migrate django_celery_results
+```
