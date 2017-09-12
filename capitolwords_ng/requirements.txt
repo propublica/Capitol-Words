@@ -86,3 +86,4 @@ wcwidth==0.1.7
 webencodings==0.5.1
 wrapt==1.10.10
 zope.interface==4.4.2
+django-extensions==1.8.1

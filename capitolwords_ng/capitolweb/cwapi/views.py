@@ -11,6 +11,7 @@ from elasticsearch_dsl.query import Match, Q, Range
 from elasticsearch_dsl.connections import connections
 from rest_framework.decorators import api_view
 
+from legislators.models import CongressPerson
 
 logger = logging.getLogger(__name__)
 
@@ -154,7 +155,9 @@ def search_by_params(request):
     else:
         response = search.query(q).execute()
     if response.success():
-        return JsonResponse(response.to_dict())
+        results = response.to_dict()
+        results['params'] = params
+        return JsonResponse(results)
     return JsonResponse("Found nothing")
 
 
@@ -165,10 +168,19 @@ def count_term_in_range(term, start_date, end_date):
         'range': {'date_issued': {'gte': start_date, 'lte': end_date}}
     }
     docs = search.query(query).filter(date_filter).execute()
-    grouped_by_day = defaultdict(int)
-    for doc in docs:
-        grouped_by_day[doc.date_issued] += 1
-    return grouped_by_day
+    return docs.to_dict()['hits']['hits']
+
+
+def get_total_in_range(term, start_date, end_date):    
+    search = make_search().sort('-date_issued')
+    queries = [
+        Q('match', content={'query': term, 'operator': 'and'}),
+        get_date_range(start_date, end_date),
+    ]
+    q = Q('bool', must=queries)
+    search_resp = search.highlight('content', fragment_size=200).query(q).execute()
+    return search_resp.to_dict()['hits']['total']
+
 
 
 @api_view(['GET'])
@@ -198,27 +210,59 @@ def count_of_term_in_content(request, term):
     # TODO: remove when we have more recent data
     start_date -= timedelta(days=150)
     end_date -= timedelta(days=150)
+    current_period_docs = count_term_in_range(term, start_date, end_date)
+    current_period_docs.sort(key=lambda d: -d['_score'])
+    current_daily_counts = defaultdict(int)
+    for doc in current_period_docs:
+        current_daily_counts[doc['_source']['date_issued']] += doc['_source']['content'].count('term')
+    total_count = get_total_in_range(term, start_date, end_date)
 
-    current_period = count_term_in_range(term, start_date, end_date)
+    # Get last benchmark data
     prev_start_date = start_date - timedelta(days=days_ago)
     prev_end_date = end_date - timedelta(days=days_ago)
-    prev_period = count_term_in_range(term, prev_start_date, prev_end_date)
+    prev_period_docs = count_term_in_range(term, prev_start_date, prev_end_date)    
+    previous_daily_counts = defaultdict(int)
+    for doc in prev_period_docs:
+        previous_daily_counts[doc['_source']['date_issued']] += doc['_source']['content'].count('term')
+    prev_total_count = get_total_in_range(term, prev_start_date, prev_end_date)
 
-    current_period_total = sum([v for k, v in current_period.items()])
-    prev_period_total = sum([v for k, v in prev_period.items()])
+    for doc in current_period_docs:
+        doc['mentions'] = doc['_source']['content'].lower().count(term.lower())
+        doc['search_phrase'] = term
+        date_issued = datetime.strptime(
+            doc['_source']['date_issued'], '%Y-%m-%dT%H:%M:%S'
+        )
+        doc['human_date'] = date_issued.strftime('%b %d, %Y')
+        i = doc['_source']['content'].lower().find(term.lower())
+        start = max(i - 200, 0)
+        end = min(start + 400, len(doc['_source']['content']))
+        doc['snippet'] = '"...{0}..."'.format(doc['_source']['content'][start:end])
+        doc['speakers'] = []
+        if doc['_source'].get('speakers', []):
+            speaker = doc['_source']['speakers'][0]
+            doc['speakers'] = []
+            for person in CongressPerson.objects.filter(official_full=speaker):
+                bio_page_url = 'https://www.congress.gov/member/{0}/{1}'.format(
+                    '-'.join(person.official_full.lower().split()), person.bioguide_id
+                )
+                doc['speakers'].append({'im_url': person.image_sm, 'party': person.terms.last().party, 'bio_page_url': bio_page_url})
 
     return JsonResponse(
         {
+            'delta': int(100 * ((total_count - prev_total_count) / float(max(prev_total_count, 1)))),
+            'docs': current_period_docs,
             'term': term,
             'current_period': {
-                'daily_breakdown': current_period,
-                'total_count': current_period_total,
+                'daily_breakdown': current_daily_counts,
+                'total_count': total_count
             },
             'previous_period': {
-                'daily_breakdown': prev_period,
-                'total_count': prev_period_total,
+                'daily_breakdown': previous_daily_counts,
+                'total_count': prev_total_count
             },
             'start_date': start_date,
             'end_date': end_date,
         }
     )
+
+

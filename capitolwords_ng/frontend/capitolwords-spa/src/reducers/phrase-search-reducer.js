@@ -12,6 +12,7 @@ const initialState = {
   isSearchFailure: false,
   phrase: null,
   results: null,
+  isModal: false,
 };
 
 export default function phraseSearch(state=initialState, action) {
