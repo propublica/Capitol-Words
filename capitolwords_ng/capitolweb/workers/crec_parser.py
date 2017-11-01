@@ -1,14 +1,16 @@
 from __future__ import print_function
 
 import logging
+import re
 from datetime import datetime
 from collections import Counter
+from collections import defaultdict
 
 import boto3
-from lxml import etree
-
 import spacy
 import textacy
+from lxml import etree
+from fuzzywuzzy import process
 
 import capitolweb.workers.text_utils as text_utils
 
@@ -31,6 +33,7 @@ DEFAULT_XPATHS =  {
 CREC_PREFIX_TEMPLATE = 'crec/%Y/%m/%d/crec'
 CREC_KEY_TEMPLATE = '{prefix}/{id}.htm'
 
+APPROX_MATCH_THRESHOLD = 90
 
 def xpath_parse(root, paths, namespaces):
     """Takes an lxml ROOT or element corresponding to the mods.xml doc and
@@ -63,6 +66,47 @@ class CRECParser(object):
         self.bucket = bucket
         self.nlp = spacy.load('en')
 
+    def find_segments(self, doc, speakers):
+        if not speakers:
+            logging.info('No speakers available')
+            return []
+        previous = None
+        current = None
+        sents = []
+        segments = []
+        for sent in doc.sents:
+            sent_str = sent.string
+            speaker = next(
+                filter(lambda person: person in sent_str, speakers), None)
+            if speaker is not None:
+                current = speaker
+                logging.info(
+                    'Found speaker: {}, previous speaker {}'.format(current, previous))
+            else:
+                speaker, score = process.extractOne(sent_str, speakers)
+                if score > APPROX_MATCH_THRESHOLD:
+                    current = speaker
+                    logging.info(
+                        'Found speaker: {} (approx. score {}/100), previous speaker: {}'.format(
+                            current, score, previous))
+
+            if previous != current:
+                if sents:
+                    segments.append({
+                        'speaker': previous,
+                        'text': ' '.join(sents)})
+                previous = current
+                sents = []
+            else:
+                sents.append(sent_str)
+
+        if sents:
+            segments.append({
+                'speaker': previous,
+                'text': ' '.join(sents)})
+
+        return segments
+
     def parse_mods_file(self, mods_file):
         logging.info('Parsing mods file...')
         doc = etree.parse(mods_file)
@@ -80,6 +124,24 @@ class CRECParser(object):
         )
         date_issued = datetime.strptime(date_issued_str, '%Y-%m-%d')
         prefix = date_issued.strftime(CREC_PREFIX_TEMPLATE)
+
+        speakers = defaultdict(dict)
+        for constituent in constituents:
+            id_ = constituent.get('ID')
+            for person in constituent.xpath('ns:extension/ns:congMember', namespaces=DEFAULT_XML_NS):
+                parsed_name = person.xpath('ns:name[@type="parsed"]', namespaces=DEFAULT_XML_NS)[0]
+                sanitized_parsed_name_str = re.sub(' of .*$', '', parsed_name.text)
+                authority_fnf_name = person.xpath('ns:name[@type="authority-fnf"]', namespaces=DEFAULT_XML_NS)[0]
+                if sanitized_parsed_name_str not in speakers and person.get('role') == 'SPEAKING':
+                    speakers[id_][sanitized_parsed_name_str] = {
+                        'bioGuideId': person.get('bioGuideId'),
+                        'chamber': person.get('chamber'),
+                        'congress': person.get('congress'),
+                        'party': person.get('party'),
+                        'state': person.get('state'),
+                        'name': authority_fnf_name.text
+                    }
+
         for record in records:
             record['date_issued'] = date_issued
             s3_key = CREC_KEY_TEMPLATE.format(
@@ -125,7 +187,15 @@ class CRECParser(object):
                 continue
 
             text = text_utils.preprocess(record['content'])
-            textacy_text = textacy.Doc(self.nlp(text))
+            doc = self.nlp(text)
+            sentences = list(doc.sents)
+            # Save speakers
+            record['speakers'] = speakers[record['ID']]
+
+            # Split in segments based on speaker
+            record['segments'] = self.find_segments(doc, record['speakers'].keys())
+
+            textacy_text = textacy.Doc(doc)
 
             # Extract named entities and their types & frequencies
             named_entities = text_utils.get_named_entities(textacy_text)
