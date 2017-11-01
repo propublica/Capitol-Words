@@ -5,9 +5,12 @@ import logging
 from collections import defaultdict
 from collections import Counter
 import re
+import sys
+import unicodedata
 
 import textacy
-from textacy.constants import NUMERIC_NE_TYPES
+from textacy.compat import unicode_
+from textacy.constants import NUMERIC_NE_TYPES, PUNCT_TRANSLATE_UNICODE, PUNCT_TRANSLATE_BYTES
 from spacy.parts_of_speech import DET
 
 
@@ -19,9 +22,12 @@ ENTITY_BLACKLIST = ['Hon', 'Jr', 'Memory', 'Speaker', 'Thereupon', 'Sr', 'Tribut
 
 ENTITY_TRAILING_BLACKLIST = (' On', ' Sine Die Adjournment')
 
-NOUN_CHUNK_BLACKLIST = [' hon ',  'sine die adjournment']
+NOUN_CHUNK_BLACKLIST = [' hon ',  'sine die adjournment', 'who', 'where', 'when', 'what',
+                        'behalf',]
 
 NOUN_CHUNK_LEMMA_BLACKLIST = ['-PRON-']
+
+CHAR_COUNT_THRESHOLD = 4
 
 def preprocess(text):
     """
@@ -38,6 +44,7 @@ def preprocess(text):
     text = text[index:]
     text = re.sub('E\s?X\s?T\s?E\s?N\s?S\s?I\s?O\s?N\s+O\s?F\s+R\s?E\s?M\s?A\s?R\s?K\s?S\n+', '', text)
     text = re.sub('HON\.', 'HON', text)
+    text = re.sub('\n{2,}', '. ', text)
     text = re.sub('_{3,}', '\n', text)
     text = re.sub('<[^<]+?>', '', text)
     text = re.sub('\n{3,}', '. ', text).strip()
@@ -98,18 +105,28 @@ def remove_trailing_tokens(entity, verb=True, adposition=True, conjunction=True,
     else:
         return None
 
+
 def remove_punct(text, marks=None, beginning_marks=None, trailing_marks=None):
     """
-    Remove punctuation from ``text`` by replacing all instances of ``marks``
-    with an empty string.
+    Remove punctuation from ``text`` by replacing all instances of ``marks``,
+    ``beginning_marks`` or ``trailing_marks`` with an empty string.
     Args:
         text (str): raw text
         marks (str): If specified, remove only the characters in this string,
             e.g. ``marks=',;:'`` removes commas, semi-colons, and colons.
-            Otherwise, all punctuation marks are removed.
+        beginning_marks (str): If specified, remove only the characters in this
+            string from the beginning of the text, e.g. ``marks='^'`` removes
+            ``^`` from the beginning of text.
+        trailing_marks (str): If specified, remove only the characters in this
+            string from the end of the text, e.g. ``marks='%'`` removes ``%``
+            from the beginning of text. If non the above is given, all punctuation
+            marks are removed.
     Returns:
         str
     """
+    # First off, replace dashes with white space: import-export banks --> import export banks
+    text = re.sub('-', ' ', text, flags=re.UNICODE)
+    text = re.sub('  ', ' ', text, flags=re.UNICODE).strip()
     if beginning_marks:
         text = re.sub('^[{}]+'.format(re.escape(beginning_marks)), '', text, flags=re.UNICODE)
     if trailing_marks:
@@ -122,13 +139,15 @@ def remove_punct(text, marks=None, beginning_marks=None, trailing_marks=None):
         else:
             return text.translate(None, PUNCT_TRANSLATE_BYTES)
 
-def camel_case(entity, force=False):
+
+def camel_case(entity, force=False, threshold=CHAR_COUNT_THRESHOLD):
     """
     Camel-cases all words in entity except when a word is all capital letters.
     
     Args:
         entity (str)
         force (bool)
+        threshold (int)
     
     Returns:
         str
@@ -138,9 +157,9 @@ def camel_case(entity, force=False):
         if len(_entity.split()) > 1:
             _entity = " ".join([w.title() for w in _entity.split()])
         else:
-            # If a word is shorter than 4 characters and all caps, it is not titled. This lets
-            # us preserve all caps for words like `WBUR` or `NPR`.
-            _entity = _entity.title() if len(_entity) > 4 else _entity
+            # If a word is shorter than `threshold` characters and all caps, it is
+            # not titled. This lets us preserve all caps for words like `WBUR` or `NPR`.
+            _entity = _entity.title() if len(_entity) > threshold else _entity
     else:
         _entity = " ".join([w.title() if not w.isupper() else w
                             for w in _entity.split()])
@@ -171,7 +190,7 @@ def process_named_entity(named_entities, marks='!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}
                          beginning_marks='!"#$%&\'()*+,-/.:;<=>?@[\\]^_`{|}~ ',
                          trailing_marks=None):
     """
-    Processes named entity by removing punctuations and at the end camel cases it.
+    Processes named entity by removing punctuations & black list entities and camel cases it.
 
     Args:
         named_entities (list of :class:`spacy.Doc()`)
@@ -267,7 +286,8 @@ def get_noun_chunks(doc, drop_determiners=True):
     # Filter blacklisted words and drop noun chunks that include pronouns (these are too specific)
     processed_noun_chunks = []
     for nc in noun_chunks:
-        is_blacklisted = any(b in nc.text.lower() for b in NOUN_CHUNK_BLACKLIST) or any(b in nc.lemma_ for b in NOUN_CHUNK_LEMMA_BLACKLIST)
+        is_blacklisted = any(b in nc.text.lower() for b in NOUN_CHUNK_BLACKLIST) or \
+                         any(b in nc.lemma_ for b in NOUN_CHUNK_LEMMA_BLACKLIST)
         if not is_blacklisted:
             nc = remove_punct(nc.text, marks='!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}~')
             processed_noun_chunks.append(nc.title())
