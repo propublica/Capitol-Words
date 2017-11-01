@@ -30,7 +30,7 @@ if __name__ == '__main__':
     output_option_group.add_argument(
         '--to_stdout',
         help='If true, will not upload to es and instead print to stdout.',
-        default=False,
+        action='store_true',
     )
     output_option_group.add_argument(
         '--es_url',
