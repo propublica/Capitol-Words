@@ -1,5 +1,10 @@
 .PhraseSearchResults-container {
   padding: 32px;
+  width: 670px;
+  display: flex;
+  margin: 16px auto;
+  flex-direction: row;
+  /*align-items: center;*/
 }
 
 .PhraseSearchResults-list {
@@ -9,15 +14,118 @@
 }
 
 .PhraseSearchResults-item {
-  margin: 16px 0;
+  margin: 32px auto;
+  background-color: #2b3a46;
+  color: #fff;
+  padding: 20px;
+  align-content: center;
+}
+.PhraseSearchResults-item a{
+  font-family: serif;
+  color: #aaa;
+  text-decoration: none;
+}
+.PhraseSearchResults-item-mention-count {
+  font-family: sans-serif;
+  color: #aaa;
+  float: right;
+  font-weight: light;
+}
+
+.PhraseSearchResults-item-date {
+  text-align: center;
+  width: 25%;
+  background-color: #212d36;
+  margin: -30px auto 10px auto;
+  padding: 10px;
+  font-size: 11px;
+  color: #b3b3b3;
+  text-transform: uppercase;
+}
+
+.PhraseSearchResults-speaker-im {
+  width: 10%;
+  height: auto;
+  margin: 5px 5px 5px 5px;
+}
+
+.PhraseSearchResults-speaker-im[data-party="Republican"]{
+  border: 0.25px solid #f55;
+}
+
+.PhraseSearchResults-speaker-im[data-party="Democrat"]{
+  border: 0.25px solid #55f;
+}
+
+
+.PhraseSearchResults-speaker-im[data-party="Independent"]{
+  border: 0.25px solid #FF25;
+}
+
+
+.PhraseSearchResults-item-snippet, .PhraseSearchResults-item-title {
+  margin: 16px auto;
+ font-size: 14px;
+}
+
+.PhraseSearchResults-item-snippet {
+  font-size: 17px;
+  font-family: serif;
+  font-weight: lighter;
+  letter-spacing: 1.5px;
+  margin: 24px 0;
+  line-height: 1.5;
+}
+
+
+.PhraseSearchResults-results-for {
+	font-size: 14px;
+	color: #757575;
+}
+
+.PhraseSearchResults-phrase {
+	font-family: serif;
+	margin: 20px auto;
+	color: #fff;
+	font-size: 350%;
+	font-weight: 100;
+	border-bottom: 0.25px solid #555;
+}
+
+.PhraseSearchResults-date-selector {
+	color: #029cd0;
+}
+
+.PhraseSearchResults-metrics-container {
   display: flex;
-  flex-direction: row;
 }
 
-.PhraseSearchResults-item-id, .PhraseSearchResults-item-title {
- // font-size: 14px;
+.PhraseSearchResults-metric-box {
+	background-color: #2b3a46;
+	margin: 20px 10px auto;
+	padding-top: 50px;
+	padding-bottom: 50px;
+  text-align: center;
+  flex: 1;
 }
 
-.PhraseSearchResults-item-id {
-  flex: 0 0 320px;
+.PhraseSearchResults-metric-box-value{
+	font-family: "Times New Roman", Times, serif;
+	font-size: 350%;
+	color: #fff;
+}
+
+.PhraseSearchResults-metric-box-label {
+	color: #6e7274;
+	font-size: 12.5px;
+}
+
+.PhraseSearchResults-results-benchmark {
+	text-align: center;
+}
+
+.snippetHighlight {
+  color: #fff;
+  background-color: #2b3a46;
+  border-bottom: 3px solid #9CAB4C;
 }

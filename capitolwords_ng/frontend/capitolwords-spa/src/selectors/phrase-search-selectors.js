@@ -19,10 +19,24 @@ export const isSearchSuccess = createSelector(
 
 export const searchResultCount = createSelector(
   getPhraseSearch,
-  phraseSearch => phraseSearch.results && phraseSearch.results.hits.total,
+  phraseSearch => phraseSearch.results && phraseSearch.results.current_period.total_count
 );
 
 export const searchResultList = createSelector(
   getPhraseSearch,
-  phraseSearch => phraseSearch.results && phraseSearch.results.hits.hits
+  phraseSearch => phraseSearch.results && phraseSearch.results.docs
 );
+
+export const searchContent = createSelector(
+  getPhraseSearch,
+  phraseSearch => phraseSearch.results && phraseSearch.results.term
+);
+
+export const searchDelta = createSelector(
+  getPhraseSearch,
+  phraseSearch => phraseSearch.results && phraseSearch.results.delta
+);
+
+// export const searchSpeakersList = createSelector(
+//   getPhraseSearch,
+//   phraseSearch => phraseSearch.results && phraseSearch.results.)

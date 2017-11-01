@@ -46,7 +46,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--s3_prefix',
         help='Key prefix for the files being staged in S3.',
-        default='capitolwords/',
+        default='crec/',
     )
     parser.add_argument(
         '--download_dir',

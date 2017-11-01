@@ -15,7 +15,6 @@ class HeaderBar extends Component {
       <div className="HeaderBar-container">
         <div>
           <h1 className="HeaderBar-title">Capitol Words</h1>
-          <div className="HeaderBar-tagline">See what congress is talking about</div>
         </div>
         <div>
           <SearchInput onSubmit={this.props.onSearchSubmit}/>
