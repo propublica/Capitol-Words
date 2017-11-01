@@ -5,9 +5,10 @@ from datetime import datetime
 from collections import Counter
 
 import boto3
+from lxml import etree
+
 import spacy
 import textacy
-from lxml import etree
 
 import capitolweb.workers.text_utils as text_utils
 
@@ -106,18 +107,20 @@ class CRECParser(object):
 
         for record in records:
             if (record['ID'].split('-')[-1].startswith('PgD') or
-                record['ID'].split('-')[-2].startswith('PgD')):
+                record['ID'].split('-')[-2].startswith('PgD') or
+                (record.get('title_part').startswith('Daily Digest') 
+                                    if record.get('title_part') else False)):
                 # dont process daily digests
                 logging.info('Not processing Daily Digest %s', record['ID'])
                 continue
 
             elif record['ID'].split('-')[-1].startswith('FrontMatter'):
-                # dont process front matters or pages with no content
+                # dont process front matters
                 logging.info('Not processing Front Matter %s', record['ID'])
                 continue
 
             elif (record.get('content') is None or 'content' not in record.keys()):
-                # dont process fpages with no content
+                # dont process pages with no content
                 logging.info('Not processing %s. No content found.', record['ID'])
                 continue
 
@@ -134,7 +137,7 @@ class CRECParser(object):
                     ne_type = 'named_entities_' + type_
                     nes = []
                     if type_ == 'PERSON':
-                        nes = [(ne.title(), named_entity_freqs[ne])
+                        nes = [(text_utils.camel_case(ne, force=False), named_entity_freqs[ne])
                                for ne in named_entity_types[type_]]
                     else:
                         nes = [(ne, named_entity_freqs[ne])
