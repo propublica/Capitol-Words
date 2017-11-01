@@ -187,15 +187,10 @@ class CRECParser(object):
                 continue
 
             text = text_utils.preprocess(record['content'])
-            doc = self.nlp(text)
-            sentences = list(doc.sents)
-            # Save speakers
-            record['speakers'] = speakers[record['ID']]
+            textacy_text = textacy.Doc(self.nlp(text))
 
             # Split in segments based on speaker
-            record['segments'] = self.find_segments(doc, record['speakers'].keys())
-
-            textacy_text = textacy.Doc(doc)
+            record['segments'] = self.find_segments(textacy_text.spacy_doc, speakers[record['ID']].keys())
 
             # Extract named entities and their types & frequencies
             named_entities = text_utils.get_named_entities(textacy_text)

@@ -82,23 +82,23 @@ def remove_trailing_tokens(entity, verb=True, adposition=True, conjunction=True,
         # remove trailing verbs like don't and won't as well.
         if entity and len(entity) > 1:
             if entity[-1].tag_ == 'RB' and any(entity[-2].tag_ == v for v in VERB_TAGS):
-                logging.info('Removing trailing verb from named entity: %s', entity)
+                # logging.info('Removing trailing verb from named entity: %s', entity)
                 entity = entity[:-2]
     if entity and adposition:
         if entity[-1].tag_ == 'IN':
-            logging.info('Removing trailing conjunction from named entity: %s', entity)
+            # logging.info('Removing trailing conjunction from named entity: %s', entity)
             entity = entity[:-1]
     if entity and conjunction:
         if entity[-1].tag_ == 'CC':
-            logging.info('Removing trailing conjunction from named entity: %s', entity)
+            # logging.info('Removing trailing conjunction from named entity: %s', entity)
             entity = entity[:-1]
     if entity and determiner:
         if entity[-1].tag_ == 'DT':
-            logging.info('Removing determiner from named entity: %s', entity)
+            # logging.info('Removing determiner from named entity: %s', entity)
             entity = entity[:-1]
     if entity and possessive_ending:
         if entity[-1].tag_ == 'POS':
-            logging.info('Removing possessive ending from named entity: %s', entity)
+            # logging.info('Removing possessive ending from named entity: %s', entity)
             entity = entity[:-1]
     if entity:
         return entity
@@ -292,7 +292,8 @@ def get_noun_chunks(doc, drop_determiners=True):
             nc = remove_punct(nc.text, marks='!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}~')
             processed_noun_chunks.append(nc.title())
         else:
-            logging.info('Removing blacklisted noun chunks: %s', nc)
+            # logging.info('Removing blacklisted noun chunks: %s', nc)
+            pass
 
     return processed_noun_chunks
 

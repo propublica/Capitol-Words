@@ -70,7 +70,7 @@ scipy==0.19.1
 simplegeneric==0.8.1
 simplejson==3.11.1
 six==1.10.0
-spacy==1.8.2
+spacy==1.9.0
 SQLAlchemy==1.1.12
 termcolor==1.1.0
 textacy==0.3.4
