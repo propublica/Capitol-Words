@@ -9,7 +9,7 @@ import spacy
 import textacy
 from lxml import etree
 
-import workers.text_utils as text_utils
+import capitolweb.workers.text_utils as text_utils
 
 
 DEFAULT_XML_NS = {'ns': 'http://www.loc.gov/mods/v3'}

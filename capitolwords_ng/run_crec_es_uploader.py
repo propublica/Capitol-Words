@@ -54,10 +54,8 @@ if __name__ == '__main__':
         default='capitol-words-data',
     )
     args = parser.parse_args()
+    setup_logger(args.loglevel)
     crec_parser = CRECParser(bucket=args.source_bucket,)
-
-    if args.to_stdout:
-        sys.exit(1)
 
     s3 = boto3.resource('s3')
     dt = args.start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -66,6 +64,7 @@ if __name__ == '__main__':
         es_host = parsed_es_url.netloc
         index = parsed_es_url.path.strip('/')
         es_conn = elasticsearch.Elasticsearch([es_host])
+    
     while dt < args.end_dt:
         logging.info('Processing files for {0}.'.format(dt))
         try:
