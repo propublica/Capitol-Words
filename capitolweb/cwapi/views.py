@@ -171,7 +171,7 @@ def count_term_in_range(term, start_date, end_date):
     return docs.to_dict()['hits']['hits']
 
 
-def get_total_in_range(term, start_date, end_date):    
+def get_total_in_range(term, start_date, end_date):
     search = make_search().sort('-date_issued')
     queries = [
         Q('match', content={'query': term, 'operator': 'and'}),
@@ -184,7 +184,7 @@ def get_total_in_range(term, start_date, end_date):
 
 
 @api_view(['GET'])
-def count_of_term_in_content(request, term):
+def count_of_term_in_content(request):
     """
     Count the mention of a term in content
 
@@ -200,7 +200,8 @@ def count_of_term_in_content(request, term):
     :param term: term whose occurances we are counting
     :return: number of occurances of the term in content
     """
-    days_ago = request.query_params.get('days_ago', 30)
+    term = request.GET.get('q', '').strip()
+    days_ago = request.GET.get('days_ago', 30)
 
     start_date = datetime.utcnow() - timedelta(days=days_ago)
     end_date = datetime.utcnow()
@@ -220,7 +221,7 @@ def count_of_term_in_content(request, term):
     # Get last benchmark data
     prev_start_date = start_date - timedelta(days=days_ago)
     prev_end_date = end_date - timedelta(days=days_ago)
-    prev_period_docs = count_term_in_range(term, prev_start_date, prev_end_date)    
+    prev_period_docs = count_term_in_range(term, prev_start_date, prev_end_date)
     previous_daily_counts = defaultdict(int)
     for doc in prev_period_docs:
         previous_daily_counts[doc['_source']['date_issued']] += doc['_source']['content'].count('term')
