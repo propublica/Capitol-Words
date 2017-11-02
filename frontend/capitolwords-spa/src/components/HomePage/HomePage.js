@@ -36,7 +36,7 @@ class HomePage extends Component {
           <h3>Capitol Words</h3>
           <p>Dig up some data on the words our legislators use every day.</p>
         </div>
-        <div className="SearchInput-container">
+        <div className="HomePage-searchInput">
           <SearchInput onSubmit={this.props.phraseSearchRequested}/>
         </div>
         <div className="QuickOptions-container">

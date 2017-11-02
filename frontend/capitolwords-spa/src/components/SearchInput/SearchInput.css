@@ -10,3 +10,19 @@
   background-color: transparent;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3)
 }
+
+.SearchInput-container {
+  display: flex;
+}
+
+.SearchInput-button {
+  background-color: #2b3f4e;
+  cursor: pointer;
+  padding: 8px;
+  color: white;
+  margin-left: 8px;
+}
+
+.SearchInput-button:hover {
+  background-color: #354d5f;
+}
