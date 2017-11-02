@@ -115,6 +115,47 @@ class CRECParser(object):
         self.bucket = bucket
         self.nlp = spacy.load('en')
 
+    def find_segments(self, doc, speakers):
+        if not speakers:
+            logging.info('No speakers available')
+            return []
+        previous = None
+        current = None
+        sents = []
+        segments = []
+        for sent in doc.sents:
+            sent_str = sent.string
+            speaker = next(
+                filter(lambda person: person in sent_str, speakers), None)
+            if speaker is not None:
+                current = speaker
+                logging.info(
+                    'Found speaker: {}, previous speaker {}'.format(current, previous))
+            else:
+                speaker, score = process.extractOne(sent_str, speakers)
+                if score > APPROX_MATCH_THRESHOLD:
+                    current = speaker
+                    logging.info(
+                        'Found speaker: {} (approx. score {}/100), previous speaker: {}'.format(
+                            current, score, previous))
+
+            if previous != current:
+                if sents:
+                    segments.append({
+                        'speaker': previous,
+                        'text': ' '.join(sents)})
+                previous = current
+                sents = []
+            else:
+                sents.append(sent_str)
+
+        if sents:
+            segments.append({
+                'speaker': previous,
+                'text': ' '.join(sents)})
+
+        return segments
+
     def parse_mods_file(self, mods_file):
         logging.info('Parsing mods file...')
         doc = etree.parse(mods_file)
