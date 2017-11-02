@@ -226,11 +226,4 @@ class CRECParser(object):
             noun_chunks = text_utils.named_entity_dedupe(noun_chunks, named_entity_freqs.keys())
             record['noun_chunks'] = str(Counter(noun_chunks).most_common())
 
-            # Shorten
-            if len(record['content']) > 200:
-                record['content'] = record['content'][:200] + ' ...'
-            for segment in record['segments']:
-                if len(segment['text']) > 100:
-                    segment['text'] = segment['text'][:100] + ' ...'
-
         return records
