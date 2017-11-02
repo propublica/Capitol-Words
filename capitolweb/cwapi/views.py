@@ -133,7 +133,7 @@ def search_by_params(request):
     """
     logger.debug("search_by_params")
     params = request.GET
-    search = make_search().sort('-date_issued')
+    search = make_search()
     queries = []
     for f in QUERIES:
         if f in params:
@@ -163,28 +163,30 @@ def search_by_params(request):
 
 def count_term_in_range(term, start_date, end_date):
     query = get_content(term)
-    search = make_search()
+    search = make_search().highlight('content', fragment_size=200)
+    q = Q('bool', must=[get_content(term), get_date_range(start_date, end_date)])
     date_filter = {
         'range': {'date_issued': {'gte': start_date, 'lte': end_date}}
     }
-    docs = search.query(query).filter(date_filter).execute()
-    return docs.to_dict()['hits']['hits']
+    docs = search.query(q).execute()
+    return docs
 
 
-def get_total_in_range(term, start_date, end_date):    
-    search = make_search().sort('-date_issued')
-    queries = [
-        Q('match', content={'query': term, 'operator': 'and'}),
-        get_date_range(start_date, end_date),
-    ]
-    q = Q('bool', must=queries)
-    search_resp = search.highlight('content', fragment_size=200).query(q).execute()
-    return search_resp.to_dict()['hits']['total']
-
+def match_speaker_to_bioguide(speaker):
+    # TODO: Get most recent entry? Or the one correct for that time?
+    for person in CongressPerson.objects.filter(official_full=speaker):
+        bio_page_url = 'https://www.congress.gov/member/{0}/{1}'.format(
+            '-'.join(person.official_full.lower().split()), person.bioguide_id
+        )
+        return {
+            'im_url': person.image_sm,
+            'party': person.terms.last().party, 
+            'bio_page_url': bio_page_url
+        }
 
 
 @api_view(['GET'])
-def count_of_term_in_content(request, term):
+def count_of_term_in_content(request):
     """
     Count the mention of a term in content
 
@@ -200,7 +202,8 @@ def count_of_term_in_content(request, term):
     :param term: term whose occurances we are counting
     :return: number of occurances of the term in content
     """
-    days_ago = request.query_params.get('days_ago', 30)
+    term = request.GET.get('q', '').strip()
+    days_ago = request.GET.get('days_ago', 30)
 
     start_date = datetime.utcnow() - timedelta(days=days_ago)
     end_date = datetime.utcnow()
@@ -210,21 +213,17 @@ def count_of_term_in_content(request, term):
     # TODO: remove when we have more recent data
     start_date -= timedelta(days=150)
     end_date -= timedelta(days=150)
+    
     current_period_docs = count_term_in_range(term, start_date, end_date)
+    total_count = current_period_docs.hits.total
+    current_period_docs = current_period_docs.to_dict()['hits']['hits']
     current_period_docs.sort(key=lambda d: -d['_score'])
-    current_daily_counts = defaultdict(int)
-    for doc in current_period_docs:
-        current_daily_counts[doc['_source']['date_issued']] += doc['_source']['content'].count('term')
-    total_count = get_total_in_range(term, start_date, end_date)
 
     # Get last benchmark data
     prev_start_date = start_date - timedelta(days=days_ago)
     prev_end_date = end_date - timedelta(days=days_ago)
     prev_period_docs = count_term_in_range(term, prev_start_date, prev_end_date)    
-    previous_daily_counts = defaultdict(int)
-    for doc in prev_period_docs:
-        previous_daily_counts[doc['_source']['date_issued']] += doc['_source']['content'].count('term')
-    prev_total_count = get_total_in_range(term, prev_start_date, prev_end_date)
+    prev_total_count = prev_period_docs.hits.total
 
     for doc in current_period_docs:
         doc['mentions'] = doc['_source']['content'].lower().count(term.lower())
@@ -233,19 +232,13 @@ def count_of_term_in_content(request, term):
             doc['_source']['date_issued'], '%Y-%m-%dT%H:%M:%S'
         )
         doc['human_date'] = date_issued.strftime('%b %d, %Y')
-        i = doc['_source']['content'].lower().find(term.lower())
-        start = max(i - 200, 0)
-        end = min(start + 400, len(doc['_source']['content']))
-        doc['snippet'] = '"...{0}..."'.format(doc['_source']['content'][start:end])
+        if len(doc['highlight'].get('content', [])) > 0:
+            doc['snippet'] = doc['highlight']['content'][0]
         doc['speakers'] = []
-        if doc['_source'].get('speakers', []):
-            speaker = doc['_source']['speakers'][0]
-            doc['speakers'] = []
-            for person in CongressPerson.objects.filter(official_full=speaker):
-                bio_page_url = 'https://www.congress.gov/member/{0}/{1}'.format(
-                    '-'.join(person.official_full.lower().split()), person.bioguide_id
-                )
-                doc['speakers'].append({'im_url': person.image_sm, 'party': person.terms.last().party, 'bio_page_url': bio_page_url})
+        for s in doc['_source'].get('speakers', []):
+            matched_bioguide_data = match_speaker_to_bioguide(s)
+            if matched_bioguide_data:
+                doc['speakers'].append(matched_bioguide_data)
 
     return JsonResponse(
         {
@@ -253,11 +246,9 @@ def count_of_term_in_content(request, term):
             'docs': current_period_docs,
             'term': term,
             'current_period': {
-                'daily_breakdown': current_daily_counts,
                 'total_count': total_count
             },
             'previous_period': {
-                'daily_breakdown': previous_daily_counts,
                 'total_count': prev_total_count
             },
             'start_date': start_date,

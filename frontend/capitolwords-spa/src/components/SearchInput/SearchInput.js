@@ -10,7 +10,13 @@ class SearchInput extends Component {
 
   handleKeyDown = (e) => {
     if (e.keyCode === 13) {
-      this.props.onSubmit(this.textInput.value);
+      const trimmedSearchTerm = this.textInput.value.trim();
+      if (trimmedSearchTerm) {
+        this.textInput.value = trimmedSearchTerm;
+        this.props.onSubmit(trimmedSearchTerm);
+      } else {
+        this.textInput.value = '';
+      }
     }
   };
 
