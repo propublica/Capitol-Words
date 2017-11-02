@@ -73,7 +73,7 @@ six==1.10.0
 spacy==1.9.0
 SQLAlchemy==1.1.12
 termcolor==1.1.0
-textacy==0.3.4
+textacy==0.4.1
 thinc==6.5.2
 toolz==0.8.2
 tqdm==4.14.0

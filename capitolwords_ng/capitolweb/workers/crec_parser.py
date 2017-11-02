@@ -5,6 +5,7 @@ import re
 from datetime import datetime
 from collections import Counter
 from collections import defaultdict
+from itertools import chain
 
 import boto3
 import spacy
@@ -34,6 +35,10 @@ CREC_PREFIX_TEMPLATE = 'crec/%Y/%m/%d/crec'
 CREC_KEY_TEMPLATE = '{prefix}/{id}.htm'
 
 APPROX_MATCH_THRESHOLD = 90
+GENERIC_SPEAKERS = [
+    'The CLERK', 'The SPEAKER pro tempore', 'The SPEAKER',
+    'The PRESIDING OFFICER', 'The ACTING PRESIDENT pro tempore'
+]
 
 def xpath_parse(root, paths, namespaces):
     """Takes an lxml ROOT or element corresponding to the mods.xml doc and
@@ -66,24 +71,24 @@ class CRECParser(object):
         self.bucket = bucket
         self.nlp = spacy.load('en')
 
-    def find_segments(self, doc, speakers):
-        if not speakers:
-            logging.info('No speakers available')
-            return []
+    def find_segments(self, doc, speaker_data):
         previous = None
         current = None
         sents = []
         segments = []
+        individual_speakers = speaker_data.keys()
         for sent in doc.sents:
             sent_str = sent.string
             speaker = next(
-                filter(lambda person: person in sent_str, speakers), None)
+                filter(lambda person: person in sent_str, chain(
+                    individual_speakers, GENERIC_SPEAKERS)), None)
             if speaker is not None:
                 current = speaker
                 logging.info(
                     'Found speaker: {}, previous speaker {}'.format(current, previous))
             else:
-                speaker, score = process.extractOne(sent_str, speakers)
+                speaker, score = process.extractOne(sent_str, chain(
+                    individual_speakers, GENERIC_SPEAKERS))
                 if score > APPROX_MATCH_THRESHOLD:
                     current = speaker
                     logging.info(
@@ -92,18 +97,26 @@ class CRECParser(object):
 
             if previous != current:
                 if sents:
-                    segments.append({
+                    segment = {
                         'speaker': previous,
-                        'text': ' '.join(sents)})
+                        'text': ' '.join(sents)
+                    }
+                    if segment['speaker'] in speaker_data:
+                        segment.update(**speaker_data[segment['speaker']])
+                    segments.append(segment)
                 previous = current
                 sents = []
             else:
                 sents.append(sent_str)
 
         if sents:
-            segments.append({
+            segment = {
                 'speaker': previous,
-                'text': ' '.join(sents)})
+                'text': ' '.join(sents)
+            }
+            if segment['speaker'] in speaker_data:
+                segment.update(**speaker_data[segment['speaker']])
+            segments.append(segment)
 
         return segments
 
@@ -190,7 +203,7 @@ class CRECParser(object):
             textacy_text = textacy.Doc(self.nlp(text))
 
             # Split in segments based on speaker
-            record['segments'] = self.find_segments(textacy_text.spacy_doc, speakers[record['ID']].keys())
+            record['segments'] = self.find_segments(textacy_text.spacy_doc, speakers[record['ID']])
 
             # Extract named entities and their types & frequencies
             named_entities = text_utils.get_named_entities(textacy_text)
