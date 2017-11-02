@@ -1,0 +1,12 @@
+.SearchInput-input {
+  font-size: 16px;
+  color: #fff;
+  height: 30px;
+  line-height: 24px;
+  padding: 16px;
+  min-width: 320px;
+  border: 0;
+  outline: 0;
+  background-color: #1C2830;
+  border-bottom: 1px solid #fff;
+}

@@ -1,0 +1,381 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "AWS CloudFormation CapitolWords Stack",
+  "Parameters": {
+    "KeyName": {
+      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "ConstraintDescription": "Can contain only ASCII characters."
+    },
+    "DBName": {
+      "Default": "capitolwords",
+      "Description": "Database name",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "64",
+      "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
+      "ConstraintDescription": "Must begin with a letter and contain only alphanumeric characters"
+    },
+    "DBUsername": {
+      "Default": "capitolwords",
+      "NoEcho": "true",
+      "Description": "User name for MySQL database access",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "16",
+      "AllowedPattern": "[a-zA-Z][a-zA-Z0-9]*",
+      "ConstraintDescription": "Must begin with a letter and contain only alphanumeric characters"
+    },
+    "DBPassword": {
+      "NoEcho": "true",
+      "Description": "Password for MySQL database access",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "41",
+      "AllowedPattern": "[a-zA-Z0-9]*",
+      "ConstraintDescription": "Must contain only alphanumeric characters"
+    },
+    "DBRootPassword": {
+      "NoEcho": "true",
+      "Description": "Root password for MySQL",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "41",
+      "AllowedPattern": "[a-zA-Z0-9]*",
+      "ConstraintDescription": "Must contain only alphanumeric characters"
+    },
+    "InstanceType": {
+      "Description": "AppServer EC2 instance type",
+      "Type": "String",
+      "Default": "m3.large",
+      "AllowedValues": [
+        "t1.micro",
+        "t2.micro",
+        "t2.small",
+        "t2.medium",
+        "m1.small",
+        "m1.medium",
+        "m1.large",
+        "m1.xlarge",
+        "m2.xlarge",
+        "m2.2xlarge",
+        "m2.4xlarge",
+        "m3.medium",
+        "m3.large",
+        "m3.xlarge",
+        "m3.2xlarge",
+        "c1.medium",
+        "c1.xlarge",
+        "c3.large",
+        "c3.xlarge",
+        "c3.2xlarge",
+        "c3.4xlarge",
+        "c3.8xlarge",
+        "g2.2xlarge",
+        "r3.large",
+        "r3.xlarge",
+        "r3.2xlarge",
+        "r3.4xlarge",
+        "r3.8xlarge",
+        "i2.xlarge",
+        "i2.2xlarge",
+        "i2.4xlarge",
+        "i2.8xlarge",
+        "hi1.4xlarge",
+        "hs1.8xlarge",
+        "cr1.8xlarge",
+        "cc2.8xlarge",
+        "cg1.4xlarge"
+      ],
+      "ConstraintDescription": "Must be a valid EC2 instance type"
+    },
+    "ExtraElasticsearchLocation": {
+      "Description": "Extra IP address range that can be used to access Elasticsearch",
+      "Type": "String",
+      "MinLength": "9",
+      "MaxLength": "15",
+      "Default": "100.38.5.130",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})",
+      "ConstraintDescription": "Must be a valid IP of the form x.x.x.x"
+    },
+    "ExtraSecurityGroup": {
+      "Description": "Specify additional Security Group with access to rds and ec2 instance",
+      "Type": "AWS::EC2::SecurityGroup::GroupName",
+      "Default": "gateway"
+    }
+  },
+  "Mappings": {
+    "AWSInstanceType2Arch": {
+      "t1.micro": {"Arch": "PV64"},
+      "t2.micro": {"Arch": "HVM64"},
+      "t2.small": {"Arch": "HVM64"},
+      "t2.medium": {"Arch": "HVM64"},
+      "m1.small": {"Arch": "PV64"},
+      "m1.medium": {"Arch": "PV64"},
+      "m1.large": {"Arch": "PV64"},
+      "m1.xlarge": {"Arch": "PV64"},
+      "m2.xlarge": {"Arch": "PV64"},
+      "m2.2xlarge": {"Arch": "PV64"},
+      "m2.4xlarge": {"Arch": "PV64"},
+      "m3.medium": {"Arch": "HVM64"},
+      "m3.large": {"Arch": "HVM64"},
+      "m3.xlarge": {"Arch": "HVM64"},
+      "m3.2xlarge": {"Arch": "HVM64"},
+      "c1.medium": {"Arch": "PV64"},
+      "c1.xlarge": {"Arch": "PV64"},
+      "c3.large": {"Arch": "HVM64"},
+      "c3.xlarge": {"Arch": "HVM64"},
+      "c3.2xlarge": {"Arch": "HVM64"},
+      "c3.4xlarge": {"Arch": "HVM64"},
+      "c3.8xlarge": {"Arch": "HVM64"},
+      "r3.large": {"Arch": "HVM64"},
+      "r3.xlarge": {"Arch": "HVM64"},
+      "r3.2xlarge": {"Arch": "HVM64"},
+      "r3.4xlarge": {"Arch": "HVM64"},
+      "r3.8xlarge": {"Arch": "HVM64"},
+      "i2.xlarge": {"Arch": "HVM64"},
+      "i2.2xlarge": {"Arch": "HVM64"},
+      "i2.4xlarge": {"Arch": "HVM64"},
+      "i2.8xlarge": {"Arch": "HVM64"}
+    },
+    "AWSRegionArch2AMI": {
+      "us-east-1": {"PV64": "ami-91104cea", "HVM64": "ami-8a134ff1"},
+      "us-east-2": {"PV64": "ami-27270742", "HVM64": "ami-54250531"},
+      "us-west-1": {"PV64": "ami-b791b8d7", "HVM64": "ami-b691b8d6"},
+      "us-west-2": {"PV64": "ami-8e6e74f7", "HVM64": "ami-dc6e74a5"},
+      "ca-central-1": {"PV64": "ami-ed08b789", "HVM64": "ami-670cb303"}
+    }
+  },
+  "Resources": {
+    "ElasticsearchCluster": {
+      "Type": "AWS::Elasticsearch::Domain",
+      "Properties": {
+        "AccessPolicies": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": "*"
+              },
+              "Action": "es:*",
+              "Resource": "*",
+              "Condition": {
+                "IpAddress": {
+                  "aws:SourceIp": [{"Ref": "ElasticIP"}, {"Ref": "ExtraElasticsearchLocation"}]
+                }
+              }
+            }
+          ]
+        },
+        "EBSOptions": {
+          "EBSEnabled": true,
+          "VolumeSize": 50,
+          "VolumeType": "gp2"
+        },
+        "ElasticsearchClusterConfig": {
+          "InstanceCount": 1,
+          "InstanceType": "m4.large.elasticsearch",
+          "ZoneAwarenessEnabled": false
+        },
+        "ElasticsearchVersion": "5.1"
+      }
+    },
+    "RDSInstance": {
+      "Type": "AWS::RDS::DBInstance",
+      "Properties": {
+        "AllocatedStorage": 10,
+        "CopyTagsToSnapshot": true,
+        "DBName": {"Ref": "DBName"},
+        "DBInstanceClass": "db.m3.large",
+        "DBSecurityGroups": [{"Ref": "RDSSecurityGroup"}],
+        "Engine": "MySQL",
+        "EngineVersion": "5.7",
+        "MasterUsername": "root",
+        "MasterUserPassword": {"Ref": "DBRootPassword"}
+      }
+    },
+    "RDSSecurityGroup": {
+      "Type": "AWS::RDS::DBSecurityGroup",
+      "Properties": {
+        "GroupDescription": "Capitolwords Database Instance",
+        "DBSecurityGroupIngress": [
+          {"EC2SecurityGroupName": {"Ref": "AppServerSecurityGroup"}},
+          {"EC2SecurityGroupName": {"Ref": "ExtraSecurityGroup"}, "EC2SecurityGroupOwnerId": {"Ref": "AWS::AccountId"}}
+        ]
+      }
+    },
+    "AppServerInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "configSets": {
+            "InstallAndRun": ["Install", "Configure"]
+          },
+          "Install": {
+            "packages": {
+              "apt": {
+                "mysql-client": [],
+                "nginx": [],
+                "git": [],
+                "python3-pip": [],
+                "libffi-dev": [],
+                "libmysqlclient-dev": [],
+                "rabbitmq-server": []
+              }
+            },
+            "files": {
+              "/tmp/setup.mysql": {
+                "content": { "Fn::Join": ["", [
+                  "GRANT ALL ON ", { "Ref": "DBName" }, ".* TO '", { "Ref": "DBUsername" }, "'@'%' IDENTIFIED BY '", { "Ref": "DBPassword" }, "';\n"
+                  ]]},
+                "mode": "000400",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/cfn/cfn-hup.conf": {
+                "content": { "Fn::Join": ["", [
+                  "[main]\n",
+                  "stack=", { "Ref": "AWS::StackId" }, "\n",
+                  "region=", { "Ref": "AWS::Region" }, "\n",
+                  "interval=1\n"
+                ]]},
+                "mode": "000644",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
+                "content": { "Fn::Join": ["", [
+                  "[cfn-auto-reloader-hook]\n",
+                  "triggers=post.update\n",
+                  "path=Resources.AppServerInstance.Metadata.AWS::CloudFormation::Init\n",
+                  "action=/usr/local/bin/cfn-init -v ",
+                  "         --stack ", { "Ref": "AWS::StackName" },
+                  "         --resource AppServerInstance ",
+                  "         --configsets InstallAndRun ",
+                  "         --region ", { "Ref": "AWS::Region" }, "\n"
+                ]]},
+                "mode": "000644",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/systemd/system/cfn-hup.service": {
+                "content": {"Fn::Join": ["", [
+                  "[Unit]\n",
+                  "Description=Cloudformation helper daemon\n",
+                  "[Service]\n",
+                  "ExecStart=/usr/local/bin/cfn-hup\n",
+                  "Restart=always\n",
+                  "RestartSec=10s\n",
+                  "Type=Notify\n",
+                  "NotifyAccess=all\n",
+                  "TimeoutStartSec=120\n",
+                  "TimeoutStopSec=15\n",
+                  "[Install]\n",
+                  "WantedBy=multi-user.target\n"
+                ]]},
+                "mode": "000644",
+                "owner": "root",
+                "group": "root"
+              },
+              "/etc/nginx/sites-available/default": {
+                "content": {"Fn::Join": ["", [
+                  "server {\n",
+                  "    listen 80;\n",
+                  "    server_name default_server;\n",
+                  "    location / {\n",
+                  "        proxy_pass http://127.0.0.1:8000;\n",
+                  "    }\n",
+                  "}\n"
+                ]]},
+                "mode": "000644",
+                "owner": "root",
+                "group": "root"
+              }
+            },
+            "commands": {
+              "enable-cfn-hup": {
+                "command": "systemctl enable cfn-hup.service"
+              },
+              "start-cfn-hup": {
+                "command": "systemctl start cfn-hup.service"
+              }
+            }
+          },
+          "Configure": {
+            "commands": {
+              "01_grant_capitolwords_dbuser": {
+                "command" : {"Fn::Join" : ["", ["mysql -h ", {"Fn::GetAtt": ["RDSInstance", "Endpoint.Address"]}, " -u root --password='", {"Ref" : "DBRootPassword" }, "' < /tmp/setup.mysql"]]},
+                "test" : {"Fn::Join" : ["", ["$(mysql ", { "Ref" : "DBUsername" }, " -h ", {"Fn::GetAtt": ["RDSInstance", "Endpoint.Address"]}, " -u root --password='", {"Ref" : "DBRootPassword" }, "' >/dev/null 2>&1 </dev/null); (( $? != 0 ))"]]}
+              },
+              "02_git_clone_capitolwords":{
+                "command": "umask 002 mkdir /mnt/capitolwords && git clone https://github.com/chartbeat-labs/Capitol-Words /mnt/capitolwords"
+              }
+            }
+          }
+        }
+      },
+      "Properties": {
+        "ImageId": {"Fn::FindInMap": [ "AWSRegionArch2AMI", {"Ref": "AWS::Region"}, {"Fn::FindInMap": ["AWSInstanceType2Arch", {"Ref": "InstanceType"}, "Arch" ]}]},
+        "InstanceType": {"Ref": "InstanceType"},
+        "SecurityGroups": [{"Ref": "AppServerSecurityGroup"}],
+        "KeyName": {"Ref": "KeyName"},
+        "UserData": {"Fn::Base64": {"Fn::Join": ["", [
+             "#!/bin/bash -xe\n",
+             "VERSION=1\n",
+             "apt-get update\n",
+             "apt-get -y install python-setuptools\n",
+             "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+
+             "# Install the files and packages from the metadata\n",
+             "/usr/local/bin/cfn-init -v ",
+             "         --stack ", { "Ref": "AWS::StackName" },
+             "         --resource AppServerInstance ",
+             "         --configsets InstallAndRun ",
+             "         --region ", { "Ref": "AWS::Region" }, "\n",
+
+             "# Signal the status from cfn-init\n",
+             "/usr/local/bin/cfn-signal -e $? ",
+             "         --stack ", { "Ref": "AWS::StackName" },
+             "         --resource AppServerInstance ",
+             "         --region ", { "Ref": "AWS::Region" }, "\n"
+        ]]}}
+      },
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Timeout": "PT5M"
+        }
+      }
+    },
+    "ElasticIP":{
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "InstanceId": {"Ref": "AppServerInstance"}
+      }
+    },
+    "AppServerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enable HTTP access via port 80",
+        "SecurityGroupIngress": [
+          {"IpProtocol": "tcp", "FromPort": "80", "ToPort": "80", "CidrIp": "0.0.0.0/0"},
+          {"IpProtocol": "tcp", "FromPort": "22", "ToPort": "22", "SourceSecurityGroupName": { "Ref": "ExtraSecurityGroup"}, "SourceSecurityGroupOwnerId": {"Ref": "AWS::AccountId"}}
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "ElasticsearchURL": {
+      "Description": "URL for the newly created Elasticsearch Cluster",
+      "Value": {"Fn::Join": ["", ["http://", {"Fn::GetAtt": ["ElasticsearchCluster", "DomainEndpoint"]}]]}
+    },
+    "MySQLAccess": {
+      "Description": "MySQL Endpoint",
+      "Value": {"Fn::Join": ["", ["mysql://", {"Fn::GetAtt": ["RDSInstance", "Endpoint.Address"]}, ":", {"Fn::GetAtt": ["RDSInstance", "Endpoint.Port"]}]]}
+    },
+    "WebsiteURL": {
+      "Description": "URL for Website",
+      "Value": {"Fn::Join": ["", ["http://", {"Fn::GetAtt": ["AppServerInstance", "PublicDnsName"]}]]}
+    }
+  }
+}

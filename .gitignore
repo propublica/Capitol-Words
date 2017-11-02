@@ -1,7 +1,6 @@
-*.swp
 *.pyc
 *.pyo
-*~
-!cwod_site/settings.py
-local_settings.py
+.python-version
 .DS_Store
+capitolweb/db.sqlite3
+node_modules
