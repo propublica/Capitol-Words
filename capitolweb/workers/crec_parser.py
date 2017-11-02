@@ -40,6 +40,7 @@ GENERIC_SPEAKERS = [
     'The PRESIDING OFFICER', 'The ACTING PRESIDENT pro tempore'
 ]
 
+
 def xpath_parse(root, paths, namespaces):
     """Takes an lxml ROOT or element corresponding to the mods.xml doc and
     produces, yanks out useful info, and returns it as a dict.
@@ -59,6 +60,49 @@ def xpath_parse(root, paths, namespaces):
     return results
 
 
+def attribute_segments(sents, speaker_ids, record_id):
+    previous = None
+    current = None
+    segment_index = 0
+    segment_sents = []
+    segments = []
+    individual_speakers = speaker_ids.keys()
+    for sent in chain(sents, ('<EOF>',)):
+        speaker = next(
+            filter(lambda person: person in sent, chain(
+                individual_speakers, GENERIC_SPEAKERS)), None)
+        if speaker is not None:
+            current = speaker
+            logging.info(
+                'Found speaker: {}, previous speaker {}'.format(current, previous))
+        else:
+            speaker, score = process.extractOne(sent, chain(
+                individual_speakers, GENERIC_SPEAKERS))
+            if score > APPROX_MATCH_THRESHOLD:
+                current = speaker
+                logging.info(
+                    'Found speaker: {} (approx. score {}/100), previous speaker: {}'.format(
+                        current, score, previous))
+
+        if previous != current or sent == '<EOF>':
+            if segment_sents:
+                segment_index += 1
+                segment = {
+                    'id': '{}-{}'.format(record_id, segment_index),
+                    'speaker': previous,
+                    'text': ' '.join(segment_sents)
+                }
+                if segment['speaker'] in speaker_ids:
+                    segment['bioGuideId'] = speaker_ids[segment['speaker']]
+                segments.append(segment)
+            previous = current
+            segment_sents = [sent]
+        else:
+            segment_sents.append(sent)
+
+    return segments
+
+
 class CRECParser(object):
 
     def __init__(self, bucket='capitol-words-data', xml_namespace=None, xpaths=DEFAULT_XPATHS):
@@ -71,55 +115,6 @@ class CRECParser(object):
         self.bucket = bucket
         self.nlp = spacy.load('en')
 
-    def attribute_segments(self, doc, speaker_data):
-        previous = None
-        current = None
-        sents = []
-        segments = []
-        individual_speakers = speaker_data.keys()
-        for sent in doc.sents:
-            sent_str = sent.string
-            speaker = next(
-                filter(lambda person: person in sent_str, chain(
-                    individual_speakers, GENERIC_SPEAKERS)), None)
-            if speaker is not None:
-                current = speaker
-                logging.info(
-                    'Found speaker: {}, previous speaker {}'.format(current, previous))
-            else:
-                speaker, score = process.extractOne(sent_str, chain(
-                    individual_speakers, GENERIC_SPEAKERS))
-                if score > APPROX_MATCH_THRESHOLD:
-                    current = speaker
-                    logging.info(
-                        'Found speaker: {} (approx. score {}/100), previous speaker: {}'.format(
-                            current, score, previous))
-
-            if previous != current:
-                if sents:
-                    segment = {
-                        'speaker': previous,
-                        'text': ' '.join(sents)
-                    }
-                    if segment['speaker'] in speaker_data:
-                        segment['bioGuideId'] = speaker_data[segment['speaker']]
-                    segments.append(segment)
-                previous = current
-                sents = []
-            else:
-                sents.append(sent_str)
-
-        if sents:
-            segment = {
-                'speaker': previous,
-                'text': ' '.join(sents)
-            }
-            if segment['speaker'] in speaker_data:
-                segment['bioGuideId'] = speaker_data[segment['speaker']]
-            segments.append(segment)
-
-        return segments
-
     def parse_mods_file(self, mods_file):
         logging.info('Parsing mods file...')
         doc = etree.parse(mods_file)
@@ -127,10 +122,29 @@ class CRECParser(object):
             '//ns:relatedItem[@type="constituent"]',
             namespaces=DEFAULT_XML_NS,
         )
-        records = [
-            xpath_parse(r, self.xpaths, namespaces=self.xml_namespace)
-            for r in constituents
-        ]
+
+        records = []
+        for constituent in constituents:
+            record = xpath_parse(
+                constituent,
+                self.xpaths,
+                namespaces=self.xml_namespace
+            )
+            persons = constituent.xpath(
+                'ns:extension/ns:congMember',
+                namespaces=DEFAULT_XML_NS
+            )
+            record['speaker_ids'] = {}
+            for person in persons:
+                parsed_name = person.xpath(
+                    'string(ns:name[@type="parsed"])',
+                    namespaces=DEFAULT_XML_NS
+                )
+                sanitized_name = re.sub(' of .*$', '', parsed_name)
+                if person.get('role') == 'SPEAKING':
+                    record['speaker_ids'][sanitized_name] = person.get('bioGuideId')
+            records.append(record)
+
         date_issued_str = doc.xpath(
             'string(//ns:originInfo/ns:dateIssued)',
             namespaces=DEFAULT_XML_NS,
@@ -138,15 +152,7 @@ class CRECParser(object):
         date_issued = datetime.strptime(date_issued_str, '%Y-%m-%d')
         prefix = date_issued.strftime(CREC_PREFIX_TEMPLATE)
 
-        speakers = defaultdict(dict)
-        for constituent in constituents:
-            id_ = constituent.get('ID')
-            for person in constituent.xpath('ns:extension/ns:congMember', namespaces=DEFAULT_XML_NS):
-                parsed_name = person.xpath('ns:name[@type="parsed"]', namespaces=DEFAULT_XML_NS)[0]
-                sanitized_parsed_name_str = re.sub(' of .*$', '', parsed_name.text)
-                if sanitized_parsed_name_str not in speakers and person.get('role') == 'SPEAKING':
-                    speakers[id_][sanitized_parsed_name_str] = person.get('bioGuideId')
-
+        failed_retrievals = []
         for record in records:
             record['date_issued'] = date_issued
             s3_key = CREC_KEY_TEMPLATE.format(
@@ -154,7 +160,6 @@ class CRECParser(object):
                 id=record['ID'].strip('id-')
             )
             record['s3_key'] = s3_key
-            failed_retrievals = []
             try:
                 response = self.s3.get_object(Bucket=self.bucket, Key=s3_key)
                 record['content'] = response['Body'].read().decode('utf-8')
@@ -193,9 +198,10 @@ class CRECParser(object):
 
             text = text_utils.preprocess(record['content'])
             textacy_text = textacy.Doc(self.nlp(text))
+            sents = (sent.string for sent in textacy_text.spacy_doc.sents)
 
             # Split in segments based on speaker
-            record['segments'] = self.attribute_segments(textacy_text.spacy_doc, speakers[record['ID']])
+            record['segments'] = attribute_segments(sents, record['speaker_ids'], record['ID'])
 
             # Extract named entities and their types & frequencies
             named_entities = text_utils.get_named_entities(textacy_text)
