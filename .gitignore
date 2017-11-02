@@ -1,10 +1,6 @@
-*.swp
 *.pyc
 *.pyo
-*~
 .python-version
-!cwod_site/settings.py
-local_settings.py
 .DS_Store
-host/.vagrant
-
+capitolweb/db.sqlite3
+node_modules
