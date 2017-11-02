@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Highlighter from 'react-highlight-words'
 
+import TimeSeries from '../TimeSeries/TimeSeries';
+
 import './PhraseSearchResults.css';
 
 import {
@@ -126,12 +128,17 @@ class PhraseSearchResults extends Component {
               </div>
             </div>
           </div>
-          {this.renderResultList() }
+          {this.renderTimeSeries()}
+          {this.renderResultList()}
         </div>
       )
     }
 
     return (<div />);
+  }
+
+  renderTimeSeries() {
+    return <TimeSeries />;
   }
 
   render() {
