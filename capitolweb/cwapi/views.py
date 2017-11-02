@@ -222,16 +222,8 @@ def count_of_term_in_content(request):
     # Get last benchmark data
     prev_start_date = start_date - timedelta(days=days_ago)
     prev_end_date = end_date - timedelta(days=days_ago)
-<<<<<<< HEAD
-    prev_period_docs = count_term_in_range(term, prev_start_date, prev_end_date)
-    previous_daily_counts = defaultdict(int)
-    for doc in prev_period_docs:
-        previous_daily_counts[doc['_source']['date_issued']] += doc['_source']['content'].count('term')
-    prev_total_count = get_total_in_range(term, prev_start_date, prev_end_date)
-=======
     prev_period_docs = count_term_in_range(term, prev_start_date, prev_end_date)    
     prev_total_count = prev_period_docs.hits.total
->>>>>>> [capitolwords] api refactor for search endpoint
 
     for doc in current_period_docs:
         doc['mentions'] = doc['_source']['content'].lower().count(term.lower())
