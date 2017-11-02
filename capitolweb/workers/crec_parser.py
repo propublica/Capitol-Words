@@ -71,7 +71,7 @@ class CRECParser(object):
         self.bucket = bucket
         self.nlp = spacy.load('en')
 
-    def find_segments(self, doc, speaker_data):
+    def attribute_segments(self, doc, speaker_data):
         previous = None
         current = None
         sents = []
@@ -102,7 +102,7 @@ class CRECParser(object):
                         'text': ' '.join(sents)
                     }
                     if segment['speaker'] in speaker_data:
-                        segment.update(**speaker_data[segment['speaker']])
+                        segment['bioGuideId'] = speaker_data[segment['speaker']]
                     segments.append(segment)
                 previous = current
                 sents = []
@@ -115,7 +115,7 @@ class CRECParser(object):
                 'text': ' '.join(sents)
             }
             if segment['speaker'] in speaker_data:
-                segment.update(**speaker_data[segment['speaker']])
+                segment['bioGuideId'] = speaker_data[segment['speaker']]
             segments.append(segment)
 
         return segments
@@ -144,16 +144,8 @@ class CRECParser(object):
             for person in constituent.xpath('ns:extension/ns:congMember', namespaces=DEFAULT_XML_NS):
                 parsed_name = person.xpath('ns:name[@type="parsed"]', namespaces=DEFAULT_XML_NS)[0]
                 sanitized_parsed_name_str = re.sub(' of .*$', '', parsed_name.text)
-                authority_fnf_name = person.xpath('ns:name[@type="authority-fnf"]', namespaces=DEFAULT_XML_NS)[0]
                 if sanitized_parsed_name_str not in speakers and person.get('role') == 'SPEAKING':
-                    speakers[id_][sanitized_parsed_name_str] = {
-                        'bioGuideId': person.get('bioGuideId'),
-                        'chamber': person.get('chamber'),
-                        'congress': person.get('congress'),
-                        'party': person.get('party'),
-                        'state': person.get('state'),
-                        'name': authority_fnf_name.text
-                    }
+                    speakers[id_][sanitized_parsed_name_str] = person.get('bioGuideId')
 
         for record in records:
             record['date_issued'] = date_issued
@@ -203,7 +195,7 @@ class CRECParser(object):
             textacy_text = textacy.Doc(self.nlp(text))
 
             # Split in segments based on speaker
-            record['segments'] = self.find_segments(textacy_text.spacy_doc, speakers[record['ID']])
+            record['segments'] = self.attribute_segments(textacy_text.spacy_doc, speakers[record['ID']])
 
             # Extract named entities and their types & frequencies
             named_entities = text_utils.get_named_entities(textacy_text)
@@ -227,5 +219,12 @@ class CRECParser(object):
             noun_chunks = text_utils.get_noun_chunks(textacy_text)
             noun_chunks = text_utils.named_entity_dedupe(noun_chunks, named_entity_freqs.keys())
             record['noun_chunks'] = str(Counter(noun_chunks).most_common())
+
+            # Shorten
+            if len(record['content']) > 200:
+                record['content'] = record['content'][:200] + ' ...'
+            for segment in record['segments']:
+                if len(segment['text']) > 100:
+                    segment['text'] = segment['text'][:100] + ' ...'
 
         return records
