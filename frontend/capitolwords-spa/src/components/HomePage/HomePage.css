@@ -1,0 +1,36 @@
+.HomePage-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.Title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+}
+
+.Title h3 {
+  font-size: 32px;
+}
+
+.SearchInput-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.QuickOptions-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.QuickOption {
+  color: #a7bb47;
+  border: 1px solid #a7bb47;
+  border-radius: 2px;
+  padding: 8px;
+  margin-right: 12px;
+  cursor: pointer;
+}

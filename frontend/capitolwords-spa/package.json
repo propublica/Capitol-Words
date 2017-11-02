@@ -8,6 +8,7 @@
     "react-highlight-words": "^0.8.1",
     "react-modal": "^2.3.2",
     "react-redux": "^5.0.5",
+    "react-spinners": "^0.1.9",
     "redux": "^3.6.0",
     "redux-dialog": "^0.0.9",
     "redux-saga": "^0.15.3",
