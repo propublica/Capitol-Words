@@ -11,5 +11,5 @@ elasticsearch==5.4.0
 elasticsearch-dsl==5.3.0
 pytz==2017.2
 requests==2.10.0
-textacy==0.3.4
+textacy==0.4.1
 lxml==3.7.2

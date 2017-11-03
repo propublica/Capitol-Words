@@ -29,8 +29,8 @@ if __name__ == '__main__':
     output_option_group = parser.add_mutually_exclusive_group(required=True)
     output_option_group.add_argument(
         '--to_stdout',
+        action='store_true',
         help='If true, will not upload to es and instead print to stdout.',
-        default=False,
     )
     output_option_group.add_argument(
         '--es_url',
@@ -64,7 +64,6 @@ if __name__ == '__main__':
         es_host = parsed_es_url.netloc
         index = parsed_es_url.path.strip('/')
         es_conn = elasticsearch.Elasticsearch([es_host])
-    
     while dt < args.end_dt:
         logging.info('Processing files for {0}.'.format(dt))
         try:
