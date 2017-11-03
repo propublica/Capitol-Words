@@ -225,7 +225,7 @@ def count_of_term_in_content(request):
     :return: number of occurances of the term in content
     """
     term = request.GET.get('q', '').strip()
-    days_ago = request.GET.get('days_ago', 30)
+    days_ago = int(request.GET.get('days_ago', '30'))
 
     start_date = datetime.utcnow() - timedelta(days=days_ago)
     end_date = datetime.utcnow()
@@ -275,11 +275,11 @@ def count_of_term_in_content(request):
             'docs': current_period_docs,
             'term': term,
             'current_period': {
-                'daily_breakdown': current_daily_counts,
+                'daily_breakdown': [{'date': k, 'count': v} for k, v in current_daily_counts.items()],
                 'total_count': total_count
             },
             'previous_period': {
-                'daily_breakdown': prev_daily_counts,
+                'daily_breakdown': [{'date': k, 'count': v} for k, v in prev_daily_counts.items()],
                 'total_count': prev_total_count
             },
             'start_date': start_date,
