@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "glamor": "^2.20.40",
+    "glamorous": "^4.11.0",
     "moment": "^2.19.1",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
@@ -17,7 +19,7 @@
     "victory": "^0.24.0"
   },
   "devDependencies": {
-    "@kadira/storybook": "^2.21.0",
+    "@storybook/react": "^3.2.14",
     "react-scripts": "1.0.7"
   },
   "scripts": {

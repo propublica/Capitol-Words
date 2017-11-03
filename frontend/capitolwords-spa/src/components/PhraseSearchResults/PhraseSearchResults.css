@@ -84,11 +84,11 @@
 }
 
 .PhraseSearchResults-phrase {
-	font-family: serif;
+	font-family: "Tiempos Text", serif;
+  font-weight: normal;
+  font-size: 3.5rem;
 	margin: 20px auto;
 	color: #fff;
-	font-size: 350%;
-	font-weight: 100;
 	border-bottom: 0.25px solid #555;
 }
 
