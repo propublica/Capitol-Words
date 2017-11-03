@@ -18,7 +18,7 @@ from workers.crec_parser import CRECParser
 MODS_KEY_TEMPLATE = 'crec/%Y/%m/%d/mods/mods.xml'
 
 
-class CrecParserCommand(BaseCommand):
+class Command(BaseCommand):
     help = 'Runs the CREC parser.'
 
     def add_arguments(self, parser):

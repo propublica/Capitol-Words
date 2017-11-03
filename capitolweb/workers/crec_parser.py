@@ -5,6 +5,7 @@ import re
 from datetime import datetime
 from collections import Counter
 from itertools import chain
+import json
 
 import boto3
 import spacy
@@ -12,7 +13,7 @@ import textacy
 from lxml import etree
 from fuzzywuzzy import process
 
-import capitolweb.workers.text_utils as text_utils
+import workers.text_utils as text_utils
 
 
 DEFAULT_XML_NS = {'ns': 'http://www.loc.gov/mods/v3'}
@@ -252,5 +253,20 @@ class CRECParser(object):
             noun_chunks = text_utils.get_noun_chunks(textacy_text)
             noun_chunks = text_utils.named_entity_dedupe(noun_chunks, named_entity_freqs.keys())
             record['noun_chunks'] = str(Counter(noun_chunks).most_common())
+
+            if bool(record['speaker_ids']):
+                named_entities = {'named_entities_{0}'.format(ne_type): \
+                                  record['named_entities_{0}'.format(ne_type)]
+                                  for ne_type in named_entity_types.keys()}
+                for bioguide_id in record['speaker_ids'].values():
+                    speaker_counts = SpeakerWordCounts(
+                        bioguide_id=bioguide_id,
+                        crec_id=record['ID'],
+                        date=record['date_issued'],
+                        named_entities=json.dumps(named_entities),
+                        noun_chunks=json.dumps(record['noun_chunks']))
+                    speaker_counts.save()
+
+            del record['speaker_ids']
 
         return records
