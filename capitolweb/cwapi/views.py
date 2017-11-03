@@ -218,12 +218,19 @@ def count_of_term_in_content(request):
     total_count = current_period_docs.hits.total
     current_period_docs = current_period_docs.to_dict()['hits']['hits']
     current_period_docs.sort(key=lambda d: -d['_score'])
-
+    current_daily_counts = defaultdict(int)
+    for doc in current_period_docs:
+        current_daily_counts[doc['_source']['date_issued']] += doc['_source']['content'].count(term)
+    
     # Get last benchmark data
     prev_start_date = start_date - timedelta(days=days_ago)
     prev_end_date = end_date - timedelta(days=days_ago)
     prev_period_docs = count_term_in_range(term, prev_start_date, prev_end_date)    
     prev_total_count = prev_period_docs.hits.total
+    prev_period_docs = prev_period_docs.to_dict()['hits']['hits']
+    prev_daily_counts = defaultdict(int)
+    for doc in prev_period_docs:
+        prev_daily_counts[doc['_source']['date_issued']] += doc['_source']['content'].count(term)
 
     for doc in current_period_docs:
         doc['mentions'] = doc['_source']['content'].lower().count(term.lower())
@@ -246,9 +253,11 @@ def count_of_term_in_content(request):
             'docs': current_period_docs,
             'term': term,
             'current_period': {
+                'daily_breakdown': current_daily_counts,
                 'total_count': total_count
             },
             'previous_period': {
+                'daily_breakdown': prev_daily_counts,
                 'total_count': prev_total_count
             },
             'start_date': start_date,
