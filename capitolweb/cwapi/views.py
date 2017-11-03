@@ -185,6 +185,28 @@ def match_speaker_to_bioguide(speaker):
         }
 
 
+def get_date_strings_in_range(start_date, end_date):
+    date_strings = []
+    while start_date < end_date:
+        date_strings.append(datetime.strftime(start_date, '%Y-%m-%dT%H:%M:%S'))
+        start_date += timedelta(days=1)
+    return date_strings
+
+
+def get_daily_counts_in_range(docs, term, start_date, end_date):
+    counts = {ds: 0 for ds in get_date_strings_in_range(start_date, end_date)}
+    print(counts.keys())
+    for doc in docs:
+        date_issued = doc.get('_source', {}).get('date_issued')
+        print(date_issued)
+        if date_issued is None:
+            raise Exception('document has no date_issued field')
+        if date_issued in counts.keys():
+            content = doc.get('_source', {}).get('content', '')
+            counts[doc['_source']['date_issued']] += content.lower().count(term.lower())
+    return counts
+
+
 @api_view(['GET'])
 def count_of_term_in_content(request):
     """
@@ -207,31 +229,31 @@ def count_of_term_in_content(request):
 
     start_date = datetime.utcnow() - timedelta(days=days_ago)
     end_date = datetime.utcnow()
-    start_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_date.replace(hour=0, minute=0, second=0, microsecond=0)
 
     # TODO: remove when we have more recent data
     start_date -= timedelta(days=150)
     end_date -= timedelta(days=150)
+
+    start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_date = end_date.replace(hour=0, minute=0, second=0, microsecond=0)
     
     current_period_docs = count_term_in_range(term, start_date, end_date)
-    total_count = current_period_docs.hits.total
     current_period_docs = current_period_docs.to_dict()['hits']['hits']
     current_period_docs.sort(key=lambda d: -d['_score'])
-    current_daily_counts = defaultdict(int)
-    for doc in current_period_docs:
-        current_daily_counts[doc['_source']['date_issued']] += doc['_source']['content'].count(term)
-    
+    current_daily_counts = get_daily_counts_in_range(
+        current_period_docs, term, start_date, end_date
+    )
+    total_count = sum(current_daily_counts.values())
     # Get last benchmark data
     prev_start_date = start_date - timedelta(days=days_ago)
     prev_end_date = end_date - timedelta(days=days_ago)
     prev_period_docs = count_term_in_range(term, prev_start_date, prev_end_date)    
-    prev_total_count = prev_period_docs.hits.total
     prev_period_docs = prev_period_docs.to_dict()['hits']['hits']
-    prev_daily_counts = defaultdict(int)
-    for doc in prev_period_docs:
-        prev_daily_counts[doc['_source']['date_issued']] += doc['_source']['content'].count(term)
-
+    prev_daily_counts = get_daily_counts_in_range(
+        prev_period_docs, term, prev_start_date, prev_end_date
+    )
+    prev_total_count = sum(prev_daily_counts.values())
+    
     for doc in current_period_docs:
         doc['mentions'] = doc['_source']['content'].lower().count(term.lower())
         doc['search_phrase'] = term
