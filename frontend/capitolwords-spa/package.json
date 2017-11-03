@@ -11,6 +11,7 @@
     "react-highlight-words": "^0.8.1",
     "react-modal": "^2.3.2",
     "react-redux": "^5.0.5",
+    "react-scripts": "1.0.17",
     "react-spinners": "^0.1.9",
     "redux": "^3.6.0",
     "redux-dialog": "^0.0.9",
@@ -19,8 +20,7 @@
     "victory": "^0.24.0"
   },
   "devDependencies": {
-    "@storybook/react": "^3.2.14",
-    "react-scripts": "1.0.7"
+    "@storybook/react": "^3.2.14"
   },
   "scripts": {
     "start": "react-scripts start",
