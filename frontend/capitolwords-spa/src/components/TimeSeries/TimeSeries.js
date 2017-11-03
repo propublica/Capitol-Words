@@ -1,36 +1,53 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { VictoryChart, VictoryBar } from 'victory';
+import moment from 'moment';
+
+import { VictoryChart, VictoryBar, VictoryAxis } from 'victory';
 
 import './TimeSeries.css';
 
 class TimeSeries extends Component {
   static propTypes = {
-    data: PropTypes.object.isRequired,
+    data: PropTypes.array.isRequired,
   };
 
+  formatDate(date) {
+    return moment(date).format('MMMM Do');
+  }
+
   render() {
-    const data = [
-      { x: 1, y: 8, width: 8 },
-      { x: 2, y: 2, width: 8 },
-      { x: 3, y: 3, width: 8 },
-      { x: 4, y: 1, width: 8 },
-      { x: 5, y: 10, width: 8 },
-      { x: 6, y: 12, width: 8 },
-      { x: 7, y: 9, width: 8 },
-      { x: 8, y: 2, width: 8 },
-      { x: 9, y: 6, width: 8 },
-      { x: 10, y: 7, width: 8 },
-    ];
 
     return (
       <div className="TimeSeries-container">
-        <VictoryChart>
+        <VictoryChart height={300} width={800}>
           <VictoryBar
             style={{ data: { fill: "#029cd0"}}}
             alignment="start"
-            data={data}
+            data={this.props.data}
+            x={'date'}
+            y={'count'}
+          />
+          <VictoryAxis
+            orientation='bottom'
+            style={{
+              axis: {stroke: "white"},
+              axisLabel: {fontSize: 20, padding: 30},
+              tickLabels: {fontSize: 20, padding: 5, fill: 'white'},
+            }}
+            tickCount={4}
+            tickFormat={this.formatDate}
+          />
+          <VictoryAxis
+            dependentAxis
+            orientation="left"
+            style={{
+              axis: {stroke: "#404040"},
+              axisLabel: {fontSize: 20, padding: 30},
+              tickLabels: {fontSize: 20, padding: 5, fill: '#404040'},
+              ticks: {stroke: "#404040", size: 5, strokeDasharray: 5},
+            }}
+            tickCount={3}
           />
         </VictoryChart>
       </div>

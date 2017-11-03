@@ -14,7 +14,8 @@ import {
   searchResultCount,
   searchContent,
   searchResultList,
-  searchDelta
+  searchDelta,
+  dailyBreakdown
 } from '../../selectors/phrase-search-selectors';
 
 class PhraseSearchResults extends Component {
@@ -138,7 +139,12 @@ class PhraseSearchResults extends Component {
   }
 
   renderTimeSeries() {
-    return <TimeSeries />;
+    return (
+      <div>
+        <h3 className="PhraseSearchResults-timeseries-title">Mentions Over Time</h3>
+          <TimeSeries data={this.props.dailyBreakdown}/>
+      </div>
+    );
   }
 
   render() {
@@ -160,4 +166,5 @@ export default connect(state => ({
   searchDelta: searchDelta(state),
   searchResultCount: searchResultCount(state),
   searchResultList: searchResultList(state),
+  dailyBreakdown: dailyBreakdown(state),
 }))(PhraseSearchResults);

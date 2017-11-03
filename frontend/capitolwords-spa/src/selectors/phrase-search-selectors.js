@@ -37,6 +37,11 @@ export const searchDelta = createSelector(
   phraseSearch => phraseSearch.results && phraseSearch.results.delta
 );
 
+export const dailyBreakdown = createSelector(
+  getPhraseSearch,
+  phraseSearch => phraseSearch.results && phraseSearch.results.current_period.daily_breakdown
+);
+
 // export const searchSpeakersList = createSelector(
 //   getPhraseSearch,
 //   phraseSearch => phraseSearch.results && phraseSearch.results.)

@@ -129,3 +129,8 @@
   background-color: #2b3a46;
   border-bottom: 3px solid #9CAB4C;
 }
+
+.PhraseSearchResults-timeseries-title {
+  text-transform: uppercase;
+  color: white;
+}
