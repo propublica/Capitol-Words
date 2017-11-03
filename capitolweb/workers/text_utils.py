@@ -23,7 +23,7 @@ ENTITY_BLACKLIST = ['Hon', 'Jr', 'Memory', 'Speaker', 'Thereupon', 'Sr', 'Tribut
 ENTITY_TRAILING_BLACKLIST = (' On', ' Sine Die Adjournment')
 
 NOUN_CHUNK_BLACKLIST = [' hon ',  'sine die adjournment', 'who', 'where', 'when', 'what',
-                        'behalf',]
+                        'behalf', 'somebody', 'some one', 'anybody', 'any one']
 
 NOUN_CHUNK_LEMMA_BLACKLIST = ['-PRON-']
 
