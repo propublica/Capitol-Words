@@ -108,8 +108,12 @@ class PhraseSearchResults extends Component {
 
           <div className="PhraseSearchResults-results-for">Search results for:</div>
           <div className="PhraseSearchResults-phrase"> {searchContent} </div>
-          <div className="PhraseSearchResults-date-selector">
-            30 days | 3 months | 6 months
+          <div className="PhraseSearchResults-date-selector-container">
+            <div className="PhraseSearchResults-date-selector">
+              <div>30 days</div>
+              <div>3 months</div>
+              <div>6 months</div>
+            </div>
           </div>
           <div className="PhraseSearchResults-metrics-container">
             <div className="PhraseSearchResults-metric-box">

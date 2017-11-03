@@ -20,7 +20,7 @@ class TimeSeries extends Component {
 
     return (
       <div className="TimeSeries-container">
-        <VictoryChart height={300} width={800}>
+        <VictoryChart height={300} width={800} paddingLeft={40} paddingRight={40} paddingTop={0}>
           <VictoryBar
             style={{ data: { fill: "#029cd0"}}}
             alignment="start"
@@ -48,6 +48,7 @@ class TimeSeries extends Component {
               ticks: {stroke: "#404040", size: 5, strokeDasharray: 5},
             }}
             tickCount={3}
+            tickFormat={(number) => Math.round(number)}
           />
         </VictoryChart>
       </div>

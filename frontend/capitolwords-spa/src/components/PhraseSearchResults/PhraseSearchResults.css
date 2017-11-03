@@ -92,10 +92,6 @@
 	border-bottom: 0.25px solid #555;
 }
 
-.PhraseSearchResults-date-selector {
-	color: #029cd0;
-}
-
 .PhraseSearchResults-metrics-container {
   display: flex;
 }
@@ -133,4 +129,33 @@
 .PhraseSearchResults-timeseries-title {
   text-transform: uppercase;
   color: white;
+}
+
+.PhraseSearchResults-date-selector-container {
+  display: flex;
+  justify-content: center;
+}
+
+.PhraseSearchResults-date-selector {
+  color: #029cd0;
+  border: 1px solid #029cd0;
+  display: flex;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.PhraseSearchResults-date-selector > * {
+  padding: 8px 16px;
+  border-left: 1px solid #029cd0;
+  border-right: 1px solid #029cd0;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.PhraseSearchResults-date-selector > :last-child {
+  border: none;
+}
+
+.PhraseSearchResults-date-selector > :first-child {
+  border: none;
 }
