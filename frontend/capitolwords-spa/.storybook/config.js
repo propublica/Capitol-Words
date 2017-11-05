@@ -16,7 +16,7 @@ const req = require.context('../src', true, /\.story\.js$/);
 
 // Add global stories decorator.
 addDecorator((story) => (
-  <g.Div padding="48px">
+  <g.Div padding="16px">
     {story()}
   </g.Div>
 ));

@@ -163,12 +163,15 @@ def search_by_params(request):
 
 def count_term_in_range(term, start_date, end_date):
     query = get_content(term)
-    search = make_search().highlight('content', fragment_size=200)
+    s = make_search()
+    s = s.highlight_options(order='score', encoder='html')
+    s = s.highlight('content', fragment_size=200, )
+
     q = Q('bool', must=[get_content(term), get_date_range(start_date, end_date)])
     date_filter = {
         'range': {'date_issued': {'gte': start_date, 'lte': end_date}}
     }
-    docs = search.query(q).execute()
+    docs = s.query(q).execute()
     return docs
 
 

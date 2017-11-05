@@ -13,7 +13,7 @@ import {
   isSearching,
   isSearchFailure,
   isSearchSuccess,
-  searchContent,
+  searchTerms,
   searchResultList,
   searchDelta
 } from '../../selectors/phrase-search-selectors';
@@ -24,7 +24,7 @@ class HomePage extends Component {
     isSearchFailure: PropTypes.bool.isRequired,
     isSearchSuccess: PropTypes.bool.isRequired,
     searchResultList: PropTypes.array,
-    searchContent: PropTypes.string,
+    searchTerms: PropTypes.string,
     searchDelta: PropTypes.number
   };
 
@@ -56,7 +56,7 @@ export default connect(state => ({
   isSearching: isSearching(state),
   isSearchFailure: isSearchFailure(state),
   isSearchSuccess: isSearchSuccess(state),
-  searchContent: searchContent(state),
+  searchTerms: searchTerms(state),
   searchDelta: searchDelta(state),
   searchResultList: searchResultList(state),
 }),

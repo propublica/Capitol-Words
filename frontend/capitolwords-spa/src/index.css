@@ -3,63 +3,65 @@
  */
 
 @font-face {
-    font-family: 'Tiempos Text';
-    src: url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-Regular.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-Regular.woff) format("woff");
-    font-weight: normal;
-    font-style: normal
+  font-family: 'Tiempos Text';
+  src: url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-Regular.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-Regular.woff) format("woff");
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Tiempos Text';
-    src: url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-RegularItalic.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-RegularItalic.woff) format("woff");
-    font-weight: normal;
-    font-style: italic
+  font-family: 'Tiempos Text';
+  src: url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-RegularItalic.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-RegularItalic.woff) format("woff");
+  font-weight: normal;
+  font-style: italic;
 }
 
 @font-face {
-    font-family: 'Tiempos Text';
-    src: url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-Bold.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-Bold.woff) format("woff");
-    font-weight: bold;
-    font-style: normal
+  font-family: 'Tiempos Text';
+  src: url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-Bold.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-Bold.woff) format("woff");
+  font-weight: bold;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Tiempos Text';
-    src: url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-BoldItalic.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-BoldItalic.woff) format("woff");
-    font-weight: bold;
-    font-style: italic
+  font-family: 'Tiempos Text';
+  src: url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-BoldItalic.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-BoldItalic.woff) format("woff");
+  font-weight: bold;
+  font-style: italic;
 }
 
 @font-face {
-    font-family: 'Graphik';
-    src: url(https://assets.propublica.org/prod/v3/fonts/Graphik-Regular-Web.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/Graphik-Regular-Web.woff) format("woff");
-    font-weight: normal;
-    font-style: normal
+  font-family: 'Graphik';
+  src: url(https://assets.propublica.org/prod/v3/fonts/Graphik-Regular-Web.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/Graphik-Regular-Web.woff) format("woff");
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Graphik';
-    src: url(https://assets.propublica.org/prod/v3/fonts/Graphik-RegularItalic-Web.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/Graphik-RegularItalic-Web.woff2) format("woff");
-    font-weight: normal;
-    font-style: italic
+  font-family: 'Graphik';
+  src: url(https://assets.propublica.org/prod/v3/fonts/Graphik-RegularItalic-Web.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/Graphik-RegularItalic-Web.woff2) format("woff");
+  font-weight: normal;
+  font-style: italic;
 }
 
 @font-face {
-    font-family: 'Graphik';
-    src: url(https://assets.propublica.org/prod/v3/fonts/Graphik-Bold-Web.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/Graphik-Bold-Web.woff) format("woff");
-    font-weight: bold;
-    font-style: normal
+  font-family: 'Graphik';
+  src: url(https://assets.propublica.org/prod/v3/fonts/Graphik-Bold-Web.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/Graphik-Bold-Web.woff) format("woff");
+  font-weight: bold;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'Graphik';
-    src: url(https://assets.propublica.org/prod/v3/fonts/Graphik-BoldItalic-Web.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/Graphik-BoldItalic-Web.woff) format("woff");
-    font-weight: bold;
-    font-style: italic
+  font-family: 'Graphik';
+  src: url(https://assets.propublica.org/prod/v3/fonts/Graphik-BoldItalic-Web.woff2) format("woff2"), url(https://assets.propublica.org/prod/v3/fonts/Graphik-BoldItalic-Web.woff) format("woff");
+  font-weight: bold;
+  font-style: italic;
 }
 
 * {
   box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html {
@@ -71,6 +73,8 @@ body {
   padding: 0;
   font-family: Graphik, sans-serif;
   font-size: 100%;
-  color: #333;
+  line-height: 1.375;
+  color: #FFFFFF;
   background-color: #151E24;
 }
+

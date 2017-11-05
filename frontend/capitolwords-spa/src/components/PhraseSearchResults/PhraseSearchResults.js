@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Highlighter from 'react-highlight-words'
 
 import TimeSeries from '../TimeSeries/TimeSeries';
+import SearchResultItem from '../SearchResultItem/SearchResultItem';
 
 import './PhraseSearchResults.css';
 
@@ -12,7 +13,7 @@ import {
   isSearchFailure,
   isSearchSuccess,
   searchResultCount,
-  searchContent,
+  searchTerms,
   searchResultList,
   searchDelta,
   dailyBreakdown
@@ -25,7 +26,7 @@ class PhraseSearchResults extends Component {
     isSearchSuccess: PropTypes.bool.isRequired,
     searchResultCount: PropTypes.number,
     searchResultList: PropTypes.array,
-    searchContent: PropTypes.string,
+    searchTerms: PropTypes.string,
     searchDelta: PropTypes.number
   };
 
@@ -35,51 +36,15 @@ class PhraseSearchResults extends Component {
     );
   }
 
-  renderResultItem(item) {
-    // var searchTerms = [searchContent];
-    // var images = [];
-    // for (var i=0; i < item.speakers.length; i++) {
-    //   if (item.party === "Republican") {
-    //      images.push(<img key={item.im_url} className="PhraseSearchResults-speaker-im-r" src={ item.im_url } alt={ item.im_url } />);
-    //   }
-    //   else if (item.party === "Democrat") {
-    //      images.push(<img key={item.im_url} className="PhraseSearchResults-speaker-im-d" src={ item.im_url } alt={ item.im_url } />);
-    //   }
-    //   else {
-    //      images.push(<img key={item.im_url} className="PhraseSearchResults-speaker-im-i" src={ item.im_url } alt={ item.im_url } />);
-    //   }
-    // }
-    return (
-      <li className="PhraseSearchResults-item" key={item._id}>
-        <div className="PhraseSearchResults-item-date">
-          { item.human_date }
-        </div>
-        <div className="PhraseSearchResults-item-mention-count">{ item.mentions } mentions</div>
-        <a href={ item._source.html_url } className="PhraseSearchResults-item-title">{ item._source.title }</a>
-        <div className="PhraseSearchResults-item-snippet">
-          <Highlighter
-            highlightClassName="snippetHighlight"
-            searchWords={[item.search_phrase]}
-            textToHighlight={ item.snippet }
-          />
-        </div>
-        { item.speakers.map(function (speaker){
-          return (
-            <a href={ speaker.bio_page_url }>
-            <img data-party={speaker.party} className="PhraseSearchResults-speaker-im" src={ speaker.im_url } alt={ speaker.im_url } />
-            </a>
-          );
-          })}
-      </li>
-    );
-  }
-
-  renderResultList() {
-    const { searchResultList } = this.props;
-
+  renderResultList(searchResultList) {
+    console.log(JSON.stringify(searchResultList));
     return (
       <ul className="PhraseSearchResults-list">
-        { searchResultList.map(this.renderResultItem) }
+        { searchResultList.map(item =>
+          <SearchResultItem
+            key={item.id}
+            item={item} />
+        )}
       </ul>
     );
   }
@@ -90,8 +55,9 @@ class PhraseSearchResults extends Component {
       isSearchFailure,
       isSearchSuccess,
       searchResultCount,
-      searchContent,
-      searchDelta
+      searchTerms,
+      searchDelta,
+      searchResultList,
     } = this.props;
 
     if (isSearching) {
@@ -107,7 +73,7 @@ class PhraseSearchResults extends Component {
         <div>
 
           <div className="PhraseSearchResults-results-for">Search results for:</div>
-          <div className="PhraseSearchResults-phrase"> {searchContent} </div>
+          <div className="PhraseSearchResults-phrase"> {searchTerms} </div>
           <div className="PhraseSearchResults-date-selector-container">
             <div className="PhraseSearchResults-date-selector">
               <div>30 days</div>
@@ -134,7 +100,7 @@ class PhraseSearchResults extends Component {
             </div>
           </div>
           {this.renderTimeSeries()}
-          {this.renderResultList()}
+          {this.renderResultList(searchResultList, searchTerms)}
         </div>
       )
     }
@@ -166,7 +132,7 @@ export default connect(state => ({
   isSearching: isSearching(state),
   isSearchFailure: isSearchFailure(state),
   isSearchSuccess: isSearchSuccess(state),
-  searchContent: searchContent(state),
+  searchTerms: searchTerms(state),
   searchDelta: searchDelta(state),
   searchResultCount: searchResultCount(state),
   searchResultList: searchResultList(state),

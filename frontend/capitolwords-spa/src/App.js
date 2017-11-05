@@ -5,7 +5,7 @@ import './App.css';
 
 import { phraseSearchRequested } from './actions/search-actions';
 
-import { searchContent, isSearching } from './selectors/phrase-search-selectors';
+import { searchTerms, isSearching } from './selectors/phrase-search-selectors';
 
 import HeaderBar from './components/HeaderBar/HeaderBar';
 import PhraseSearchResults from './components/PhraseSearchResults/PhraseSearchResults';
@@ -16,8 +16,8 @@ import { ClipLoader } from 'react-spinners';
 class App extends Component {
 
   renderMainContent() {
-    const { searchContent, isSearching } = this.props;
-    const mainContent = searchContent ? <PhraseSearchResults /> : <HomePage />;
+    const { searchTerms, isSearching } = this.props;
+    const mainContent = searchTerms ? <PhraseSearchResults /> : <HomePage />;
     const content = isSearching ? this.renderLoader() : mainContent;
     return (
       <div className="Main-container">
@@ -45,7 +45,7 @@ class App extends Component {
 }
 
 export default connect(state => ({
-    searchContent: searchContent(state),
+    searchTerms: searchTerms(state),
     isSearching: isSearching(state),
   }),
   {
