@@ -13,3 +13,4 @@ pytz==2017.2
 requests==2.10.0
 textacy==0.4.1
 lxml==3.7.2
+django-extensions==1.9.7

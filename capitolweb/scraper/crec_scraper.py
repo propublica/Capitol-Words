@@ -10,7 +10,6 @@ from datetime import datetime
 from datetime import timedelta
 from zipfile import ZipFile
 from collections import defaultdict
-from urllib.request import urlopen
 from urllib.error import HTTPError
 
 import boto3
@@ -18,18 +17,12 @@ import requests
 from botocore.exceptions import ClientError
 
 
-def get_dates(start_dt, end_dt=None):
-    if end_dt is None:
-        end_dt = datetime.utcnow()
-    end_dt = end_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-    if start_dt is None:
-        start_dt = end_dt - timedelta(days=1)
-    dt = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-    dates = []
-    while dt < end_dt:
-        dates.append(dt)
-        dt += timedelta(days=1)
-    return dates
+class CRECDataNotFoundException(Exception):
+    """Indicates data for the given date cannot be found at the normal gpo.gov
+    url."""
+    
+    def __init__(self, url):
+        self.url = url
 
 
 class CRECScraper(object):
@@ -48,8 +41,8 @@ class CRECScraper(object):
         CREC_ZIP_TEMPLATE (:obj:`str`): The endpoint template for a CREC zip.
     """
 
-    CREC_ZIP_TEMPLATE = 'https://www.gpo.gov/fdsys/pkg/CREC-%Y-%m-%d.zip'
-    MODS_ZIP_TEMPLATE = 'https://www.gpo.gov/fdsys/pkg/CREC-%Y-%m-%d/mods.xml'
+    CREC_URL_TEMPLATE = 'https://www.gpo.gov/fdsys/pkg/CREC-%Y-%m-%d.zip'
+    MODS_URL_TEMPLATE = 'https://www.gpo.gov/fdsys/pkg/CREC-%Y-%m-%d/mods.xml'
 
     def __init__(self, download_dir, s3_bucket, s3_key_prefix):
         self.download_dir = download_dir
@@ -57,52 +50,23 @@ class CRECScraper(object):
         self.s3_key_prefix = s3_key_prefix
         self.s3 = boto3.resource('s3')
 
-    def download_crec_zip(self, date):
-        """Downloads the CREC zip for this date.
+    def download_crec_data(self, url):
+        """Downloads the CREC zip or mods.xml for this date.
+
+        Args:
+            :obj:`datetime.datetime`: The date to download data for.    
 
         Returns:
-            :obj:`str`: The path to the downloaded zip.
+            str: The path to the downloaded zip.
         """
-        url = date.strftime(self.CREC_ZIP_TEMPLATE)
-        logging.info('Downloading CREC zip from "{0}".'.format(url))
-        try:
-            response = urlopen(url)
-        except HTTPError as e:
-            if e.getcode() == 404:
-                logging.info('No zip found for date {0}'.format(date))
-            else:
-                logging.exception('Error retrieving CREC zip.')
-            return None
-        zip_path = os.path.join(self.download_dir, url.split('/')[-1])
-        zip_data = response.read()
-        with open(zip_path, 'wb') as f:
-            f.write(zip_data)
-        return zip_path
-
-    def download_mods_xml(self, date):
-        """Downloads the mods.xml metadata file for this date to download_dir.
-
-        Returns:
-            :obj:`str`: Path to the downloaded mods.xml file.
-        """
-        url = date.strftime(self.MODS_ZIP_TEMPLATE)
-        logging.info('Downloading mods.xml from "{0}".'.format(url))
-        try:
-            response = urlopen(url)
-        except HTTPError as e:
-            if e.getcode() == 404:
-                logging.debug('No mods.xml found for date {0}, at "{1}"'.format(
-                        date, url
-                    )
-                )
-            else:
-                logging.exception('Error retrieving mods.xml.')
-            return None
+        response = requests.get(url)
+        if r.status_code == 404:
+            raise CRECDataNotFoundException(url)
         data = response.read()
-        mods_path = os.path.join(self.download_dir, 'mods.xml')
-        with open(mods_path, 'wb') as f:
-            f.write(data)
-        return str(mods_path)
+        out_path = os.path.join(self.download_dir, url.split('/')[-1])
+        with open(out_path, 'wb') as f:
+            f.write(out_path)
+        return out_path
 
     def extract_html_files(self, zip_path):
         """Unpacks all html files in the zip at the provided path to the value
@@ -153,7 +117,13 @@ class CRECScraper(object):
         return s3_key
 
     def scrape_files_for_date(self, date):
-        zip_path = self.download_crec_zip(date)
+        url = date.strftime(self.CREC_ZIP_TEMPLATE)
+        try:
+            zip_path = self.download_crec_data(date.strftime(self.CREC_URL_TEMPLATE))
+            mods_path = self.download_crec_data(date.strftime(self.MODS_URL_TEMPLATE))
+        except CRECDataNotFoundException as e:
+            logging.info('No data found for date {0} at url "{1}"'.format(date, url))
+        zip_path = self.down(date)
         mods_path = self.download_mods_xml(date)
         result = {
             'success': False,
@@ -195,18 +165,3 @@ class CRECScraper(object):
             result['num_crec_files_uploaded'] = len(html_file_paths)
             result['success'] = True
         return result
-
-    def scrape_files_in_range(self, start_dt, end_dt=None):
-        results = []
-        if end_dt is None:
-            end_dt = datetime.utcnow()
-        end_dt = end_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-        if start_dt is None:
-            start_dt = end_dt - timedelta(days=1)
-        dt = start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
-        dates = []
-        while dt < end_dt:
-            result = self.scrape_files_for_date(dt)
-            results.append(result)
-            dt += timedelta(days=1)
-        return results
