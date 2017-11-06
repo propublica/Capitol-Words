@@ -143,10 +143,12 @@ class CRECScraper(object):
         except CRECDataNotFoundException as e:
             logger.info('No data found for date {0} at url "{1}"'.format(date, url))
             orm_result.success = True
+            orm_result.save()
             return orm_result
         except Exception as e:
             orm_result.message = 'Error downloading CREC data for date {0} at url "{1}"'.format(date, url)
             logger.exception(orm_result.message)
+            orm_result.save()
             return orm_result
         logger.info('Uploading extracted data to s3...')
         try:
@@ -154,9 +156,10 @@ class CRECScraper(object):
         except ClientError as e:
             orm_result.message = 'Error uploading CREC data to s3, exiting'
             logger.exception(orm_result.message)
+            orm_result.save()
             return orm_result
         logger.info('Uploads finished.')
-        orm_result.message = 'CREC files uploaded to: ' + ','.join(s3_keys)
+        orm_result.message = '\n'.join(s3_keys)
         orm_result.num_crec_files_uploaded = len(
             [k for k in s3_keys if self.is_crec_filename(k)]
         )

@@ -13,7 +13,11 @@ import textacy
 from lxml import etree
 from fuzzywuzzy import process
 
+<<<<<<< HEAD:capitolweb/workers/crec_parser.py
 import workers.text_utils as text_utils
+=======
+import parser.text_utils as text_utils
+>>>>>>> [capitolweb] removed celery stuff:capitolweb/parser/crec_parser.py
 
 
 DEFAULT_XML_NS = {'ns': 'http://www.loc.gov/mods/v3'}
