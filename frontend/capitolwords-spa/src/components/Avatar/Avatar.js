@@ -2,7 +2,7 @@ import React from 'react';
 
 import g from 'glamorous';
 
-import * as s from '../../styles/base';
+import * as s from '../../styles';
 
 const AvatarImg = g.a({
   display: 'inline-block',

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import g from 'glamorous';
-import * as s from '../../styles/base';
+import * as s from '../../styles';
 
 const InputField = g.input({
   ...s.sansRegular,

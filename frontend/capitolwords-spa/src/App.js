@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Route } from 'react-router';
 
 import g from 'glamorous';
-import * as s from './styles/base';
+import * as s from './styles';
 
 import PhraseSearchResults from './components/PhraseSearchResults/PhraseSearchResults';
 import HomePage from './components/HomePage/HomePage';

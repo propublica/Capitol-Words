@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import g from 'glamorous';
 import { ClipLoader } from 'react-spinners';
 
-import * as s from '../../styles/base';
+import * as s from '../../styles';
 import {
   phraseSearchRequested,
   routeToPhraseSearch
