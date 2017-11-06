@@ -6,25 +6,45 @@ import './index.css';
 
 import {
   applyMiddleware,
+  combineReducers,
   createStore,
 } from 'redux';
 import { Provider } from 'react-redux';
-import createSagaMiddleware from 'redux-saga'
 
-import reducer from './reducers/root-reducer';
+import createHistory from 'history/createBrowserHistory';
+
+import {
+  ConnectedRouter,
+  routerReducer,
+  routerMiddleware,
+} from 'react-router-redux';
+
+import createSagaMiddleware from 'redux-saga';
+
+import reducers from './reducers';
 import searchSaga from './sagas/search-saga';
+
+const history = createHistory();
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(
-  reducer,
-  applyMiddleware(sagaMiddleware)
-)
+  combineReducers({
+    ...reducers,
+    router: routerReducer,
+  }),
+  applyMiddleware(
+    routerMiddleware(history),
+    sagaMiddleware,
+  ),
+);
 
-sagaMiddleware.run(searchSaga)
+sagaMiddleware.run(searchSaga);
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <ConnectedRouter history={history}>
+      <App />
+    </ConnectedRouter>
   </Provider>, document.getElementById('root')
 );
 

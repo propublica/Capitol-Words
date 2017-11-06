@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { phraseSearchRequested } from '../../actions/search-actions';
+import { routeToPhraseSearch } from '../../actions/search-actions';
 
 import SearchInput from '../SearchInput/SearchInput';
 
@@ -12,10 +12,10 @@ import {
   isSearching,
   isSearchFailure,
   isSearchSuccess,
-  searchTerms,
   searchResultList,
   searchDelta
 } from '../../selectors/phrase-search-selectors';
+
 
 class HomePage extends Component {
   static propTypes = {
@@ -23,12 +23,12 @@ class HomePage extends Component {
     isSearchFailure: PropTypes.bool.isRequired,
     isSearchSuccess: PropTypes.bool.isRequired,
     searchResultList: PropTypes.array,
-    searchTerms: PropTypes.string,
     searchDelta: PropTypes.number
   };
 
-
   render() {
+    const { routeToPhraseSearch } = this.props;
+
     return (
       <div className="HomePage-container">
         <div className="Title">
@@ -36,13 +36,13 @@ class HomePage extends Component {
           <p>Dig up some data on the words our legislators use every day.</p>
         </div>
         <div className="HomePage-searchInput">
-          <SearchInput onSubmit={this.props.phraseSearchRequested}/>
+          <SearchInput variant="blue" onSubmit={routeToPhraseSearch}/>
         </div>
         <div className="QuickOptions-container">
-          <div className="QuickOption" onClick={() => {this.props.phraseSearchRequested('Poverty')}}>Poverty</div>
-          <div className="QuickOption" onClick={() => {this.props.phraseSearchRequested('Russian Interference')}}>Russian Interference</div>
-          <div className="QuickOption" onClick={() => {this.props.phraseSearchRequested('Education')}}>Education</div>
-          <div className="QuickOption" onClick={() => {this.props.phraseSearchRequested('Tax Cuts')}}>Tax Cuts</div>
+          <div className="QuickOption" onClick={() => {routeToPhraseSearch('Poverty')}}>Poverty</div>
+          <div className="QuickOption" onClick={() => {routeToPhraseSearch('Russian Interference')}}>Russian Interference</div>
+          <div className="QuickOption" onClick={() => {routeToPhraseSearch('Education')}}>Education</div>
+          <div className="QuickOption" onClick={() => {routeToPhraseSearch('Tax Cuts')}}>Tax Cuts</div>
         </div>
       </div>
     );
@@ -55,10 +55,9 @@ export default connect(state => ({
   isSearching: isSearching(state),
   isSearchFailure: isSearchFailure(state),
   isSearchSuccess: isSearchSuccess(state),
-  searchTerms: searchTerms(state),
   searchDelta: searchDelta(state),
   searchResultList: searchResultList(state),
 }),
 {
-  phraseSearchRequested,
+  routeToPhraseSearch,
 })(HomePage);

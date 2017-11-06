@@ -2,8 +2,18 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import TimeSeries from '../TimeSeries/TimeSeries';
+import g from 'glamorous';
+import { ClipLoader } from 'react-spinners';
+
+import * as s from '../../styles/base';
+import {
+  phraseSearchRequested,
+  routeToPhraseSearch
+} from '../../actions/search-actions';
+
+import HeaderBar from '../HeaderBar/HeaderBar';
 import SearchResultItem from '../SearchResultItem/SearchResultItem';
+import TimeSeries from '../TimeSeries/TimeSeries';
 
 import './PhraseSearchResults.css';
 
@@ -12,11 +22,14 @@ import {
   isSearchFailure,
   isSearchSuccess,
   searchResultCount,
-  searchTerms,
   searchResultList,
   searchDelta,
   dailyBreakdown
 } from '../../selectors/phrase-search-selectors';
+
+import  {
+  searchString
+} from '../../selectors/router-selectors';
 
 class PhraseSearchResults extends Component {
   static propTypes = {
@@ -25,26 +38,40 @@ class PhraseSearchResults extends Component {
     isSearchSuccess: PropTypes.bool.isRequired,
     searchResultCount: PropTypes.number,
     searchResultList: PropTypes.array,
-    searchTerms: PropTypes.string,
+    searchString: PropTypes.string,
     searchDelta: PropTypes.number
   };
 
-  renderSpeakerThumb(item){
+  constructor(props) {
+    super(props);
+
+    props.phraseSearchRequested(props.searchString);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.searchString !== this.props.searchString) {
+      this.props.phraseSearchRequested(nextProps.searchString);
+    }
+  }
+
+  renderLoader() {
     return (
-      <img className="PhraseSearchResults-speaker-im-r" src={ item.im_url } alt={ item.im_url } />
+      <div className="Loader-container">
+        <ClipLoader color="#9CAB4C"/>
+      </div>
     );
   }
 
   renderResultList(searchResultList) {
     console.log(JSON.stringify(searchResultList));
     return (
-      <ul className="PhraseSearchResults-list">
+      <g.Ul listStyle="none" padding="0" margin="2rem 0 0 0">
         { searchResultList.map(item =>
           <SearchResultItem
             key={item.id}
             item={item} />
         )}
-      </ul>
+      </g.Ul>
     );
   }
 
@@ -54,13 +81,13 @@ class PhraseSearchResults extends Component {
       isSearchFailure,
       isSearchSuccess,
       searchResultCount,
-      searchTerms,
+      searchString,
       searchDelta,
       searchResultList,
     } = this.props;
 
     if (isSearching) {
-      return (<div>Searching...</div>);
+      return this.renderLoader();
     }
 
     if (isSearchFailure) {
@@ -69,10 +96,10 @@ class PhraseSearchResults extends Component {
 
     if (isSearchSuccess) {
       return (
-        <div>
+        <g.Div margin="2em auto" maxWidth="640px">
 
           <div className="PhraseSearchResults-results-for">Search results for:</div>
-          <div className="PhraseSearchResults-phrase"> {searchTerms} </div>
+          <div className="PhraseSearchResults-phrase"> {searchString} </div>
           <div className="PhraseSearchResults-date-selector-container">
             <div className="PhraseSearchResults-date-selector">
               <div>30 days</div>
@@ -99,8 +126,8 @@ class PhraseSearchResults extends Component {
             </div>
           </div>
           {this.renderTimeSeries()}
-          {this.renderResultList(searchResultList, searchTerms)}
-        </div>
+          {this.renderResultList(searchResultList, searchString)}
+        </g.Div>
       )
     }
 
@@ -117,10 +144,19 @@ class PhraseSearchResults extends Component {
   }
 
   render() {
+    const {
+      routeToPhraseSearch,
+      searchString,
+    } = this.props;
+
     return (
-      <div className="PhraseSearchResults-container">
+      <g.Div
+        maxWidth={s.contentMaxWidth}
+        margin="0 auto"
+        >
+        <HeaderBar defaultValue={searchString} onSearchSubmit={routeToPhraseSearch} />
         { this.renderContents() }
-      </div>
+      </g.Div>
     );
   }
 
@@ -131,9 +167,12 @@ export default connect(state => ({
   isSearching: isSearching(state),
   isSearchFailure: isSearchFailure(state),
   isSearchSuccess: isSearchSuccess(state),
-  searchTerms: searchTerms(state),
+  searchString: searchString(state),
   searchDelta: searchDelta(state),
   searchResultCount: searchResultCount(state),
   searchResultList: searchResultList(state),
   dailyBreakdown: dailyBreakdown(state),
-}))(PhraseSearchResults);
+}), {
+  phraseSearchRequested,
+  routeToPhraseSearch,
+})(PhraseSearchResults);

@@ -39,6 +39,10 @@ export const fontSize32 = { fontSize: '2rem' };
 export const fontSize48 = { fontSize: '3rem' };
 
 
+// Layout
+
+export const contentMaxWidth = '1024px';
+
 
 // Colors
 

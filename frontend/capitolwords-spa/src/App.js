@@ -1,53 +1,28 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Route } from 'react-router';
 
-import './App.css';
+import g from 'glamorous';
+import * as s from './styles/base';
 
-import { phraseSearchRequested } from './actions/search-actions';
-
-import { searchTerms, isSearching } from './selectors/phrase-search-selectors';
-
-import HeaderBar from './components/HeaderBar/HeaderBar';
 import PhraseSearchResults from './components/PhraseSearchResults/PhraseSearchResults';
 import HomePage from './components/HomePage/HomePage';
 
-import { ClipLoader } from 'react-spinners';
+const AppContainer = g.div({
+  margin: '0 auto',
+  maxWidth: s.contentMaxWidth,
+  minHeight: '100%',
+})
 
 class App extends Component {
-
-  renderMainContent() {
-    const { searchTerms, isSearching } = this.props;
-    const mainContent = searchTerms ? <PhraseSearchResults /> : <HomePage />;
-    const content = isSearching ? this.renderLoader() : mainContent;
-    return (
-      <div className="Main-container">
-        {content}
-      </div>
-    );
-  }
-
-  renderLoader() {
-    return (
-      <div className="Loader-container">
-        <ClipLoader color="#9CAB4C"/>
-      </div>
-    );
-  }
-
   render() {
     return (
-      <div className="App-container">
-        <HeaderBar onSearchSubmit={this.props.phraseSearchRequested}/>
-        {this.renderMainContent()}
-      </div>
+      <AppContainer>
+        <Route exact path="/" component={HomePage}/>
+        <Route path="/search" component={PhraseSearchResults}/>
+      </AppContainer>
     );
   }
 }
 
-export default connect(state => ({
-    searchTerms: searchTerms(state),
-    isSearching: isSearching(state),
-  }),
-  {
-    phraseSearchRequested,
-  })(App);
+export default App;

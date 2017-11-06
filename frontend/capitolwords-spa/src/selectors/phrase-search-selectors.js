@@ -32,11 +32,6 @@ export const searchResultDocs = createSelector(
   results => results && results.docs
 );
 
-export const searchTerms = createSelector(
-  phraseSearchResults,
-  results => results && results.term
-);
-
 export const searchDelta = createSelector(
   phraseSearchResults,
   results => results && results.delta
