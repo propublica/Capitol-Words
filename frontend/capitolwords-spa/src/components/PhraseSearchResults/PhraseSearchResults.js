@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Highlighter from 'react-highlight-words'
 
 import TimeSeries from '../TimeSeries/TimeSeries';
 import SearchResultItem from '../SearchResultItem/SearchResultItem';
