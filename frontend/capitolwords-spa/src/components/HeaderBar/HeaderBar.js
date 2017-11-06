@@ -4,6 +4,9 @@ import PropTypes from 'prop-types';
 import g from 'glamorous';
 import * as s from '../../styles';
 
+import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
+
 import logo from './logo-propublica.svg';
 import SearchInput from '../SearchInput/SearchInput';
 
@@ -23,6 +26,12 @@ class HeaderBar extends Component {
     onSearchSubmit: PropTypes.func.isRequired,
   };
 
+  navigateHome = (e) => {
+    e.preventDefault();
+    console.log('helloo');
+    this.props.push('/');
+  };
+
   render() {
     const {
       defaultValue,
@@ -31,10 +40,12 @@ class HeaderBar extends Component {
 
     return (
       <Container>
-        <g.Div display="flex" justifyContent="flex-start" alignItems="center">
-          <g.Img src={logo} width="150px" marginLeft="1rem"/>
-          <g.Span margin="0 1rem 0" {...s.sansBold} {...s.fontSize12} textTransform="uppercase" lineHeight="32px" position="relative" top="3px">
-            |&nbsp;&nbsp;&nbsp;&nbsp;Capitol Words
+        <g.Div display="flex" justifyContent="flex-start" alignItems="center" height="48px" paddingTop="8px">
+          <g.A marginLeft="1rem" href="https://www.propublica.org">
+            <g.Img src={logo} width="150px"/>
+          </g.A>
+          <g.Span margin="0 1rem 0" {...s.sansBold} {...s.fontSize12} textTransform="uppercase" lineHeight="32px" position="relative" top="1px">
+            |&nbsp;&nbsp;&nbsp;&nbsp;<g.A href="/" color="#FFFFFF" textDecoration="none" onClick={ this.navigateHome } >Capitol Words</g.A>
           </g.Span>
         </g.Div>
         <div>
@@ -45,4 +56,4 @@ class HeaderBar extends Component {
   }
 }
 
-export default HeaderBar;
+export default connect(null, { push })(HeaderBar);

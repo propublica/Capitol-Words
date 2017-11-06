@@ -78,7 +78,7 @@ const SearchResultItem = ({ item }) => (
     <Snippet dangerouslySetInnerHTML={{__html: item.snippet}} />
     <Speakers>
       { item.speakers.map(speaker => (
-        <Avatar person={speaker} />
+        <Avatar key={speaker.url} person={speaker} />
       ))}
     </Speakers>
   </ResultListItem>

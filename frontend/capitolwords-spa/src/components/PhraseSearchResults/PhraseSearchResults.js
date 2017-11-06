@@ -63,7 +63,6 @@ class PhraseSearchResults extends Component {
   }
 
   renderResultList(searchResultList) {
-    console.log(JSON.stringify(searchResultList));
     return (
       <g.Ul listStyle="none" padding="0" margin="2rem 0 0 0">
         { searchResultList.map(item =>
