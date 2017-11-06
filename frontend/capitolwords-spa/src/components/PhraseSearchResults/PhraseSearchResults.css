@@ -159,3 +159,10 @@
 .PhraseSearchResults-date-selector > :first-child {
   border: none;
 }
+
+.Loader-container {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding-top: 30vh;
+}
