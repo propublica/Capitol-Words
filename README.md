@@ -95,7 +95,14 @@ The frontend app depends on the APIs, so you'll need to also be running the djan
 
 ## Data Pipeline
 
-There are two stages to getting CREC content and metadata into Elasticsearch, the scraper and the parser.
+Data ingestion consists of a scraper that pulls in CREC data from gpo.gov then stages it in S3 and a parser that reads that staged S3 data extracts some additional metadata then uploads those documents to elasticsearch.
+
+The staging location in S3 is determined by the following settings in the main capitolweb settings file:
+    
+    * `CREC_STAGING_S3_BUCKET`: Name of S3 bucket to stage files in.
+    * `CREC_STAGING_S3_ROOT_PREFIX`: All S3 keys for files will be prefixed with this value.
+
+The key format is a combination of the value of `CREC_STAGING_S3_ROOT_PREFIX`, the date the files were recorded for ("dateIssued" in the mods.xml metadata), and the filename within the gpo.gov zip file.
 
 ### scraper
 
@@ -106,13 +113,6 @@ The scraper takes a date range and pulls in each zip file for every day in that 
 ```
 ./manage.py run_crec_scraper --start_date=2016-01-20 --end_date=2016-01-21
 ```
-
-The upload location in S3 is determined by the following settings in the main capitolweb settings file:
-    
-    * `CREC_STAGING_S3_BUCKET`: Name of S3 bucket to stage files in.
-    * `CREC_STAGING_S3_ROOT_PREFIX`: All S3 keys for files will be prefixed with this value.
-
-The key format is a combination of the value of `CREC_STAGING_S3_ROOT_PREFIX`, the date the files were recorded for ("dateIssued" in the mods.xml metadata), and the filename within the gpo.gov zip file.
 
 ### parser
 
