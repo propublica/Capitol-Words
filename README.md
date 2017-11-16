@@ -1,21 +1,23 @@
 # Capitol Words NG - The Upgrade
 
-This will ultimately replace the top level codebase. Developed by [Chartbeat](https://www.chartbeat.com) Engineers during hackweeks!
+Developed by [Chartbeat](https://www.chartbeat.com) Engineers during hackweeks!
 
 
 ## The API
 
-The API is built on Django and it's broken into 2 apps:
+The API is built on Django and it's broken into the following apps:
 
     * cwapi - document search with elastic search
     * legislators - database of congress people
+    * scraper - service to scrape CREC documents from gpo.gov and stage them in s3
+    * parser - service to extract metadata from CREC documents and upload to elasticsearch and rds
 
 
 ### Setup
 
 To set up the API do the following:
 
-    cd Capitol-Words/capitolwords_ng/capitolweb
+    cd Capitol-Words/capitolweb
     python manage.py migrate
     python manage.py loadcongress
     python manage.py createsuperuser (if you want to use the admin tool to browse)
@@ -93,50 +95,31 @@ The frontend app depends on the APIs, so you'll need to also be running the djan
 
 ## Data Pipeline
 
-There are two stages to getting CREC content and metadata into Elasticsearch, the scraper and the elasticsearch uploader.
+There are two stages to getting CREC content and metadata into Elasticsearch, the scraper and the parser.
 
 ### scraper
 
-All CREC docs for a given day are available as a zip file from gpo.gov. Metadata for these docs is available in a single xml file, `mods.xml`.
+All CREC docs for a given day are available as a zip file from gpo.gov. Metadata for these docs is available in a single xml file, `mods.xml`, contained within that zip file.
 
-The scraper takes a date range and pulls in each zip ands mods.xml files for every day in that range (days when congress was not in session are ignored).
+The scraper takes a date range and pulls in each zip file for every day in that range (days when congress was not in session are ignored). Its run through a custom django manage command:
+
+```
+./manage.py run_crec_scraper --start_date=2016-01-20 --end_date=2016-01-21
+```
+
+The upload location in S3 is determined by the following settings in the main capitolweb settings file:
+    
+    * `CREC_STAGING_S3_BUCKET`: Name of S3 bucket to stage files in.
+    * `CREC_STAGING_S3_ROOT_PREFIX`: All S3 keys for files will be prefixed with this value.
+
+The key format is a combination of the value of `CREC_STAGING_S3_ROOT_PREFIX`, the date the files were recorded for ("dateIssued" in the mods.xml metadata), and the filename within the gpo.gov zip file.
+
+### parser
+
+The parser looks up the mods.xml file in the staged S3 data and extracts the metadata specific to each CREC document. It also does some NLP analysis of the content of each document. The resulting parsed data is uploaded to elasticsearch and rds.
 
 Example usage:
 
 ```
-python run_scraper.py --start_dt=2016-01-01 --end_dt=2017-01-01 --s3_bucket=mybukkit --data_type=crec
-```
-
-This will stage all data for 2016 in the provided s3 bucket under the `capitolwords/` prefix. The rest of the key includes year, month and day, e.g.: `s3://mybukkit/crec/2017/01/03/crec/CREC-2017-01-03-pt1-PgD1.htm`.
-
-### elasticsearch uploader
-
-Right now, the uploader only supports CREC data. It takes a path to a mods.xml file on local disk or in S3. The modx.xml file contains metadata for each CREC document for that day. The uploader iterates through every one of those entries and reads in the corresponding CREC file from S3. The content of that file is stored along with the relevant metadata from the mods.xml in an elasticsearch document.
-
-Example usage:
-
-```
-python run_es_uploader.py --source_path=s3://mybuckkit/crec/1994/01/25/mods/mods.xml --data_type=crec --es_url=es://<YOUR_ES_HOST>:80/<YOUR_INDEX>
-```
-
-## Workers
-
-The instructions above cover how to use the scraper and parser/es uploader via python scripts, but they can also be scheduled as crons via the django admin ui.
-
-The actual scheduling and configuration is pretty self-explanatory, but for things to actually execute you'll need to be running 2 celery processes, one for the scheduler and one for the workers themselves:
-
-```
-celery -A capitolweb beat -l debug -S django
-```
-
-and
-
-```
-celery -A capitolweb worker -l info
-```
-
-You may also need to run a migration for the admin ui:
-
-```
-python manage.py migrate django_celery_results
+./manage.py run_crec_parser --start_date=2016-01-20 --end_date=2016-01-21
 ```

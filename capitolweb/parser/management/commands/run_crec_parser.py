@@ -25,15 +25,15 @@ class Command(BaseCommand):
     help = 'Runs the CREC parser.'
 
     def add_arguments(self, parser):
-        output_option_group = parser.add_mutually_exclusive_group(required=True)
-        output_option_group.add_argument(
+        parser.add_argument(
             '--to_stdout',
             help='If true, will not upload to es and instead print to stdout.',
             default=False,
         )
-        output_option_group.add_argument(
+        parser.add_argument(
             '--es_url',
             help='Elastic search URL to upload records to.',
+            default=settings.CREC_ELASTICSEARCH_URL,
         )
         parser.add_argument(
             '--start_date',
@@ -56,7 +56,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         s3 = boto3.resource('s3')
         dt = options['start_date'].replace(hour=0, minute=0, second=0, microsecond=0)
-        if options['es_url']:
+        if not options['to_stdout']:
             parsed_es_url = urlparse.urlparse(options['es_url'])
             es_host = parsed_es_url.netloc
             index = parsed_es_url.path.strip('/')
@@ -86,7 +86,7 @@ class Command(BaseCommand):
                                 es_conn.index(
                                     index=index,
                                     doc_type='crec',
-                                    id=r['ID'],
+                                    id=crec.id,
                                     body=crec.to_es_doc()
                                 )
                             upload_speaker_word_counts(crec)

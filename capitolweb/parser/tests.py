@@ -11,7 +11,7 @@ import boto3
 from moto import mock_s3
 
 from cwapi.models import SpeakerWordCounts
-from parser.crec_parser import CRECModsInfo
+from parser.crec_parser import CRECParser
 from parser.crec_parser import extract_crecs_from_mods
 from parser.crec_parser import upload_speaker_word_counts
 from scraper.crec_scraper import CRECScraper
@@ -22,7 +22,7 @@ from scraper.crec_scraper import CRECScraper
     CREC_STAGING_S3_BUCKET='my-test-bukkit',
     CREC_STAGING_S3_ROOT_PREFIX='crec-test',
 )
-class CRECModsInfoTestCase(TestCase):
+class CRECParserTestCase(TestCase):
     
     @classmethod
     @mock_s3 # NOTE: This is required in addition to the class level decorator.

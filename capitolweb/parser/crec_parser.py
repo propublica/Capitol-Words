@@ -15,19 +15,11 @@ from fuzzywuzzy import process
 from django.utils.functional import cached_property
 from django.conf import settings
 
-<<<<<<< HEAD
-<<<<<<< HEAD:capitolweb/workers/crec_parser.py
-import workers.text_utils as text_utils
-=======
-import parser.text_utils as text_utils
->>>>>>> [capitolweb] removed celery stuff:capitolweb/parser/crec_parser.py
-=======
 from botocore.exceptions import ClientError
 
 from cwapi.models import SpeakerWordCounts
 import parser.text_utils as text_utils
 from scraper.crec_scraper import crec_s3_key
->>>>>>> [cwapi][parser] setting up new command for parser
 
 
 logger = logging.getLogger(__name__)
@@ -62,7 +54,7 @@ SENATE_GENERIC_SPEAKERS = [
 GENERIC_SPEAKERS = HOUSE_GENERIC_SPEAKERS + SENATE_GENERIC_SPEAKERS
 
 
-class CRECModsInfo(object):
+class CRECParser(object):
     
     def __init__(self, 
                  xml_tree,
@@ -219,75 +211,6 @@ class CRECModsInfo(object):
         if len(tokens) > 0:
             return self.id.split('-')[-1].startswith('FrontMatter')
         else:
-<<<<<<< HEAD
-            logging.info('All crec retrievals succeeded.')
-
-        for record in records:
-            if (record['ID'].split('-')[-1].startswith('PgD') or
-                record['ID'].split('-')[-2].startswith('PgD') or
-                (record.get('title_part').startswith('Daily Digest') 
-                                    if record.get('title_part') else False)):
-                # dont process daily digests
-                logging.info('Not processing Daily Digest %s', record['ID'])
-                continue
-
-            elif record['ID'].split('-')[-1].startswith('FrontMatter'):
-                # dont process front matters
-                logging.info('Not processing Front Matter %s', record['ID'])
-                continue
-
-            elif (record.get('content') is None or 'content' not in record.keys()):
-                # dont process pages with no content
-                logging.info('Not processing %s. No content found.', record['ID'])
-                continue
-
-            text = text_utils.preprocess(record['content'])
-            textacy_text = textacy.Doc(self.nlp(text))
-            sents = (sent.string for sent in textacy_text.spacy_doc.sents)
-
-            # Split in segments based on speaker
-            record['segments'] = attribute_segments(sents, record['speaker_ids'], record['ID'])
-
-            # Extract named entities and their types & frequencies
-            named_entities = text_utils.get_named_entities(textacy_text)
-            if any(named_entities):
-                named_entity_types = text_utils.get_named_entity_types(named_entities)
-                named_entity_freqs = text_utils.get_named_entity_frequencies(named_entities)
-
-                for type_ in named_entity_types.keys():
-                    ne_type = 'named_entities_' + type_
-                    nes = []
-                    if type_ == 'PERSON':
-                        nes = [(text_utils.camel_case(ne, force=False), named_entity_freqs[ne])
-                               for ne in named_entity_types[type_]]
-                    else:
-                        nes = [(ne, named_entity_freqs[ne])
-                               for ne in named_entity_types[type_]]
-                    nes.sort(key=lambda x: x[1], reverse=True)
-                    record[ne_type] = str(nes)
-
-            # Extract noun phrases & their frequencies
-            noun_chunks = text_utils.get_noun_chunks(textacy_text)
-            noun_chunks = text_utils.named_entity_dedupe(noun_chunks, named_entity_freqs.keys())
-            record['noun_chunks'] = str(Counter(noun_chunks).most_common())
-
-            if bool(record['speaker_ids']):
-                named_entities = {'named_entities_{0}'.format(ne_type): \
-                                  record['named_entities_{0}'.format(ne_type)]
-                                  for ne_type in named_entity_types.keys()}
-                for bioguide_id in record['speaker_ids'].values():
-                    speaker_counts = SpeakerWordCounts(
-                        bioguide_id=bioguide_id,
-                        crec_id=record['ID'],
-                        date=record['date_issued'],
-                        named_entities=json.dumps(named_entities),
-                        noun_chunks=json.dumps(record['noun_chunks']))
-                    speaker_counts.save()
-
-            del record['speaker_ids']
-
-        return records
-=======
             return False
     
     def is_skippable(self):
@@ -437,6 +360,12 @@ class CRECModsInfo(object):
         return segments_
     
     def to_es_doc(self):
+        """Returns the CRECParser as a dict ready to be uploaded to
+        elasticsearch.
+        
+        Returns:
+            dict: A dict representation of this document.
+        """
         return {
             'id': self.id,
             'title': self.title,
@@ -452,6 +381,13 @@ class CRECModsInfo(object):
 
 
 def upload_speaker_word_counts(crec_parser):
+    """Creates new entries of the SpeakerWordCounts ORM model containing 
+    counts of named entities and noun chunks within this document.
+    
+    Args:
+        crec_parser (:class:`parser.crec_parser.CRECParser`): A CRECParser
+            instance representing a single CREC document.
+    """"
     if crec_parser.speaker_ids:
         named_entities = {'named_entities_{0}'.format(ne_type): counts                    
                           for ne_type, counts in crec_parser.named_entity_counts.items()}
@@ -467,6 +403,21 @@ def upload_speaker_word_counts(crec_parser):
 
 
 def extract_crecs_from_mods(mods_file_obj, xml_namespace=DEFAULT_XML_NS):
+    """Takes a file-like object containing mods.xml data for a single day,
+    extracts each "constituent" (a single CREC document from that day) and 
+    creates a new CRECParser instance for that document. Returns all CRECParser
+    instances created for a single day as a list.
+    
+    Args:
+        mods_file_obj (file): An open file, StringIO or BytesIO buffer
+            containing mods.xml data.
+        xml_namespace (dict): The xml_namespaces argument to use with the lxml
+            parser.
+    
+    Returns:
+        list of :class:`parser.crec_parser.CRECParser`: A list of parsed CREC
+            docs for a single day.
+    """
     xml_tree = None
     xml_tree = etree.parse(mods_file_obj)
     constituents = xml_tree.xpath(
@@ -478,5 +429,4 @@ def extract_crecs_from_mods(mods_file_obj, xml_namespace=DEFAULT_XML_NS):
         namespaces=xml_namespace,
     )
     date_issued = datetime.strptime(date_issued_str, '%Y-%m-%d')
-    return [CRECModsInfo(c, date_issued) for c in constituents]
->>>>>>> [cwapi][parser] setting up new command for parser
+    return [CRECParser(c, date_issued) for c in constituents]
