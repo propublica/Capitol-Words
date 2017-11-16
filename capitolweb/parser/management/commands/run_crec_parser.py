@@ -11,11 +11,14 @@ import elasticsearch
 import botocore
 import boto3
 from django.core.management.base import BaseCommand, CommandError
+from django.conf import settings
 
-from workers.crec_parser import CRECParser
+from parser.crec_parser import extract_crecs_from_mods
+from parser.crec_parser import upload_speaker_word_counts
+from scraper.crec_scraper import crec_s3_key
 
 
-MODS_KEY_TEMPLATE = 'crec/%Y/%m/%d/mods/mods.xml'
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -47,12 +50,10 @@ class Command(BaseCommand):
         parser.add_argument(
             '--source_bucket',
             help='Location of crec data.',
-            default='capitol-words-data',
+            default=settings.CREC_STAGING_S3_BUCKET,
         )
 
     def handle(self, *args, **options):
-        crec_parser = CRECParser(bucket=options['source_bucket'])
-
         s3 = boto3.resource('s3')
         dt = options['start_date'].replace(hour=0, minute=0, second=0, microsecond=0)
         if options['es_url']:
@@ -62,27 +63,33 @@ class Command(BaseCommand):
             es_conn = elasticsearch.Elasticsearch([es_host])
         
         while dt < options['end_date']:
-            logging.info('Processing files for {0}.'.format(dt))
+            logger.info('Processing files for {0}.'.format(dt))
             try:
                 response = s3.Object(
                     options['source_bucket'],
-                    dt.strftime(MODS_KEY_TEMPLATE)
+                    crec_s3_key('mods.xml', dt)
                 ).get()
             except botocore.exceptions.ClientError as e:
-                logging.info('Could not find mods file for {0}.'.format(dt))
+                logger.info('Could not find mods file for {0}.'.format(dt))
                 response = None
             if response is not None and response.get('Body'):
                 try:
-                    input_stream = response['Body']
-                    new_records = crec_parser.parse_mods_file(input_stream)
-                    logging.info('Found {0} new records.'.format(len(new_records)))
+                    crecs = extract_crecs_from_mods(response['Body'])
+                    logger.info('Found {0} new records.'.format(len(crecs)))
                     if options['to_stdout']:
-                        logging.info('Using stdout:')
-                        for r in new_records:
-                            logging.info(r)
-                    else:
-                        for r in new_records:
-                            es_conn.index(index=index, doc_type='crec', id=r['ID'], body=r)
+                        logger.info('Using stdout:')
+                    for crec in crecs:
+                        if not crec.is_skippable():
+                            if options['to_stdout']:
+                                logger.info(crec.to_es_doc())
+                            else:
+                                es_conn.index(
+                                    index=index,
+                                    doc_type='crec',
+                                    id=r['ID'],
+                                    body=crec.to_es_doc()
+                                )
+                            upload_speaker_word_counts(crec)
                 except Exception as e:
-                    logging.exception('Error processing data for {0}.'.format(dt.strftime('%Y-%m-%d')))
+                    logger.exception('Error processing data for {0}.'.format(dt.strftime('%Y-%m-%d')))
             dt += timedelta(days=1)

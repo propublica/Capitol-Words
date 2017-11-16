@@ -21,7 +21,7 @@ DEV_FRONTEND = True
 DEV_FRONTEND_SPA_BASE_URL = 'http://localhost:3000'
 
 CREC_STAGING_S3_BUCKET = 'capitol-words-data'
-CREC_STAGING_S3_KEY_PREFIX = 'crec'
+CREC_STAGING_S3_ROOT_PREFIX = 'crec'
 CREC_STAGING_FOLDER = '/tmp'
 CREC_ELASTICSEARCH_URL = 'es://capitolwords.chartbeat.net:80/crec'
 
@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_swagger',
     'parser',
-    'scraper'
+    'scraper',
+    'cwapi'
 ]
 
 MIDDLEWARE = [
@@ -160,6 +161,14 @@ LOGGING = {
 =======
         'scraper.crec_scraper': {
 >>>>>>> [capitolweb] added tests for scraper, made zip unpacking in memory instead of on-disk
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'parser.crec_parser': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'parser.management.commands.run_crec_parser': {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },

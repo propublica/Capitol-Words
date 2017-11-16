@@ -10,11 +10,33 @@ from zipfile import ZipFile
 import boto3
 import requests
 from botocore.exceptions import ClientError
+from django.conf import settings
 
 from scraper.models import CRECScraperResult
 
 
 logger = logging.getLogger(__name__)
+
+
+def crec_s3_key(filename, date_issued):
+    """Location of a CREC document (or mods.xml file) within an S3 bucket.
+    
+    The key is comprised of a root prefix set in django settings, formatted
+    date time and the filename, joined by "/".
+    
+    Args:
+        filename (str): The name of the file, e.g. "mods.xml".
+        date_issed (:class:`datetime.datetime`): The date issued as a datetime
+            object.
+    
+    Returns:
+        str: An s3 key where that file should be located.
+    """
+    return os.path.join(
+        settings.CREC_STAGING_S3_ROOT_PREFIX,
+        date_issued.strftime('%Y/%m/%d'),
+        filename
+    )
 
 
 class CRECDataNotFoundException(Exception):
@@ -26,37 +48,32 @@ class CRECDataNotFoundException(Exception):
 
 
 class CRECScraper(object):
-    """Downloads the zip for specified date from gpo.gov, unpacks all html files
-    to disk, then uploads each one to S3.
+    """Downloads the zip for specified date from gpo.gov and uploads all html
+    and mods.xml files to s3.
 
     Args:
         s3_bucket (:obj:`str`): The name of an S3 bucket to stage unpacked html
             files in.
-        s3_key_prefix (:obj:`str`): The prefix is prepended to each html
-            filename to create the S3 key to upload it to.
 
     Attributes:
         CREC_ZIP_TEMPLATE (:obj:`str`): The endpoint template for a CREC zip.
     """
 
     CREC_ZIP_URL_TEMPLATE = 'https://www.gpo.gov/fdsys/pkg/CREC-%Y-%m-%d.zip'
-    S3_KEY_FORMAT = '{prefix}/%Y/%m/%d/{data_type}/{file_name}'
 
-
-    def __init__(self, s3_bucket, s3_key_prefix):
+    def __init__(self, s3_bucket=settings.CREC_STAGING_S3_BUCKET):
         self.s3_bucket = s3_bucket
-        self.s3_key_prefix = s3_key_prefix
         self.s3 = boto3.resource('s3')
 
     def download_crec_zip(self, url):
-        """Retrieves the CREC zip or mods.xml for this date from gpo.gov.
+        """Retrieves the CREC zip for this date from gpo.gov.
 
         Args:
             str: A gpo.gov URL to a CREC zip file.
             
         Raises:
             CRECDataNotFoundException: Indicates a 404 from gpo.gov, usually due
-                to there being no data for the previous day (e.g., during a
+                to there being no data for the previous day (e.g. during a
                 recess).
 
         Returns:
@@ -70,51 +87,33 @@ class CRECScraper(object):
         zf = ZipFile(io.BytesIO(response.content))
         return zf
     
-    def is_crec_filename(self, file_name):
-        return file_name.endswith('html') or file_name.endswith('htm')
-    
-    def is_mods_filename(self, file_name):
-        return file_name.endswith('mods.xml')
-    
-    def get_s3_key(self, date, data_type, file_path):
-        return os.path.join(
-            self.s3_key_prefix,
-            date.strftime('%Y/%m/%d'),
-            data_type,
-            os.path.basename(file_path),
-        )
+    def is_relevant_filename(self, file_name):
+        return file_name.endswith('htm') or file_name.endswith('mods.xml')
     
     def extract_and_upload_to_s3(self, crec_zip_file, date):
-        """Uploads the file at the provided path to s3. The s3 key is
-        generated from the date, the original filename, and the s3_key_prefix.
+        """Uploads the file at the provided path to s3. See ``crec_scraper.crec_s3_key``
+        for s3 key format.
     
         Args:
             file_path (str): Path to html file.
-            data_type (str): One of "crec" or "mods", used in s3 key.
-            date :class:`datetime.datetime`: Date to upload data for.
+            date (:class:`datetime.datetime`): Date to upload data for.
         
         Returns:
             str: The S3 key the file was uploaded to.
         """
-        s3_key_template_for_date = date.strftime(self.S3_KEY_FORMAT)
         s3_keys = []
         for zipped_file in crec_zip_file.filelist:
-            if self.is_crec_filename(zipped_file.filename):
-                data_type = 'crec'
-            elif self.is_mods_filename(zipped_file.filename):
-                data_type = 'mods'
-            else:
-                continue
-            s3_key = self.get_s3_key(date, data_type, zipped_file.filename)
-            s3_keys.append(s3_key)
-            logger.debug(
-                'Uploading "{0}" to "s3://{1}/{2}".'.format(
-                    zipped_file.filename, self.s3_bucket, s3_key
+            if self.is_relevant_filename(zipped_file.filename):
+                s3_key = crec_s3_key(os.path.basename(zipped_file.filename), date)
+                s3_keys.append(s3_key)
+                logger.debug(
+                    'Uploading "{0}" to "s3://{1}/{2}".'.format(
+                        zipped_file.filename, self.s3_bucket, s3_key
+                    )
                 )
-            )
-            with crec_zip_file.open(zipped_file) as unzipped_file:
-                obj = self.s3.Object(self.s3_bucket, s3_key)
-                obj.upload_fileobj(unzipped_file)
+                with crec_zip_file.open(zipped_file) as unzipped_file:
+                    obj = self.s3.Object(self.s3_bucket, s3_key)
+                    obj.upload_fileobj(unzipped_file)
         return s3_keys
 
     def get_crec_zip_url(self, date):
@@ -130,6 +129,17 @@ class CRECScraper(object):
         return date.strftime(self.CREC_ZIP_URL_TEMPLATE)
 
     def scrape_files_for_date(self, date):
+        """Retrieve the zip file for the given date, unpack all CREC files and
+        the mods.xml metadata file to memory, then upload to s3. Stores results
+        in an ORM, ``scraper.models.CRECScraperResult``.
+        
+        Args:
+            date (:class:`datetime.datetime`): The date to retreive docs for.
+        
+        Returns:
+            :class:`scraper.models.CRECScraperResult`: An ORM model instance
+                containing a summary of the scraper job results.
+        """
         logger.info('Scraping data for {0}...'.format(date))
         orm_result = CRECScraperResult.objects.create(
             date=date,
@@ -161,7 +171,7 @@ class CRECScraper(object):
         logger.info('Uploads finished.')
         orm_result.message = '\n'.join(s3_keys)
         orm_result.num_crec_files_uploaded = len(
-            [k for k in s3_keys if self.is_crec_filename(k)]
+            [k for k in s3_keys if k.endswith('.htm')]
         )
         orm_result.success = True
         orm_result.save()

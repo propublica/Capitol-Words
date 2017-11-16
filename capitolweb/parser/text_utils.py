@@ -308,8 +308,9 @@ def named_entity_dedupe(noun_chunks, named_entities):
     Returns:
         list
     """
-    noun_chunks_ = [nc.lower() for nc in noun_chunks]
-    named_entities_ = [ne.lower() for ne in named_entities]
-    deduped_uniques = set(noun_chunks_) - set(named_entities_)
+    noun_chunks_ = {nc.lower() for nc in noun_chunks}
+    named_entities_ = {ne.lower() for ne in named_entities}
+    deduped_uniques = noun_chunks_ - named_entities_
     noun_chunks_ = [nc for nc in noun_chunks_ if nc in deduped_uniques]
     return noun_chunks_
+    

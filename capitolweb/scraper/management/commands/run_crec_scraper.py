@@ -5,7 +5,6 @@ from datetime import timedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from scraper.tasks import scrape_crecs
 from scraper.models import CRECScraperResult
 from scraper.crec_scraper import CRECScraper
 
@@ -35,11 +34,6 @@ class Command(BaseCommand):
             help='Location of crec data.',
             default=settings.CREC_STAGING_S3_BUCKET
         )
-        parser.add_argument(
-            '--s3_prefix',
-            help='Prefix for s3 keys.',
-            default=settings.CREC_STAGING_S3_KEY_PREFIX
-        )
 
     def handle(self, *args, **options):
         start_date = options['start_date']
@@ -49,12 +43,7 @@ class Command(BaseCommand):
             end_date = options['end_date']
         start_date.replace(hour=0, minute=0, second=0, microsecond=0)
         end_date.replace(hour=0, minute=0, second=0, microsecond=0)
-        scraper = CRECScraper(
-            options['s3_bucket'],
-            options['s3_prefix']
-        )
-        results = []
+        scraper = CRECScraper(options['s3_bucket'])
         while start_date < end_date:
             result = scraper.scrape_files_for_date(start_date)
-            results.append(result)
             start_date += timedelta(days=1)
