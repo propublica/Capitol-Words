@@ -21,7 +21,7 @@ DEV_FRONTEND = True
 DEV_FRONTEND_SPA_BASE_URL = 'http://localhost:3000'
 
 CREC_STAGING_S3_BUCKET = 'capitol-words-data'
-CREC_STAGING_S3_KEY_PREFIX = 'crec'
+CREC_STAGING_S3_ROOT_PREFIX = 'crec'
 CREC_STAGING_FOLDER = '/tmp'
 CREC_ELASTICSEARCH_URL = 'es://capitolwords.chartbeat.net:80/crec'
 
@@ -54,11 +54,9 @@ INSTALLED_APPS = [
     'legislators',
     'rest_framework',
     'rest_framework_swagger',
-    'django_celery_beat',
-    'django_celery_results',
-    'django_extensions',
-    'workers',
-    'cwapi',
+    'parser',
+    'scraper',
+    'cwapi'
 ]
 
 MIDDLEWARE = [
@@ -158,16 +156,17 @@ LOGGING = {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
-        'workers.crec_parser': {
+        'scraper.crec_scraper': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'parser.crec_parser': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'parser.management.commands.run_crec_parser': {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
     },
 }
-
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_BROKER_URL = 'amqp://guest:guest@localhost//'
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
