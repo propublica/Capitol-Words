@@ -156,11 +156,7 @@ LOGGING = {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
-<<<<<<< HEAD
-        'workers.crec_parser': {
-=======
         'scraper.crec_scraper': {
->>>>>>> [capitolweb] added tests for scraper, made zip unpacking in memory instead of on-disk
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },

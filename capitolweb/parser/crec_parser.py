@@ -387,7 +387,7 @@ def upload_speaker_word_counts(crec_parser):
     Args:
         crec_parser (:class:`parser.crec_parser.CRECParser`): A CRECParser
             instance representing a single CREC document.
-    """"
+    """
     if crec_parser.speaker_ids:
         named_entities = {'named_entities_{0}'.format(ne_type): counts                    
                           for ne_type, counts in crec_parser.named_entity_counts.items()}
