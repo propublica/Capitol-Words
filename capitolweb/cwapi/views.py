@@ -198,10 +198,8 @@ def get_date_strings_in_range(start_date, end_date):
 
 def get_daily_counts_in_range(docs, term, start_date, end_date):
     counts = {ds: 0 for ds in get_date_strings_in_range(start_date, end_date)}
-    print(counts.keys())
     for doc in docs:
         date_issued = doc.get('_source', {}).get('date_issued')
-        print(date_issued)
         if date_issued is None:
             raise Exception('document has no date_issued field')
         if date_issued in counts.keys():
