@@ -18,6 +18,8 @@ from django.conf import settings
 from botocore.exceptions import ClientError
 
 from cwapi.models import SpeakerWordCounts
+from cwapi.es_docs import CRECDoc
+# from cwapi.es_docs import AttributedSegmentDoc
 import parser.text_utils as text_utils
 from scraper.crec_scraper import crec_s3_key
 
@@ -309,13 +311,13 @@ class CRECParser(object):
                         'id': 'id-CREC-2017-01-20-pt1-PgS348-1', 
                         'speaker': 'Mr. McCONNELL', 
                         'text': 'THANKING FORMER PRESIDENT OBAMA. Mr. McCONNELL.Mr.  President, I wish to offer a few words regarding...',
-                        'bioGuideId': 'M000355'
+                        'bioguide_id': 'M000355'
                     },
                     {  
                         'id': 'id-CREC-2017-01-20-pt1-PgS348-2-1',
                         'speaker': 'Mr. DURBIN',
                         'text': 'NOMINATIONS. Mr. DURBIN.  Mr. President, I listened carefully to the statement by theRepublican lead...',
-                        'bioGuideId': 'D000563'
+                        'bioguide_id': 'D000563'
                     }
                 ]
         """
@@ -348,10 +350,11 @@ class CRECParser(object):
                     segment = {
                         'id': '{}-{}'.format(self.id, segment_index),
                         'speaker': previous,
-                        'text': ' '.join(segment_sents)
+                        'text': ' '.join(segment_sents),
+                        'bioguide_id': None,
                     }
                     if segment['speaker'] in self.speaker_ids:
-                        segment['bioGuideId'] = self.speaker_ids[segment['speaker']]
+                        segment['bioguide_id'] = self.speaker_ids[segment['speaker']]
                     segments_.append(segment)
                 previous = current
                 segment_sents = [sent]
@@ -366,18 +369,19 @@ class CRECParser(object):
         Returns:
             dict: A dict representation of this document.
         """
-        return {
-            'id': self.id,
-            'title': self.title,
-            'title_part': self.title_part,
-            'pdf_url': self.pdf_url,
-            'html_url': self.html_url,
-            'page_start': self.page_start,
-            'page_end': self.page_end,
-            'speakers': ','.join(self.speakers),
-            'content': self.content,
-            'segments': self.segments
-        }
+        return CRECDoc(
+            title=self.title,
+            title_part=self.title_part,
+            date_issued=self.date_issued,
+            content=self.content,
+            crec_id=self.id,
+            pdf_url=self.pdf_url,
+            html_url=self.html_url,
+            page_start=self.page_start,
+            page_end=self.page_end,
+            speakers=','.join(self.speakers),
+            segments=self.segments,
+        )
 
 
 def upload_speaker_word_counts(crec_parser):

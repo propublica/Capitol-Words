@@ -10,172 +10,32 @@ from elasticsearch_dsl import Search
 from elasticsearch_dsl.query import Match, Q, Range
 from elasticsearch_dsl.connections import connections
 from rest_framework.decorators import api_view
+from django.core.paginator import Paginator
 
 from legislators.models import CongressPerson
+from cwapi.es_docs import CRECDoc, get_term_count_in_doc, get_term_count_agg, make_search
+
 
 logger = logging.getLogger(__name__)
 
 
-connections.create_connection(hosts=[settings.ES_URL], timeout=20)
-
-
-# This maps the query parameters to factory methods for the queries
-QUERIES = {
-    'title': 'get_title',
-    'speaker': 'get_speaker',
-    'content': 'get_content',
-    'entity': 'get_entity'
-}
-
-
-def make_search():
-    return Search(index=settings.ES_CW_INDEX)
-
-
-def execute_search(query, sorting='-date_issued'):
-    """
-    Runs a search with basic handling for sorting
-    :param query: the query to execute
-    :param sorting: the type of sorting, i.e. -dateIssued
-    :return: results or False
-    """
-    search = make_search().sort(sorting)
-    results = search.query(query).execute()
-    if results.success():
-        return results
-    return False
-
-
-def get_speaker(name):
-    return Match(speakers={"query": name, "operator": "and"})
-
-
-def get_title(title):
-    return Match(title={"query": title, "type": "phrase"})
-
-
-def get_content(content):
-    return Q('match', content={'query': content, 'operator': 'and'})
-
-
-def get_entity(entity):
-    return Match(named_entities={"query": entity, "operator": "and"})
-
-
-def get_date_range(start, end="now/d"):
-    return Range(date_issued={"gte": start, "lte": end})
-
-
-@api_view(['GET'])
-def search_by_speaker(request, name):
-    """
-    Search for a speaker by name
-    :param request:
-    :param name: name of the congress person speaking
-    :return: list sorted by date_issued
-    """
-    query = get_speaker(name)
-    response = execute_search(query)
-    if response.success():
-        return JsonResponse(response.to_dict())
-
-
-@api_view(['GET'])
-def search_by_title(request, title):
-    """
-    Search by title of a document
-    :param request:
-    :param title: the title
-    :return: list of results sorted by date_issued
-    """
-    query = get_title(title)
-    response = execute_search(query)
-    if response.success():
-        return JsonResponse(response.to_dict())
-
-
-@api_view(['GET'])
-def search_by_entities(request):
-    """
-    Search by title of a document
-    entities are specified in the query param 'entity'
-    :param request:
-    :return: list of results sorted by date_issued
-    """
-    terms = request.GET.getlist('entity')
-    queries = [get_entity(e) for e in terms]
-    logger.info("queries? %s " % queries)
-    q = Q('bool', must=queries)
-    response = execute_search(q)
-    if response.success():
-        return JsonResponse(response.to_dict())
-
-
-@api_view(['GET'])
-def search_by_params(request):
-    """
-    Search by arbitrary params which can be combined and can also be lists
-
-    title - search on the title field
-    speaker - individual speakers
-    content - search for text matches in the content add &highlight=<number> to include contextual
-              matches of the given fragment size in the result (default is 200)
-    entity - named entities
-    start_date / end_date in form 2017-01-04, inclusive. end_date defaults to today.
-
-    Example:
-        http://localhost:8000/cwapi/search/multi/?title=Budget&entity=social%20security&entity=senate&speaker=sanders
-        http://localhost:8000/cwapi/search/multi/?speaker=schumer&content=trump&highlight=1000
-        http://localhost:8000/cwapi/search/multi/?title=Budget&speaker=sanders&start_date=2016-01-11&end_date=2017-01-04
-
-    :param request:
-    :return:
-    """
-    logger.debug("search_by_params")
-    params = request.GET
-    search = make_search()
-    queries = []
-    for f in QUERIES:
-        if f in params:
-            for r in params.getlist(f):
-                queries.append(globals()[QUERIES[f]](r))
-    if 'start_date' in params:
-        if 'end_date' in params:
-            queries.append(get_date_range(params.get('start_date'), params.get('end_date')))
-        else:
-            queries.append(get_date_range(params.get('start_date')))
-    logger.info("queries? %s " % queries)
-    q = Q('bool', must=queries)
-
-    if 'highlight' in params and 'content' in params:
-        frag_size = params.get('highlight')
-        if not frag_size.isnumeric():
-            frag_size = 200
-        response = search.highlight('content', fragment_size=frag_size).query(q).execute()
-    else:
-        response = search.query(q).execute()
-    if response.success():
-        results = response.to_dict()
-        results['params'] = params
-        return JsonResponse(results)
-    return JsonResponse("Found nothing")
-
-
-def count_term_in_range(term, start_date, end_date):
-    query = get_content(term)
-    s = make_search()
-    s = s.highlight_options(order='score', encoder='html')
-    s = s.highlight('content', fragment_size=200, )
-
-    q = Q('bool', must=[get_content(term), get_date_range(start_date, end_date)])
-    date_filter = {
-        'range': {'date_issued': {'gte': start_date, 'lte': end_date}}
-    }
-    docs = s.query(q).execute()
-    return docs
+VALID_SEARCH_FIELDS = [
+    'title', 'speaker', 'content'
+]
 
 
 def match_speaker_to_bioguide(speaker):
+    """Look up a speaker in the legislators db by their full name, as it 
+    appears in the CREC metadata.
+    
+    Args:
+        speaker (str): The offical_full name of the speaker, as it should
+            appear in the speakers section of a CREC doc.
+    
+    Returns:
+        dict: A dict containing the speakers party, a link to their thumbnail
+            image, and a link to their bio page on congress.gov.
+    """
     # TODO: Get most recent entry? Or the one correct for that time?
     for person in CongressPerson.objects.filter(official_full=speaker):
         bio_page_url = 'https://www.congress.gov/member/{0}/{1}'.format(
@@ -186,106 +46,190 @@ def match_speaker_to_bioguide(speaker):
             'party': person.terms.last().party, 
             'bio_page_url': bio_page_url
         }
+        
+
+def get_date_range_from_args(request):
+    """Expects a request object with either "start_date" and "end_date"
+    or "days_ago" query arguments. Returns a tuple containing a start and an
+    end datetime.
+    
+    Args:
+        request (django.http.request.HttpRequest): A django request object.
+    
+    Returns:
+        tuple: 2-item tuple containing a start and an end datetime.
+    """
+    if 'start_date' in request.GET and 'end_date' in request.GET:
+        start_date_str = request.GET.get('start_date', '').strip()
+        end_date_str = request.GET.get('end_date', '').strip()
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+    else:
+        days_ago = int(request.GET.get('days_ago', 30))
+        end_date = datetime.utcnow()
+        end_date = end_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        start_date = end_date - timedelta(days=days_ago)
+    return (start_date, end_date)
 
 
-def get_date_strings_in_range(start_date, end_date):
-    date_strings = []
-    while start_date < end_date:
-        date_strings.append(datetime.strftime(start_date, '%Y-%m-%dT%H:%M:%S'))
-        start_date += timedelta(days=1)
-    return date_strings
-
-
-def get_daily_counts_in_range(docs, term, start_date, end_date):
-    counts = {ds: 0 for ds in get_date_strings_in_range(start_date, end_date)}
-    for doc in docs:
-        date_issued = doc.get('_source', {}).get('date_issued')
-        if date_issued is None:
-            raise Exception('document has no date_issued field')
-        if date_issued in counts.keys():
-            content = doc.get('_source', {}).get('content', '')
-            counts[doc['_source']['date_issued']] += content.lower().count(term.lower())
-    return counts
+def get_text_search_results(start_date, end_date, terms, size=10, offset=0):
+    """Runs a "match query against any provided field in the terms argument.
+    Returns a list of docs as dicts including the search score.
+    
+    Args:
+        start_date (datetime): Start of date range.
+        end_date (datetime): End of date range.
+        terms (dict): A dict mapping field name to search term, multiple fields
+            are or'd together.
+        size (int): The number of results to retrieve, defaults to 10.
+        offset (int): The offset from the highest search result to return items
+            from (for pagination).
+    
+    Returns:
+        list: A list of CREC documents as dicts, reverse sorted by score.
+    """
+    search = CRECDoc.search()
+    for field, search_term in terms.items():
+        m = Match(**{field: {'query': search_term, 'type': 'phrase'}})
+        search = search.query(m)
+    search = search.filter(
+        'range', date_issued={'gte': start_date, 'lte': end_date}
+    )
+    search = search.sort('_score')
+    search = search[offset:offset+size]
+    results = search.execute()
+    data = []
+    for r in results:
+        d = r.to_dict()
+        d['date_issued'] = r.date_issued.strftime('%Y-%m-%d')
+        d['score'] = r.meta.score
+        data.append(d)
+    data.sort(key=lambda x: -x['score'])
+    return data
 
 
 @api_view(['GET'])
-def count_of_term_in_content(request):
+def search_text_match(request):
+    """Runs a "match" query against any provided field.
     """
-    Count the mention of a term in content
+    start_date, end_date = get_date_range_from_args(request)
+    offset = int(request.GET.get('offset', 0))
+    size = int(request.GET.get('size', 10))
+    terms = {}
+    for field in VALID_SEARCH_FIELDS:
+        value = request.GET.get(field)
+        if value:
+            terms[field] = value
+    data = get_text_search_results(
+        start_date, end_date, terms, size=size, offset=offset
+    )
+    return JsonResponse({
+        'status': 'success',
+        'data': data
+    })
 
-    time_period(optional, default to 'month') - period of time to go
-                                                back from today
-                                                month | week | day
 
-    Example:
-        http://127.0.0.1:8000/cwapi/count/obamacare/?time_period=week
-        http://127.0.0.1:8000/cwapi/count/obamacare/
-
-    :param request:
-    :param term: term whose occurances we are counting
-    :return: number of occurances of the term in content
+def get_term_counts_histogram(es_conn, term, start_date, end_date):
+    """Runs an elasticsearchs scripted metric aggregation to count the
+    ocurrences of the provided term in the content field of all CREC documents,
+    bucketed by day.
+    
+    Args:
+        es_conn :cls:`elasticsearch.Elasticsearch`: A connection to an
+            elasticsearch cluster.
+        term (str): Search term.
+        start_date (datetime): Start of date range.
+        end_date (datetime): End of date range.
+    
+    Returns:
+        dict: A historam mapping a timestamp (format YYYY-MM-DD) to the count
+            for that day.
     """
-    term = request.GET.get('q', '').strip()
-    days_ago = int(request.GET.get('days_ago', '30'))
+    results = get_term_count_in_doc(es_conn, term, start_date, end_date)
+    aggs = get_term_count_agg(results)
+    if aggs is None:
+        raise Exception()
+    histogram = {}
+    dt = start_date
+    while dt <= end_date:
+        histogram[dt.strftime('%Y-%m-%d')] = 0
+        dt += timedelta(days=1)
+    for bucket in aggs:
+        dt = datetime.strptime(bucket['key_as_string'], '%Y-%m-%dT%H:%M:%S.%fZ')
+        dt = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+        histogram[dt.strftime('%Y-%m-%d')] = bucket['term_counts']['value']
+    return histogram
 
-    start_date = datetime.utcnow() - timedelta(days=days_ago)
-    end_date = datetime.utcnow()
 
-    # TODO: remove when we have more recent data
-    start_date -= timedelta(days=150)
-    end_date -= timedelta(days=150)
-
-    start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    end_date = end_date.replace(hour=0, minute=0, second=0, microsecond=0)
+@api_view(['GET'])
+def term_counts_by_day(request):
+    es_conn = connections.get_connection()
+    term = request.GET.get('term', '').strip().lower()
+    start_date, end_date = get_date_range_from_args(request)
+    histogram = get_term_counts_histogram(es_conn, term, start_date, end_date)
+    return JsonResponse({
+        'status': 'success',
+        'data': {
+            'daily_counts': histogram
+        }
+    })
     
-    current_period_docs = count_term_in_range(term, start_date, end_date)
-    current_period_docs = current_period_docs.to_dict()['hits']['hits']
-    current_period_docs.sort(key=lambda d: -d['_score'])
-    current_daily_counts = get_daily_counts_in_range(
-        current_period_docs, term, start_date, end_date
+
+@api_view(['GET'])
+def search_results_page(request):
+    es_conn = connections.get_connection()
+    term = request.GET.get('q', '').strip().lower()
+    days_ago = request.GET.get('days_ago', 30)
+    size = request.GET.get('size', 10)
+    offset = request.GET.get('offset', 0)
+    start_date, end_date = get_date_range_from_args(request)
+    prev_start_date = start_date - timedelta(days=int(days_ago))
+    prev_end_date = end_date - timedelta(days=int(days_ago))
+    current_histogram = get_term_counts_histogram(
+        es_conn, term, start_date, end_date
     )
-    total_count = sum(current_daily_counts.values())
-    # Get last benchmark data
-    prev_start_date = start_date - timedelta(days=days_ago)
-    prev_end_date = end_date - timedelta(days=days_ago)
-    prev_period_docs = count_term_in_range(term, prev_start_date, prev_end_date)    
-    prev_period_docs = prev_period_docs.to_dict()['hits']['hits']
-    prev_daily_counts = get_daily_counts_in_range(
-        prev_period_docs, term, prev_start_date, prev_end_date
+    prev_histogram = get_term_counts_histogram(
+        es_conn, term, prev_start_date, prev_end_date
     )
-    prev_total_count = sum(prev_daily_counts.values())
-    
-    for doc in current_period_docs:
-        doc['mentions'] = doc['_source']['content'].lower().count(term.lower())
+    current_total = sum(current_histogram.values())
+    prev_total = sum(prev_histogram.values())
+    docs = get_text_search_results(
+        start_date, end_date, {'content': term}, size=size, offset=offset
+    )
+    for doc in docs:
+        doc['mentions'] = doc['content'].lower().count(term.lower())
         doc['search_phrase'] = term
-        date_issued = datetime.strptime(
-            doc['_source']['date_issued'], '%Y-%m-%dT%H:%M:%S'
-        )
+        date_issued = datetime.strptime(doc['date_issued'], '%Y-%m-%d')
         doc['human_date'] = date_issued.strftime('%b %d, %Y')
-        if len(doc['highlight'].get('content', [])) > 0:
-            doc['snippet'] = doc['highlight']['content'][0]
+        i = doc['content'].lower().find(term.lower())
+        if i > 0:
+            start = max(0, i - 100)
+            end = min(len(doc['content']), i + 200)
+            doc['snippet'] = doc['content'][start:end]
+        speakers = doc.get('speakers', '').split(',')
         doc['speakers'] = []
-        for s in doc['_source'].get('speakers', []):
+        for s in speakers:
             matched_bioguide_data = match_speaker_to_bioguide(s)
             if matched_bioguide_data:
                 doc['speakers'].append(matched_bioguide_data)
-
     return JsonResponse(
         {
-            'delta': int(100 * ((total_count - prev_total_count) / float(max(prev_total_count, 1)))),
-            'docs': current_period_docs,
+            'delta': int(100 * ((current_total - prev_total) / float(max(prev_total, 1)))),
+            'docs': docs,
             'term': term,
             'current_period': {
-                'daily_breakdown': [{'date': k, 'count': v} for k, v in current_daily_counts.items()],
-                'total_count': total_count
+                'daily_breakdown': [
+                    {'date': k, 'count': v} for k, v in current_histogram.items()
+                ],
+                'total_count': current_total
             },
             'previous_period': {
-                'daily_breakdown': [{'date': k, 'count': v} for k, v in prev_daily_counts.items()],
-                'total_count': prev_total_count
+                'daily_breakdown': [
+                    {'date': k, 'count': v} for k, v in prev_histogram.items()
+                ],
+                'total_count': prev_total
             },
             'start_date': start_date,
             'end_date': end_date,
         }
     )
-
-

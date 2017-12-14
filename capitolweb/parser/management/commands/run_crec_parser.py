@@ -12,10 +12,12 @@ import botocore
 import boto3
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+from elasticsearch_dsl.connections import connections
 
 from parser.crec_parser import extract_crecs_from_mods
 from parser.crec_parser import upload_speaker_word_counts
 from scraper.crec_scraper import crec_s3_key
+from cwapi.es_docs import CRECDoc
 
 
 logger = logging.getLogger(__name__)
@@ -33,7 +35,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--es_url',
             help='Elastic search URL to upload records to.',
-            default=settings.CREC_ELASTICSEARCH_URL,
+            default=settings.ES_URL,
         )
         parser.add_argument(
             '--start_date',
@@ -57,11 +59,8 @@ class Command(BaseCommand):
         s3 = boto3.resource('s3')
         dt = options['start_date'].replace(hour=0, minute=0, second=0, microsecond=0)
         if not options['to_stdout']:
-            parsed_es_url = urlparse.urlparse(options['es_url'])
-            es_host = parsed_es_url.netloc
-            index = parsed_es_url.path.strip('/')
-            es_conn = elasticsearch.Elasticsearch([es_host])
-        
+            connections.create_connection(hosts=[options['es_url']], timeout=20)
+            CRECDoc.init()
         while dt < options['end_date']:
             logger.info('Processing files for {0}.'.format(dt))
             try:
@@ -83,12 +82,8 @@ class Command(BaseCommand):
                             if options['to_stdout']:
                                 logger.info(crec.to_es_doc())
                             else:
-                                es_conn.index(
-                                    index=index,
-                                    doc_type='crec',
-                                    id=crec.id,
-                                    body=crec.to_es_doc()
-                                )
+                                es_doc = crec.to_es_doc()
+                                es_doc.save()
                             upload_speaker_word_counts(crec)
                 except Exception as e:
                     logger.exception('Error processing data for {0}.'.format(dt.strftime('%Y-%m-%d')))

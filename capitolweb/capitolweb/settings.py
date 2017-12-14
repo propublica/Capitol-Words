@@ -15,7 +15,7 @@ import os
 # CAPITOL WORDS CONFIGS
 
 ES_URL = 'es://capitolwords.chartbeat.net:80'
-ES_CW_INDEX = 'will-test'
+ES_CW_INDEX = 'capitol_words_crecs'
 
 DEV_FRONTEND = True
 DEV_FRONTEND_SPA_BASE_URL = 'http://localhost:3000'
@@ -23,7 +23,6 @@ DEV_FRONTEND_SPA_BASE_URL = 'http://localhost:3000'
 CREC_STAGING_S3_BUCKET = 'capitol-words-data'
 CREC_STAGING_S3_ROOT_PREFIX = 'crec'
 CREC_STAGING_FOLDER = '/tmp'
-CREC_ELASTICSEARCH_URL = 'es://capitolwords.chartbeat.net:80/crec'
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -157,6 +156,10 @@ LOGGING = {
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
         'scraper.crec_scraper': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'scraper.management.commands.run_crec_scraper': {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },

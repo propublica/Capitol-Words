@@ -3,8 +3,16 @@ import os
 import sys
 
 if __name__ == "__main__":
-    if not os.environ.get("DJANGO_SETTINGS_MODULE"):
-        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "capitolweb.settings")
+    # Integration tests delete the crec index so this ensures no one
+    # accidentally runs tests with prod settings.
+    if 'test' in sys.argv:
+        os.environ.setdefault(
+            "DJANGO_SETTINGS_MODULE", "capitolweb.settings_test"
+        )
+    elif not os.environ.get("DJANGO_SETTINGS_MODULE"):
+        os.environ.setdefault(
+            "DJANGO_SETTINGS_MODULE", "capitolweb.settings"
+        )
     try:
         from django.core.management import execute_from_command_line
     except ImportError:
@@ -21,3 +29,4 @@ if __name__ == "__main__":
             )
         raise
     execute_from_command_line(sys.argv)
+    

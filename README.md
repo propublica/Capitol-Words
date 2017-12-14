@@ -12,8 +12,11 @@ The API is built on Django and it's broken into the following apps:
     * scraper - service to scrape CREC documents from gpo.gov and stage them in s3
     * parser - service to extract metadata from CREC documents and upload to elasticsearch and rds
 
-
 ### Setup
+
+Most of the ops related settings are setup via the django settings module.
+
+For the elasticsearch cluster, `ES_URL` and `ES_CW_INDEX` need to contain the url with port for an elasticsearch cluster and the name of an index (this is used for both reading with the API and uploading to with the parser).
 
 To set up the API do the following:
 
@@ -23,31 +26,131 @@ To set up the API do the following:
     python manage.py createsuperuser (if you want to use the admin tool to browse)
     python manage.py runserver
 
+See the "Frontend" section for setting up the single page frontend app.
 
 ### cwapi
 
-The seach API is backed by elastic search and uses [elasticsearch-dsl-py](https://github.com/elastic/elasticsearch-dsl-py)
+The search API is backed by elastic search and uses [elasticsearch-dsl-py](https://github.com/elastic/elasticsearch-dsl-py)
 
-Endpoints:
+There are three endpoints supported:
 
-    /cwapi/search/speaker/<name>
-    /cwapi/search/title/<title>
-    /cwapi/search/multi?<params>
-
-`speaker` and `title` take a term match like: `/cwapi/search/speaker/Sanders`
-
-The `multi` endpoint allows for full text search of documents combined with titles or speakers.
-
-    title - search on the title field
-    speaker - individual speakers
-    content - search for text matches in the content add &highlight=<number> to include contextual
-              matches of the given fragment size in the result (default is 200)
-
-    Example:
-        http://127.0.0.1:8000/cwapi/search/multi/?speaker=schumer&content=trump&highlight=1000
-
-Currently all of these endpoints return an elastic search document as json.
-
+    1. `cwapi/term_counts_by_day/`
+        - Counts the occurrences of a provided term in all CREC docs over a given time period and returns the total count per day over that date range.
+        - Args:
+            - `start_date`: A timestamp for the start of a date range filter, format: YYYY-MM-DD (inclusive).
+            - `end_date`: End of date range filter, format: YYYY-MM-DD (inclusive).
+            - `days_ago`: Number of days before the current date to retrieve results for.
+            - `term`: A search term (or terms, space separated) to count occurrences for.
+        - Example:
+            - Request: `http://localhost:8000/cwapi/term_counts_by_day/?term=russia&start_date=2017-03-01&end_date=2017-03-30`
+            - Response:
+                ```json
+                {
+                  "status": "success",
+                  "data": {
+                    "daily_counts": {
+                      "2017-03-01": 5,
+                      "2017-03-02": 45,
+                      "2017-03-03": 0,
+                      "2017-03-04": 0,
+                      "2017-03-05": 0,
+                      "2017-03-06": 1,
+                      "2017-03-07": 2,
+                      "2017-03-08": 3,
+                      "2017-03-09": 1,
+                      "2017-03-10": 0,
+                      "2017-03-11": 0,
+                      "2017-03-12": 0,
+                      "2017-03-13": 1,
+                      "2017-03-14": 0,
+                      "2017-03-15": 20,
+                      "2017-03-16": 3,
+                      "2017-03-17": 0,
+                      "2017-03-18": 0,
+                      "2017-03-19": 0,
+                      "2017-03-20": 1,
+                      "2017-03-21": 0,
+                      "2017-03-22": 3,
+                      "2017-03-23": 33,
+                      "2017-03-24": 0,
+                      "2017-03-25": 0,
+                      "2017-03-26": 0,
+                      "2017-03-27": 10,
+                      "2017-03-28": 25,
+                      "2017-03-29": 29,
+                      "2017-03-30": 26
+                    }
+                  }
+                }
+                ```
+    2. `cwapi/search/`
+        - Performs elasticsearch match queries using the provided terms.
+        - Args:
+            - `start_date`: A timestamp for the start of a date range filter, format: YYYY-MM-DD (inclusive).
+            - `end_date`: End of date range filter, format: YYYY-MM-DD (inclusive).
+            - `days_ago`: Number of days before the current date to retrieve results for.
+            - `title`: Search for docs with this value in the "title" of the CREC doc. 
+            - `speaker`: Search for docs with this speaker listed in the CREC doc.
+            - `content`: Search for docs that contain this value in the body of the CREC doc.
+        - Example:
+            - Request: `http://localhost:8000/cwapi/search/?content=russia&start_date=2017-03-01&end_date=2017-03-30&size=1`
+            - Response:
+                ```json
+                {
+                    "status": "success",
+                    "data": [
+                        {
+                            "title": "RUSSIA AND TRUMP CAMPAIGN INVESTIGATION",
+                            "title_part": "Senate",
+                            "date_issued": "2017-03-30",
+                            "content": "...",
+                            "crec_id": "id-CREC-2017-03-30-pt1-PgS2140",
+                            "pdf_url": "https://www.gpo.gov/fdsys/pkg/CREC-2017-03-30/pdf/CREC-2017-03-30-pt1-PgS2140.pdf",
+                            "html_url": "https://www.gpo.gov/fdsys/pkg/CREC-2017-03-30/html/CREC-2017-03-30-pt1-PgS2140.htm",
+                            "page_start": "S2140",
+                            "page_end": "S2141",
+                            "speakers": "Tom Udall,Jon Tester",
+                            "segments": [
+                                {
+                                    "id": "id-CREC-2017-03-30-pt1-PgS2140-1",
+                                    "text": "RUSSIA AND TRUMP CAMPAIGN INVESTIGATION. "
+                                },
+                                {
+                                    "id": "id-CREC-2017-03-30-pt1-PgS2140-2",
+                                    "speaker": "Mr. UDALL",
+                                    "text": "...",
+                                    "bioguide_id": "U000039"
+                                },
+                                {
+                                    "id": "id-CREC-2017-03-30-pt1-PgS2140-3",
+                                    "speaker": "The PRESIDING OFFICER",
+                                    "text": "..."
+                                },
+                                {
+                                    "id": "id-CREC-2017-03-30-pt1-PgS2140-4",
+                                    "speaker": "Mr. TESTER",
+                                    "text": "...""
+                                    "bioguide_id": "T000464"
+                                },
+                                {
+                                    "id": "id-CREC-2017-03-30-pt1-PgS2140-5",
+                                    "speaker": "The PRESIDING OFFICER",
+                                    "text": "...""
+                                }
+                            ],
+                            "score": 7.5042105
+                        },
+                    ]
+                }
+                ```
+    3. `cwapi/count`
+        - Uses the same methods as #1 and #2 to return the collected data for a search results page. This includes daily histograms for the current period and the previous one, as well as one page of the documents themselves. Currently only supports searching the "content" field of the CREC docs.
+        - Args:
+            - `start_date`: A timestamp for the start of a date range filter, format: YYYY-MM-DD (inclusive).
+            - `end_date`: End of date range filter, format: YYYY-MM-DD (inclusive).
+            - `days_ago`: Number of days before the current date to retrieve results for.
+            - `term`: A search term (or terms, space separated) to search by (in the "content" field) and count occurrences.
+    
 ### legislators api
 
 The legislators are pulled from the [unitedstates/congress-legislators](https://github.com/unitedstates/congress-legislators) project and stored in the database.
@@ -116,10 +219,16 @@ The scraper takes a date range and pulls in each zip file for every day in that 
 
 ### parser
 
-The parser looks up the mods.xml file in the staged S3 data and extracts the metadata specific to each CREC document. It also does some NLP analysis of the content of each document. The resulting parsed data is uploaded to elasticsearch and rds.
+The parser looks up the mods.xml file in the staged S3 data and extracts the metadata specific to each CREC document. It also does some NLP analysis of the content of each document. The resulting parsed data is uploaded to elasticsearch and the django configured db.
 
 Example usage:
 
 ```
 ./manage.py run_crec_parser --start_date=2016-01-20 --end_date=2016-01-21
 ```
+
+### Tests
+
+Most of the test cases included are integration tests that required a live elasticsearch cluster configured in the django settings file. A separate test index is defined in the `capitolweb.settings_test` module. `manage.py` has been modified to ensure that running `./manage.py test` will override any environment variable settings and always use the test settings.
+
+You should be able run the scraper and parser tests without any external dependencies as they rely on [moto](https://github.com/spulec/moto) to mock out S3 operations.

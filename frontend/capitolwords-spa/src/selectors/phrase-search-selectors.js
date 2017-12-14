@@ -52,11 +52,11 @@ function processSpeaker(s) {
 
 function docToSearchResultItem(doc) {
   return {
-    id: doc._id,
+    id: doc.crec_id,
     displayDate: doc.human_date,
     mentionCount: doc.mentions,
-    title: doc._source.title,
-    docUrl: doc._source.html_url,
+    title: doc.title,
+    docUrl: doc.html_url,
     snippet: doc.snippet,
     speakers: doc.speakers.map(processSpeaker)
   };
