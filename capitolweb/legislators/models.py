@@ -52,8 +52,8 @@ class Term(models.Model):
     caucus = models.CharField(max_length=25)
     address = models.TextField()
     office = models.TextField()
-    phone = models.CharField(max_length=20)
-    fax = models.CharField(max_length=20)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    fax = models.CharField(max_length=20, blank=True, null=True)
     contact_form = models.URLField(blank=True, null=True)
     rss_url = models.URLField(blank=True, null=True)
     url = models.URLField(blank=True, null=True)
@@ -78,5 +78,3 @@ def get_current_legislators():
     """
     results = CongressPerson.objects.filter(terms__start_date__lte=date.today(), terms__end_date__gte=date.today())
     return results
-
-
