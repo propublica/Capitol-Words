@@ -57,30 +57,30 @@ GENERIC_SPEAKERS = HOUSE_GENERIC_SPEAKERS + SENATE_GENERIC_SPEAKERS
 
 
 class CRECParser(object):
-    
-    def __init__(self, 
+
+    def __init__(self,
                  xml_tree,
-                 date_issued, 
+                 date_issued,
                  xml_namespace=DEFAULT_XML_NS):
         self._xml_tree = xml_tree
         self._xml_namespace = xml_namespace
         self.date_issued = date_issued
-        self.s3 = boto3.client('s3')
-        
+        self.s3 = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
+
     def _get_by_xpath(self, xml_tree, xpath):
         return xml_tree.xpath(xpath, namespaces=self._xml_namespace)
 
-    @cached_property                
+    @cached_property
     def id(self):
         """@ID field in mods metadata, usually corresponds to filename minus the
         file extension.
-        
+
         Example:
             "id-CREC-2017-01-20-pt1-PgD55"
         """
         return self._get_by_xpath(self._xml_tree, 'string(@ID)')
 
-    @cached_property        
+    @cached_property
     def title(self):
         """Title of CREC document.
         """
@@ -88,7 +88,7 @@ class CRECParser(object):
             self._xml_tree, 'string(ns:titleInfo/ns:title)'
         )
 
-    @cached_property                
+    @cached_property
     def title_part(self):
         """Section of daily batch of CREC docs, usually one of "Daily Digest",
         "Extensions of Remarks", "House", "Senate".
@@ -97,25 +97,25 @@ class CRECParser(object):
             self._xml_tree, 'string(ns:titleInfo/ns:partName)'
         )
 
-    @cached_property            
+    @cached_property
     def pdf_url(self):
         """Location on gpo.gov for the pdf version of this CREC doc.
         """
         return self._get_by_xpath(
-            self._xml_tree, 
+            self._xml_tree,
             'string(ns:location/ns:url[@displayLabel="PDF rendition"])'
         )
 
-    @cached_property            
+    @cached_property
     def html_url(self):
         """Location on gpo.gov for the html version of this CREC doc.
         """
         return self._get_by_xpath(
-            self._xml_tree, 
+            self._xml_tree,
             'string(ns:location/ns:url[@displayLabel="HTML rendition"])'
         )
 
-    @cached_property            
+    @cached_property
     def page_start(self):
         """CREC docs are grouped into one large pdf each day, this indicates the
         page on which this document starts (a single page can include more than
@@ -126,7 +126,7 @@ class CRECParser(object):
             'string(ns:part[@type="article"]/ns:extent/ns:start)'
         )
 
-    @cached_property            
+    @cached_property
     def page_end(self):
         """CREC docs are grouped into one large pdf each day, this indicates the
         page on which this document ends (a single page can include more than
@@ -137,12 +137,12 @@ class CRECParser(object):
             'string(ns:part[@type="article"]/ns:extent/ns:end)'
         )
 
-    @cached_property        
+    @cached_property
     def speakers(self):
         """List of names of people identified as speakers in this doc. Names
         usually corrrespond to the ``official_full`` field in bioguide data.
         Can be empty.
-        
+
         Examples:
             ``['Mitch McConnell', 'Roy Blunt', 'Charles E. Schumer']``
             ``['Charles E. Schumer']``
@@ -157,7 +157,7 @@ class CRECParser(object):
         """Maps a short name version of a speaker's name with their bioguideid,
         this is used for matching segments within this doc to the speaker for
         that segment. Can be empty.
-        
+
         Examples:
             ``{'Mr. GALLEGO': 'G000574'}``
             ``{'Mr. SMITH': 'S000583', 'Mr. LATTA': 'L000566'}``
@@ -175,7 +175,7 @@ class CRECParser(object):
             if person.get('role') == 'SPEAKING':
                 speaker_ids_[sanitized_name] = person.get('bioGuideId')
         return speaker_ids_
-    
+
     @cached_property
     def content(self):
         """The text of this CREC doc (may be plain text or html).
@@ -190,7 +190,7 @@ class CRECParser(object):
         except ClientError as e:
             # TODO: Proper error handling for missing CREC file.
             print(s3_key)
-        
+
     @cached_property
     def is_daily_digest(self):
         """True if this doc is a daily digest. The Daily Digest is an
@@ -214,14 +214,14 @@ class CRECParser(object):
             return self.id.split('-')[-1].startswith('FrontMatter')
         else:
             return False
-    
+
     def is_skippable(self):
         """Returns True if this is one of the type of documents in the daily
         aggregation of CREC docs that does not contain relevant data and should
         not be uploaded to elasticsearch.
         """
-        return self.is_daily_digest or self.is_front_matter    
-        
+        return self.is_daily_digest or self.is_front_matter
+
     @cached_property
     def textacy_text(self):
         """An instance of ``textacy.Doc`` containing preprocessed data from the
@@ -229,18 +229,18 @@ class CRECParser(object):
         """
         text = text_utils.preprocess(self.content)
         return textacy.Doc(SPACY_NLP(text))
-    
+
     @cached_property
     def named_entity_counts(self):
         """A nested-dict mapping named entity type to a histogram dict of any
-        named entities of that type contained within ``content``. See 
-        `https://spacy.io/usage/linguistic-features#section-named-entities`_ 
+        named entities of that type contained within ``content``. See
+        `https://spacy.io/usage/linguistic-features#section-named-entities`_
         for a list and decriptions of these types.
-        
+
         Example:
-        
+
             ::
-            
+
                 {
                     'PERSON': {
                         'Benjamin S. Carson': 1, 'Elaine L. Chao': 1
@@ -252,7 +252,7 @@ class CRECParser(object):
         """
         named_entities = text_utils.get_named_entities(self.textacy_text)
         named_entity_counts_ = {}
-        if any(named_entities):            
+        if any(named_entities):
             named_entity_types = text_utils.get_named_entity_types(
                 named_entities
             )
@@ -272,21 +272,21 @@ class CRECParser(object):
                         for ne in named_entity_types[ne_type]
                     }
         return named_entity_counts_
-    
+
     @cached_property
     def noun_chunks_counts(self):
         """A dict mapping noun chunks type to number of occurrences within
         ``content``.
-        
+
         Example:
 
             ::
-        
+
                 {
-                    'united states trade representative': 1, 
+                    'united states trade representative': 1,
                     'unanimous consent agreement': 1,
                 }
-        """        
+        """
         noun_chunks = text_utils.get_noun_chunks(self.textacy_text)
         noun_chunks = text_utils.named_entity_dedupe(
             noun_chunks,
@@ -304,16 +304,16 @@ class CRECParser(object):
         new segment.
 
         Example:
-        
+
             ::
                 [
                     {
-                        'id': 'id-CREC-2017-01-20-pt1-PgS348-1', 
-                        'speaker': 'Mr. McCONNELL', 
+                        'id': 'id-CREC-2017-01-20-pt1-PgS348-1',
+                        'speaker': 'Mr. McCONNELL',
                         'text': 'THANKING FORMER PRESIDENT OBAMA. Mr. McCONNELL.Mr.  President, I wish to offer a few words regarding...',
                         'bioguide_id': 'M000355'
                     },
-                    {  
+                    {
                         'id': 'id-CREC-2017-01-20-pt1-PgS348-2-1',
                         'speaker': 'Mr. DURBIN',
                         'text': 'NOMINATIONS. Mr. DURBIN.  Mr. President, I listened carefully to the statement by theRepublican lead...',
@@ -361,11 +361,11 @@ class CRECParser(object):
             else:
                 segment_sents.append(sent)
         return segments_
-    
+
     def to_es_doc(self):
         """Returns the CRECParser as a dict ready to be uploaded to
         elasticsearch.
-        
+
         Returns:
             dict: A dict representation of this document.
         """
@@ -385,15 +385,15 @@ class CRECParser(object):
 
 
 def upload_speaker_word_counts(crec_parser):
-    """Creates new entries of the SpeakerWordCounts ORM model containing 
+    """Creates new entries of the SpeakerWordCounts ORM model containing
     counts of named entities and noun chunks within this document.
-    
+
     Args:
         crec_parser (:class:`parser.crec_parser.CRECParser`): A CRECParser
             instance representing a single CREC document.
     """
     if crec_parser.speaker_ids:
-        named_entities = {'named_entities_{0}'.format(ne_type): counts                    
+        named_entities = {'named_entities_{0}'.format(ne_type): counts
                           for ne_type, counts in crec_parser.named_entity_counts.items()}
         for bioguide_id in crec_parser.speaker_ids.values():
             speaker_counts = SpeakerWordCounts(
@@ -408,16 +408,16 @@ def upload_speaker_word_counts(crec_parser):
 
 def extract_crecs_from_mods(mods_file_obj, xml_namespace=DEFAULT_XML_NS):
     """Takes a file-like object containing mods.xml data for a single day,
-    extracts each "constituent" (a single CREC document from that day) and 
+    extracts each "constituent" (a single CREC document from that day) and
     creates a new CRECParser instance for that document. Returns all CRECParser
     instances created for a single day as a list.
-    
+
     Args:
         mods_file_obj (file): An open file, StringIO or BytesIO buffer
             containing mods.xml data.
         xml_namespace (dict): The xml_namespaces argument to use with the lxml
             parser.
-    
+
     Returns:
         list of :class:`parser.crec_parser.CRECParser`: A list of parsed CREC
             docs for a single day.
