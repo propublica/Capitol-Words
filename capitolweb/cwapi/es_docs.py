@@ -2,16 +2,13 @@ from django.conf import settings
 from elasticsearch_dsl import Search, Index, DocType, Date, Text, Nested
 from elasticsearch_dsl import InnerObjectWrapper
 from elasticsearch_dsl.connections import connections
-from elasticsearch import RequestsHttpConnection
-#import certifi
 
-connections.create_connection(hosts=[{'host':settings.ES_URL, 'port':443, 'use_ssl':True}], timeout=20)
-
+connections.create_connection(hosts=[settings.ES_URL], timeout=20)
 
 def make_search():
     """Convenience function for returning a base :cls:`elasticsearch_dsl.Search`
     instance using the index name in django settings.
-    
+
     Returns:
         :cls:`elasticsearch_dsl.Search`: An elasticsearch_dsl Search instance.
     """
@@ -21,7 +18,7 @@ def make_search():
 def get_term_count_agg(results):
     """Convenience function for extracting the date histogram from the a term
     count aggregation.
-    
+
     Returns:
         list: A list of aggregation buckets containing both the date and the
             aggregated term count for that bucket.
@@ -37,11 +34,11 @@ def term_counts_script(term):
     painless limits total iterations in a loop, this will not return accurate
     counts for docs that contain more than 4999 tokens (the overwhelming
     majority of CREC documents fall below this limit).
-    
+
     Args:
         term (str): A search term to look for in the "content" field of each
             CREC document.
-    
+
     Returns:
         dict: The content for a scripted metric aggregation part of an
             elasticsearch query.
@@ -86,7 +83,7 @@ def term_counts_script(term):
 class CRECDoc(DocType):
     """An elasticsearch_dsl document model for CREC documents.
     """
-    
+
     title = Text()
     title_part = Text()
     date_issued = Date()
@@ -102,10 +99,10 @@ class CRECDoc(DocType):
             'segment_id': Text(),
             'speaker': Text(),
             'text': Text(),
-            'bioguide_id': Text() 
+            'bioguide_id': Text()
         }
     )
-    
+
     class Meta:
         index = settings.ES_CW_INDEX
 
@@ -114,14 +111,14 @@ def get_term_count_in_doc(es_conn, term, start_date, end_date):
     """Queries elasticsearch with a scripted metric aggregation, bucketed by
     day, that counts the total number of occurrences of the provided term in
     every CREC document in that bucket.
-    
+
     Args:
         es_conn :cls:`elasticsearch.Elasticsearch`: A connection to an
             elasticsearch cluster.
         term (str): Search term.
         start_date (date): Start of date range.
         end_date (date): End of date range.
-    
+
     Returns:
         dict: The response from the elasticsearch query.
     """
