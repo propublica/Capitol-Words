@@ -2,12 +2,12 @@
 
 HERE=$(unset CDPATH && cd "$(dirname $BASH_SOURCE)" && echo $PWD)
 ROOT=$(cd $HERE && git rev-parse --show-toplevel)
-DJANGOROOT="${ROOT}/capitolwords_ng/capitolweb"
-REQUIREMENTS="${ROOT}/capitolwords_ng/requirements.txt"
+DJANGOROOT="${ROOT}/capitolweb"
+REQUIREMENTS="${ROOT}/requirements.txt"
 PIP=$(which pip3 || which pip)
 PYTHON=$(which python3 || which python)
 
 env CFLAGS="-Wno-narrowing" $PIP install -r $REQUIREMENTS
 (cd $DJANGOROOT && $PYTHON manage.py migrate)
 (cd $DJANGOROOT && echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'pass') if not User.objects.filter(username='admin') else None" | $PYTHON manage.py shell)
-cd $ROOT/capitolwords_ng/capitolweb && exec python manage.py runserver $*
+cd $ROOT/capitolweb && exec python manage.py runserver $*

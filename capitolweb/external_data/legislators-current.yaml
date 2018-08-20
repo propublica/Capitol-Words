@@ -618,7 +618,7 @@
     state: UT
     party: Republican
     class: 1
-    url: http://www.hatch.senate.gov
+    url: https://www.hatch.senate.gov
     address: 104 Hart Senate Office Building Washington DC 20510
     phone: 202-224-5251
     fax: 202-224-6331
@@ -1104,7 +1104,7 @@
     address: 731 Hart Senate Office Building Washington DC 20510
     phone: 202-224-4822
     fax: 202-228-0325
-    contact_form: http://www.stabenow.senate.gov/?p=contact
+    contact_form: https://www.stabenow.senate.gov/contact
     office: 731 Hart Senate Office Building
     state_rank: senior
     rss_url: http://stabenow.senate.gov/rss/?p=news
@@ -1581,7 +1581,7 @@
     state: ME
     class: 2
     party: Republican
-    url: http://www.collins.senate.gov
+    url: https://www.collins.senate.gov
     address: 413 Dirksen Senate Office Building Washington DC 20510
     phone: 202-224-2523
     fax: 202-224-2693
@@ -2225,7 +2225,7 @@
     - S6RI00163
     - H0RI02071
     cspan: 24239
-    wikipedia: Jack Reed (politician)
+    wikipedia: Jack Reed (Rhode Island politician)
     house_history: 20232
     ballotpedia: Jack Reed
     maplight: 600
@@ -2735,64 +2735,10 @@
     address: 478 Russell Senate Office Building Washington DC 20510
     phone: 202-224-4451
     fax: 202-228-0282
-    contact_form: http://www.gillibrand.senate.gov/contact/
+    contact_form: https://www.gillibrand.senate.gov/contact/email-me
     office: 478 Russell Senate Office Building
     state_rank: junior
     rss_url: http://www.gillibrand.senate.gov/rss/
-- id:
-    bioguide: F000457
-    thomas: '01969'
-    lis: S332
-    govtrack: 412378
-    opensecrets: N00029016
-    votesmart: 108924
-    fec:
-    - S8MN00438
-    cspan: 23334
-    wikipedia: Al Franken
-    ballotpedia: Al Franken
-    maplight: 1189
-    icpsr: 40904
-    wikidata: Q319084
-    google_entity_id: kg:/m/01lct6
-  name:
-    first: Alan
-    middle: Stuart
-    last: Franken
-    nickname: Al
-    official_full: Al Franken
-  bio:
-    birthday: '1951-05-21'
-    gender: M
-  terms:
-  - type: sen
-    start: '2009-07-07'
-    end: '2015-01-03'
-    state: MN
-    class: 2
-    party: Democrat
-    url: http://www.franken.senate.gov
-    address: 309 Hart Senate Office Building Washington DC 20510
-    phone: 202-224-5641
-    contact_form: http://www.franken.senate.gov/?p=email_al
-    fax: 202-224-0044
-    office: 309 Hart Senate Office Building
-    state_rank: junior
-    rss_url: http://franken.senate.gov/rss/?p=hot_topic
-  - type: sen
-    start: '2015-01-06'
-    end: '2021-01-03'
-    state: MN
-    class: 2
-    party: Democrat
-    url: https://www.franken.senate.gov
-    address: 309 Hart Senate Office Building Washington DC 20510
-    phone: 202-224-5641
-    contact_form: https://www.franken.senate.gov/?p=contact
-    office: 309 Hart Senate Office Building
-    state_rank: junior
-    rss_url: http://franken.senate.gov/rss/?p=hot_topic
-    fax: 202-224-0044
 - id:
     bioguide: C001088
     thomas: '01984'
@@ -2888,7 +2834,7 @@
     state: WV
     party: Democrat
     class: 1
-    url: https://www.manchin.senate.gov/public
+    url: https://www.manchin.senate.gov
     address: 306 Hart Senate Office Building Washington DC 20510
     phone: 202-224-3954
     contact_form: http://www.manchin.senate.gov/public/index.cfm/contact-form
@@ -3086,7 +3032,7 @@
     district: 3
     party: Republican
     phone: 202-225-3831
-    url: http://amash.house.gov
+    url: https://amash.house.gov
     rss_url: http://amash.house.gov/rss.xml
     address: 114 Cannon HOB; Washington DC 20515-2203
     office: 114 Cannon House Office Building
@@ -3176,11 +3122,11 @@
     party: Democrat
     class: 1
     url: https://www.baldwin.senate.gov
-    address: 709 Hart Washington DC 20510
+    address: 709 Hart Senate Office Building Washington DC 20510
     phone: 202-224-5653
     fax: 202-225-6942
     contact_form: https://www.baldwin.senate.gov/feedback
-    office: 709 Hart
+    office: 709 Hart Senate Office Building
     state_rank: junior
     rss_url: http://www.baldwin.senate.gov/rss/feeds/?type=all
 - id:
@@ -3251,7 +3197,7 @@
     district: 11
     party: Republican
     phone: 202-225-6511
-    url: http://barletta.house.gov
+    url: https://barletta.house.gov
     rss_url: http://barletta.house.gov/common/rss//index.cfm?rss=25
     address: 2049 Rayburn HOB; Washington DC 20515-3811
     office: 2049 Rayburn House Office Building
@@ -3736,7 +3682,7 @@
     district: 1
     party: Republican
     phone: 202-225-0453
-    url: http://robbishop.house.gov
+    url: https://robbishop.house.gov
     rss_url: http://robbishop.house.gov/news/rss.aspx
     address: 123 Cannon HOB; Washington DC 20515-4401
     office: 123 Cannon House Office Building
@@ -3870,7 +3816,7 @@
     district: 2
     party: Democrat
     phone: 202-225-3631
-    url: http://bishop.house.gov
+    url: https://bishop.house.gov
     rss_url: http://bishop.house.gov/rss.xml
     address: 2407 Rayburn HOB; Washington DC 20515-1002
     office: 2407 Rayburn House Office Building
@@ -3942,7 +3888,7 @@
     district: 6
     party: Republican
     phone: 202-225-4231
-    url: http://black.house.gov
+    url: https://black.house.gov
     rss_url: http://black.house.gov/rss.xml
     address: 1131 Longworth HOB; Washington DC 20515-4206
     office: 1131 Longworth House Office Building
@@ -4046,7 +3992,7 @@
     district: 7
     party: Republican
     phone: 202-225-2811
-    url: http://blackburn.house.gov
+    url: https://blackburn.house.gov
     rss_url: http://blackburn.house.gov/news/rss.aspx
     address: 2266 Rayburn HOB; Washington DC 20515-4207
     office: 2266 Rayburn House Office Building
@@ -4636,7 +4582,7 @@
     district: 8
     party: Republican
     phone: 202-225-4901
-    url: http://kevinbrady.house.gov
+    url: https://kevinbrady.house.gov
     rss_url: http://kevinbrady.house.gov/common/rss/index.cfm?rss=49
     address: 1011 Longworth HOB; Washington DC 20515-4308
     office: 1011 Longworth House Office Building
@@ -4757,7 +4703,7 @@
     district: 1
     party: Democrat
     phone: 202-225-4731
-    url: http://brady.house.gov
+    url: https://brady.house.gov
     rss_url: http://brady.house.gov/rss.xml
     address: 2004 Rayburn HOB; Washington DC 20515-3801
     office: 2004 Rayburn House Office Building
@@ -5094,7 +5040,7 @@
     district: 26
     party: Republican
     phone: 202-225-7772
-    url: http://burgess.house.gov
+    url: https://burgess.house.gov
     rss_url: http://burgess.house.gov/news/rss.aspx
     address: 2336 Rayburn HOB; Washington DC 20515-4326
     office: 2336 Rayburn House Office Building
@@ -5293,7 +5239,7 @@
     district: 1
     party: Democrat
     phone: 202-225-3101
-    url: http://butterfield.house.gov
+    url: https://butterfield.house.gov
     rss_url: http://butterfield.house.gov/rss/press-releases.xml/
     address: 2080 Rayburn HOB; Washington DC 20515-3301
     office: 2080 Rayburn House Office Building
@@ -5426,7 +5372,7 @@
     district: 42
     party: Republican
     phone: 202-225-1986
-    url: http://calvert.house.gov
+    url: https://calvert.house.gov
     rss_url: http://calvert.house.gov/news/rss.aspx
     address: 2205 Rayburn HOB; Washington DC 20515-0542
     office: 2205 Rayburn House Office Building
@@ -5731,7 +5677,7 @@
     district: 7
     party: Democrat
     phone: 202-225-4011
-    url: http://carson.house.gov
+    url: https://carson.house.gov
     rss_url: http://carson.house.gov/index.php?option=com_bca-rss-syndicator&amp;feed_id=1
     address: 2135 Rayburn HOB; Washington DC 20515-1407
     office: 2135 Rayburn House Office Building
@@ -5998,7 +5944,7 @@
     district: 14
     party: Democrat
     phone: 202-225-3376
-    url: http://castor.house.gov
+    url: https://castor.house.gov
     rss_url: http://castor.house.gov/news/rss.aspx
     address: 2052 Rayburn HOB; Washington DC 20515-0914
     office: 2052 Rayburn House Office Building
@@ -6118,92 +6064,11 @@
     district: 1
     party: Republican
     phone: 202-225-2216
-    url: http://chabot.house.gov
+    url: https://chabot.house.gov
     rss_url: http://chabot.house.gov/common/rss/index.cfm?rss=49
     address: 2371 Rayburn HOB; Washington DC 20515-3501
     office: 2371 Rayburn House Office Building
     fax: 202-225-3012
-- id:
-    bioguide: C001076
-    thomas: '01956'
-    govtrack: 412270
-    opensecrets: N00028958
-    votesmart: 103482
-    fec:
-    - H8UT03089
-    cspan: 1031362
-    wikipedia: Jason Chaffetz
-    house_history: 11813
-    ballotpedia: Jason Chaffetz
-    maplight: 752
-    icpsr: 20949
-    wikidata: Q1683881
-    google_entity_id: kg:/m/047blr4
-  name:
-    first: Jason
-    last: Chaffetz
-    official_full: Jason Chaffetz
-  bio:
-    birthday: '1967-03-26'
-    gender: M
-  terms:
-  - type: rep
-    start: '2009-01-06'
-    end: '2011-01-03'
-    state: UT
-    district: 3
-    party: Republican
-    url: http://chaffetz.house.gov
-  - type: rep
-    start: '2011-01-05'
-    end: '2013-01-03'
-    state: UT
-    district: 3
-    party: Republican
-    url: http://chaffetz.house.gov
-    address: 1032 Longworth HOB; Washington DC 20515-4403
-    phone: 202-225-7751
-    fax: 202-225-5629
-    contact_form: https://forms.house.gov/chaffetz/contact-form.shtml
-    office: 1032 Longworth House Office Building
-  - type: rep
-    start: '2013-01-03'
-    end: '2015-01-03'
-    state: UT
-    party: Republican
-    district: 3
-    url: http://chaffetz.house.gov
-    address: 2464 Rayburn HOB; Washington DC 20515-4403
-    phone: 202-225-7751
-    fax: 202-225-5629
-    contact_form: https://chaffetz.house.gov/contact-me/email-me
-    office: 2464 Rayburn House Office Building
-    rss_url: http://chaffetz.house.gov/rss.xml
-  - type: rep
-    start: '2015-01-06'
-    end: '2017-01-03'
-    state: UT
-    party: Republican
-    district: 3
-    url: http://chaffetz.house.gov
-    address: 2236 Rayburn HOB; Washington DC 20515-4403
-    phone: 202-225-7751
-    fax: 202-225-5629
-    contact_form: https://chaffetz.house.gov/contact-me/email-me
-    office: 2236 Rayburn House Office Building
-    rss_url: http://chaffetz.house.gov/rss.xml
-  - type: rep
-    start: '2017-01-03'
-    end: '2019-01-03'
-    state: UT
-    district: 3
-    party: Republican
-    phone: 202-225-7751
-    url: https://chaffetz.house.gov
-    rss_url: http://chaffetz.house.gov/rss.xml
-    address: 2236 Rayburn HOB; Washington DC 20515-4403
-    office: 2236 Rayburn House Office Building
-    fax: 202-225-5629
 - id:
     bioguide: C001080
     thomas: '01970'
@@ -6355,7 +6220,7 @@
     district: 1
     party: Democrat
     phone: 202-225-4911
-    url: http://cicilline.house.gov
+    url: https://cicilline.house.gov
     rss_url: http://cicilline.house.gov/rss.xml
     address: 2244 Rayburn HOB; Washington DC 20515-3901
     office: 2244 Rayburn House Office Building
@@ -6464,6 +6329,7 @@
     icpsr: 20147
     wikidata: Q959455
     google_entity_id: kg:/m/024vjr
+    ballotpedia: William Lacy Clay
   name:
     first: Wm.
     middle: Lacy
@@ -6648,7 +6514,7 @@
     district: 5
     party: Democrat
     phone: 202-225-4535
-    url: http://cleaver.house.gov
+    url: https://cleaver.house.gov
     rss_url: http://cleaver.house.gov/rss.xml
     address: 2335 Rayburn HOB; Washington DC 20515-2505
     office: 2335 Rayburn House Office Building
@@ -6783,7 +6649,7 @@
     district: 6
     party: Democrat
     phone: 202-225-3315
-    url: http://clyburn.house.gov
+    url: https://clyburn.house.gov
     rss_url: http://clyburn.house.gov/rss.xml
     address: 242 Cannon HOB; Washington DC 20515-4006
     office: 242 Cannon House Office Building
@@ -6868,7 +6734,7 @@
     district: 6
     party: Republican
     phone: 202-225-7882
-    url: http://coffman.house.gov
+    url: https://coffman.house.gov
     rss_url: http://coffman.house.gov/index.php?format=feed&amp;type=rss
     address: 2443 Rayburn HOB; Washington DC 20515-0606
     office: 2443 Rayburn House Office Building
@@ -7153,7 +7019,7 @@
     district: 11
     party: Republican
     phone: 202-225-3605
-    url: http://conaway.house.gov
+    url: https://conaway.house.gov
     address: 2430 Rayburn HOB; Washington DC 20515-4311
     office: 2430 Rayburn House Office Building
     fax: 202-225-1783
@@ -7238,224 +7104,6 @@
     address: 2238 Rayburn HOB; Washington DC 20515-4611
     office: 2238 Rayburn House Office Building
     fax: 202-225-3071
-- id:
-    bioguide: C000714
-    thomas: '00229'
-    govtrack: 400080
-    opensecrets: N00004029
-    votesmart: 26904
-    icpsr: 10713
-    fec:
-    - H6MI01028
-    cspan: 1824
-    wikipedia: John Conyers
-    house_history: 11348
-    ballotpedia: John Conyers, Jr.
-    maplight: 195
-    wikidata: Q1370968
-    google_entity_id: kg:/m/02hy5d
-  name:
-    first: John
-    last: Conyers
-    suffix: Jr.
-    official_full: John Conyers, Jr.
-  bio:
-    birthday: '1929-05-16'
-    gender: M
-    religion: Baptist
-  terms:
-  - type: rep
-    start: '1965-01-04'
-    end: '1967-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1967-01-10'
-    end: '1969-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1969-01-03'
-    end: '1971-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1971-01-21'
-    end: '1973-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1973-01-03'
-    end: '1975-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1975-01-14'
-    end: '1977-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1977-01-04'
-    end: '1979-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1979-01-15'
-    end: '1981-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1981-01-05'
-    end: '1983-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1983-01-03'
-    end: '1985-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1985-01-03'
-    end: '1987-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1987-01-06'
-    end: '1989-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1989-01-03'
-    end: '1991-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1991-01-03'
-    end: '1993-01-03'
-    state: MI
-    district: 1
-    party: Democrat
-  - type: rep
-    start: '1993-01-05'
-    end: '1995-01-03'
-    state: MI
-    district: 14
-    party: Democrat
-  - type: rep
-    start: '1995-01-04'
-    end: '1997-01-03'
-    state: MI
-    district: 14
-    party: Democrat
-  - type: rep
-    start: '1997-01-07'
-    end: '1999-01-03'
-    state: MI
-    district: 14
-    party: Democrat
-  - type: rep
-    start: '1999-01-06'
-    end: '2001-01-03'
-    state: MI
-    district: 14
-    party: Democrat
-  - type: rep
-    start: '2001-01-03'
-    end: '2003-01-03'
-    state: MI
-    district: 14
-    party: Democrat
-  - type: rep
-    start: '2003-01-07'
-    end: '2005-01-03'
-    state: MI
-    district: 14
-    party: Democrat
-    url: http://www.house.gov/conyers
-  - type: rep
-    start: '2005-01-04'
-    end: '2007-01-03'
-    state: MI
-    district: 14
-    party: Democrat
-    url: http://www.house.gov/conyers
-  - type: rep
-    start: '2007-01-04'
-    end: '2009-01-03'
-    state: MI
-    district: 14
-    party: Democrat
-    url: http://www.house.gov/conyers
-  - type: rep
-    start: '2009-01-06'
-    end: '2011-01-03'
-    state: MI
-    district: 14
-    party: Democrat
-    url: http://www.house.gov/conyers
-  - type: rep
-    start: '2011-01-05'
-    end: '2013-01-03'
-    state: MI
-    district: 14
-    party: Democrat
-    url: http://www.house.gov/conyers
-    address: 2426 Rayburn HOB; Washington DC 20515-2214
-    phone: 202-225-5126
-    fax: 202-225-0072
-    contact_form: http://conyers.house.gov/index.cfm?FuseAction=Contact.OnlineContactForm
-    office: 2426 Rayburn House Office Building
-  - type: rep
-    start: '2013-01-03'
-    end: '2015-01-03'
-    state: MI
-    party: Democrat
-    district: 13
-    url: http://conyers.house.gov
-    address: 2426 Rayburn HOB; Washington DC 20515-2213
-    phone: 202-225-5126
-    fax: 202-225-0072
-    contact_form: https://conyers.house.gov/index.cfm/online-contact-form
-    office: 2426 Rayburn House Office Building
-    rss_url: http://conyers.house.gov/index.cfm/rss/feed
-  - type: rep
-    start: '2015-01-06'
-    end: '2017-01-03'
-    state: MI
-    party: Democrat
-    district: 13
-    url: https://conyers.house.gov
-    address: 2426 Rayburn HOB; Washington DC 20515-2213
-    phone: 202-225-5126
-    fax: 202-225-0072
-    contact_form: https://conyers.house.gov/index.cfm/online-contact-form
-    office: 2426 Rayburn House Office Building
-    rss_url: http://conyers.house.gov/index.cfm/rss/feed
-  - type: rep
-    start: '2017-01-03'
-    end: '2019-01-03'
-    state: MI
-    district: 13
-    party: Democrat
-    phone: 202-225-5126
-    url: https://conyers.house.gov
-    rss_url: http://conyers.house.gov/index.cfm/rss/feed
-    address: 2426 Rayburn HOB; Washington DC 20515-2213
-    office: 2426 Rayburn House Office Building
-    fax: 202-225-0072
 - id:
     bioguide: C000754
     thomas: '00231'
@@ -7592,7 +7240,7 @@
     district: 5
     party: Democrat
     phone: 202-225-4311
-    url: http://cooper.house.gov
+    url: https://cooper.house.gov
     rss_url: http://cooper.house.gov/index.php?format=feed&amp;type=rss
     address: 1536 Longworth HOB; Washington DC 20515-4205
     office: 1536 Longworth House Office Building
@@ -7934,7 +7582,7 @@
     district: 1
     party: Republican
     phone: 202-225-4076
-    url: http://crawford.house.gov
+    url: https://crawford.house.gov
     rss_url: http://crawford.house.gov/news/rss.aspx
     address: 2422 Rayburn HOB; Washington DC 20515-0401
     office: 2422 Rayburn House Office Building
@@ -8050,7 +7698,7 @@
     district: 14
     party: Democrat
     phone: 202-225-3965
-    url: http://crowley.house.gov
+    url: https://crowley.house.gov
     rss_url: http://crowley.house.gov/rss.xml
     address: 1035 Longworth HOB; Washington DC 20515-3214
     office: 1035 Longworth House Office Building
@@ -8144,7 +7792,7 @@
     district: 28
     party: Democrat
     phone: 202-225-1640
-    url: http://cuellar.house.gov
+    url: https://cuellar.house.gov
     rss_url: http://cuellar.house.gov/news/rss.aspx
     address: 2209 Rayburn HOB; Washington DC 20515-4328
     office: 2209 Rayburn House Office Building
@@ -8254,7 +7902,7 @@
     district: 7
     party: Republican
     phone: 202-225-2571
-    url: http://culberson.house.gov
+    url: https://culberson.house.gov
     rss_url: http://culberson.house.gov/rss/
     address: 2161 Rayburn HOB; Washington DC 20515-4307
     office: 2161 Rayburn House Office Building
@@ -8761,7 +8409,7 @@
     district: 4
     party: Democrat
     phone: 202-225-6416
-    url: http://defazio.house.gov
+    url: https://defazio.house.gov
     rss_url: http://www.defazio.house.gov/index.php?format=feed&amp;type=rss
     address: 2134 Rayburn HOB; Washington DC 20515-3704
     office: 2134 Rayburn House Office Building
@@ -8882,7 +8530,7 @@
     district: 1
     party: Democrat
     phone: 202-225-4431
-    url: http://degette.house.gov
+    url: https://degette.house.gov
     rss_url: http://degette.house.gov/index.php?option=com_ninjarsssyndicator&amp;feed_id=1&amp;format=raw
     address: 2111 Rayburn HOB; Washington DC 20515-0601
     office: 2111 Rayburn House Office Building
@@ -9094,7 +8742,7 @@
     district: 10
     party: Republican
     phone: 202-225-4540
-    url: http://denham.house.gov
+    url: https://denham.house.gov
     rss_url: http://denham.house.gov/rss.xml
     address: 1730 Longworth HOB; Washington DC 20515-0510
     office: 1730 Longworth House Office Building
@@ -9343,7 +8991,7 @@
     district: 22
     party: Democrat
     phone: 202-225-3001
-    url: http://teddeutch.house.gov
+    url: https://teddeutch.house.gov
     rss_url: http://teddeutch.house.gov/news/rss.aspx
     address: 2447 Rayburn HOB; Washington DC 20515-0922
     office: 2447 Rayburn House Office Building
@@ -9446,7 +9094,7 @@
     district: 25
     party: Republican
     phone: 202-225-4211
-    url: http://mariodiazbalart.house.gov
+    url: https://mariodiazbalart.house.gov
     rss_url: http://mariodiazbalart.house.gov/rss.xml
     address: 440 Cannon HOB; Washington DC 20515-0925
     office: 440 Cannon House Office Building
@@ -9772,7 +9420,7 @@
     district: 14
     party: Democrat
     phone: 202-225-2135
-    url: http://doyle.house.gov
+    url: https://doyle.house.gov
     rss_url: http://doyle.house.gov/rss.xml
     address: 239 Cannon HOB; Washington DC 20515-3814
     office: 239 Cannon House Office Building
@@ -9918,7 +9566,7 @@
     district: 3
     party: Republican
     phone: 202-225-5301
-    url: http://jeffduncan.house.gov
+    url: https://jeffduncan.house.gov
     rss_url: http://jeffduncan.house.gov/rss.xml
     address: 2229 Rayburn HOB; Washington DC 20515-4003
     office: 2229 Rayburn House Office Building
@@ -9933,7 +9581,7 @@
     fec:
     - H8TN02069
     cspan: 6114
-    wikipedia: Jimmy Duncan (U.S. politician)
+    wikipedia: Jimmy Duncan (politician)
     house_history: 12493
     maplight: 228
     wikidata: Q653994
@@ -10071,7 +9719,7 @@
     district: 2
     party: Republican
     phone: 202-225-5435
-    url: http://duncan.house.gov
+    url: https://duncan.house.gov
     rss_url: http://duncan.house.gov/rss.xml
     address: 2207 Rayburn HOB; Washington DC 20515-4202
     office: 2207 Rayburn House Office Building
@@ -10511,7 +10159,7 @@
     district: 27
     party: Republican
     phone: 202-225-7742
-    url: http://farenthold.house.gov
+    url: https://farenthold.house.gov
     rss_url: http://farenthold.house.gov/index.php?format=feed&amp;type=rss
     address: 2331 Rayburn HOB; Washington DC 20515-4327
     office: 2331 Rayburn House Office Building
@@ -10672,7 +10320,7 @@
     district: 3
     party: Republican
     phone: 202-225-3271
-    url: http://fleischmann.house.gov
+    url: https://fleischmann.house.gov
     rss_url: http://fleischmann.house.gov/rss.xml
     address: 2410 Rayburn HOB; Washington DC 20515-4203
     office: 2410 Rayburn House Office Building
@@ -10744,7 +10392,7 @@
     district: 17
     party: Republican
     phone: 202-225-6105
-    url: http://flores.house.gov
+    url: https://flores.house.gov
     rss_url: http://flores.house.gov/common/rss//index.cfm?rss=25
     address: 2440 Rayburn HOB; Washington DC 20515-4317
     office: 2440 Rayburn House Office Building
@@ -10934,114 +10582,11 @@
     district: 5
     party: Republican
     phone: 202-225-2071
-    url: http://foxx.house.gov
+    url: https://foxx.house.gov
     rss_url: http://foxx.house.gov/common/rss/?rss=55
     address: 2262 Rayburn HOB; Washington DC 20515-3305
     office: 2262 Rayburn House Office Building
     fax: 202-225-2995
-- id:
-    bioguide: F000448
-    thomas: '01707'
-    govtrack: 400141
-    opensecrets: N00006423
-    votesmart: 28399
-    fec:
-    - H4AZ04024
-    cspan: 1003550
-    wikipedia: Trent Franks
-    house_history: 13543
-    ballotpedia: Trent Franks
-    maplight: 251
-    icpsr: 20304
-    wikidata: Q1397303
-    google_entity_id: kg:/m/024p5b
-  name:
-    first: Trent
-    last: Franks
-    official_full: Trent Franks
-  bio:
-    birthday: '1957-06-19'
-    gender: M
-    religion: Baptist
-  terms:
-  - type: rep
-    start: '2003-01-07'
-    end: '2005-01-03'
-    state: AZ
-    district: 2
-    party: Republican
-    url: http://www.house.gov/franks
-  - type: rep
-    start: '2005-01-04'
-    end: '2007-01-03'
-    state: AZ
-    district: 2
-    party: Republican
-    url: http://www.house.gov/franks
-  - type: rep
-    start: '2007-01-04'
-    end: '2009-01-03'
-    state: AZ
-    district: 2
-    party: Republican
-    url: http://www.house.gov/franks
-  - type: rep
-    start: '2009-01-06'
-    end: '2011-01-03'
-    state: AZ
-    district: 2
-    party: Republican
-    url: http://www.house.gov/franks
-  - type: rep
-    start: '2011-01-05'
-    end: '2013-01-03'
-    state: AZ
-    district: 2
-    party: Republican
-    url: http://www.house.gov/franks
-    address: 2435 Rayburn HOB; Washington DC 20515-0302
-    phone: 202-225-4576
-    fax: 202-225-6328
-    contact_form: https://forms.house.gov/franks/email_zipcheck.shtml
-    office: 2435 Rayburn House Office Building
-  - type: rep
-    start: '2013-01-03'
-    end: '2015-01-03'
-    state: AZ
-    party: Republican
-    district: 8
-    url: http://franks.house.gov
-    address: 2435 Rayburn HOB; Washington DC 20515-0308
-    phone: 202-225-4576
-    fax: 202-225-6328
-    contact_form: https://franks.house.gov/contact-me/email-me
-    office: 2435 Rayburn House Office Building
-    rss_url: http://franks.house.gov/rss.xml
-  - type: rep
-    start: '2015-01-06'
-    end: '2017-01-03'
-    state: AZ
-    party: Republican
-    district: 8
-    url: http://franks.house.gov
-    address: 2435 Rayburn HOB; Washington DC 20515-0308
-    phone: 202-225-4576
-    fax: 202-225-6328
-    contact_form: https://franks.house.gov/contact-me/email-me
-    office: 2435 Rayburn House Office Building
-    rss_url: http://franks.house.gov/rss.xml
-  - type: rep
-    start: '2017-01-03'
-    end: '2019-01-03'
-    state: AZ
-    district: 8
-    party: Republican
-    phone: 202-225-4576
-    url: https://franks.house.gov
-    rss_url: http://franks.house.gov/rss.xml
-    address: 2435 Rayburn HOB; Washington DC 20515-0308
-    office: 2435 Rayburn House Office Building
-    fax: 202-225-6328
 - id:
     bioguide: F000372
     thomas: '00414'
@@ -11340,7 +10885,7 @@
     district: 3
     party: Democrat
     phone: 202-225-1880
-    url: http://garamendi.house.gov
+    url: https://garamendi.house.gov
     rss_url: http://garamendi.house.gov/rss.xml
     address: 2438 Rayburn HOB; Washington DC 20515-0503
     office: 2438 Rayburn House Office Building
@@ -11780,7 +11325,7 @@
     district: 4
     party: Republican
     phone: 202-225-2315
-    url: http://gosar.house.gov
+    url: https://gosar.house.gov
     rss_url: http://gosar.house.gov/rss.xml
     address: 2057 Rayburn HOB; Washington DC 20515-0304
     office: 2057 Rayburn House Office Building
@@ -11973,7 +11518,7 @@
     district: 12
     party: Republican
     phone: 202-225-5071
-    url: http://kaygranger.house.gov
+    url: https://kaygranger.house.gov
     rss_url: http://kaygranger.house.gov/rss.xml
     address: 1026 Longworth HOB; Washington DC 20515-4312
     office: 1026 Longworth House Office Building
@@ -12269,7 +11814,7 @@
     district: 14
     party: Republican
     phone: 202-225-5211
-    url: http://tomgraves.house.gov
+    url: https://tomgraves.house.gov
     rss_url: http://tomgraves.house.gov/news/rss.aspx
     address: 2078 Rayburn HOB; Washington DC 20515-1014
     office: 2078 Rayburn House Office Building
@@ -12364,7 +11909,7 @@
     district: 9
     party: Democrat
     phone: 202-225-7508
-    url: http://algreen.house.gov
+    url: https://algreen.house.gov
     rss_url: http://algreen.house.gov/rss.xml
     address: 2347 Rayburn HOB; Washington DC 20515-4309
     office: 2347 Rayburn House Office Building
@@ -12571,7 +12116,7 @@
     district: 9
     party: Republican
     phone: 202-225-3861
-    url: http://morgangriffith.house.gov
+    url: https://morgangriffith.house.gov
     rss_url: http://morgangriffith.house.gov/news/rss.aspx
     address: 2202 Rayburn HOB; Washington DC 20515-4609
     office: 2202 Rayburn House Office Building
@@ -12970,7 +12515,7 @@
     district: 3
     party: Republican
     phone: 202-225-5031
-    url: http://harper.house.gov
+    url: https://harper.house.gov
     rss_url: http://harper.house.gov/rss.xml
     address: 2227 Rayburn HOB; Washington DC 20515-2403
     office: 2227 Rayburn House Office Building
@@ -13042,7 +12587,7 @@
     district: 1
     party: Republican
     phone: 202-225-5311
-    url: http://harris.house.gov
+    url: https://harris.house.gov
     rss_url: http://harris.house.gov/rss.xml
     address: 1533 Longworth HOB; Washington DC 20515-2001
     office: 1533 Longworth House Office Building
@@ -13249,7 +12794,7 @@
     district: 20
     party: Democrat
     phone: 202-225-1313
-    url: http://alceehastings.house.gov
+    url: https://alceehastings.house.gov
     rss_url: http://www.alceehastings.house.gov/news/rss.aspx
     address: 2353 Rayburn HOB; Washington DC 20515-0920
     office: 2353 Rayburn House Office Building
@@ -13410,7 +12955,7 @@
     district: 5
     party: Republican
     phone: 202-225-3484
-    url: http://hensarling.house.gov
+    url: https://hensarling.house.gov
     rss_url: http://hensarling.house.gov/atom.xml
     address: 2228 Rayburn HOB; Washington DC 20515-4305
     office: 2228 Rayburn House Office Building
@@ -13482,7 +13027,7 @@
     district: 3
     party: Republican
     phone: 202-225-3536
-    url: http://herrerabeutler.house.gov
+    url: https://herrerabeutler.house.gov
     rss_url: http://herrerabeutler.house.gov/news/rss.aspx
     address: 1107 Longworth HOB; Washington DC 20515-4703
     office: 1107 Longworth House Office Building
@@ -13577,7 +13122,7 @@
     district: 26
     party: Democrat
     phone: 202-225-3306
-    url: http://higgins.house.gov
+    url: https://higgins.house.gov
     rss_url: http://higgins.house.gov/rss.xml
     address: 2459 Rayburn HOB; Washington DC 20515-3226
     office: 2459 Rayburn House Office Building
@@ -14045,7 +13590,7 @@
     district: 2
     party: Republican
     phone: 202-225-4401
-    url: http://huizenga.house.gov
+    url: https://huizenga.house.gov
     rss_url: http://huizenga.house.gov/news/rss.aspx
     address: 2232 Rayburn HOB; Washington DC 20515-2202
     office: 2232 Rayburn House Office Building
@@ -14118,7 +13663,7 @@
     district: 14
     party: Republican
     phone: 202-225-2976
-    url: http://hultgren.house.gov
+    url: https://hultgren.house.gov
     rss_url: http://hultgren.house.gov/common/rss//index.cfm?rss=49
     address: 2455 Rayburn HOB; Washington DC 20515-1314
     office: 2455 Rayburn House Office Building
@@ -14521,7 +14066,7 @@
     district: 18
     party: Democrat
     phone: 202-225-3816
-    url: http://jacksonlee.house.gov
+    url: https://jacksonlee.house.gov
     rss_url: http://jacksonlee.house.gov/news/rss.aspx
     address: 2187 Rayburn HOB; Washington DC 20515-4318
     office: 2187 Rayburn House Office Building
@@ -14675,7 +14220,7 @@
     district: 6
     party: Republican
     phone: 202-225-5705
-    url: http://billjohnson.house.gov
+    url: https://billjohnson.house.gov
     rss_url: http://billjohnson.house.gov/constituentservices/opendoorsschedule.htm
     address: 1710 Longworth HOB; Washington DC 20515-3506
     office: 1710 Longworth House Office Building
@@ -14808,7 +14353,7 @@
     district: 30
     party: Democrat
     phone: 202-225-8885
-    url: http://ebjohnson.house.gov
+    url: https://ebjohnson.house.gov
     rss_url: http://ebjohnson.house.gov/common/rss//index.cfm?rss=21
     address: 2468 Rayburn HOB; Washington DC 20515-4330
     office: 2468 Rayburn House Office Building
@@ -14914,7 +14459,7 @@
     fec:
     - S0WI00197
     cspan: 62835
-    wikipedia: Ron Johnson (U.S. politician)
+    wikipedia: Ron Johnson (American politician)
     ballotpedia: Ron Johnson (Wisconsin)
     maplight: 1501
     icpsr: 41111
@@ -15090,7 +14635,7 @@
     district: 3
     party: Republican
     phone: 202-225-4201
-    url: http://samjohnson.house.gov
+    url: https://samjohnson.house.gov
     rss_url: http://samjohnson.house.gov/news/rss.aspx
     address: 2304 Rayburn HOB; Washington DC 20515-4303
     office: 2304 Rayburn House Office Building
@@ -15219,7 +14764,7 @@
     district: 3
     party: Republican
     phone: 202-225-3415
-    url: http://jones.house.gov
+    url: https://jones.house.gov
     rss_url: http://jones.house.gov/rss.xml
     address: 2333 Rayburn HOB; Washington DC 20515-3303
     office: 2333 Rayburn House Office Building
@@ -15236,7 +14781,7 @@
     fec:
     - H6OH04082
     cspan: 1022879
-    wikipedia: Jim Jordan (U.S. politician)
+    wikipedia: Jim Jordan (American politician)
     house_history: 16067
     ballotpedia: Jim Jordan
     maplight: 711
@@ -15310,7 +14855,7 @@
     district: 4
     party: Republican
     phone: 202-225-2676
-    url: http://jordan.house.gov
+    url: https://jordan.house.gov
     rss_url: http://jordan.house.gov/news/rss.aspx
     address: 2056 Rayburn HOB; Washington DC 20515-3504
     office: 2056 Rayburn House Office Building
@@ -15618,7 +15163,7 @@
     district: 3
     party: Republican
     phone: 202-225-5406
-    url: http://kelly.house.gov
+    url: https://kelly.house.gov
     rss_url: http://kelly.house.gov/rss.xml
     address: 1707 Longworth HOB; Washington DC 20515-3803
     office: 1707 Longworth House Office Building
@@ -15875,7 +15420,7 @@
     district: 2
     party: Republican
     phone: 202-225-7896
-    url: http://peteking.house.gov
+    url: https://peteking.house.gov
     rss_url: http://peteking.house.gov/rss.xml
     address: 339 Cannon HOB; Washington DC 20515-3202
     office: 339 Cannon House Office Building
@@ -16052,7 +15597,7 @@
     district: 16
     party: Republican
     phone: 202-225-3635
-    url: http://kinzinger.house.gov
+    url: https://kinzinger.house.gov
     rss_url: http://kinzinger.house.gov/common/rss//index.cfm?rss=49
     address: 2245 Rayburn HOB; Washington DC 20515-1316
     office: 2245 Rayburn House Office Building
@@ -16214,7 +15759,7 @@
     district: 5
     party: Republican
     phone: 202-225-4422
-    url: http://lamborn.house.gov
+    url: https://lamborn.house.gov
     rss_url: http://lamborn.house.gov/news-rss-graphic/news-rss-graphic/
     address: 2402 Rayburn HOB; Washington DC 20515-0605
     office: 2402 Rayburn House Office Building
@@ -16295,7 +15840,7 @@
     district: 7
     party: Republican
     phone: 202-225-5361
-    url: http://lance.house.gov
+    url: https://lance.house.gov
     rss_url: http://lance.house.gov/rss-button/rss-button/
     address: 2352 Rayburn HOB; Washington DC 20515-3007
     office: 2352 Rayburn House Office Building
@@ -16405,7 +15950,7 @@
     district: 2
     party: Democrat
     phone: 202-225-2735
-    url: http://langevin.house.gov
+    url: https://langevin.house.gov
     rss_url: http://langevin.house.gov/rss.xml
     address: 2077 Rayburn HOB; Washington DC 20515-3902
     office: 2077 Rayburn House Office Building
@@ -16585,7 +16130,7 @@
     district: 2
     party: Democrat
     phone: 202-225-2605
-    url: http://larsen.house.gov
+    url: https://larsen.house.gov
     rss_url: http://larsen.house.gov/rss.xml
     address: 2113 Rayburn HOB; Washington DC 20515-4702
     office: 2113 Rayburn House Office Building
@@ -16789,7 +16334,7 @@
     district: 5
     party: Republican
     phone: 202-225-6405
-    url: http://latta.house.gov
+    url: https://latta.house.gov
     rss_url: http://latta.house.gov/news/rss.aspx
     address: 2448 Rayburn HOB; Washington DC 20515-3505
     office: 2448 Rayburn House Office Building
@@ -17019,7 +16564,7 @@
     fec:
     - S0UT00165
     cspan: 9267977
-    wikipedia: Mike Lee (U.S. politician)
+    wikipedia: Mike Lee (American politician)
     ballotpedia: Mike Lee
     maplight: 1500
     icpsr: 41110
@@ -17218,7 +16763,7 @@
     district: 9
     party: Democrat
     phone: 202-225-4961
-    url: http://levin.house.gov
+    url: https://levin.house.gov
     rss_url: http://levin.house.gov/rss.xml
     address: 1236 Longworth HOB; Washington DC 20515-2209
     office: 1236 Longworth House Office Building
@@ -17599,7 +17144,7 @@
     district: 2
     party: Republican
     phone: 202-225-6572
-    url: http://lobiondo.house.gov
+    url: https://lobiondo.house.gov
     rss_url: http://lobiondo.house.gov/rss.xml
     address: 2427 Rayburn HOB; Washington DC 20515-3002
     office: 2427 Rayburn House Office Building
@@ -17687,7 +17232,7 @@
     district: 2
     party: Democrat
     phone: 202-225-6576
-    url: http://loebsack.house.gov
+    url: https://loebsack.house.gov
     rss_url: http://loebsack.house.gov/news/rss.aspx
     address: 1527 Longworth HOB; Washington DC 20515-1502
     office: 1527 Longworth House Office Building
@@ -18166,7 +17711,7 @@
     district: 3
     party: Republican
     phone: 202-225-5565
-    url: http://lucas.house.gov
+    url: https://lucas.house.gov
     rss_url: http://lucas.house.gov/rss.xml
     address: 2405 Rayburn HOB; Washington DC 20515-3603
     office: 2405 Rayburn House Office Building
@@ -18246,7 +17791,7 @@
     district: 3
     party: Republican
     phone: 202-225-2956
-    url: http://luetkemeyer.house.gov
+    url: https://luetkemeyer.house.gov
     rss_url: http://luetkemeyer.house.gov/news/rss.aspx
     address: 2230 Rayburn HOB; Washington DC 20515-2503
     office: 2230 Rayburn House Office Building
@@ -18437,7 +17982,7 @@
     district: 8
     party: Democrat
     phone: 202-225-8273
-    url: http://lynch.house.gov
+    url: https://lynch.house.gov
     rss_url: http://lynch.house.gov/rss.xml
     address: 2268 Rayburn HOB; Washington DC 20515-2108
     office: 2268 Rayburn House Office Building
@@ -18571,7 +18116,7 @@
     district: 12
     party: Democrat
     phone: 202-225-7944
-    url: http://maloney.house.gov
+    url: https://maloney.house.gov
     rss_url: http://maloney.house.gov/rss.xml
     address: 2308 Rayburn HOB; Washington DC 20515-3212
     office: 2308 Rayburn House Office Building
@@ -19023,7 +18568,7 @@
     district: 6
     party: Democrat
     phone: 202-225-7163
-    url: https://matsui.house.gov
+    url: http://matsui.house.gov
     rss_url: http://matsui.house.gov/index.php?format=feed&amp;type=rss
     address: 2311 Rayburn HOB; Washington DC 20515-0506
     office: 2311 Rayburn House Office Building
@@ -19227,7 +18772,7 @@
     district: 23
     party: Republican
     phone: 202-225-2915
-    url: http://kevinmccarthy.house.gov
+    url: https://kevinmccarthy.house.gov
     rss_url: http://kevinmccarthy.house.gov/index.php?format=feed&amp;type=rss
     address: 2421 Rayburn HOB; Washington DC 20515-0523
     office: 2421 Rayburn House Office Building
@@ -19321,7 +18866,7 @@
     district: 10
     party: Republican
     phone: 202-225-2401
-    url: http://mccaul.house.gov
+    url: https://mccaul.house.gov
     address: 2001 Rayburn HOB; Washington DC 20515-4310
     office: 2001 Rayburn House Office Building
     fax: 202-225-5955
@@ -19401,7 +18946,7 @@
     district: 4
     party: Republican
     phone: 202-225-2511
-    url: http://mcclintock.house.gov
+    url: https://mcclintock.house.gov
     rss_url: http://mcclintock.house.gov/atom.xml
     address: 2312 Rayburn HOB; Washington DC 20515-0504
     office: 2312 Rayburn House Office Building
@@ -19511,7 +19056,7 @@
     district: 4
     party: Democrat
     phone: 202-225-6631
-    url: http://mccollum.house.gov
+    url: https://mccollum.house.gov
     rss_url: http://mccollum.house.gov/rss.xml
     address: 2256 Rayburn HOB; Washington DC 20515-2304
     office: 2256 Rayburn House Office Building
@@ -19525,7 +19070,7 @@
     fec:
     - H4MA03022
     cspan: 45976
-    wikipedia: Jim McGovern (U.S. politician)
+    wikipedia: Jim McGovern (American politician)
     house_history: 17711
     maplight: 360
     icpsr: 29729
@@ -19633,7 +19178,7 @@
     district: 2
     party: Democrat
     phone: 202-225-6101
-    url: http://mcgovern.house.gov
+    url: https://mcgovern.house.gov
     rss_url: http://mcgovern.house.gov/common/rss/?rss=15
     address: 438 Cannon HOB; Washington DC 20515-2102
     office: 438 Cannon House Office Building
@@ -19728,7 +19273,7 @@
     district: 10
     party: Republican
     phone: 202-225-2576
-    url: http://mchenry.house.gov
+    url: https://mchenry.house.gov
     rss_url: http://mchenry.house.gov/news/rss.aspx
     address: 2334 Rayburn HOB; Washington DC 20515-3310
     office: 2334 Rayburn House Office Building
@@ -19896,7 +19441,7 @@
     district: 5
     party: Republican
     phone: 202-225-2006
-    url: http://mcmorris.house.gov
+    url: https://mcmorris.house.gov
     rss_url: http://mcmorris.house.gov/common/rss/?rss=96
     address: 1314 Longworth HOB; Washington DC 20515-4705
     office: 1314 Longworth House Office Building
@@ -19983,7 +19528,7 @@
     district: 9
     party: Democrat
     phone: 202-225-1947
-    url: http://mcnerney.house.gov
+    url: https://mcnerney.house.gov
     rss_url: http://mcnerney.house.gov/rss.xml
     address: 2265 Rayburn HOB; Washington DC 20515-0509
     office: 2265 Rayburn House Office Building
@@ -20177,7 +19722,7 @@
     district: 5
     party: Democrat
     phone: 202-225-3461
-    url: http://meeks.house.gov
+    url: https://meeks.house.gov
     rss_url: http://meeks.house.gov/rss.xml
     address: 2234 Rayburn HOB; Washington DC 20515-3205
     office: 2234 Rayburn House Office Building
@@ -20518,108 +20063,6 @@
     state_rank: junior
     rss_url: http://www.theday.com/article/20121216/nws12/312169935/1069/rss
 - id:
-    bioguide: M001151
-    thomas: '01744'
-    govtrack: 400285
-    opensecrets: N00024992
-    votesmart: 9794
-    fec:
-    - H2PA18143
-    cspan: 1003612
-    wikipedia: Timothy F. Murphy
-    house_history: 18774
-    maplight: 381
-    icpsr: 20346
-    wikidata: Q2434181
-    google_entity_id: kg:/m/0517t7
-  name:
-    first: Tim
-    last: Murphy
-    official_full: Tim Murphy
-  bio:
-    birthday: '1952-09-11'
-    gender: M
-    religion: Roman Catholic
-  terms:
-  - type: rep
-    start: '2003-01-07'
-    end: '2005-01-03'
-    state: PA
-    district: 18
-    party: Republican
-    url: http://www.house.gov/murphy
-  - type: rep
-    start: '2005-01-04'
-    end: '2007-01-03'
-    state: PA
-    district: 18
-    party: Republican
-    url: http://www.house.gov/murphy
-  - type: rep
-    start: '2007-01-04'
-    end: '2009-01-03'
-    state: PA
-    district: 18
-    party: Republican
-    url: http://murphy.house.gov
-  - type: rep
-    start: '2009-01-06'
-    end: '2011-01-03'
-    state: PA
-    district: 18
-    party: Republican
-    url: http://murphy.house.gov
-  - type: rep
-    start: '2011-01-05'
-    end: '2013-01-03'
-    state: PA
-    district: 18
-    party: Republican
-    url: http://murphy.house.gov
-    address: 322 Cannon HOB; Washington DC 20515-3818
-    phone: 202-225-2301
-    fax: 202-225-1844
-    contact_form: http://murphy.house.gov/Contact/zipauth.htm
-    office: 322 Cannon House Office Building
-  - type: rep
-    start: '2013-01-03'
-    end: '2015-01-03'
-    state: PA
-    party: Republican
-    district: 18
-    url: http://murphy.house.gov
-    address: 2332 Rayburn HOB; Washington DC 20515-3818
-    phone: 202-225-2301
-    fax: 202-225-1844
-    contact_form: https://murphy.house.gov/contact-me
-    office: 2332 Rayburn House Office Building
-    rss_url: http://murphy.house.gov/common/rss/?rss=44
-  - type: rep
-    start: '2015-01-06'
-    end: '2017-01-03'
-    state: PA
-    party: Republican
-    district: 18
-    url: http://murphy.house.gov
-    address: 2332 Rayburn HOB; Washington DC 20515-3818
-    phone: 202-225-2301
-    fax: 202-225-1844
-    contact_form: https://murphy.house.gov/contact-me
-    office: 2332 Rayburn House Office Building
-    rss_url: http://murphy.house.gov/common/rss/?rss=44
-  - type: rep
-    start: '2017-01-03'
-    end: '2019-01-03'
-    state: PA
-    district: 18
-    party: Republican
-    phone: 202-225-2301
-    url: https://murphy.house.gov
-    rss_url: http://murphy.house.gov/common/rss/?rss=44
-    address: 2332 Rayburn HOB; Washington DC 20515-3818
-    office: 2332 Rayburn House Office Building
-    fax: 202-225-1844
-- id:
     bioguide: M001111
     thomas: '01409'
     lis: S229
@@ -20827,7 +20270,7 @@
     district: 10
     party: Democrat
     phone: 202-225-5635
-    url: http://nadler.house.gov
+    url: https://nadler.house.gov
     rss_url: http://nadler.house.gov/rss.xml
     address: 2109 Rayburn HOB; Washington DC 20515-3210
     office: 2109 Rayburn House Office Building
@@ -20942,7 +20385,7 @@
     district: 32
     party: Democrat
     phone: 202-225-5256
-    url: http://napolitano.house.gov
+    url: https://napolitano.house.gov
     rss_url: http://napolitano.house.gov/rss.xml
     address: 1610 Longworth HOB; Washington DC 20515-0532
     office: 1610 Longworth House Office Building
@@ -21403,7 +20846,7 @@
     district: 22
     party: Republican
     phone: 202-225-2523
-    url: http://nunes.house.gov
+    url: https://nunes.house.gov
     rss_url: http://nunes.house.gov/news/rss.aspx
     address: 1013 Longworth HOB; Washington DC 20515-0522
     office: 1013 Longworth House Office Building
@@ -21423,6 +20866,7 @@
     icpsr: 20948
     wikidata: Q2073303
     google_entity_id: kg:/m/0407vf_
+    ballotpedia: Pete Olson
   name:
     first: Pete
     last: Olson
@@ -21556,7 +21000,7 @@
     district: 4
     party: Republican
     phone: 202-225-5772
-    url: http://palazzo.house.gov
+    url: https://palazzo.house.gov
     rss_url: http://palazzo.house.gov/rss.xml
     address: 2349 Rayburn HOB; Washington DC 20515-2404
     office: 2349 Rayburn House Office Building
@@ -21831,7 +21275,7 @@
     district: 9
     party: Democrat
     phone: 202-225-5751
-    url: http://pascrell.house.gov
+    url: https://pascrell.house.gov
     rss_url: http://www.house.gov/apps/list/press/nj08_pascrell/rss.xml
     address: 2370 Rayburn HOB; Washington DC 20515-3009
     office: 2370 Rayburn House Office Building
@@ -22061,7 +21505,7 @@
     district: 2
     party: Republican
     phone: 202-225-2365
-    url: http://pearce.house.gov
+    url: https://pearce.house.gov
     rss_url: http://pearce.house.gov/rss.xml
     address: 2432 Rayburn HOB; Washington DC 20515-3102
     office: 2432 Rayburn House Office Building
@@ -22227,7 +21671,7 @@
     district: 12
     party: Democrat
     phone: 202-225-4965
-    url: http://pelosi.house.gov
+    url: https://pelosi.house.gov
     rss_url: http://pelosi.house.gov/atom.xml
     address: 233 Cannon HOB; Washington DC 20515-0512
     office: 233 Cannon House Office Building
@@ -22530,7 +21974,7 @@
     district: 7
     party: Democrat
     phone: 202-225-2165
-    url: http://collinpeterson.house.gov
+    url: https://collinpeterson.house.gov
     rss_url: http://collinpeterson.house.gov/rss.xml
     address: 2204 Rayburn HOB; Washington DC 20515-2307
     office: 2204 Rayburn House Office Building
@@ -22788,7 +22232,7 @@
     district: 2
     party: Democrat
     phone: 202-225-2161
-    url: http://polis.house.gov
+    url: https://polis.house.gov
     rss_url: http://polis.house.gov/news/rss.aspx
     address: 1727 Longworth HOB; Washington DC 20515-0602
     office: 1727 Longworth House Office Building
@@ -22969,7 +22413,7 @@
     district: 8
     party: Republican
     phone: 202-225-3671
-    url: http://posey.house.gov
+    url: https://posey.house.gov
     rss_url: http://posey.house.gov/news/rss.aspx?documenttypeid=1487
     address: 2150 Rayburn HOB; Washington DC 20515-0908
     office: 2150 Rayburn House Office Building
@@ -22984,7 +22428,7 @@
     fec:
     - H6NC04037
     cspan: 6748
-    wikipedia: David Price (U.S. politician)
+    wikipedia: David Price (American politician)
     house_history: 19927
     ballotpedia: David Price
     maplight: 420
@@ -23371,7 +22815,7 @@
     district: 8
     party: Republican
     phone: 202-225-7761
-    url: http://reichert.house.gov
+    url: https://reichert.house.gov
     rss_url: http://reichert.house.gov/rss.xml
     address: 1127 Longworth HOB; Washington DC 20515-4708
     office: 1127 Longworth House Office Building
@@ -23592,7 +23036,7 @@
     district: 2
     party: Republican
     phone: 202-225-2901
-    url: http://roby.house.gov
+    url: https://roby.house.gov
     rss_url: http://roby.house.gov/rss.xml
     address: 442 Cannon HOB; Washington DC 20515-0102
     office: 442 Cannon House Office Building
@@ -23672,7 +23116,7 @@
     district: 1
     party: Republican
     phone: 202-225-6356
-    url: http://roe.house.gov
+    url: https://roe.house.gov
     address: 336 Cannon HOB; Washington DC 20515-4201
     office: 336 Cannon House Office Building
     fax: 202-225-6356
@@ -23841,7 +23285,7 @@
     district: 5
     party: Republican
     phone: 202-225-4601
-    url: http://halrogers.house.gov
+    url: https://halrogers.house.gov
     rss_url: http://halrogers.house.gov/news/rss.aspx
     address: 2406 Rayburn HOB; Washington DC 20515-1705
     office: 2406 Rayburn House Office Building
@@ -24174,7 +23618,7 @@
     fec:
     - H8FL16022
     cspan: 1030486
-    wikipedia: Tom Rooney (politician)
+    wikipedia: Tom Rooney (Florida politician)
     house_history: 20809
     ballotpedia: Thomas J. Rooney
     maplight: 793
@@ -24387,7 +23831,7 @@
     district: 27
     party: Republican
     phone: 202-225-3931
-    url: http://ros-lehtinen.house.gov
+    url: https://ros-lehtinen.house.gov
     rss_url: http://ros-lehtinen.house.gov/rss.xml
     address: 2206 Rayburn HOB; Washington DC 20515-0927
     office: 2206 Rayburn House Office Building
@@ -24551,7 +23995,7 @@
     district: 15
     party: Republican
     phone: 202-225-1252
-    url: http://dennisross.house.gov
+    url: https://dennisross.house.gov
     rss_url: http://dennisross.house.gov/news/rss.aspx
     address: 436 Cannon HOB; Washington DC 20515-0915
     office: 436 Cannon House Office Building
@@ -24683,7 +24127,7 @@
     district: 40
     party: Democrat
     phone: 202-225-1766
-    url: http://roybal-allard.house.gov
+    url: https://roybal-allard.house.gov
     rss_url: http://roybal-allard.house.gov/news/rss.aspx
     address: 2083 Rayburn HOB; Washington DC 20515-0540
     office: 2083 Rayburn House Office Building
@@ -24820,7 +24264,7 @@
     district: 39
     party: Republican
     phone: 202-225-4111
-    url: http://royce.house.gov
+    url: https://royce.house.gov
     rss_url: http://royce.house.gov/news/rss.aspx
     address: 2310 Rayburn HOB; Washington DC 20515-0539
     office: 2310 Rayburn House Office Building
@@ -24975,7 +24419,7 @@
     district: 2
     party: Democrat
     phone: 202-225-3061
-    url: http://ruppersberger.house.gov
+    url: https://ruppersberger.house.gov
     rss_url: http://dutch.house.gov/atom.xml
     address: 2416 Rayburn HOB; Washington DC 20515-2002
     office: 2416 Rayburn House Office Building
@@ -25109,7 +24553,7 @@
     district: 1
     party: Democrat
     phone: 202-225-4372
-    url: http://rush.house.gov
+    url: https://rush.house.gov
     rss_url: http://rush.house.gov/rss.xml
     address: 2188 Rayburn HOB; Washington DC 20515-1301
     office: 2188 Rayburn House Office Building
@@ -25233,7 +24677,7 @@
     district: 1
     party: Republican
     phone: 202-225-3031
-    url: http://paulryan.house.gov
+    url: https://paulryan.house.gov
     rss_url: http://paulryan.house.gov/news/rss.aspx
     address: 1233 Longworth HOB; Washington DC 20515-4901
     office: 1233 Longworth House Office Building
@@ -25337,7 +24781,7 @@
     district: 13
     party: Democrat
     phone: 202-225-5261
-    url: http://timryan.house.gov
+    url: https://timryan.house.gov
     rss_url: http://timryan.house.gov/rss.xml
     address: 1126 Longworth HOB; Washington DC 20515-3513
     office: 1126 Longworth House Office Building
@@ -25425,7 +24869,7 @@
     district: 0
     party: Democrat
     phone: 202-225-2646
-    url: http://sablan.house.gov
+    url: https://sablan.house.gov
     rss_url: http://sablan.house.gov/rss.xml
     address: 2411 Rayburn HOB; Washington DC 20515-5201
     office: 2411 Rayburn House Office Building
@@ -25617,7 +25061,7 @@
     district: 1
     party: Republican
     phone: 202-225-3015
-    url: http://scalise.house.gov
+    url: https://scalise.house.gov
     rss_url: http://scalise.house.gov/rss.xml
     address: 2338 Rayburn HOB; Washington DC 20515-1801
     office: 2338 Rayburn House Office Building
@@ -25843,7 +25287,7 @@
     district: 28
     party: Democrat
     phone: 202-225-4176
-    url: http://schiff.house.gov
+    url: https://schiff.house.gov
     rss_url: http://schiff.house.gov/common/rss/?rss=49
     address: 2372 Rayburn HOB; Washington DC 20515-0528
     office: 2372 Rayburn House Office Building
@@ -25924,7 +25368,7 @@
     district: 5
     party: Democrat
     phone: 202-225-5711
-    url: http://schrader.house.gov
+    url: https://schrader.house.gov
     rss_url: http://schrader.house.gov/news/rss.aspx
     address: 2431 Rayburn HOB; Washington DC 20515-3705
     office: 2431 Rayburn House Office Building
@@ -26300,7 +25744,7 @@
     district: 13
     party: Democrat
     phone: 202-225-2939
-    url: http://davidscott.house.gov
+    url: https://davidscott.house.gov
     rss_url: http://davidscott.house.gov/news/rss.aspx
     address: 225 Cannon HOB; Washington DC 20515-1013
     office: 225 Cannon House Office Building
@@ -26435,7 +25879,7 @@
     district: 3
     party: Democrat
     phone: 202-225-8351
-    url: http://bobbyscott.house.gov
+    url: https://bobbyscott.house.gov
     rss_url: http://www.house.gov/index.php?format=feed&amp;type=rss
     address: 1201 Longworth HOB; Washington DC 20515-4603
     office: 1201 Longworth House Office Building
@@ -26691,7 +26135,7 @@
     district: 5
     party: Republican
     phone: 202-225-5101
-    url: http://sensenbrenner.house.gov
+    url: https://sensenbrenner.house.gov
     rss_url: http://sensenbrenner.house.gov/news/rss.aspx
     address: 2449 Rayburn HOB; Washington DC 20515-4905
     office: 2449 Rayburn House Office Building
@@ -26711,6 +26155,7 @@
     house_history: 21443
     wikidata: Q460267
     google_entity_id: kg:/m/03s6z9
+    ballotpedia: Jose Serrano
   name:
     first: José
     middle: E.
@@ -27265,7 +26710,7 @@
     district: 30
     party: Democrat
     phone: 202-225-5911
-    url: http://sherman.house.gov
+    url: https://sherman.house.gov
     rss_url: http://bradsherman.house.gov/press-releases-and-columns/rss.shtml
     address: 2181 Rayburn HOB; Washington DC 20515-0530
     office: 2181 Rayburn House Office Building
@@ -27614,7 +27059,7 @@
     district: 2
     party: Republican
     phone: 202-225-5531
-    url: http://simpson.house.gov
+    url: https://simpson.house.gov
     rss_url: http://simpson.house.gov/news/rss.aspx
     address: 2084 Rayburn HOB; Washington DC 20515-1202
     office: 2084 Rayburn House Office Building
@@ -28068,7 +27513,7 @@
     district: 3
     party: Republican
     phone: 202-225-6435
-    url: http://adriansmith.house.gov
+    url: https://adriansmith.house.gov
     rss_url: http://adriansmith.house.gov/rss.xml
     address: 320 Cannon HOB; Washington DC 20515-2703
     office: 320 Cannon House Office Building
@@ -28238,7 +27683,7 @@
     district: 4
     party: Republican
     phone: 202-225-3765
-    url: http://chrissmith.house.gov
+    url: https://chrissmith.house.gov
     rss_url: http://chrissmith.house.gov/news/rss.aspx
     address: 2373 Rayburn HOB; Washington DC 20515-3004
     office: 2373 Rayburn House Office Building
@@ -28253,7 +27698,7 @@
     fec:
     - H6TX21012
     cspan: 8884
-    wikipedia: Lamar S. Smith
+    wikipedia: Lamar Smith
     ballotpedia: Lamar Smith
     maplight: 470
     house_history: 21856
@@ -28390,7 +27835,7 @@
     district: 21
     party: Republican
     phone: 202-225-4236
-    url: http://lamarsmith.house.gov
+    url: https://lamarsmith.house.gov
     rss_url: http://lamarsmith.house.gov/news/rss.aspx
     address: 2409 Rayburn HOB; Washington DC 20515-4321
     office: 2409 Rayburn House Office Building
@@ -28550,7 +27995,7 @@
     district: 15
     party: Republican
     phone: 202-225-2015
-    url: http://stivers.house.gov
+    url: https://stivers.house.gov
     rss_url: http://stivers.house.gov/news/rss.aspx
     address: 1022 Longworth HOB; Washington DC 20515-3515
     office: 1022 Longworth House Office Building
@@ -28904,7 +28349,7 @@
     district: 5
     party: Democrat
     phone: 202-225-3311
-    url: http://mikethompson.house.gov
+    url: https://mikethompson.house.gov
     rss_url: http://mikethompson.house.gov/news/rss.aspx
     address: 231 Cannon HOB; Washington DC 20515-0505
     office: 231 Cannon House Office Building
@@ -28984,7 +28429,7 @@
     district: 5
     party: Republican
     phone: 202-225-5121
-    url: http://thompson.house.gov
+    url: https://thompson.house.gov
     rss_url: http://thompson.house.gov/rss.xml
     address: 124 Cannon HOB; Washington DC 20515-3805
     office: 124 Cannon House Office Building
@@ -29110,7 +28555,7 @@
     district: 13
     party: Republican
     phone: 202-225-3706
-    url: http://thornberry.house.gov
+    url: https://thornberry.house.gov
     address: 2208 Rayburn HOB; Washington DC 20515-4313
     office: 2208 Rayburn House Office Building
     fax: 202-225-3486
@@ -29194,117 +28639,6 @@
     contact_form: http://www.thune.senate.gov/public/index.cfm/contact
     fax: 202-228-5429
 - id:
-    bioguide: T000462
-    thomas: '01664'
-    govtrack: 400406
-    opensecrets: N00009699
-    votesmart: 8404
-    fec:
-    - H0OH12062
-    cspan: 88155
-    wikipedia: Pat Tiberi
-    ballotpedia: Patrick J. Tiberi
-    maplight: 493
-    icpsr: 20130
-    house_history: 23204
-    wikidata: Q603467
-    google_entity_id: kg:/m/02zfh_
-  name:
-    first: Patrick
-    middle: J.
-    last: Tiberi
-    nickname: Pat
-    official_full: Patrick J. Tiberi
-  bio:
-    birthday: '1962-10-21'
-    gender: M
-    religion: Catholic
-  terms:
-  - type: rep
-    start: '2001-01-03'
-    end: '2003-01-03'
-    state: OH
-    district: 12
-    party: Republican
-  - type: rep
-    start: '2003-01-07'
-    end: '2005-01-03'
-    state: OH
-    district: 12
-    party: Republican
-    url: http://www.house.gov/tiberi
-  - type: rep
-    start: '2005-01-04'
-    end: '2007-01-03'
-    state: OH
-    district: 12
-    party: Republican
-    url: http://www.house.gov/tiberi
-  - type: rep
-    start: '2007-01-04'
-    end: '2009-01-03'
-    state: OH
-    district: 12
-    party: Republican
-    url: http://tiberi.house.gov
-  - type: rep
-    start: '2009-01-06'
-    end: '2011-01-03'
-    state: OH
-    district: 12
-    party: Republican
-    url: http://tiberi.house.gov
-  - type: rep
-    start: '2011-01-05'
-    end: '2013-01-03'
-    state: OH
-    district: 12
-    party: Republican
-    url: http://tiberi.house.gov
-    address: 106 Cannon HOB; Washington DC 20515-3512
-    phone: 202-225-5355
-    fax: 202-226-4523
-    contact_form: http://www.house.gov/writerep
-    office: 106 Cannon House Office Building
-  - type: rep
-    start: '2013-01-03'
-    end: '2015-01-03'
-    state: OH
-    party: Republican
-    district: 12
-    url: http://tiberi.house.gov
-    address: 106 Cannon HOB; Washington DC 20515-3512
-    phone: 202-225-5355
-    fax: 202-226-4523
-    contact_form: https://tiberi.house.gov/contact/contactform.htm
-    office: 106 Cannon House Office Building
-    rss_url: http://tiberi.house.gov/news/rss.aspx
-  - type: rep
-    start: '2015-01-06'
-    end: '2017-01-03'
-    state: OH
-    party: Republican
-    district: 12
-    url: http://tiberi.house.gov
-    address: 1203 Longworth HOB; Washington DC 20515-3512
-    phone: 202-225-5355
-    fax: 202-226-4523
-    contact_form: https://tiberi.house.gov/contact/contactform.htm
-    office: 1203 Longworth House Office Building
-    rss_url: http://tiberi.house.gov/news/rss.aspx
-  - type: rep
-    start: '2017-01-03'
-    end: '2019-01-03'
-    state: OH
-    district: 12
-    party: Republican
-    phone: 202-225-5355
-    url: http://tiberi.house.gov
-    rss_url: http://tiberi.house.gov/news/rss.aspx
-    address: 1203 Longworth HOB; Washington DC 20515-3512
-    office: 1203 Longworth House Office Building
-    fax: 202-226-4523
-- id:
     bioguide: T000470
     thomas: '01997'
     govtrack: 412405
@@ -29373,7 +28707,7 @@
     district: 3
     party: Republican
     phone: 202-225-4761
-    url: http://tipton.house.gov
+    url: https://tipton.house.gov
     rss_url: http://tipton.house.gov/rss.xml
     address: 218 Cannon HOB; Washington DC 20515-0603
     office: 218 Cannon House Office Building
@@ -29876,7 +29210,7 @@
     district: 6
     party: Republican
     phone: 202-225-3761
-    url: http://upton.house.gov
+    url: https://upton.house.gov
     rss_url: http://www.house.gov/news/rss.aspx
     address: 2183 Rayburn HOB; Washington DC 20515-2206
     office: 2183 Rayburn House Office Building
@@ -30350,7 +29684,7 @@
     district: 7
     party: Republican
     phone: 202-225-6276
-    url: http://walberg.house.gov
+    url: https://walberg.house.gov
     rss_url: http://walberg.house.gov/news/rss.aspx
     address: 2436 Rayburn HOB; Washington DC 20515-2207
     office: 2436 Rayburn House Office Building
@@ -30863,7 +30197,7 @@
     district: 11
     party: Republican
     phone: 202-225-1002
-    url: http://webster.house.gov
+    url: https://webster.house.gov
     rss_url: http://webster.house.gov/news/rss.aspx
     address: 1210 Longworth HOB; Washington DC 20515-0911
     office: 1210 Longworth House Office Building
@@ -30966,7 +30300,7 @@
     fec:
     - H2SC02059
     cspan: 1002567
-    wikipedia: Joe Wilson (U.S. politician)
+    wikipedia: Joe Wilson (American politician)
     ballotpedia: Joe Wilson
     maplight: 519
     icpsr: 20138
@@ -31062,7 +30396,7 @@
     district: 2
     party: Republican
     phone: 202-225-2452
-    url: http://joewilson.house.gov
+    url: https://joewilson.house.gov
     rss_url: http://joewilson.house.gov/news/rss.aspx
     address: 1436 Longworth HOB; Washington DC 20515-4002
     office: 1436 Longworth House Office Building
@@ -31226,7 +30560,7 @@
     district: 1
     party: Republican
     phone: 202-225-4261
-    url: http://wittman.house.gov
+    url: https://wittman.house.gov
     rss_url: http://www.wittman.house.gov/index.php?format=feed&amp;type=rss
     address: 2055 Rayburn HOB; Washington DC 20515-4601
     office: 2055 Rayburn House Office Building
@@ -31299,7 +30633,7 @@
     district: 3
     party: Republican
     phone: 202-225-4301
-    url: http://womack.house.gov
+    url: https://womack.house.gov
     rss_url: http://womack.house.gov/news/rss.aspx
     address: 2412 Rayburn HOB; Washington DC 20515-0403
     office: 2412 Rayburn House Office Building
@@ -31653,7 +30987,7 @@
     district: 3
     party: Republican
     phone: 202-225-2865
-    url: http://yoder.house.gov
+    url: https://yoder.house.gov
     rss_url: http://yoder.house.gov/common/rss/index.cfm?rss=49
     address: 2433 Rayburn HOB; Washington DC 20515-1603
     office: 2433 Rayburn House Office Building
@@ -31847,7 +31181,7 @@
     district: 0
     party: Republican
     phone: 202-225-5765
-    url: http://donyoung.house.gov
+    url: https://donyoung.house.gov
     rss_url: http://donyoung.house.gov/news/rss.aspx
     address: 2314 Rayburn HOB; Washington DC 20515-0200
     office: 2314 Rayburn House Office Building
@@ -31927,7 +31261,7 @@
     office: 400 Russell Senate Office Building
     phone: 202-224-5623
     url: https://www.young.senate.gov
-    contact_form: https://www.young.senate.gov/content/contact-senator
+    contact_form: https://www.young.senate.gov/contact
     fax: 202-226-6866
 - id:
     bioguide: H001041
@@ -32147,7 +31481,7 @@
     district: 1
     party: Democrat
     phone: 202-225-0855
-    url: http://bonamici.house.gov
+    url: https://bonamici.house.gov
     rss_url: http://bonamici.house.gov/rss.xml
     address: 439 Cannon HOB; Washington DC 20515-3701
     office: 439 Cannon House Office Building
@@ -32361,7 +31695,7 @@
     district: 10
     party: Democrat
     phone: 202-225-3436
-    url: http://payne.house.gov
+    url: https://payne.house.gov
     rss_url: http://payne.house.gov/rss.xml
     address: 132 Cannon HOB; Washington DC 20515-3010
     office: 132 Cannon House Office Building
@@ -32506,7 +31840,7 @@
     district: 11
     party: Democrat
     phone: 202-225-3515
-    url: http://foster.house.gov
+    url: https://foster.house.gov
     rss_url: http://foster.house.gov/rss.xml
     address: 1224 Longworth HOB; Washington DC 20515-1311
     office: 1224 Longworth House Office Building
@@ -32746,7 +32080,7 @@
     district: 1
     party: Republican
     phone: 202-225-3076
-    url: http://lamalfa.house.gov
+    url: https://lamalfa.house.gov
     rss_url: http://lamalfa.house.gov/rss.xml
     address: 322 Cannon HOB; Washington DC 20515-0501
     office: 322 Cannon House Office Building
@@ -32807,7 +32141,7 @@
     district: 2
     party: Democrat
     phone: 202-225-5161
-    url: http://huffman.house.gov
+    url: https://huffman.house.gov
     rss_url: http://huffman.house.gov/rss.xml
     address: 1406 Longworth HOB; Washington DC 20515-0502
     office: 1406 Longworth House Office Building
@@ -32868,7 +32202,7 @@
     district: 7
     party: Democrat
     phone: 202-225-5716
-    url: http://bera.house.gov
+    url: https://bera.house.gov
     rss_url: http://bera.house.gov/rss.xml
     address: 1431 Longworth HOB; Washington DC 20515-0507
     office: 1431 Longworth House Office Building
@@ -32928,7 +32262,7 @@
     party: Republican
     phone: 202-225-5861
     fax: 202-225-6498
-    url: http://cook.house.gov
+    url: https://cook.house.gov
     rss_url: http://cook.house.gov/rss.xml
     address: 1222 Longworth HOB; Washington DC 20515-0508
     office: 1222 Longworth House Office Building
@@ -33044,7 +32378,7 @@
     district: 21
     party: Republican
     phone: 202-225-4695
-    url: http://valadao.house.gov
+    url: https://valadao.house.gov
     rss_url: http://valadao.house.gov/rss.xml
     address: 1728 Longworth HOB; Washington DC 20515-0521
     office: 1728 Longworth House Office Building
@@ -33106,7 +32440,7 @@
     district: 26
     party: Democrat
     phone: 202-225-5811
-    url: http://juliabrownley.house.gov
+    url: https://juliabrownley.house.gov
     rss_url: http://juliabrownley.house.gov/rss.xml
     address: 1019 Longworth HOB; Washington DC 20515-0526
     office: 1019 Longworth House Office Building
@@ -33349,7 +32683,7 @@
     district: 47
     party: Democrat
     phone: 202-225-7924
-    url: http://lowenthal.house.gov
+    url: https://lowenthal.house.gov
     rss_url: http://lowenthal.house.gov/news/rss.aspx
     address: 125 Cannon HOB; Washington DC 20515-0547
     office: 125 Cannon House Office Building
@@ -33410,7 +32744,7 @@
     district: 51
     party: Democrat
     phone: 202-225-8045
-    url: http://vargas.house.gov
+    url: https://vargas.house.gov
     rss_url: http://vargas.house.gov/rss.xml
     address: 1605 Longworth HOB; Washington DC 20515-0551
     office: 1605 Longworth House Office Building
@@ -33472,7 +32806,7 @@
     district: 52
     party: Democrat
     phone: 202-225-0508
-    url: http://scottpeters.house.gov
+    url: https://scottpeters.house.gov
     rss_url: http://scottpeters.house.gov/rss.xml
     address: 1122 Longworth HOB; Washington DC 20515-0552
     office: 1122 Longworth House Office Building
@@ -33595,7 +32929,7 @@
     district: 3
     party: Republican
     phone: 202-225-5744
-    url: http://yoho.house.gov
+    url: https://yoho.house.gov
     rss_url: http://yoho.house.gov/rss.xml
     address: 511 Cannon HOB; Washington DC 20515-0903
     office: 511 Cannon House Office Building
@@ -33655,7 +32989,7 @@
     district: 6
     party: Republican
     phone: 202-225-2706
-    url: http://desantis.house.gov
+    url: https://desantis.house.gov
     rss_url: http://desantis.house.gov/rss.xml
     address: 1524 Longworth HOB; Washington DC 20515-0906
     office: 1524 Longworth House Office Building
@@ -33718,7 +33052,7 @@
     district: 21
     party: Democrat
     phone: 202-225-9890
-    url: http://frankel.house.gov
+    url: https://frankel.house.gov
     rss_url: http://frankel.house.gov/rss.xml
     address: 1037 Longworth HOB; Washington DC 20515-0921
     office: 1037 Longworth House Office Building
@@ -33963,7 +33297,7 @@
     district: 13
     party: Republican
     phone: 202-225-2371
-    url: http://rodneydavis.house.gov
+    url: https://rodneydavis.house.gov
     rss_url: http://rodneydavis.house.gov/rss.xml
     address: 1740 Longworth HOB; Washington DC 20515-1313
     office: 1740 Longworth House Office Building
@@ -34087,7 +33421,7 @@
     district: 2
     party: Republican
     phone: 202-225-3915
-    url: http://walorski.house.gov
+    url: https://walorski.house.gov
     rss_url: http://walorski.house.gov/rss.xml
     address: 419 Cannon HOB; Washington DC 20515-1402
     office: 419 Cannon House Office Building
@@ -34149,7 +33483,7 @@
     district: 5
     party: Republican
     phone: 202-225-2276
-    url: http://susanwbrooks.house.gov
+    url: https://susanwbrooks.house.gov
     rss_url: http://susanwbrooks.house.gov/rss.xml
     address: 1030 Longworth HOB; Washington DC 20515-1405
     office: 1030 Longworth House Office Building
@@ -34222,7 +33556,7 @@
     thomas: '02131'
     cspan: 61848
     votesmart: 117290
-    wikipedia: Andy Barr (U.S. politician)
+    wikipedia: Andy Barr (American politician)
     fec:
     - H0KY06104
     opensecrets: N00031233
@@ -34320,7 +33654,7 @@
     thomas: '02172'
     cspan: 79948
     votesmart: 141275
-    wikipedia: Joseph P. Kennedy III
+    wikipedia: Joe Kennedy III
     fec:
     - H2MA04073
     opensecrets: N00034044
@@ -34444,7 +33778,7 @@
     district: 6
     party: Democrat
     phone: 202-225-2721
-    url: http://delaney.house.gov
+    url: https://delaney.house.gov
     rss_url: http://delaney.house.gov/rss.xml
     address: 1632 Longworth HOB; Washington DC 20515-2006
     office: 1632 Longworth House Office Building
@@ -34544,7 +33878,7 @@
     district: 5
     party: Democrat
     phone: 202-225-3611
-    url: http://dankildee.house.gov
+    url: https://dankildee.house.gov
     rss_url: http://dankildee.house.gov/rss.xml
     address: 227 Cannon HOB; Washington DC 20515-2205
     office: 227 Cannon House Office Building
@@ -34627,7 +33961,7 @@
     district: 8
     party: Democrat
     phone: 202-225-6211
-    url: http://nolan.house.gov
+    url: https://nolan.house.gov
     rss_url: http://nolan.house.gov/rss.xml
     address: 2366 Rayburn HOB; Washington DC 20515-2308
     office: 2366 Rayburn House Office Building
@@ -34688,7 +34022,7 @@
     party: Republican
     phone: 202-225-1621
     fax: 202-225-2563
-    url: http://wagner.house.gov
+    url: https://wagner.house.gov
     rss_url: http://wagner.house.gov/rss.xml
     address: 435 Cannon HOB; Washington DC 20515-2502
     office: 435 Cannon House Office Building
@@ -34748,7 +34082,7 @@
     thomas: '02140'
     cspan: 79622
     votesmart: 136448
-    wikipedia: Richard Hudson (U.S. politician)
+    wikipedia: Richard Hudson (American politician)
     fec:
     - H2NC08185
     opensecrets: N00033630
@@ -34980,7 +34314,7 @@
     district: 2
     party: Republican
     phone: 202-225-3032
-    url: http://holding.house.gov
+    url: https://holding.house.gov
     rss_url: http://holding.house.gov/rss.xml
     address: 1110 Longworth HOB; Washington DC 20515-3302
     office: 1110 Longworth House Office Building
@@ -35081,7 +34415,7 @@
     district: 0
     party: Republican
     phone: 202-225-2611
-    url: http://cramer.house.gov
+    url: https://cramer.house.gov
     rss_url: http://cramer.house.gov/rss.xml
     address: 1717 Longworth HOB; Washington DC 20515-3400
     office: 1717 Longworth House Office Building
@@ -35183,7 +34517,7 @@
     district: 2
     party: Democrat
     phone: 202-225-5206
-    url: http://kuster.house.gov
+    url: https://kuster.house.gov
     rss_url: http://kuster.house.gov/rss.xml
     address: 137 Cannon HOB; Washington DC 20515-2902
     office: 137 Cannon House Office Building
@@ -35306,7 +34640,7 @@
     district: 6
     party: Democrat
     phone: 202-225-2601
-    url: http://meng.house.gov
+    url: https://meng.house.gov
     rss_url: http://meng.house.gov/rss.xml
     address: 1317 Longworth HOB; Washington DC 20515-3206
     office: 1317 Longworth House Office Building
@@ -35366,7 +34700,7 @@
     district: 8
     party: Democrat
     phone: 202-225-5936
-    url: http://jeffries.house.gov
+    url: https://jeffries.house.gov
     rss_url: http://jeffries.house.gov/rss.xml
     address: 1607 Longworth HOB; Washington DC 20515-3208
     office: 1607 Longworth House Office Building
@@ -35426,7 +34760,7 @@
     district: 18
     party: Democrat
     phone: 202-225-5441
-    url: http://seanmaloney.house.gov
+    url: https://seanmaloney.house.gov
     rss_url: http://seanmaloney.house.gov/rss.xml
     address: 1027 Longworth HOB; Washington DC 20515-3218
     office: 1027 Longworth House Office Building
@@ -35439,7 +34773,7 @@
     fec:
     - H8NY29032
     votesmart: 139770
-    wikipedia: Chris Collins (U.S. politician)
+    wikipedia: Chris Collins (American politician)
     opensecrets: N00001285
     ballotpedia: Chris Collins
     maplight: 1787
@@ -35545,7 +34879,7 @@
     district: 2
     party: Republican
     phone: 202-225-3164
-    url: http://wenstrup.house.gov
+    url: https://wenstrup.house.gov
     address: 2419 Rayburn HOB; Washington DC 20515-3502
     office: 2419 Rayburn House Office Building
     fax: 202-225-1992
@@ -35605,7 +34939,7 @@
     district: 3
     party: Democrat
     phone: 202-225-4324
-    url: http://beatty.house.gov
+    url: https://beatty.house.gov
     rss_url: http://beatty.house.gov/rss.xml
     address: 133 Cannon HOB; Washington DC 20515-3503
     office: 133 Cannon House Office Building
@@ -35728,7 +35062,7 @@
     district: 1
     party: Republican
     phone: 202-225-2211
-    url: http://bridenstine.house.gov
+    url: https://bridenstine.house.gov
     rss_url: http://bridenstine.house.gov/rss.xml
     address: 216 Cannon HOB; Washington DC 20515-3601
     office: 216 Cannon House Office Building
@@ -35850,7 +35184,7 @@
     district: 4
     party: Republican
     phone: 202-225-5836
-    url: http://perry.house.gov
+    url: https://perry.house.gov
     rss_url: http://perry.house.gov/rss.xml
     address: 1207 Longworth HOB; Washington DC 20515-3804
     office: 1207 Longworth House Office Building
@@ -35973,7 +35307,7 @@
     district: 17
     party: Democrat
     phone: 202-225-5546
-    url: http://cartwright.house.gov
+    url: https://cartwright.house.gov
     rss_url: http://cartwright.house.gov/rss.xml
     address: 1034 Longworth HOB; Washington DC 20515-3817
     office: 1034 Longworth House Office Building
@@ -36033,7 +35367,7 @@
     district: 7
     party: Republican
     phone: 202-225-9895
-    url: http://rice.house.gov
+    url: https://rice.house.gov
     rss_url: http://rice.house.gov/rss.xml
     address: 223 Cannon HOB; Washington DC 20515-4007
     office: 223 Cannon House Office Building
@@ -36072,7 +35406,7 @@
     office: 404 Russell Senate Office Building
     phone: 202-224-5922
     state_rank: junior
-    contact_form: http://www.cruz.senate.gov/?p=email_senator
+    contact_form: https://www.cruz.senate.gov/?p=form&id=16
     fax: 202-228-3398
 - id:
     govtrack: 412574
@@ -36131,7 +35465,7 @@
     district: 14
     party: Republican
     phone: 202-225-2831
-    url: http://weber.house.gov
+    url: https://weber.house.gov
     rss_url: http://weber.house.gov/rss.xml
     address: 1708 Longworth HOB; Washington DC 20515-4314
     office: 1708 Longworth House Office Building
@@ -36153,8 +35487,8 @@
     google_entity_id: kg:/m/0dty9d
   name:
     first: Beto
-    last: O'Rourke
-    official_full: Beto O'Rourke
+    last: O’Rourke
+    official_full: Beto O’Rourke
   bio:
     gender: M
     birthday: '1972-09-26'
@@ -36190,7 +35524,7 @@
     district: 16
     party: Democrat
     phone: 202-225-4831
-    url: http://orourke.house.gov
+    url: https://orourke.house.gov
     rss_url: http://orourke.house.gov/rss.xml
     address: 1330 Longworth HOB; Washington DC 20515-4316
     office: 1330 Longworth House Office Building
@@ -36264,7 +35598,7 @@
     - H2TX33040
     - S2TX00270
     votesmart: 50112
-    wikipedia: Roger Williams (U.S. politician)
+    wikipedia: Roger Williams (American politician)
     opensecrets: N00030602
     ballotpedia: Roger Williams
     maplight: 1802
@@ -36312,7 +35646,7 @@
     district: 25
     party: Republican
     phone: 202-225-9896
-    url: http://williams.house.gov
+    url: https://williams.house.gov
     rss_url: http://williams.house.gov/rss.xml
     address: 1323 Longworth HOB; Washington DC 20515-4325
     office: 1323 Longworth House Office Building
@@ -36373,7 +35707,7 @@
     district: 33
     party: Democrat
     phone: 202-225-9897
-    url: http://veasey.house.gov
+    url: https://veasey.house.gov
     rss_url: http://veasey.house.gov/rss.xml
     address: 1519 Longworth HOB; Washington DC 20515-4333
     office: 1519 Longworth House Office Building
@@ -36495,7 +35829,7 @@
     district: 2
     party: Republican
     phone: 202-225-9730
-    url: http://stewart.house.gov
+    url: https://stewart.house.gov
     rss_url: http://stewart.house.gov/rss.xml
     address: 323 Cannon HOB; Washington DC 20515-4402
     office: 323 Cannon House Office Building
@@ -36652,7 +35986,7 @@
     district: 10
     party: Democrat
     phone: 202-225-9740
-    url: http://dennyheck.house.gov
+    url: https://dennyheck.house.gov
     rss_url: http://dennyheck.house.gov/rss.xml
     address: 425 Cannon HOB; Washington DC 20515-4710
     office: 425 Cannon House Office Building
@@ -36713,7 +36047,7 @@
     district: 2
     party: Democrat
     phone: 202-225-2906
-    url: http://pocan.house.gov
+    url: https://pocan.house.gov
     rss_url: http://pocan.house.gov/rss.xml
     address: 1421 Longworth HOB; Washington DC 20515-4902
     office: 1421 Longworth House Office Building
@@ -36865,7 +36199,7 @@
     bioguide: S001195
     thomas: '02191'
     govtrack: 412596
-    wikipedia: Jason T. Smith
+    wikipedia: Jason Smith (politician)
     votesmart: 59318
     maplight: 2047
     opensecrets: N00035282
@@ -37145,7 +36479,7 @@
     district: 7
     party: Republican
     phone: 202-225-2815
-    url: http://brat.house.gov
+    url: https://brat.house.gov
     address: 1628 Longworth HOB; Washington DC 20515-4607
     office: 1628 Longworth House Office Building
 - id:
@@ -37261,7 +36595,7 @@
     district: 12
     party: Democrat
     phone: 202-225-1510
-    url: http://adams.house.gov
+    url: https://adams.house.gov
     address: 222 Cannon HOB; Washington DC 20515-3312
     office: 222 Cannon House Office Building
     fax: 202-225-1512
@@ -37453,6 +36787,7 @@
     google_entity_id: kg:/m/0wy0mz5
     cspan: 77233
     icpsr: 21502
+    votesmart: 123732
   name:
     first: Ruben
     last: Gallego
@@ -37494,6 +36829,7 @@
     google_entity_id: kg:/m/0289gkw
     cspan: 61736
     icpsr: 21504
+    votesmart: 69477
   name:
     first: Mark
     last: DeSaulnier
@@ -37538,6 +36874,7 @@
     ballotpedia: Stephen Knight
     cspan: 76118
     icpsr: 21505
+    votesmart: 71098
   name:
     first: Steve
     last: Knight
@@ -37625,6 +36962,8 @@
     google_entity_id: kg:/m/0f3y2w
     cspan: 28076
     icpsr: 21507
+    votesmart: 1516
+    ballotpedia: Ted Lieu
   name:
     first: Ted
     last: Lieu
@@ -37669,6 +37008,7 @@
     google_entity_id: kg:/m/03wd1hs
     cspan: 76129
     icpsr: 21508
+    votesmart: 71284
   name:
     first: Norma
     last: Torres
@@ -37713,6 +37053,7 @@
     google_entity_id: kg:/m/077r0l
     cspan: 76141
     icpsr: 21509
+    votesmart: 29346
   name:
     first: Mimi
     last: Walters
@@ -37797,7 +37138,7 @@
     thomas: '02235'
     maplight: 2077
     wikidata: Q18631533
-    wikipedia: Carlos Curbelo (politician)
+    wikipedia: Carlos Curbelo
     google_entity_id: kg:/m/0127nzmk
     votesmart: 137676
     cspan: 70472
@@ -37827,7 +37168,7 @@
     district: 26
     party: Republican
     phone: 202-225-2778
-    url: http://curbelo.house.gov
+    url: https://curbelo.house.gov
     address: 1404 Longworth HOB; Washington DC 20515-0926
     office: 1404 Longworth House Office Building
 - id:
@@ -37870,7 +37211,7 @@
     district: 1
     party: Republican
     phone: 202-225-5831
-    url: http://buddycarter.house.gov
+    url: https://buddycarter.house.gov
     address: 432 Cannon HOB; Washington DC 20515-1001
     office: 432 Cannon House Office Building
     fax: 202-226-2269
@@ -37958,7 +37299,7 @@
     district: 11
     party: Republican
     phone: 202-225-2931
-    url: http://loudermilk.house.gov
+    url: https://loudermilk.house.gov
     address: 329 Cannon HOB; Washington DC 20515-1011
     office: 329 Cannon House Office Building
     fax: 202-225-2944
@@ -38002,7 +37343,7 @@
     district: 12
     party: Republican
     phone: 202-225-2823
-    url: http://allen.house.gov
+    url: https://allen.house.gov
     address: 426 Cannon HOB; Washington DC 20515-1012
     office: 426 Cannon House Office Building
     fax: 202-225-3377
@@ -38063,6 +37404,7 @@
     google_entity_id: kg:/m/0127pc92
     cspan: 76211
     icpsr: 21521
+    votesmart: 155218
   name:
     first: David
     last: Young
@@ -38104,6 +37446,7 @@
     google_entity_id: kg:/m/0kry42
     cspan: 76176
     icpsr: 21519
+    votesmart: 6302
   name:
     first: Mike
     last: Bost
@@ -38264,7 +37607,7 @@
     district: 6
     party: Democrat
     phone: 202-225-8020
-    url: http://moulton.house.gov
+    url: https://moulton.house.gov
     address: 1408 Longworth HOB; Washington DC 20515-2106
     office: 1408 Longworth House Office Building
     fax: 202-225-5915
@@ -38282,6 +37625,7 @@
     google_entity_id: kg:/m/0hrbhmw
     cspan: 76253
     icpsr: 21524
+    votesmart: 120909
   name:
     first: Bruce
     last: Poliquin
@@ -38722,6 +38066,7 @@
     google_entity_id: kg:/m/03h4jcq
     cspan: 61616
     icpsr: 21539
+    votesmart: 110252
   name:
     first: Lee
     last: Zeldin
@@ -38793,7 +38138,7 @@
     district: 4
     party: Democrat
     phone: 202-225-5516
-    url: http://kathleenrice.house.gov
+    url: https://kathleenrice.house.gov
     address: 1508 Longworth HOB; Washington DC 20515-3204
     office: 1508 Longworth House Office Building
     fax: 202-225-5758
@@ -38899,6 +38244,7 @@
     google_entity_id: kg:/m/0ndnv6f
     cspan: 77286
     icpsr: 21546
+    votesmart: 106528
   name:
     first: Steve
     last: Russell
@@ -39143,7 +38489,7 @@
     district: 36
     party: Republican
     phone: 202-225-1555
-    url: http://babin.house.gov
+    url: https://babin.house.gov
     address: 316 Cannon HOB; Washington DC 20515-4336
     office: 316 Cannon House Office Building
     fax: 202-226-0396
@@ -39232,7 +38578,7 @@
     district: 8
     party: Democrat
     phone: 202-225-4376
-    url: http://beyer.house.gov
+    url: https://beyer.house.gov
     address: 1119 Longworth HOB; Washington DC 20515-4608
     office: 1119 Longworth House Office Building
     fax: 202-225-0017
@@ -39409,7 +38755,7 @@
     district: 6
     party: Republican
     phone: 202-225-2476
-    url: http://grothman.house.gov
+    url: https://grothman.house.gov
     address: 1217 Longworth HOB; Washington DC 20515-4906
     office: 1217 Longworth House Office Building
     fax: 202-225-2356
@@ -39426,6 +38772,7 @@
     google_entity_id: kg:/m/02qqy78
     cspan: 76588
     icpsr: 21557
+    votesmart: 145943
   name:
     first: Alex
     last: Mooney
@@ -39553,7 +38900,7 @@
     lis: S383
     maplight: 2121
     wikidata: Q5218668
-    wikipedia: Dan Sullivan (U.S. Senator)
+    wikipedia: Dan Sullivan (American senator)
     google_entity_id: kg:/m/07s4r4q
     votesmart: 114964
     cspan: 1023262
@@ -40174,7 +39521,7 @@
     office: 112 Hart Senate Office Building
     phone: 202-224-3553
     url: https://www.harris.senate.gov
-    contact_form: https://www.harris.senate.gov/content/contact-senator
+    contact_form: https://www.harris.senate.gov/contact
 - id:
     bioguide: K000393
     fec:
@@ -40209,8 +39556,8 @@
     address: 383 Russell Senate Office Building Washington DC 20510
     office: 383 Russell Senate Office Building
     phone: 202-224-4623
-    url: https://www.kennedy.senate.gov
-    contact_form: https://www.kennedy.senate.gov/content/contact-senator
+    url: https://www.kennedy.senate.gov/public
+    contact_form: https://www.kennedy.senate.gov/public/email-me
 - id:
     bioguide: H001076
     fec:
@@ -40282,7 +39629,7 @@
     office: 204 Russell Senate Office Building
     phone: 202-224-3542
     url: https://www.cortezmasto.senate.gov
-    contact_form: https://www.cortezmasto.senate.gov/content/contact-senator
+    contact_form: https://www.cortezmasto.senate.gov/contact
 - id:
     govtrack: 412534
     bioguide: S001190
@@ -40409,8 +39756,8 @@
     icpsr: 21739
   name:
     first: Tom
-    last: O'Halleran
-    official_full: Tom O'Halleran
+    last: O’Halleran
+    official_full: Tom O’Halleran
   bio:
     gender: M
     birthday: '1946-01-24'
@@ -40428,7 +39775,7 @@
 - id:
     bioguide: B001302
     govtrack: 412683
-    wikipedia: Andy Biggs (politician)
+    wikipedia: Andy Biggs
     wikidata: Q16199304
     votesmart: 28088
     fec:
@@ -40968,6 +40315,7 @@
     google_entity_id: kg:/g/11c0xj334k
     cspan: 104731
     icpsr: 21717
+    ballotpedia: Drew Ferguson
   name:
     first: A.
     middle: Drew
@@ -41303,7 +40651,7 @@
 - id:
     bioguide: L000587
     govtrack: 412711
-    wikipedia: Jason Lewis (congressman)
+    wikipedia: Jason Lewis (Minnesota politician)
     wikidata: Q6162964
     votesmart: 171558
     google_entity_id: kg:/m/0fx5rd
@@ -41644,7 +40992,7 @@
     phone: 202-225-4276
     address: 514 Cannon HOB; Washington DC 20515-3808
     office: 514 Cannon House Office Building
-    url: https://brianfitzpatrick.house.gov
+    url: https://fitzpatrick.house.gov
 - id:
     bioguide: S001199
     govtrack: 412722
@@ -41697,7 +41045,7 @@
   terms:
   - type: rep
     start: '2017-01-03'
-    end: '2019-01-03'
+    end: '2021-01-03'
     state: PR
     district: 0
     party: Republican
@@ -41986,40 +41334,6 @@
     office: 416 Cannon House Office Building
     url: https://cheney.house.gov
 - id:
-    bioguide: S001202
-    govtrack: 412734
-    lis: S392
-    fec:
-    - S8AL00308
-    maplight: 2245
-    wikipedia: Luther Strange
-    wikidata: Q6705642
-    cspan: 9278255
-    icpsr: 41704
-    votesmart: 121424
-    ballotpedia: Luther Strange
-    google_entity_id: kg:/m/06w5pjw
-  name:
-    first: Luther
-    last: Strange
-    official_full: Luther Strange
-  bio:
-    birthday: '1953-03-01'
-    gender: M
-  terms:
-  - type: sen
-    start: '2017-02-09'
-    end: '2021-01-03'
-    state: AL
-    class: 2
-    party: Republican
-    state_rank: junior
-    address: 326 Russell Senate Office Building Washington DC 20510
-    office: 326 Russell Senate Office Building
-    phone: 202-224-4124
-    url: https://www.strange.senate.gov
-    contact_form: https://www.strange.senate.gov/content/contact-senator
-- id:
     bioguide: E000298
     fec:
     - H8KS04112
@@ -42032,6 +41346,7 @@
     cspan: 107963
     maplight: 2246
     google_entity_id: kg:/m/0gfgsrm
+    opensecrets: N00040712
   name:
     first: Ron
     last: Estes
@@ -42051,3 +41366,232 @@
     address: 2452 Rayburn HOB; Washington DC 20515-1604
     office: 2452 Rayburn House Office Building
     phone: 202-225-6216
+- id:
+    bioguide: G000584
+    fec:
+    - H8MT01182
+    govtrack: 412736
+    opensecrets: N00040733
+    votesmart: 168594
+    cspan: 104895
+    wikipedia: Greg Gianforte
+    wikidata: Q5605607
+    ballotpedia: Greg Gianforte
+    google_entity_id: kg:/m/030pb5p
+    house_history: 15032448990
+    maplight: 2247
+  name:
+    first: Greg
+    last: Gianforte
+    official_full: Greg Gianforte
+  bio:
+    birthday: '1961-04-17'
+    gender: M
+  terms:
+  - type: rep
+    start: '2017-06-21'
+    end: '2019-01-03'
+    state: MT
+    district: 0
+    party: Republican
+    url: https://gianforte.house.gov
+    address: 1419 Longworth HOB; Washington DC 20515-2600
+    office: 1419 Longworth House Office Building
+    phone: 202-225-3211
+    fax: 202-225-5687
+- id:
+    bioguide: N000190
+    fec:
+    - H8SC05158
+    govtrack: 412738
+    opensecrets: N00027783
+    votesmart: 47930
+    cspan: 61996
+    wikipedia: Ralph Norman
+    wikidata: Q7287914
+    ballotpedia: Ralph W. Norman
+    google_entity_id: kg:/m/0f9kbx
+    house_history: 15032448994
+    maplight: 2248
+  name:
+    first: Ralph
+    last: Norman
+    suffix: Jr.
+    official_full: Ralph Norman
+  bio:
+    birthday: '1953-06-20'
+    gender: M
+  terms:
+  - type: rep
+    start: '2017-06-26'
+    end: '2019-01-03'
+    state: SC
+    district: 5
+    party: Republican
+    url: https://norman.house.gov
+    address: 2350 Rayburn HOB; Washington DC 20515-4005
+    office: 2350 Rayburn House Office Building
+    phone: 202-225-5501
+    fax: ~
+- id:
+    bioguide: H001078
+    fec:
+    - H8GA06286
+    govtrack: 412737
+    opensecrets: N00035477
+    votesmart: 69553
+    cspan: 1026745
+    wikipedia: Karen Handel
+    wikidata: Q6369678
+    ballotpedia: Karen Handel
+    google_entity_id: kg:/m/0g838b
+    house_history: 15032448993
+    maplight: 2249
+  name:
+    first: Karen
+    last: Handel
+    official_full: Karen C. Handel
+  bio:
+    birthday: '1962-04-18'
+    gender: F
+  terms:
+  - type: rep
+    start: '2017-06-26'
+    end: '2019-01-03'
+    state: GA
+    district: 6
+    party: Republican
+    url: https://handel.house.gov
+    address: 1211 Longworth HOB; Washington DC 20515-1006
+    office: 1211 Longworth House Office Building
+    phone: 202-225-4501
+    fax: ~
+- id:
+    bioguide: G000585
+    fec:
+    - H8CA34266
+    govtrack: 412739
+    opensecrets: N00040597
+    votesmart: 138524
+    wikipedia: Jimmy Gomez
+    wikidata: Q6200205
+    ballotpedia: Jimmy Gomez
+    google_entity_id: kg:/m/0n_73h1
+    cspan: 108883
+    house_history: 15032449022
+    maplight: 2250
+  name:
+    first: Jimmy
+    last: Gomez
+    official_full: Jimmy Gomez
+  bio:
+    birthday: '1974-11-25'
+    gender: M
+  terms:
+  - type: rep
+    start: '2017-07-11'
+    end: '2019-01-03'
+    state: CA
+    district: 34
+    party: Democrat
+    url: https://gomez.house.gov
+    phone: 202-225-6235
+    address: 1226 Longworth HOB; Washington DC 20515-0534
+    office: 1226 Longworth House Office Building
+- id:
+    bioguide: C001114
+    fec:
+    - H8UT03238
+    govtrack: 412740
+    opensecrets: N00041221
+    votesmart: 123390
+    wikipedia: John Curtis (American politician)
+    wikidata: Q6253810
+    ballotpedia: John Curtis (Utah)
+    google_entity_id: kg:/m/0bmdhtb
+    maplight: 2251
+  name:
+    first: John
+    last: Curtis
+    official_full: John Curtis
+  bio:
+    birthday: '1960-05-10'
+    gender: M
+  terms:
+  - type: rep
+    start: '2017-11-13'
+    end: '2019-01-03'
+    state: UT
+    district: 3
+    party: Republican
+    url: https://curtis.house.gov
+    phone: 202-225-7751
+    address: 2236 Rayburn HOB; Washington DC 20515-4403
+    office: 2236 Rayburn House Office Building
+- id:
+    bioguide: J000300
+    lis: S393
+    govtrack: 412741
+    fec:
+    - S0AL00156
+    wikipedia: Doug Jones (politician)
+    wikidata: Q30122825
+    cspan: 1024592
+    votesmart: 176464
+    ballotpedia: Doug Jones (Alabama)
+    google_entity_id: kg:/g/11dyzdzg1j
+    maplight: 2252
+    opensecrets: N00024817
+  name:
+    first: Doug
+    last: Jones
+    official_full: Doug Jones
+  bio:
+    birthday: '1954-05-04'
+    gender: M
+  terms:
+  - type: sen
+    start: '2018-01-03'
+    end: '2021-01-03'
+    state: AL
+    class: 2
+    party: Democrat
+    state_rank: junior
+    address: 326 Russell Senate Office Building Washington DC 20510
+    office: 326 Russell Senate Office Building
+    phone: 202-224-4124
+    url: https://www.jones.senate.gov
+    contact_form: https://www.jones.senate.gov/content/contact-senator
+- id:
+    bioguide: S001203
+    lis: S394
+    govtrack: 412742
+    votesmart: 152968
+    fec:
+    - S8MN00578
+    cspan: 111313
+    wikipedia: Tina Smith
+    ballotpedia: Tina Smith
+    wikidata: Q18631509
+    google_entity_id: kg:/m/0127xvy3
+    maplight: 2253
+    opensecrets: N00042353
+  name:
+    first: Tina
+    middle: Flint
+    last: Smith
+    official_full: Tina Smith
+  bio:
+    birthday: '1958-03-04'
+    gender: F
+  terms:
+  - type: sen
+    start: '2018-01-03'
+    end: '2021-01-03'
+    state: MN
+    class: 2
+    party: Democrat
+    state_rank: junior
+    address: 309 Hart Senate Office Building
+    office: 309 Hart Senate Office Building
+    phone: 202-224-5641

@@ -24,6 +24,9 @@ CREC_STAGING_S3_BUCKET = 'capitol-words-data'
 CREC_STAGING_S3_ROOT_PREFIX = 'crec'
 CREC_STAGING_FOLDER = '/tmp'
 
+AWS_ACCESS_KEY = 'AWS ACCESS KEY'
+AWS_SECRET_ACCESS_KEY = 'AWS_SECRET_ACCESS_KEY'
+
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
