@@ -2,9 +2,10 @@ from django.conf import settings
 from elasticsearch_dsl import Search, Index, DocType, Date, Text, Nested
 from elasticsearch_dsl import InnerObjectWrapper
 from elasticsearch_dsl.connections import connections
+from elasticsearch import RequestsHttpConnection
+#import certifi
 
-
-connections.create_connection(hosts=[settings.ES_URL], timeout=20)
+connections.create_connection(hosts=[{'host':settings.ES_URL, 'port':443, 'use_ssl':True}], timeout=20)
 
 
 def make_search():

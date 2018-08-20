@@ -25,6 +25,7 @@ CREC_STAGING_S3_ROOT_PREFIX = 'crec'
 CREC_STAGING_FOLDER = '/tmp'
 
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -38,7 +39,7 @@ SECRET_KEY = 'gr_g_my_75@1*8lpt1o@*7#3t%rpw^eg0rxc!io8=*dfscfk)t'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['ec2-18-204-248-183.compute-1.amazonaws.com']
 
 
 # Application definition
@@ -173,3 +174,8 @@ LOGGING = {
         },
     },
 }
+
+try:
+	from .settings_prod import *
+except:
+	pass

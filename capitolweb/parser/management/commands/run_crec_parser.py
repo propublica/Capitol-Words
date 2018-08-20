@@ -59,7 +59,7 @@ class Command(BaseCommand):
         s3 = boto3.resource('s3')
         dt = options['start_date'].replace(hour=0, minute=0, second=0, microsecond=0)
         if not options['to_stdout']:
-            connections.create_connection(hosts=[options['es_url']], timeout=20)
+            connections.create_connection(hosts=[{'host':options['es_url'], 'port':443,'use_ssl':True}], timeout=20)
             CRECDoc.init()
         while dt < options['end_date']:
             logger.info('Processing files for {0}.'.format(dt))
