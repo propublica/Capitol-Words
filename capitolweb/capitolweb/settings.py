@@ -42,7 +42,7 @@ SECRET_KEY = 'gr_g_my_75@1*8lpt1o@*7#3t%rpw^eg0rxc!io8=*dfscfk)t'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['ec2-18-204-248-183.compute-1.amazonaws.com']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -179,6 +179,6 @@ LOGGING = {
 }
 
 try:
-	from .settings_prod import *
+    from .settings_prod import *
 except:
-	pass
+    pass
