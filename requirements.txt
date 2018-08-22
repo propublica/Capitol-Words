@@ -1,5 +1,6 @@
-boto3==1.4.4
-botocore==1.5.90
+boto3
+botocore
+moto
 celery==4.1.0
 Django==1.11.3
 django-celery-beat==1.0.1
@@ -10,10 +11,12 @@ docutils==0.13.1
 elasticsearch==5.4.0
 elasticsearch-dsl==5.3.0
 pytz==2017.2
-requests==2.10.0
-textacy==0.4.1
+requests==2.19
+textacy==0.6.2
 lxml==3.7.2
 django-extensions==1.9.7
 requests-mock==1.3.0
-moto==1.1.24
 freezegun==0.3.9
+fuzzywuzzy==0.16
+spacy>=2.0.0,<3.0.0
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.0.0/en_core_web_sm-2.0.0.tar.gz
