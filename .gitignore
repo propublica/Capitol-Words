@@ -5,3 +5,4 @@
 capitolweb/db.sqlite3
 node_modules
 .idea
+settings_local.py

@@ -16,19 +16,26 @@ The API is built on Django and it's broken into the following apps:
 
 Most of the ops related settings are setup via the django settings module.
 
+### elasticsearch
+
 For the elasticsearch cluster, `ES_URL` and `ES_CW_INDEX` need to contain the url with port for an elasticsearch cluster and the name of an index (this is used for both reading with the API and uploading to with the parser).
 
-To set up the API do the following:
+CapitolWords is written against Elasticsearch 5.4. To spin up a local instance of Elasticsearch for development, run the following command:
 
+`docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:5.4.3`
+
+You may need to increase Docker's default memory limit from 2GB to 4GB to use Elasticsearch.
+
+### cwapi
+
+To set up the API do the following:
+```
     cd Capitol-Words/capitolweb
     python manage.py migrate
     python manage.py loadcongress
     python manage.py createsuperuser (if you want to use the admin tool to browse)
     python manage.py runserver
-
-See the "Frontend" section for setting up the single page frontend app.
-
-### cwapi
+```
 
 The search API is backed by elastic search and uses [elasticsearch-dsl-py](https://github.com/elastic/elasticsearch-dsl-py)
 
@@ -89,7 +96,7 @@ There are three endpoints supported:
         - `start_date`: A timestamp for the start of a date range filter, format: YYYY-MM-DD (inclusive).
         - `end_date`: End of date range filter, format: YYYY-MM-DD (inclusive).
         - `days_ago`: Number of days before the current date to retrieve results for.
-        - `title`: Search for docs with this value in the "title" of the CREC doc. 
+        - `title`: Search for docs with this value in the "title" of the CREC doc.
         - `speaker`: Search for docs with this speaker listed in the CREC doc.
         - `content`: Search for docs that contain this value in the body of the CREC doc.
     - Example:
@@ -186,9 +193,10 @@ The record returned includes Term objects for every term served by the Congress 
 
 The frontend is built in Javascript using a React/Redux stack. The project is in the `frontend/capitolwords-spa` directory and was initially created using the create-react-app tool (https://github.com/facebookincubator/create-react-app), so it should be easily updateable to newer frontend best-practices by following the upgrade path outlined in create-react-app's documentation (see the [README.md in the capitolwords-spa directory](frontend/capitolwords-spa/README.md) or read the docs on their site).
 
-To run the frontend app, make sure you have a recent version of node installed (this is tested with node 6.9.3). I'm using [yarn](https://yarnpkg.com) instead of npm since that seems to be the norm for create-react-app. You can probably use npm (installed automatically with node) instead of yarn if you want. Just replace `yarn` with `npm` in the commands below. Do the following to get up and running:
+To run the frontend app, make sure you have a recent version of node installed (this is tested with node 6.9.3). I'm using [yarn](https://yarnpkg.com) instead of npm since that seems to be the norm for create-react-app. You can use npm (installed automatically with node) instead of yarn if you want. Just replace `yarn` with `npm` in the commands below. Do the following to get up and running:
 
-```bash
+```
+bash
 cd frontend/capitolwords-spa
 yarn install # This installs all frontend dependencies.
 yarn start   # This runs the frontend development server on port 3000.
@@ -201,7 +209,7 @@ The frontend app depends on the APIs, so you'll need to also be running the djan
 Data ingestion consists of a scraper that pulls in CREC data from gpo.gov then stages it in S3 and a parser that reads that staged S3 data extracts some additional metadata then uploads those documents to elasticsearch.
 
 The staging location in S3 is determined by the following settings in the main capitolweb settings file:
-    
+
     * `CREC_STAGING_S3_BUCKET`: Name of S3 bucket to stage files in.
     * `CREC_STAGING_S3_ROOT_PREFIX`: All S3 keys for files will be prefixed with this value.
 

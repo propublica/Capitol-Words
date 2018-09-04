@@ -14,18 +14,19 @@ import os
 
 # CAPITOL WORDS CONFIGS
 
-ES_URL = 'es://capitolwords.chartbeat.net:80'
+ES_URL = 'es://127.0.0.1:9200'
 ES_CW_INDEX = 'capitol_words_crecs'
 
 DEV_FRONTEND = True
 DEV_FRONTEND_SPA_BASE_URL = 'http://localhost:3000'
 
-CREC_STAGING_S3_BUCKET = 'capitol-words-data'
+CREC_STAGING_S3_BUCKET = 'Your Bucket Name Goes Here'
 CREC_STAGING_S3_ROOT_PREFIX = 'crec'
 CREC_STAGING_FOLDER = '/tmp'
 
-AWS_ACCESS_KEY = 'AWS ACCESS KEY'
-AWS_SECRET_ACCESS_KEY = 'AWS_SECRET_ACCESS_KEY'
+AWS_ACCESS_KEY = 'Your Access Key Goes Here'
+AWS_SECRET_ACCESS_KEY = 'Your Secret Key Goes Here'
+
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -176,3 +177,13 @@ LOGGING = {
         },
     },
 }
+
+try:
+    from .settings_prod import *
+except:
+    pass
+
+try:
+    from .settings_local import *
+except:
+    pass
