@@ -3,7 +3,10 @@ from elasticsearch_dsl import Search, Index, DocType, Date, Text, Nested
 from elasticsearch_dsl import InnerObjectWrapper
 from elasticsearch_dsl.connections import connections
 
-connections.create_connection(hosts=[settings.ES_URL], timeout=20)
+connections.create_connection(
+    hosts=[settings.ES_URL],
+    **settings.ES_CONNECTION_PARAMS
+)
 
 def make_search():
     """Convenience function for returning a base :cls:`elasticsearch_dsl.Search`
