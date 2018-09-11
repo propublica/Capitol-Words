@@ -28,7 +28,7 @@ class CRECParserTestCase(TestCase):
     @mock_s3 # NOTE: This is required in addition to the class level decorator.
     def setUpTestData(cls):
         cls.xml_path = 'parser/test_resources/mods.xml'
-        cls.s3 = boto3.resource('s3')
+        cls.s3 = boto3.resource('s3', aws_access_key_id=settings.AWS_ACCESS_KEY, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
         with open(cls.xml_path) as f:
             cls.crecs = extract_crecs_from_mods(f)
         cls.s3_bucket = cls.s3.Bucket(settings.CREC_STAGING_S3_BUCKET)

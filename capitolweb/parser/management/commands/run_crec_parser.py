@@ -56,7 +56,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource('s3', aws_access_key_id=settings.AWS_ACCESS_KEY, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
         dt = options['start_date'].replace(hour=0, minute=0, second=0, microsecond=0)
         if not options['to_stdout']:
             connections.create_connection(hosts=[options['es_url']], **settings.ES_CONNECTION_PARAMS)
