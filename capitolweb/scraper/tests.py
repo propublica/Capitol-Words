@@ -21,7 +21,7 @@ from scraper.crec_scraper import CRECScraper
 class CRECScraperTestCase(TestCase):
     
     def setUp(self):
-        self.s3 = boto3.resource('s3')
+        self.s3 = boto3.resource('s3', aws_access_key_id=settings.AWS_ACCESS_KEY, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
         self.s3_bucket = self.s3.Bucket(settings.CREC_STAGING_S3_BUCKET)
         self.s3_bucket.create()
         self.crec_scraper = CRECScraper(s3_bucket=settings.CREC_STAGING_S3_BUCKET)

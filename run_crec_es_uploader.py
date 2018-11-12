@@ -57,7 +57,7 @@ if __name__ == '__main__':
     setup_logger(args.loglevel)
     crec_parser = CRECParser(bucket=args.source_bucket,)
 
-    s3 = boto3.resource('s3')
+    s3 = boto3.resource('s3', aws_access_key_id=settings.AWS_ACCESS_KEY, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
     dt = args.start_dt.replace(hour=0, minute=0, second=0, microsecond=0)
     if args.es_url:
         parsed_es_url = urlparse.urlparse(args.es_url)

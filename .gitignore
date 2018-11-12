@@ -4,5 +4,5 @@
 .DS_Store
 capitolweb/db.sqlite3*
 node_modules
-settings_prod.py
 .idea
+settings_local.py

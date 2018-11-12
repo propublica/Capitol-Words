@@ -63,7 +63,7 @@ class CRECScraper(object):
 
     def __init__(self, s3_bucket=settings.CREC_STAGING_S3_BUCKET):
         self.s3_bucket = s3_bucket
-        self.s3 = boto3.resource('s3')
+        self.s3 = boto3.resource('s3', aws_access_key_id=settings.AWS_ACCESS_KEY, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY)
 
     def download_crec_zip(self, url):
         """Retrieves the CREC zip for this date from gpo.gov.

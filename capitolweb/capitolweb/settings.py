@@ -14,7 +14,8 @@ import os
 
 # CAPITOL WORDS CONFIGS
 
-ES_URL = 'es://127.0.0.1:9200'
+ES_URL = 'es://elasticsearch:9200'
+ES_CONNECTION_PARAMS = {}
 ES_CW_INDEX = 'capitol_words_crecs'
 
 DEV_FRONTEND = True
