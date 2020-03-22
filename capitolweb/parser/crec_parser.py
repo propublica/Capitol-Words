@@ -11,7 +11,7 @@ import boto3
 import spacy
 import textacy
 from lxml import etree
-from fuzzywuzzy import process
+from rapidfuzz import process
 from django.utils.functional import cached_property
 from django.conf import settings
 
