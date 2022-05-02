@@ -1,5 +1,9 @@
 # Capitol Words NG - The Upgrade
 
+This repository is no longer maintained and exists for archival purposes only.
+
+<details><summary>See archival README information.</summary>
+
 Developed by [Chartbeat](https://www.chartbeat.com) Engineers during hackweeks!
 
 
@@ -240,3 +244,5 @@ Example usage:
 Most of the test cases included are integration tests that required a live elasticsearch cluster configured in the django settings file. A separate test index is defined in the `capitolweb.settings_test` module. `manage.py` has been modified to ensure that running `./manage.py test` will override any environment variable settings and always use the test settings.
 
 You should be able run the scraper and parser tests without any external dependencies as they rely on [moto](https://github.com/spulec/moto) to mock out S3 operations.
+
+</details>
