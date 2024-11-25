@@ -68,7 +68,7 @@ Pyphen==0.9.5
 python-dateutil==2.7.3
 python-Levenshtein==0.12.0
 pytz==2017.2
-PyYAML==3.13
+PyYAML==5.4
 regex==2017.4.5
 requests-aws4auth
 requests>=2.20.0
