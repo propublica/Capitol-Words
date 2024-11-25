@@ -23,7 +23,7 @@ django-celery-beat==1.0.1
 django-celery-results==1.0.1
 django-extensions==1.9.7
 django-rest-swagger==2.1.2
-djangorestframework==3.6.3
+djangorestframework==3.11.2
 docker==3.5.0
 docker-pycreds==0.3.0
 docutils==0.13.1
